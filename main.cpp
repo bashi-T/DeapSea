@@ -14,8 +14,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		else {
-}
+		else
+		{
+
+        }
 	}
 
 	return 0;
