@@ -8,7 +8,6 @@ LRESULT CALLBACK WindowApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 		PostQuitMessage(0);
 		return 0;
 	}
-
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
@@ -21,10 +20,10 @@ void WindowApp::CreateWindowView(const wchar_t* title)
 	RegisterClass(&wc);
 
 	RECT wtc = {
-  0,
-  0,
-  kClientWidth,
-  kColientHeight
+        0,
+        0,
+        kClientWidth,
+        kColientHeight
 	};
 
 	AdjustWindowRect(&wtc, WS_OVERLAPPEDWINDOW, false);
