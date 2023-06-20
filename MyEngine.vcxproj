@@ -12,13 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="DX12.cpp" />
+    <ClCompile Include="DX12Common.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WindowApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
-    <ClInclude Include="DX12.h" />
+    <ClInclude Include="DX12Common.h" />
     <ClInclude Include="WindowApp.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

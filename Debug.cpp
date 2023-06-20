@@ -5,7 +5,6 @@ void Debug::Log(const std::string& message)
 	OutputDebugStringA(message.c_str());
 }
 
-
 std::string Debug::ConvertString(const std::wstring& str)
 {
     if (str.empty())

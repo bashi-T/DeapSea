@@ -2,24 +2,24 @@
 #include<windows.h>
 #include<cstdint>
 
-class WindowApp {
+class WinAPP {
 public:
-	static const int32_t kClientWidth = 1280;
-	static const int32_t kColientHeight = 720;
-	static HWND hwnd;
+	static void Initilize(int32_t width, int32_t height);
 
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static LRESULT CALLBACK WindowProc(HWND hwnd,
+		UINT msg, WPARAM wparam, LPARAM lparam);
 	const wchar_t* title = L"CG2";
 	static void CreateWindowView(const wchar_t* title = L"CG2");
-private:
-	static inline WNDCLASS wc{};
+	static int32_t GetClientWidth() { return clientWidth_; }
+	static int32_t GetClientHeight() { return clientHeight_; }
+	static HWND GetHWND() { return hwnd_; }
 
+private:
+	static int32_t clientWidth_;
+	static int32_t clientHeight_;
+	static inline WNDCLASS wc_{};
+	static HWND hwnd_;
 };
 
-typedef struct Vector4 {
-	float x;
-	float y;
-	float z;
-	float w;
-} Vector4;
+
 

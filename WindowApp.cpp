@@ -1,6 +1,15 @@
 #include "WindowApp.h"
 
-LRESULT CALLBACK WindowApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+int32_t WinAPP::clientWidth_ = 0;
+int32_t WinAPP::clientHeight_ = 0;
+
+void WinAPP::Initilize(int32_t width, int32_t height)
+{
+	clientWidth_ = width;
+	clientHeight_ = height;
+}
+
+LRESULT CALLBACK WinAPP::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg)
 	{
@@ -11,25 +20,25 @@ LRESULT CALLBACK WindowApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WindowApp::CreateWindowView(const wchar_t* title)
+void WinAPP::CreateWindowView(const wchar_t* title)
 {
-	wc.lpfnWndProc = WindowProc;
-	wc.lpszClassName = L"CG2WindowClass";
-	wc.hInstance = GetModuleHandle(nullptr);
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	RegisterClass(&wc);
+	wc_.lpfnWndProc = WindowProc;
+	wc_.lpszClassName = L"CG2WindowClass";
+	wc_.hInstance = GetModuleHandle(nullptr);
+	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	RegisterClass(&wc_);
 
 	RECT wtc = {
         0,
         0,
-        kClientWidth,
-        kColientHeight
+        clientWidth_,
+        clientHeight_
 	};
 
 	AdjustWindowRect(&wtc, WS_OVERLAPPEDWINDOW, false);
 
-	hwnd = CreateWindow(
-		wc.lpszClassName,
+	hwnd_ = CreateWindow(
+		wc_.lpszClassName,
 		title,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
@@ -38,12 +47,11 @@ void WindowApp::CreateWindowView(const wchar_t* title)
 		wtc.bottom - wtc.top,
 		nullptr,
 		nullptr,
-		wc.hInstance,
+		wc_.hInstance,
 		nullptr
 	);
-
-	ShowWindow(hwnd, SW_SHOW);
+	ShowWindow(hwnd_, SW_SHOW);
 
 }
-HWND WindowApp::hwnd;
+HWND WinAPP::hwnd_;
 
