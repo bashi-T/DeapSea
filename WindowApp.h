@@ -13,12 +13,15 @@ public:
 	static int32_t GetClientWidth() { return clientWidth_; }
 	static int32_t GetClientHeight() { return clientHeight_; }
 	static HWND GetHWND() { return hwnd_; }
-
+	static inline MSG GetMSG() { return msg; }
+	static void ProcessMessage(MSG NewMSG);
 private:
 	static int32_t clientWidth_;
 	static int32_t clientHeight_;
 	static inline WNDCLASS wc_{};
 	static HWND hwnd_;
+	static inline MSG msg{};
+
 };
 
 

@@ -8,6 +8,14 @@ DX12::~DX12()
 {
 }
 
+void DX12::Init()
+{
+	MakeDXGIFactory();
+	ChoseUseAdapter();
+	MakeD3D12Device();
+
+}
+
 void DX12::MakeDXGIFactory()
 {
 	hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
@@ -140,6 +148,22 @@ void DX12::MakeRTV()
 
 void DX12::MakeScreen()
 {
+	//
+	MakeCommandQueue();
+	//
+	MakeCommandList();
+	//
+	MakeSwapchain(
+		WinAPP::GetClientWidth(),
+		WinAPP::GetClientHeight(),
+		WinAPP::GetHWND()
+	);
+	//
+	MakeDescriptorHeap();
+	//
+	BringResources();
+	MakeRTV();
+
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -193,4 +217,24 @@ void DX12::MakeFence()
 	assert(SUCCEEDED(hr));
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
+}
+
+void DX12::DX12Release(ID3D12Debug1* debugController)
+{
+	CloseHandle(fenceEvent);
+	fence->Release();
+	rtvDescriptorHeap->Release();
+	swapChainResources[0]->Release();
+	swapChainResources[1]->Release();
+	swapChain->Release();
+	commandList->Release();
+	commandAllocator->Release();
+	commandQueue->Release();
+	device->Release();
+	useAdapter->Release();
+	dxgiFactory->Release();
+#ifdef _DEBUG
+	debugController->Release();
+#endif
+	CloseWindow(window_->GetHWND());
 }

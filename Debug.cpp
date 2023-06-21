@@ -24,7 +24,6 @@ std::string Debug::ConvertString(const std::wstring& str)
 
 void Debug::DebugLayer()
 {
-    ID3D12Debug1* debugController = nullptr;
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
     {
         debugController->EnableDebugLayer();
@@ -39,7 +38,7 @@ void Debug::InfoQueue(ID3D12Device* device)
     {
         InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
         InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-        InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
+        //InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
         D3D12_MESSAGE_ID denyIds[] =
         {
             D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
@@ -52,6 +51,17 @@ void Debug::InfoQueue(ID3D12Device* device)
         filter.DenyList.pSeverityList = severities;
         InfoQueue->PushStorageFilter(&filter);
         InfoQueue->Release();
+    }
+}
+
+void Debug::ReportLiveObject()
+{
+    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
+    {
+        debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+        debug->Release();
     }
 }
 

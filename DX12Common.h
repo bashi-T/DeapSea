@@ -13,6 +13,7 @@ class DX12
 public:
 	DX12();
 	~DX12();
+	void Init();
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
 	void MakeD3D12Device();
@@ -27,6 +28,7 @@ public:
 
 	void MakeScreen();
 	void MakeFence();
+	void DX12Release(ID3D12Debug1* debugController);
 
 	ID3D12Device* GetDevice() { return device; }
 

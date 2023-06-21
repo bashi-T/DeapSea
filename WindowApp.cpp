@@ -53,5 +53,10 @@ void WinAPP::CreateWindowView(const wchar_t* title)
 	ShowWindow(hwnd_, SW_SHOW);
 
 }
+void WinAPP::ProcessMessage(MSG NewMSG)
+{
+	TranslateMessage(&NewMSG);
+	DispatchMessage(&NewMSG);
+}
 HWND WinAPP::hwnd_;
 

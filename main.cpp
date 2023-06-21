@@ -6,45 +6,34 @@ const int32_t kWindowHeight = 720;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	OutputDebugStringA("HelloDirectX!\n");
-	//WindowApp* window_ = new WindowApp;
-	DX12* dx12_ = new DX12;
-	Debug* debug_ = new Debug;
+	//WinAPP window_;
 	WinAPP::Initilize(kWindowWidth, kWindowHeight);
+	DX12* dx12Common_ = new DX12;
+	Debug* debug_ = new Debug;
+	MSG NewMSG = WinAPP::GetMSG();
 
 	WinAPP::CreateWindowView(L"CG2");
 #ifdef _DEBUG
 	debug_->DebugLayer();
 #endif
-
-	dx12_->MakeDXGIFactory();
-	dx12_->ChoseUseAdapter();
-	dx12_->MakeD3D12Device();
+	dx12Common_->Init();
 #ifdef _DEBUG
-	debug_->InfoQueue(dx12_->GetDevice());
+	debug_->InfoQueue(dx12Common_->GetDevice());
 #endif
-	dx12_->MakeCommandQueue();
-	dx12_->MakeCommandList();
-	dx12_->MakeSwapchain(WinAPP::GetClientWidth(),
-		WinAPP::GetClientHeight(),WinAPP::GetHWND());
-	dx12_->MakeDescriptorHeap();
-	dx12_->BringResources();
-	dx12_->MakeRTV();
-	dx12_->MakeScreen();
+	dx12Common_->MakeScreen();
 
-
-	MSG msg{};
-	while(msg.message!=WM_QUIT)
+	while(NewMSG.message != WM_QUIT)
 	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			WinAPP::ProcessMessage(NewMSG);
 		}
 		else
 		{
 
         }
 	}
-
+	dx12Common_->DX12Release(debug_->GetDebugController());
+	debug_->ReportLiveObject();
 	return 0;
 }
