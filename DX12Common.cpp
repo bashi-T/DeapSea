@@ -100,6 +100,7 @@ void DX12::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
 		nullptr,
 		reinterpret_cast<IDXGISwapChain1**>(&swapChain)
 	);
+	assert(SUCCEEDED(hr));
 }
 
 void DX12::MakeDescriptorHeap()
@@ -121,15 +122,16 @@ void DX12::BringResources()
 
 void DX12::MakeRTV()
 {
-	MakeDescriptorHeap();
-	BringResources();
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
 		rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(
 		swapChainResources[0], &rtvDesc, rtvHandles[0]);
+
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(
@@ -138,7 +140,14 @@ void DX12::MakeRTV()
 
 void DX12::MakeScreen()
 {
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	commandList->ResourceBarrier(1, &barrier);
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
 		false, nullptr);
 	
@@ -148,15 +157,40 @@ void DX12::MakeScreen()
 	};
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	commandList->ResourceBarrier(1, &barrier);
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
-	ID3D12CommandList* commandLists[] = { commandList };
+	ID3D12CommandList* commandLists[] =
+	{
+		commandList
+	};
 	commandQueue->ExecuteCommandLists(1, commandLists);
 	swapChain->Present(1, 0);
+
+	MakeFence();
+	fenceValue++;
+	commandQueue->Signal(fence, fenceValue);
+
+	if (fence->GetCompletedValue() < fenceValue)
+	{
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator,nullptr);
 	assert(SUCCEEDED(hr));
 
+}
+
+void DX12::MakeFence()
+{
+	hr = device->CreateFence(fenceValue,
+		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(SUCCEEDED(hr));
+	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent != nullptr);
 }

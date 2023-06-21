@@ -26,15 +26,18 @@ public:
 	void MakeRTV();
 
 	void MakeScreen();
+	void MakeFence();
+
+	ID3D12Device* GetDevice() { return device; }
 
 private:
 	Debug* debug_ = nullptr;
 	WinAPP* window_ = nullptr;
+	ID3D12Device* device = nullptr;
 
 	IDXGIFactory7 * dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	IDXGIAdapter4* useAdapter = nullptr;
-	ID3D12Device* device = nullptr;
 
 	ID3D12CommandQueue* commandQueue = nullptr;
 	ID3D12CommandAllocator* commandAllocator = nullptr;
@@ -44,9 +47,9 @@ private:
 	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 	ID3D12Resource* swapChainResources[2] = { nullptr };
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	UINT backBufferIndex;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-
+	ID3D12Fence* fence = nullptr;
+	uint64_t fenceValue = 0;
+	HANDLE fenceEvent;
 };
 
