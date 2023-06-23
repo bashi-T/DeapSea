@@ -1,28 +1,33 @@
 #include "DX12Common.h"
 
-DX12::DX12()
+DX12Common::DX12Common()
 {
 }
 
-DX12::~DX12()
+DX12Common::~DX12Common()
 {
 }
 
-void DX12::Init()
+void DX12Common::Init()
 {
 	MakeDXGIFactory();
 	ChoseUseAdapter();
 	MakeD3D12Device();
-
+#ifdef _DEBUG
+	debug_->InfoQueue(GetDevice());
+#endif
+	MakeScreen();
+	mesh_->ResetDXC();
+	mesh_->MakePSO(GetDevice());
 }
 
-void DX12::MakeDXGIFactory()
+void DX12Common::MakeDXGIFactory()
 {
 	hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
 }
 
-void DX12::ChoseUseAdapter()
+void DX12Common::ChoseUseAdapter()
 {
 	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(
 		i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
@@ -43,7 +48,7 @@ void DX12::ChoseUseAdapter()
 	}
 }
 
-void DX12::MakeD3D12Device()
+void DX12Common::MakeD3D12Device()
 {
 	D3D_FEATURE_LEVEL featureLevels[] =
 	{
@@ -72,7 +77,7 @@ void DX12::MakeD3D12Device()
 	debug_->Log("Complete create D3D12Device\n");
 }
 
-void DX12::MakeCommandQueue()
+void DX12Common::MakeCommandQueue()
 {
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	hr = device->CreateCommandQueue(
@@ -80,7 +85,7 @@ void DX12::MakeCommandQueue()
 	assert(SUCCEEDED(hr));
 }
 
-void DX12::MakeCommandList()
+void DX12Common::MakeCommandList()
 {
 	hr = device->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
@@ -90,7 +95,7 @@ void DX12::MakeCommandList()
 	assert(SUCCEEDED(hr));
 }
 
-void DX12::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
+void DX12Common::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
 {
 	swapChainDesc.Width = width;
 	swapChainDesc.Height = height;
@@ -111,7 +116,7 @@ void DX12::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
 	assert(SUCCEEDED(hr));
 }
 
-void DX12::MakeDescriptorHeap()
+void DX12Common::MakeDescriptorHeap()
 {
 	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	rtvDescriptorHeapDesc.NumDescriptors = 2;
@@ -120,7 +125,7 @@ void DX12::MakeDescriptorHeap()
 	assert(SUCCEEDED(hr));
 }
 
-void DX12::BringResources()
+void DX12Common::BringResources()
 {
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
 	assert(SUCCEEDED(hr));
@@ -128,7 +133,7 @@ void DX12::BringResources()
 	assert(SUCCEEDED(hr));
 }
 
-void DX12::MakeRTV()
+void DX12Common::MakeRTV()
 {
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -146,7 +151,7 @@ void DX12::MakeRTV()
 		swapChainResources[1], &rtvDesc, rtvHandles[1]);
 }
 
-void DX12::MakeScreen()
+void DX12Common::MakeScreen()
 {
 	//
 	MakeCommandQueue();
@@ -195,6 +200,9 @@ void DX12::MakeScreen()
 	swapChain->Present(1, 0);
 
 	MakeFence();
+
+	mesh_->ResetDXC();
+
 	fenceValue++;
 	commandQueue->Signal(fence, fenceValue);
 
@@ -210,7 +218,7 @@ void DX12::MakeScreen()
 
 }
 
-void DX12::MakeFence()
+void DX12Common::MakeFence()
 {
 	hr = device->CreateFence(fenceValue,
 		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
@@ -219,7 +227,7 @@ void DX12::MakeFence()
 	assert(fenceEvent != nullptr);
 }
 
-void DX12::DX12Release(ID3D12Debug1* debugController)
+void DX12Common::DX12Release(ID3D12Debug1* debugController)
 {
 	CloseHandle(fenceEvent);
 	fence->Release();

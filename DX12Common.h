@@ -4,15 +4,15 @@
 #include<cassert>
 #include"Debug.h"
 #include"WindowApp.h"
-
+#include"Mesh.h"
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
-class DX12
+class DX12Common
 {
 public:
-	DX12();
-	~DX12();
+	DX12Common();
+	~DX12Common();
 	void Init();
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
@@ -36,6 +36,7 @@ private:
 	Debug* debug_ = nullptr;
 	WinAPP* window_ = nullptr;
 	ID3D12Device* device = nullptr;
+	Mesh* mesh_ = nullptr;
 
 	IDXGIFactory7 * dxgiFactory = nullptr;
 	HRESULT hr = NULL;

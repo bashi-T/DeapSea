@@ -3,12 +3,12 @@
 #include"DX12Common.h"
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
+const wchar_t* title = L"CG2";
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	OutputDebugStringA("HelloDirectX!\n");
-	//WinAPP window_;
+	//OutputDebugStringA("HelloDirectX!\n");
 	WinAPP::Initilize(kWindowWidth, kWindowHeight);
-	DX12* dx12Common_ = new DX12;
+	DX12Common* dx12Common_ = new DX12Common;
 	Debug* debug_ = new Debug;
 	MSG NewMSG = WinAPP::GetMSG();
 
@@ -17,12 +17,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	debug_->DebugLayer();
 #endif
 	dx12Common_->Init();
-#ifdef _DEBUG
-	debug_->InfoQueue(dx12Common_->GetDevice());
-#endif
-	dx12Common_->MakeScreen();
 
-	while(NewMSG.message != WM_QUIT)
+	while(title != 0)
 	{
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
 		{
