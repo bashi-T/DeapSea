@@ -17,8 +17,14 @@ void DX12Common::Init()
 	debug_->InfoQueue(GetDevice());
 #endif
 	MakeScreen();
-	mesh_->ResetDXC();
-	mesh_->MakePSO(GetDevice());
+	MakeFence();
+	Mesh::ResetDXC();
+
+	Mesh::MakePSO(GetDevice());
+
+	Mesh::MakeVertexResource(GetDevice());
+	Mesh::MakeVertexBufferView();
+	Mesh::InputData();
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -71,7 +77,7 @@ void DX12Common::MakeD3D12Device()
 			debug_->Log(std::format("featureLevel {}\n",
 				featureLevelStrings[i]));
 			break;
-	    }
+		}
 	}
 	assert(device != nullptr);
 	debug_->Log("Complete create D3D12Device\n");
@@ -169,6 +175,11 @@ void DX12Common::MakeScreen()
 	BringResources();
 	MakeRTV();
 
+
+}
+
+void DX12Common::ClearScreen()
+{
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -179,7 +190,7 @@ void DX12Common::MakeScreen()
 	commandList->ResourceBarrier(1, &barrier);
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
 		false, nullptr);
-	
+
 	float clearColor[] =
 	{
 		0.1f, 0.25f,0.5f,1.0f
@@ -198,11 +209,6 @@ void DX12Common::MakeScreen()
 	};
 	commandQueue->ExecuteCommandLists(1, commandLists);
 	swapChain->Present(1, 0);
-
-	MakeFence();
-
-	mesh_->ResetDXC();
-
 	fenceValue++;
 	commandQueue->Signal(fence, fenceValue);
 
@@ -211,11 +217,11 @@ void DX12Common::MakeScreen()
 		fence->SetEventOnCompletion(fenceValue, fenceEvent);
 		WaitForSingleObject(fenceEvent, INFINITE);
 	}
+
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator,nullptr);
+	hr = commandList->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
-
 }
 
 void DX12Common::MakeFence()
