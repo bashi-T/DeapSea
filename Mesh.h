@@ -29,7 +29,7 @@ public:
 	static void Draw(ID3D12GraphicsCommandList* commandList);
 	static void MeshRelease();
 
-	static ID3D12PipelineState* GetGraphicsPipelineState() { return graphicsPipelineState; }
+	//static ID3D12PipelineState* GetGraphicsPipelineState() { return graphicsPipelineState; }
 
 private:
 	static inline Debug* debug_;
@@ -40,7 +40,7 @@ private:
 	static inline IDxcCompiler3* dxcCompiler = nullptr;
 	static inline IDxcIncludeHandler* includeHandler = nullptr;
 	static inline ID3D12RootSignature* rootSignature = nullptr;
-	static inline ID3D12PipelineState* graphicsPipelineState = nullptr;
+	static inline ID3D12PipelineState* graphicsPipelineState=NULL;
 	static inline ID3DBlob* signatureBlob = nullptr;
 	static inline ID3DBlob* errorBlob = nullptr;
 	static inline IDxcBlob* pixelShaderBlob = nullptr;

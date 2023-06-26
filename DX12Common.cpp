@@ -24,7 +24,6 @@ void DX12Common::Init()
 
 	Mesh::MakeVertexResource(GetDevice());
 	Mesh::MakeVertexBufferView();
-	Mesh::InputData();
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -174,8 +173,6 @@ void DX12Common::MakeScreen()
 	//
 	BringResources();
 	MakeRTV();
-
-
 }
 
 void DX12Common::ClearScreen()
@@ -212,7 +209,7 @@ void DX12Common::ClearScreen()
 	fenceValue++;
 	commandQueue->Signal(fence, fenceValue);
 
-	if (fence->GetCompletedValue() < fenceValue)
+	if (fence->GetCompletedValue() > fenceValue)
 	{
 		fence->SetEventOnCompletion(fenceValue, fenceEvent);
 		WaitForSingleObject(fenceEvent, INFINITE);

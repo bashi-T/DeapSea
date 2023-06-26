@@ -27,6 +27,7 @@ public:
 
 	static ID3D12Device* GetDevice() { return device; }
 	static ID3D12GraphicsCommandList* GetcommandList() { return commandList; }
+	static inline uint64_t fenceValue = 0;
 
 private:
 	static inline Debug* debug_ = nullptr;
@@ -47,7 +48,6 @@ private:
 	static inline ID3D12Resource* swapChainResources[2] = { nullptr };
 	static inline D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	static inline ID3D12Fence* fence = nullptr;
-	static inline uint64_t fenceValue = 0;
 	static inline HANDLE fenceEvent;
 };
 
