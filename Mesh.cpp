@@ -2,10 +2,10 @@
 
 void Mesh::Initialize(int32_t width, int32_t height)
 {
-	viewport.Width = width;
-	viewport.Height = height;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
+	viewport.Width = width;
+	viewport.Height = height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 

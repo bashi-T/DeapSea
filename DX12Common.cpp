@@ -209,7 +209,7 @@ void DX12Common::ClearScreen()
 	fenceValue++;
 	commandQueue->Signal(fence, fenceValue);
 
-	if (fence->GetCompletedValue() > fenceValue)
+	if (fence->GetCompletedValue() < fenceValue)
 	{
 		fence->SetEventOnCompletion(fenceValue, fenceEvent);
 		WaitForSingleObject(fenceEvent, INFINITE);
@@ -219,6 +219,8 @@ void DX12Common::ClearScreen()
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
+
+	Mesh::Draw(GetcommandList());
 }
 
 void DX12Common::MakeFence()

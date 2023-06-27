@@ -7,14 +7,14 @@ const wchar_t* title = L"CG2";
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//OutputDebugStringA("HelloDirectX!\n");
-	WinAPP::Initilize(kWindowWidth, kWindowHeight);
 	Mesh* mesh_ = new Mesh;
 	DX12Common* dx12Common_ = new DX12Common;
 	Debug* debug_ = new Debug;
 	MSG NewMSG = WinAPP::GetMSG();
+	WinAPP::Initilize(kWindowWidth, kWindowHeight);
+	mesh_->Initialize(kWindowWidth, kWindowHeight);
 
 	WinAPP::CreateWindowView(L"CG2");
-	mesh_->Initialize(kWindowWidth, kWindowHeight);
 
 #ifdef _DEBUG
 	debug_->DebugLayer();
@@ -30,9 +30,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else
 		{
 			dx12Common_->ClearScreen();
-
-			mesh_->Draw(dx12Common_->GetcommandList());
-
 		}
 	}
 	dx12Common_->DX12Release(debug_->GetDebugController());
