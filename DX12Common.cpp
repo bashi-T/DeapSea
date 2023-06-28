@@ -200,6 +200,7 @@ void DX12Common::ClearScreen()
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
+
 	ID3D12CommandList* commandLists[] =
 	{
 		commandList
@@ -219,8 +220,9 @@ void DX12Common::ClearScreen()
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
+	
+	Mesh::Draw(commandList);
 
-	Mesh::Draw(GetcommandList());
 }
 
 void DX12Common::MakeFence()
@@ -246,6 +248,8 @@ void DX12Common::DX12Release(ID3D12Debug1* debugController)
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
+	Mesh::MeshRelease();
+
 #ifdef _DEBUG
 	debugController->Release();
 #endif

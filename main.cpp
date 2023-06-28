@@ -33,7 +33,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 	dx12Common_->DX12Release(debug_->GetDebugController());
-	mesh_->MeshRelease();
 	debug_->ReportLiveObject();
 	return 0;
-}
+}//NewMSG.message != WM_QUIT

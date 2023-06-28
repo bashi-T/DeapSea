@@ -49,6 +49,9 @@ private:
 	static inline ID3D12Resource* vertexResource = nullptr;
 	static inline D3D12_VIEWPORT viewport{};
 	static inline D3D12_RECT scissorRect{};
+	static inline D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+	static inline D3D12_RESOURCE_DESC vertexResourceDesc{};
+
 };
 struct Vector4 final {
 	float x;

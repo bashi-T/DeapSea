@@ -156,9 +156,7 @@ void Mesh::MakePSO(ID3D12Device* device)
 
 void Mesh::MakeVertexResource(ID3D12Device* device)
 {
-	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-	D3D12_RESOURCE_DESC vertexResourceDesc{};
 	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	vertexResourceDesc.Width = sizeof(Vector4) * 3;
 	vertexResourceDesc.Height = 1;
@@ -194,7 +192,6 @@ void Mesh::InputData()
 
 void Mesh::Draw(ID3D12GraphicsCommandList* commandList)
 {
-	InputData();
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->SetGraphicsRootSignature(rootSignature);
