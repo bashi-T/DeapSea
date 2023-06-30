@@ -3,7 +3,7 @@
 #include"DX12Common.h"
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
-const wchar_t* title = L"CG2";
+Vector4* vertexData = nullptr;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//OutputDebugStringA("HelloDirectX!\n");
@@ -11,7 +11,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DX12Common* dx12Common_ = new DX12Common;
 	Debug* debug_ = new Debug;
 	MSG NewMSG = WinAPP::GetMSG();
-	WinAPP::Initilize(kWindowWidth, kWindowHeight);
+	WinAPP::Initialize(kWindowWidth, kWindowHeight);
 	mesh_->Initialize(kWindowWidth, kWindowHeight);
 
 	WinAPP::CreateWindowView(L"CG2");
@@ -21,7 +21,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif
 	dx12Common_->Init();
 
-	while (title != 0)
+	while (NewMSG.message != WM_QUIT)
 	{
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
 		{
@@ -29,10 +29,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else
 		{
+			mesh_->GetVertexResource()->Map(
+				0, nullptr, reinterpret_cast<void**>(&vertexData));
+			vertexData[0] = { -0.5f,-0.5f,0.0f,1.0f };//左下
+			vertexData[1] = { 0.0f,0.5f,0.0f,1.0f };//上
+			vertexData[2] = { 0.5f,-0.5f,0.0f,1.0f };//右下
+
 			dx12Common_->ClearScreen();
+			mesh_->Draw(dx12Common_->GetcommandList());
 		}
 	}
 	dx12Common_->DX12Release(debug_->GetDebugController());
 	debug_->ReportLiveObject();
 	return 0;
-}//NewMSG.message != WM_QUIT
+}

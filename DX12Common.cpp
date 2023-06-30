@@ -10,14 +10,14 @@ DX12Common::~DX12Common()
 
 void DX12Common::Init()
 {
-	MakeDXGIFactory();
-	ChoseUseAdapter();
-	MakeD3D12Device();
+	DX12Common::MakeDXGIFactory();
+	DX12Common::ChoseUseAdapter();
+	DX12Common::MakeD3D12Device();
 #ifdef _DEBUG
 	debug_->InfoQueue(GetDevice());
 #endif
-	MakeScreen();
-	MakeFence();
+	DX12Common::MakeScreen();
+	DX12Common::MakeFence();
 	Mesh::ResetDXC();
 
 	Mesh::MakePSO(GetDevice());
@@ -185,6 +185,7 @@ void DX12Common::ClearScreen()
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
+
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
 		false, nullptr);
 
@@ -220,9 +221,6 @@ void DX12Common::ClearScreen()
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
-	
-	Mesh::Draw(commandList);
-
 }
 
 void DX12Common::MakeFence()
@@ -237,6 +235,7 @@ void DX12Common::MakeFence()
 void DX12Common::DX12Release(ID3D12Debug1* debugController)
 {
 	CloseHandle(fenceEvent);
+	Mesh::MeshRelease();
 	fence->Release();
 	rtvDescriptorHeap->Release();
 	swapChainResources[0]->Release();
@@ -248,7 +247,6 @@ void DX12Common::DX12Release(ID3D12Debug1* debugController)
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
-	Mesh::MeshRelease();
 
 #ifdef _DEBUG
 	debugController->Release();

@@ -3,7 +3,7 @@
 int32_t WinAPP::clientWidth_ = 0;
 int32_t WinAPP::clientHeight_ = 0;
 
-void WinAPP::Initilize(int32_t width, int32_t height)
+void WinAPP::Initialize(int32_t width, int32_t height)
 {
 	clientWidth_ = width;
 	clientHeight_ = height;

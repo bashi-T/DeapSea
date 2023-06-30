@@ -4,7 +4,7 @@
 
 class WinAPP {
 public:
-	static void Initilize(int32_t width, int32_t height);
+	static void Initialize(int32_t width, int32_t height);
 
 	static LRESULT CALLBACK WindowProc(HWND hwnd,
 		UINT msg, WPARAM wparam, LPARAM lparam);

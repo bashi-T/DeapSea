@@ -25,16 +25,15 @@ public:
 	static void MakePSO(ID3D12Device* device);
 	static void MakeVertexResource(ID3D12Device* device);
 	static void MakeVertexBufferView();
-	static void InputData();
+	//static void InputData(struct Vector4* vertexData);
 	static void Draw(ID3D12GraphicsCommandList* commandList);
 	static void MeshRelease();
 
-	//static ID3D12PipelineState* GetGraphicsPipelineState() { return graphicsPipelineState; }
+	static ID3D12Resource* GetVertexResource() { return vertexResource; }
 
 private:
 	static inline Debug* debug_;
 	static inline HRESULT hr = NULL;
-	static inline ID3D12GraphicsCommandList* commandList;
 
 	static inline IDxcUtils* dxcUtils = nullptr;
 	static inline IDxcCompiler3* dxcCompiler = nullptr;
@@ -51,6 +50,12 @@ private:
 	static inline D3D12_RECT scissorRect{};
 	static inline D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	static inline D3D12_RESOURCE_DESC vertexResourceDesc{};
+	static inline D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	static inline D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
+	static inline D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+	static inline D3D12_BLEND_DESC blendDesc{};
+	static inline D3D12_RASTERIZER_DESC rasterizerDesc{};
+	static inline D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
 };
 struct Vector4 final {
