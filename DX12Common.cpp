@@ -195,12 +195,16 @@ void DX12Common::ClearScreen()
 	};
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+	Mesh::Draw(commandList);
+
+
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList->ResourceBarrier(1, &barrier);
+	
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
-
 
 	ID3D12CommandList* commandLists[] =
 	{

@@ -36,7 +36,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			vertexData[2] = { 0.5f,-0.5f,0.0f,1.0f };//右下
 
 			dx12Common_->ClearScreen();
-			mesh_->Draw(dx12Common_->GetcommandList());
 		}
 	}
 	dx12Common_->DX12Release(debug_->GetDebugController());

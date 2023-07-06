@@ -34,15 +34,17 @@ IDxcBlob* Mesh::CompileShader(
 	IDxcCompiler3* dxcCompiler,
 	IDxcIncludeHandler* includeHandler)
 {
-	debug_->Log(debug_->ConvertString(
-		std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
+	debug_->Log(debug_->ConvertString(std::format(
+		L"Begin CompileShader,path{},\n", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
 	hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
+
 	DxcBuffer shaderSourceBuffer;
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+
 	LPCWSTR arguments[]
 	{
 		filePath.c_str(),
