@@ -195,7 +195,7 @@ void DX12Common::ClearScreen()
 	};
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-
+	Mesh::InputData(Mesh::GetVertexData());
 	Mesh::Draw(commandList);
 
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

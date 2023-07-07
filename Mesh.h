@@ -25,12 +25,12 @@ public:
 	static void MakePSO(ID3D12Device* device);
 	static void MakeVertexResource(ID3D12Device* device);
 	static void MakeVertexBufferView();
-	//static void InputData(struct Vector4* vertexData);
+	static void InputData(struct Vector4* vertexData);
 	static void Draw(ID3D12GraphicsCommandList* commandList);
 	static void MeshRelease();
 
 	static ID3D12Resource* GetVertexResource() { return vertexResource; }
-
+	static struct Vector4* GetVertexData() { return vertexData; }
 private:
 	static inline Debug* debug_;
 	static inline HRESULT hr = NULL;
@@ -56,7 +56,7 @@ private:
 	static inline D3D12_BLEND_DESC blendDesc{};
 	static inline D3D12_RASTERIZER_DESC rasterizerDesc{};
 	static inline D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-
+	static inline struct Vector4* vertexData=nullptr;
 };
 struct Vector4 final {
 	float x;

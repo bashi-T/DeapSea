@@ -29,11 +29,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else
 		{
-			mesh_->GetVertexResource()->Map(
-				0, nullptr, reinterpret_cast<void**>(&vertexData));
-			vertexData[0] = { -0.5f,-0.5f,0.0f,1.0f };//左下
-			vertexData[1] = { 0.0f,0.5f,0.0f,1.0f };//上
-			vertexData[2] = { 0.5f,-0.5f,0.0f,1.0f };//右下
+			//mesh_->GetVertexResource()->Map(
+			//	0, nullptr, reinterpret_cast<void**>(&vertexData));
+			//vertexData[0] = { -0.5f,-0.5f,0.0f,1.0f };//左下
+			//vertexData[1] = { 0.0f,0.0f,0.0f,1.0f };//上
+			//vertexData[2] = { 0.5f,-0.5f,0.0f,1.0f };//右下
 
 			dx12Common_->ClearScreen();
 		}

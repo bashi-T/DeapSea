@@ -157,7 +157,7 @@ void Mesh::MakeVertexResource(ID3D12Device* device)
 
 	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 
-	vertexResourceDesc.Width = sizeof(Vector4) * 3;
+	vertexResourceDesc.Width = sizeof(Vector4) * 6;
 
 	vertexResourceDesc.Height = 1;
 	vertexResourceDesc.DepthOrArraySize = 1;
@@ -176,18 +176,22 @@ void Mesh::MakeVertexResource(ID3D12Device* device)
 void Mesh::MakeVertexBufferView()
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
+	vertexBufferView.SizeInBytes = sizeof(Vector4) * 6;
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 
 }
 
-//void Mesh::InputData(struct Vector4* vertexData)
-//{
-//	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-//	vertexData[0] = { -0.5f,-0.5f,0.0f,1.0f };//左下
-//	vertexData[1] = { 0.0f,0.5f,0.0f,1.0f };//上
-//	vertexData[2] = { 0.5f,-0.5f,0.0f,1.0f };//右下
-//}
+void Mesh::InputData(struct Vector4* vertexData)
+{
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexData[0] = { -0.5f,-0.75f,0.0f,1.0f };//左下
+	vertexData[1] = { -0.25f,-0.5f,0.0f,1.0f };//上
+	vertexData[2] = { 0.0f,-0.75f,0.0f,1.0f };//右下
+
+	vertexData[3] = { 0.0f,0.75f,0.0f,1.0f };//左下
+	vertexData[4] = { 0.25f,0.5f,0.0f,1.0f };//上
+	vertexData[5] = { 0.5f,0.75f,0.0f,1.0f };//右下
+}
 
 void Mesh::Draw(ID3D12GraphicsCommandList* commandList)
 {
