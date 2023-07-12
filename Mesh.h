@@ -12,7 +12,7 @@
 class Mesh
 {
 public:
-	void Initialize(int32_t width, int32_t height);
+	void Initialize(int32_t width, int32_t height, int32_t numTriangle);
 	static void ResetDXC();
 
 	static IDxcBlob* CompileShader(
@@ -23,14 +23,16 @@ public:
 		IDxcIncludeHandler* includeHandler
 	);
 	static void MakePSO(ID3D12Device* device);
-	static void MakeVertexResource(ID3D12Device* device);
-	static void MakeVertexBufferView();
-	static void InputData(struct Vector4* vertexData);
-	static void Draw(ID3D12GraphicsCommandList* commandList);
+	static void MakeVertexResource(ID3D12Device* device, int NumTriangle);
+	static void MakeVertexBufferView(int NumTriangle);
+	static void InputData(struct Vector4* vertexData, int32_t i);
+	static void Draw(ID3D12GraphicsCommandList* commandList/*, int NumTriangle*/);
 	static void MeshRelease();
 
 	static ID3D12Resource* GetVertexResource() { return vertexResource; }
 	static struct Vector4* GetVertexData() { return vertexData; }
+	static int32_t GetNumTriangle() { return NumTriangle; }
+
 private:
 	static inline Debug* debug_;
 	static inline HRESULT hr = NULL;
@@ -57,6 +59,7 @@ private:
 	static inline D3D12_RASTERIZER_DESC rasterizerDesc{};
 	static inline D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	static inline struct Vector4* vertexData=nullptr;
+	static inline int32_t NumTriangle;
 };
 struct Vector4 final {
 	float x;

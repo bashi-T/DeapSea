@@ -21,6 +21,8 @@ public:
 	static void MakeRTV();
 
 	static void MakeScreen();
+	static void DrawScreen(int32_t numTriangle);
+	static void DrawTriangle(int32_t numTriangle, int i);
 	static void ClearScreen();
 	static void MakeFence();
 	static void DX12Release(ID3D12Debug1* debugController);
@@ -49,5 +51,7 @@ private:
 	static inline D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	static inline ID3D12Fence* fence = nullptr;
 	static inline HANDLE fenceEvent;
+	static inline D3D12_RESOURCE_BARRIER barrier{};
+	static inline UINT backBufferIndex;
 };
 

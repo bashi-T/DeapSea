@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-void Mesh::Initialize(int32_t width, int32_t height)
+void Mesh::Initialize(int32_t width, int32_t height, int32_t numTriangle)
 {
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
@@ -13,6 +13,8 @@ void Mesh::Initialize(int32_t width, int32_t height)
 	scissorRect.right = width;
 	scissorRect.top = 0.0f;
 	scissorRect.bottom = height;
+
+	NumTriangle = numTriangle;
 }
 
 
@@ -90,13 +92,16 @@ void Mesh::MakePSO(ID3D12Device* device)
 {
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+
 	if (FAILED(hr))
 	{
 		debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
+
 	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 
@@ -151,13 +156,13 @@ void Mesh::MakePSO(ID3D12Device* device)
 	assert(SUCCEEDED(hr));
 }
 
-void Mesh::MakeVertexResource(ID3D12Device* device)
+void Mesh::MakeVertexResource(ID3D12Device* device,int NumTriangle)
 {
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
 	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 
-	vertexResourceDesc.Width = sizeof(Vector4) * 6;
+	vertexResourceDesc.Width = sizeof(Vector4) * NumTriangle*3;
 
 	vertexResourceDesc.Height = 1;
 	vertexResourceDesc.DepthOrArraySize = 1;
@@ -173,27 +178,69 @@ void Mesh::MakeVertexResource(ID3D12Device* device)
 	assert(SUCCEEDED(hr));
 }
 
-void Mesh::MakeVertexBufferView()
+void Mesh::MakeVertexBufferView(int NumTriangle)
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * 6;
+	vertexBufferView.SizeInBytes = sizeof(Vector4) * NumTriangle*3;
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
-
 }
 
-void Mesh::InputData(struct Vector4* vertexData)
+void Mesh::InputData(struct Vector4* vertexData,int32_t i)
 {
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	vertexData[0] = { -0.5f,-0.75f,0.0f,1.0f };//左下
-	vertexData[1] = { -0.25f,-0.5f,0.0f,1.0f };//上
-	vertexData[2] = { 0.0f,-0.75f,0.0f,1.0f };//右下
 
-	vertexData[3] = { 0.0f,0.75f,0.0f,1.0f };//左下
-	vertexData[4] = { 0.25f,0.5f,0.0f,1.0f };//上
-	vertexData[5] = { 0.5f,0.75f,0.0f,1.0f };//右下
+	//int32_t NumVertex = i * 3;
+	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//vertexData[i] = { -1.0f,-1.0f,0.0f,1.0f };//左下
+	//vertexData[i + 1] = { -0.75f,-0.5f,0.0f,1.0f };//上
+	//vertexData[i + 2] = { -0.5f,-1.0f,0.0f,1.0f };//右下
+
+	int32_t NumVertex = i;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexData[0] = { -1.0f,-1.0f,0.0f,1.0f };//左下
+	vertexData[1] = { -0.75f,-0.5f,0.0f,1.0f };//上
+	vertexData[2] = { -0.5f,-1.0f,0.0f,1.0f };//右下
+
+	vertexData[3] = { -0.5f,-1.0f,0.0f,1.0f };//左下
+	vertexData[4] = { -0.25f,-0.5f,0.0f,1.0f };//上
+	vertexData[5] = { 0.0f,-1.0f,0.0f,1.0f };//右下
+
+	vertexData[6] = { 0.0f,-1.0f,0.0f,1.0f };//左下
+	vertexData[7] = { 0.25f,-1.0f,0.0f,1.0f };//上
+	vertexData[8] = { 0.5f,-1.0f,0.0f,1.0f };//右下
+
+	vertexData[9] = { 0.5f,-1.0f,0.0f,1.0f };//左下
+	vertexData[10] = { 0.75f,-1.0f,0.0f,1.0f };//上
+	vertexData[11] = { 1.0f,-1.0f,0.0f,1.0f };//右下
+
+
+	vertexData[12] = { -0.5f,-0.5f,0.0f,1.0f };//左下
+	vertexData[13] = { -0.25f,0.0f,0.0f,1.0f };//上
+	vertexData[14] = { 0.0f,-0.5f,0.0f,1.0f };//右下
+
+	vertexData[15] = { 0.0f,-0.5f,0.0f,1.0f };//左下
+	vertexData[16] = { 0.25f,0.0f,0.0f,1.0f };//上
+	vertexData[17] = { 0.5f,-0.5f,0.0f,1.0f };//右下
+
+
+	vertexData[18] = { -0.5f,0.0f,0.0f,1.0f };//左下
+	vertexData[19] = { -0.25f,0.5f,0.0f,1.0f };//上
+	vertexData[20] = { 0.0f,0.0f,0.0f,1.0f };//右下
+
+	vertexData[21] = { -0.0f,0.0f,0.0f,1.0f };//左下
+	vertexData[22] = { 0.25f,0.5f,0.0f,1.0f };//上
+	vertexData[23] = { 0.5f,0.0f,0.0f,1.0f };//右下
+
+	vertexData[24] = { -0.5f,0.5f,0.0f,1.0f };//左下
+	vertexData[25] = { -0.25f,1.0f,0.0f,1.0f };//上
+	vertexData[26] = { 0.0f,0.5f,0.0f,1.0f };//右下
+
+	vertexData[27] = { 0.0f,0.5f,0.0f,1.0f };//左下
+	vertexData[28] = { 0.25f,1.0f,0.0f,1.0f };//上
+	vertexData[29] = { 0.5f,0.5f,0.0f,1.0f };//右下
+
 }
 
-void Mesh::Draw(ID3D12GraphicsCommandList* commandList)
+void Mesh::Draw(ID3D12GraphicsCommandList* commandList/*,int NumTriangle*/)
 {
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
@@ -201,7 +248,7 @@ void Mesh::Draw(ID3D12GraphicsCommandList* commandList)
 	commandList->SetGraphicsRootSignature(rootSignature);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->DrawInstanced(3, 1, 0, 0);
+	commandList->DrawInstanced(/*NumTriangle*3*/3, /*NumTriangle*/1, 0, 0);
 }
 
 void Mesh::MeshRelease()

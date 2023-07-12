@@ -22,8 +22,6 @@ void DX12Common::Init()
 
 	Mesh::MakePSO(GetDevice());
 
-	Mesh::MakeVertexResource(GetDevice());
-	Mesh::MakeVertexBufferView();
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -175,10 +173,12 @@ void DX12Common::MakeScreen()
 	MakeRTV();
 }
 
-void DX12Common::ClearScreen()
+void DX12Common::DrawScreen(int32_t numTriangle)
 {
+	Mesh::MakeVertexResource(GetDevice(), numTriangle);
+	Mesh::MakeVertexBufferView(numTriangle);
+
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.Transition.pResource = swapChainResources[backBufferIndex];
@@ -188,16 +188,23 @@ void DX12Common::ClearScreen()
 
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
 		false, nullptr);
+}
 
+void DX12Common::DrawTriangle(int32_t numTriangle, int i)
+{
 	float clearColor[] =
 	{
 		0.1f, 0.25f,0.5f,1.0f
 	};
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-	Mesh::InputData(Mesh::GetVertexData());
-	Mesh::Draw(commandList);
+	Mesh::InputData(Mesh::GetVertexData(), i);
+	Mesh::Draw(commandList/*, numTriangle*/);
 
+}
+
+void DX12Common::ClearScreen()
+{
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList->ResourceBarrier(1, &barrier);

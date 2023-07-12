@@ -3,23 +3,28 @@
 #include"DX12Common.h"
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
+const int32_t kNumTriangle = 10;
 Vector4* vertexData = nullptr;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//OutputDebugStringA("HelloDirectX!\n");
-	Mesh* mesh_ = new Mesh;
-	DX12Common* dx12Common_ = new DX12Common;
-	Debug* debug_ = new Debug;
-	MSG NewMSG = WinAPP::GetMSG();
-	WinAPP::Initialize(kWindowWidth, kWindowHeight);
-	mesh_->Initialize(kWindowWidth, kWindowHeight);
+	Mesh* mesh[kNumTriangle] = {};
+	DX12Common* dx12Common = new DX12Common;
+	Debug* debug = new Debug;
 
+	MSG NewMSG = WinAPP::GetMSG();
+
+	WinAPP::Initialize(kWindowWidth, kWindowHeight);
 	WinAPP::CreateWindowView(L"CG2");
 
+	for (int i = 0; i < kNumTriangle; i++) {
+	mesh[i]->Initialize(kWindowWidth, kWindowHeight, kNumTriangle);
+	}
+
 #ifdef _DEBUG
-	debug_->DebugLayer();
+	debug->DebugLayer();
 #endif
-	dx12Common_->Init();
+	dx12Common->Init();
 
 	while (NewMSG.message != WM_QUIT)
 	{
@@ -29,16 +34,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else
 		{
-			//mesh_->GetVertexResource()->Map(
-			//	0, nullptr, reinterpret_cast<void**>(&vertexData));
-			//vertexData[0] = { -0.5f,-0.5f,0.0f,1.0f };//左下
-			//vertexData[1] = { 0.0f,0.0f,0.0f,1.0f };//上
-			//vertexData[2] = { 0.5f,-0.5f,0.0f,1.0f };//右下
-
-			dx12Common_->ClearScreen();
+			dx12Common->DrawScreen(kNumTriangle);
+			for (int i = 0; i < kNumTriangle; i++) {
+				dx12Common->DrawTriangle(kNumTriangle, i);
+			}
+			dx12Common->ClearScreen();
 		}
 	}
-	dx12Common_->DX12Release(debug_->GetDebugController());
-	debug_->ReportLiveObject();
+	dx12Common->DX12Release(debug->GetDebugController());
+	debug->ReportLiveObject();
 	return 0;
 }
