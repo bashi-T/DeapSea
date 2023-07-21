@@ -22,6 +22,5 @@ public:
 private:
 	IDXGIDebug1* debug;
 	ID3D12Debug1* debugController = nullptr;
-
 };
 

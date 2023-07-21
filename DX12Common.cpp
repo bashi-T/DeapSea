@@ -1,11 +1,9 @@
 #include "DX12Common.h"
 
-DX12Common::DX12Common()
+DX12Common* DX12Common::GetInstance()
 {
-}
-
-DX12Common::~DX12Common()
-{
+	static DX12Common instance;
+	return &instance;
 }
 
 void DX12Common::Init()
@@ -18,9 +16,6 @@ void DX12Common::Init()
 #endif
 	DX12Common::MakeScreen();
 	DX12Common::MakeFence();
-	Mesh::ResetDXC();
-
-	Mesh::MakePSO(GetDevice());
 
 }
 
@@ -156,29 +151,21 @@ void DX12Common::MakeRTV()
 
 void DX12Common::MakeScreen()
 {
-	//
 	MakeCommandQueue();
-	//
 	MakeCommandList();
-	//
 	MakeSwapchain(
 		WinAPP::GetClientWidth(),
 		WinAPP::GetClientHeight(),
 		WinAPP::GetHWND()
 	);
-	//
 	MakeDescriptorHeap();
-	//
 	BringResources();
 	MakeRTV();
 }
 
-void DX12Common::DrawScreen(int32_t numTriangle)
+void DX12Common::DrawScreen()
 {
-	Mesh::MakeVertexResource(GetDevice(), numTriangle);
-	Mesh::MakeVertexBufferView(numTriangle);
-
-	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.Transition.pResource = swapChainResources[backBufferIndex];
@@ -190,19 +177,6 @@ void DX12Common::DrawScreen(int32_t numTriangle)
 		false, nullptr);
 }
 
-void DX12Common::DrawTriangle(int32_t numTriangle, int i)
-{
-	float clearColor[] =
-	{
-		0.1f, 0.25f,0.5f,1.0f
-	};
-	commandList->ClearRenderTargetView(
-		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-	Mesh::InputData(Mesh::GetVertexData(), i);
-	Mesh::Draw(commandList/*, numTriangle*/);
-
-}
-
 void DX12Common::ClearScreen()
 {
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -211,7 +185,6 @@ void DX12Common::ClearScreen()
 	
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
-
 
 	ID3D12CommandList* commandLists[] =
 	{
@@ -245,8 +218,6 @@ void DX12Common::MakeFence()
 
 void DX12Common::DX12Release(ID3D12Debug1* debugController)
 {
-	CloseHandle(fenceEvent);
-	Mesh::MeshRelease();
 	fence->Release();
 	rtvDescriptorHeap->Release();
 	swapChainResources[0]->Release();

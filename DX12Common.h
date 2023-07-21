@@ -1,57 +1,66 @@
 #pragma once
 #include"WindowApp.h"
-#include"Mesh.h"
-
-class DX12Common
+#include "list"
+#include<cassert>
+#include"Debug.h"
+#include<d3d12.h>
+#include<dxgi1_6.h>
+#pragma comment(lib,"d3d12.lib")
+#pragma comment(lib,"dxgi.lib")
+class DX12Common final
 {
 public:
-	DX12Common();
-	~DX12Common();
-	static void Init();
-	static void MakeDXGIFactory();
-	static void ChoseUseAdapter();
-	static void MakeD3D12Device();
+	void Init();
+	void MakeDXGIFactory();
+	void ChoseUseAdapter();
+	void MakeD3D12Device();
 
-	static void MakeCommandQueue();
-	static void MakeCommandList();
+	void MakeCommandQueue();
+	void MakeCommandList();
 
-	static void MakeSwapchain(int32_t width, int32_t height, HWND hwnd_);
-	static void MakeDescriptorHeap();
-	static void BringResources();
-	static void MakeRTV();
+	void MakeSwapchain(int32_t width, int32_t height, HWND hwnd_);
+	void MakeDescriptorHeap();
+	void BringResources();
+	void MakeRTV();
 
-	static void MakeScreen();
-	static void DrawScreen(int32_t numTriangle);
-	static void DrawTriangle(int32_t numTriangle, int i);
-	static void ClearScreen();
-	static void MakeFence();
-	static void DX12Release(ID3D12Debug1* debugController);
+	void MakeScreen();
+	void DrawScreen();
+	void ClearScreen();
+	void MakeFence();
+	void DX12Release(ID3D12Debug1* debugController);
 
-	static ID3D12Device* GetDevice() { return device; }
-	static ID3D12GraphicsCommandList* GetcommandList() { return commandList; }
-	static inline uint64_t fenceValue = 0;
+	ID3D12Device* GetDevice() { return device; }
+	ID3D12GraphicsCommandList* GetcommandList() { return commandList; }
+	UINT GetBackBufferIndex() { return backBufferIndex; }
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	HANDLE GetFenceEvent() { return fenceEvent; }
+	uint64_t fenceValue = 0;
+	DX12Common(const DX12Common& obj) = delete;
+	DX12Common& oparator(const DX12Common&obj) = delete;
+	static DX12Common* GetInstance();
 
 private:
-	static inline Debug* debug_ = nullptr;
-	static inline WinAPP* window_ = nullptr;
-	static inline ID3D12Device* device = nullptr;
+	DX12Common();
+	~DX12Common();
 
-	static inline IDXGIFactory7* dxgiFactory = nullptr;
-	static inline HRESULT hr = NULL;
-	static inline IDXGIAdapter4* useAdapter = nullptr;
+	Debug* debug_ = nullptr;
+	WinAPP* window_ = nullptr;
+	ID3D12Device* device = nullptr;
+	IDXGIFactory7* dxgiFactory = nullptr;
+	HRESULT hr = NULL;
+	IDXGIAdapter4* useAdapter = nullptr;
 
-	static inline ID3D12CommandQueue* commandQueue = nullptr;
-	static inline ID3D12CommandAllocator* commandAllocator = nullptr;
-	static inline ID3D12GraphicsCommandList* commandList = nullptr;
-	static inline IDXGISwapChain4* swapChain = nullptr;
-	static inline DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	static inline ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
-	static inline D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
-	static inline ID3D12Resource* swapChainResources[2] = { nullptr };
-	static inline D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	static inline ID3D12Fence* fence = nullptr;
-	static inline HANDLE fenceEvent;
-	static inline D3D12_RESOURCE_BARRIER barrier{};
-	static inline UINT backBufferIndex;
+	ID3D12CommandQueue* commandQueue = nullptr;
+	ID3D12CommandAllocator* commandAllocator = nullptr;
+	ID3D12GraphicsCommandList* commandList = nullptr;
+	IDXGISwapChain4* swapChain = nullptr;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+	ID3D12Resource* swapChainResources[10] = { nullptr };
+	ID3D12Fence* fence = nullptr;
+	HANDLE fenceEvent;
+	D3D12_RESOURCE_BARRIER barrier{};
+	UINT backBufferIndex;
 };
 

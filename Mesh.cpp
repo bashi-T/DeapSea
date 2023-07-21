@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-void Mesh::Initialize(int32_t width, int32_t height, int32_t numTriangle)
+void Mesh::Initialize(int32_t width, int32_t height)
 {
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
@@ -14,13 +14,13 @@ void Mesh::Initialize(int32_t width, int32_t height, int32_t numTriangle)
 	scissorRect.top = 0.0f;
 	scissorRect.bottom = height;
 
-	NumTriangle = numTriangle;
-}
+	Mesh::ResetDXC();
 
+	Mesh::MakePSO();
+}
 
 void Mesh::ResetDXC()
 {
-
 	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	assert(SUCCEEDED(hr));
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
@@ -34,7 +34,7 @@ IDxcBlob* Mesh::CompileShader(
 	const wchar_t* profile,
 	IDxcUtils* dxcUtils,
 	IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler)
+	)
 {
 	debug_->Log(debug_->ConvertString(std::format(
 		L"Begin CompileShader,path{},\n", filePath, profile)));
@@ -87,13 +87,12 @@ IDxcBlob* Mesh::CompileShader(
 	shaderResult->Release();
 	return shaderBlob;
 }
-
-void Mesh::MakePSO(ID3D12Device* device)
+void Mesh::CreatePSO()
 {
-	descriptionRootSignature.Flags =
+	descriptionRootSignature_.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+	hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
 	if (FAILED(hr))
@@ -102,7 +101,7 @@ void Mesh::MakePSO(ID3D12Device* device)
 		assert(false);
 	}
 
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+	hr = DX12Common::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 
 	inputElementDescs[0].SemanticName = "POSITION";
@@ -150,10 +149,16 @@ void Mesh::MakePSO(ID3D12Device* device)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	hr = device->CreateGraphicsPipelineState(
+	hr = DX12Common::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
 		&graphicsPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
+}
+
+
+
+void Mesh::MakePSO()
+{
 }
 
 void Mesh::MakeVertexResource(ID3D12Device* device,int NumTriangle)
@@ -185,16 +190,8 @@ void Mesh::MakeVertexBufferView(int NumTriangle)
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 }
 
-void Mesh::InputData(struct Vector4* vertexData,int32_t i)
+void Mesh::InputData(Vector4* vertexData)
 {
-
-	//int32_t NumVertex = i * 3;
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	//vertexData[i] = { -1.0f,-1.0f,0.0f,1.0f };//左下
-	//vertexData[i + 1] = { -0.75f,-0.5f,0.0f,1.0f };//上
-	//vertexData[i + 2] = { -0.5f,-1.0f,0.0f,1.0f };//右下
-
-	int32_t NumVertex = i;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0] = { -1.0f,-1.0f,0.0f,1.0f };//左下
 	vertexData[1] = { -0.75f,-0.5f,0.0f,1.0f };//上
@@ -212,7 +209,6 @@ void Mesh::InputData(struct Vector4* vertexData,int32_t i)
 	vertexData[10] = { 0.75f,-1.0f,0.0f,1.0f };//上
 	vertexData[11] = { 1.0f,-1.0f,0.0f,1.0f };//右下
 
-
 	vertexData[12] = { -0.5f,-0.5f,0.0f,1.0f };//左下
 	vertexData[13] = { -0.25f,0.0f,0.0f,1.0f };//上
 	vertexData[14] = { 0.0f,-0.5f,0.0f,1.0f };//右下
@@ -220,7 +216,6 @@ void Mesh::InputData(struct Vector4* vertexData,int32_t i)
 	vertexData[15] = { 0.0f,-0.5f,0.0f,1.0f };//左下
 	vertexData[16] = { 0.25f,0.0f,0.0f,1.0f };//上
 	vertexData[17] = { 0.5f,-0.5f,0.0f,1.0f };//右下
-
 
 	vertexData[18] = { -0.5f,0.0f,0.0f,1.0f };//左下
 	vertexData[19] = { -0.25f,0.5f,0.0f,1.0f };//上
@@ -240,7 +235,18 @@ void Mesh::InputData(struct Vector4* vertexData,int32_t i)
 
 }
 
-void Mesh::Draw(ID3D12GraphicsCommandList* commandList/*,int NumTriangle*/)
+void Mesh::InputDataChain(struct Vector4* vertexData,int32_t i)
+{
+	int32_t NumVertex = i * 3;
+	float NumDistance = i * 0.1f;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexData[NumVertex] = { -1.0f + NumDistance,-1.0f + NumDistance,0.0f,1.0f };//左下
+	vertexData[NumVertex + 1] = { -0.9f + NumDistance,-0.9f + NumDistance,0.0f,1.0f };//上
+	vertexData[NumVertex + 2] = { -0.8f + NumDistance,-1.0f + NumDistance,0.0f,1.0f };//右下
+
+}
+
+void Mesh::Draw(ID3D12GraphicsCommandList* commandList,int NumTriangle)
 {
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
@@ -248,7 +254,25 @@ void Mesh::Draw(ID3D12GraphicsCommandList* commandList/*,int NumTriangle*/)
 	commandList->SetGraphicsRootSignature(rootSignature);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->DrawInstanced(/*NumTriangle*3*/3, /*NumTriangle*/1, 0, 0);
+	commandList->DrawInstanced(NumTriangle*3, NumTriangle, 0, 0);
+}
+
+void Mesh::DrawTriangle(
+	int32_t numTriangle,
+	int i,	
+	ID3D12GraphicsCommandList* commandList,
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[],
+	UINT backBufferIndex)
+{
+	float clearColor[] =
+	{
+		0.1f, 0.25f,0.5f,1.0f
+	};
+	commandList->ClearRenderTargetView(
+		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+	Mesh::InputData(vertexData);
+	Mesh::Draw(commandList, numTriangle);
 }
 
 void Mesh::MeshRelease()
