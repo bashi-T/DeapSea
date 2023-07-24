@@ -7,6 +7,7 @@
 #include<dxgi1_6.h>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
+
 class DX12Common final
 {
 public:
@@ -30,18 +31,18 @@ public:
 	void DX12Release(ID3D12Debug1* debugController);
 
 	ID3D12Device* GetDevice() { return device; }
-	ID3D12GraphicsCommandList* GetcommandList() { return commandList; }
+	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	uint64_t fenceValue = 0;
-	DX12Common(const DX12Common& obj) = delete;
-	DX12Common& oparator(const DX12Common&obj) = delete;
 	static DX12Common* GetInstance();
 
 private:
-	DX12Common();
-	~DX12Common();
+	DX12Common()=default;
+	~DX12Common()=default;
+	DX12Common(const DX12Common& obj) = delete;
+	DX12Common& oparator(const DX12Common&obj) = delete;
 
 	Debug* debug_ = nullptr;
 	WinAPP* window_ = nullptr;

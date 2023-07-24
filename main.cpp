@@ -11,11 +11,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Mesh* mesh[kNumTriangle] = { nullptr };
 	DX12Common* dx12Common = DX12Common::GetInstance();
 	Debug* debug = new Debug;
+	WinAPP* winAPP = WinAPP::GetInstance();
+	MSG NewMSG = winAPP->GetMSG();
 
-	MSG NewMSG = WinAPP::GetMSG();
-
-	WinAPP::Initialize(kWindowWidth, kWindowHeight);
-	WinAPP::CreateWindowView(L"CG2");
+	winAPP->Initialize(kWindowWidth, kWindowHeight);
+	winAPP->CreateWindowView(L"CG2");
 
 #ifdef _DEBUG
 	debug->DebugLayer();
@@ -30,21 +30,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	{
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
 		{
-			WinAPP::ProcessMessage(NewMSG);
+			winAPP->ProcessMessage(NewMSG);
 		}
 		else
 		{
 			for (int i = 0; i < kNumTriangle; i++)
 			{
-				mesh[i]->MakeVertexResource(dx12Common->GetDevice(), kNumTriangle);
+				mesh[i]->MakeVertexResource(kNumTriangle);
 				mesh[i]->MakeVertexBufferView(kNumTriangle);
 			}
 			dx12Common->DrawScreen();
 			for (int i = 0; i < kNumTriangle; i++)
 			{
 				mesh[i]->DrawTriangle(
-					kNumTriangle, i,
-					dx12Common->GetcommandList(),
+					kNumTriangle,
 					dx12Common->rtvHandles,
 					dx12Common->GetBackBufferIndex()
 				);

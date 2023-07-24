@@ -16,7 +16,14 @@ public:
 	static inline MSG GetMSG() { return msg; }
 	static void ProcessMessage(MSG NewMSG);
 	static inline MSG msg{};
+	static WinAPP* GetInstance();
+
 private:
+	WinAPP() = default;
+	~WinAPP() = default;
+	WinAPP(const WinAPP& obj) = delete;
+	WinAPP& oparator(const WinAPP& obj) = delete;
+	
 	static int32_t clientWidth_;
 	static int32_t clientHeight_;
 	static inline WNDCLASS wc_{};

@@ -33,7 +33,8 @@ IDxcBlob* Mesh::CompileShader(
 	const std::wstring& filePath,
 	const wchar_t* profile,
 	IDxcUtils* dxcUtils,
-	IDxcCompiler3* dxcCompiler,
+    IDxcCompiler3* dxcCompiler,
+	IDxcIncludeHandler* includeHandler
 	)
 {
 	debug_->Log(debug_->ConvertString(std::format(
@@ -87,81 +88,79 @@ IDxcBlob* Mesh::CompileShader(
 	shaderResult->Release();
 	return shaderBlob;
 }
-void Mesh::CreatePSO()
-{
-	descriptionRootSignature_.Flags =
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
-
-	hr = DX12Common::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-
-	inputElementDescs[0].SemanticName = "POSITION";
-	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-	blendDesc.RenderTarget[0].RenderTargetWriteMask =
-		D3D12_COLOR_WRITE_ENABLE_ALL;
-
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-	vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0",
-		dxcUtils, dxcCompiler, includeHandler);
-	assert(vertexShaderBlob != nullptr);
-
-	pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0",
-		dxcUtils, dxcCompiler, includeHandler);
-	assert(pixelShaderBlob != nullptr);
-
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
-	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
-	graphicsPipelineStateDesc.VS =
-	{
-		vertexShaderBlob->GetBufferPointer(),
-		vertexShaderBlob->GetBufferSize()
-	};
-	graphicsPipelineStateDesc.PS =
-	{
-		pixelShaderBlob->GetBufferPointer(),
-		pixelShaderBlob->GetBufferSize()
-	};
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
-
-	graphicsPipelineStateDesc.NumRenderTargets = 1;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	graphicsPipelineStateDesc.PrimitiveTopologyType =
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-
-	hr = DX12Common::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
-		&graphicsPipelineStateDesc,
-		IID_PPV_ARGS(&graphicsPipelineState));
-	assert(SUCCEEDED(hr));
-}
-
-
 
 void Mesh::MakePSO()
 {
+		descriptionRootSignature_.Flags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	
+		hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
+			D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	
+		if (FAILED(hr))
+		{
+			debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+			assert(false);
+		}
+	
+		hr = DX12Common::GetInstance()->GetDevice()->CreateRootSignature(
+	        0,
+			signatureBlob->GetBufferPointer(),
+			signatureBlob->GetBufferSize(),
+	        IID_PPV_ARGS(&rootSignature));
+	
+		inputElementDescs[0].SemanticName = "POSITION";
+		inputElementDescs[0].SemanticIndex = 0;
+		inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	
+		inputLayoutDesc.pInputElementDescs = inputElementDescs;
+		inputLayoutDesc.NumElements = _countof(inputElementDescs);
+	
+		blendDesc.RenderTarget[0].RenderTargetWriteMask =
+			D3D12_COLOR_WRITE_ENABLE_ALL;
+	
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	
+		vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0",
+			dxcUtils, dxcCompiler, includeHandler);
+		assert(vertexShaderBlob != nullptr);
+	
+		pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0",
+			dxcUtils, dxcCompiler, includeHandler);
+		assert(pixelShaderBlob != nullptr);
+	
+		graphicsPipelineStateDesc.pRootSignature = rootSignature;
+		graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
+		graphicsPipelineStateDesc.VS =
+		{
+			vertexShaderBlob->GetBufferPointer(),
+			vertexShaderBlob->GetBufferSize()
+		};
+		graphicsPipelineStateDesc.PS =
+		{
+			pixelShaderBlob->GetBufferPointer(),
+			pixelShaderBlob->GetBufferSize()
+		};
+		graphicsPipelineStateDesc.BlendState = blendDesc;
+		graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
+	
+		graphicsPipelineStateDesc.NumRenderTargets = 1;
+		graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		graphicsPipelineStateDesc.PrimitiveTopologyType =
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	
+		graphicsPipelineStateDesc.SampleDesc.Count = 1;
+		graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	
+		hr = DX12Common::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
+			&graphicsPipelineStateDesc,
+			IID_PPV_ARGS(&graphicsPipelineState));
+		assert(SUCCEEDED(hr));
 }
 
-void Mesh::MakeVertexResource(ID3D12Device* device,int NumTriangle)
+void Mesh::MakeVertexResource(int NumTriangle)
 {
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
@@ -176,7 +175,7 @@ void Mesh::MakeVertexResource(ID3D12Device* device,int NumTriangle)
 
 	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	hr = device->CreateCommittedResource(
+	hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
 		&vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr, IID_PPV_ARGS(&vertexResource));
@@ -190,7 +189,7 @@ void Mesh::MakeVertexBufferView(int NumTriangle)
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 }
 
-void Mesh::InputData(Vector4* vertexData)
+void Mesh::InputDataTriangle(Vector4* vertexData)
 {
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0] = { -1.0f,-1.0f,0.0f,1.0f };//左下
@@ -235,45 +234,33 @@ void Mesh::InputData(Vector4* vertexData)
 
 }
 
-void Mesh::InputDataChain(struct Vector4* vertexData,int32_t i)
-{
-	int32_t NumVertex = i * 3;
-	float NumDistance = i * 0.1f;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	vertexData[NumVertex] = { -1.0f + NumDistance,-1.0f + NumDistance,0.0f,1.0f };//左下
-	vertexData[NumVertex + 1] = { -0.9f + NumDistance,-0.9f + NumDistance,0.0f,1.0f };//上
-	vertexData[NumVertex + 2] = { -0.8f + NumDistance,-1.0f + NumDistance,0.0f,1.0f };//右下
-
-}
-
-void Mesh::Draw(ID3D12GraphicsCommandList* commandList,int NumTriangle)
-{
-	commandList->RSSetViewports(1, &viewport);
-	commandList->RSSetScissorRects(1, &scissorRect);
-	commandList->SetPipelineState(graphicsPipelineState);
-	commandList->SetGraphicsRootSignature(rootSignature);
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->DrawInstanced(NumTriangle*3, NumTriangle, 0, 0);
-}
-
 void Mesh::DrawTriangle(
 	int32_t numTriangle,
-	int i,	
-	ID3D12GraphicsCommandList* commandList,
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[],
-	UINT backBufferIndex)
-{
+	UINT backBufferIndex,
+    int NumTriangle) {
 	float clearColor[] =
 	{
 		0.1f, 0.25f,0.5f,1.0f
 	};
-	commandList->ClearRenderTargetView(
+	DX12Common::GetInstance()->GetCommandList()->ClearRenderTargetView(
 		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
-	Mesh::InputData(vertexData);
-	Mesh::Draw(commandList, numTriangle);
+	Mesh::InputDataTriangle(vertexData);
 }
+
+void Mesh::Draw(int NumTriangle) {
+	DrawTriangle();
+	DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
+	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
+	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
+	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(NumTriangle * 3, NumTriangle, 0, 0);
+}
+    
 
 void Mesh::MeshRelease()
 {
