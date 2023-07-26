@@ -1,7 +1,15 @@
 #include "Mesh.h"
 
-void Mesh::Initialize(int32_t width, int32_t height)
+Mesh::~Mesh()
 {
+	delete dxcUtils;
+	delete dxcCompiler;
+	delete includeHandler;
+	delete rootSignature;
+	delete graphicsPipelineState;
+}
+
+void Mesh::Initialize(int32_t width, int32_t height) {
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.Width = width;
@@ -160,6 +168,13 @@ void Mesh::MakePSO()
 		assert(SUCCEEDED(hr));
 }
 
+void Mesh::Update(int NumTriangle)
+{
+	    MakeVertexResource(NumTriangle);
+	    MakeVertexBufferView(NumTriangle);
+	    InputDataTriangle(vertexData,NumTriangle);
+}
+
 void Mesh::MakeVertexResource(int NumTriangle)
 {
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -189,76 +204,78 @@ void Mesh::MakeVertexBufferView(int NumTriangle)
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 }
 
-void Mesh::InputDataTriangle(Vector4* vertexData)
+void Mesh::InputDataTriangle(Vector4* vertexData,int numTriangle)
 {
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0] = { -1.0f,-1.0f,0.0f,1.0f };//左下
-	vertexData[1] = { -0.75f,-0.5f,0.0f,1.0f };//上
+	vertexData[1] = { -0.75f,-0.6f,0.0f,1.0f };//上
 	vertexData[2] = { -0.5f,-1.0f,0.0f,1.0f };//右下
 
 	vertexData[3] = { -0.5f,-1.0f,0.0f,1.0f };//左下
-	vertexData[4] = { -0.25f,-0.5f,0.0f,1.0f };//上
+	vertexData[4] = { -0.25f,-0.7f,0.0f,1.0f };//上
 	vertexData[5] = { 0.0f,-1.0f,0.0f,1.0f };//右下
 
 	vertexData[6] = { 0.0f,-1.0f,0.0f,1.0f };//左下
-	vertexData[7] = { 0.25f,-1.0f,0.0f,1.0f };//上
+	vertexData[7] = { 0.25f,-0.8f,0.0f,1.0f };//上
 	vertexData[8] = { 0.5f,-1.0f,0.0f,1.0f };//右下
 
 	vertexData[9] = { 0.5f,-1.0f,0.0f,1.0f };//左下
-	vertexData[10] = { 0.75f,-1.0f,0.0f,1.0f };//上
+	vertexData[10] = { 0.75f,-0.9f,0.0f,1.0f };//上
 	vertexData[11] = { 1.0f,-1.0f,0.0f,1.0f };//右下
 
-	vertexData[12] = { -0.5f,-0.5f,0.0f,1.0f };//左下
-	vertexData[13] = { -0.25f,0.0f,0.0f,1.0f };//上
-	vertexData[14] = { 0.0f,-0.5f,0.0f,1.0f };//右下
+	vertexData[12] = { -0.6f,-0.5f,0.0f,1.0f };//左下
+	vertexData[13] = { -0.45f,0.0f,0.0f,1.0f };//上
+	vertexData[14] = { -0.3f,-0.5f,0.0f,1.0f };//右下
 
-	vertexData[15] = { 0.0f,-0.5f,0.0f,1.0f };//左下
+	vertexData[15] = { 0.05f,-0.5f,0.0f,1.0f };//左下
 	vertexData[16] = { 0.25f,0.0f,0.0f,1.0f };//上
-	vertexData[17] = { 0.5f,-0.5f,0.0f,1.0f };//右下
+	vertexData[17] = { 0.55f,-0.5f,0.0f,1.0f };//右下
 
-	vertexData[18] = { -0.5f,0.0f,0.0f,1.0f };//左下
-	vertexData[19] = { -0.25f,0.5f,0.0f,1.0f };//上
+	vertexData[18] = { -0.9f,0.0f,0.0f,1.0f };//左下
+	vertexData[19] = { -0.45f,0.5f,0.0f,1.0f };//上
 	vertexData[20] = { 0.0f,0.0f,0.0f,1.0f };//右下
 
 	vertexData[21] = { -0.0f,0.0f,0.0f,1.0f };//左下
 	vertexData[22] = { 0.25f,0.5f,0.0f,1.0f };//上
 	vertexData[23] = { 0.5f,0.0f,0.0f,1.0f };//右下
 
-	vertexData[24] = { -0.5f,0.5f,0.0f,1.0f };//左下
+	vertexData[24] = { -0.25f,0.5f,0.0f,1.0f };//左下
 	vertexData[25] = { -0.25f,1.0f,0.0f,1.0f };//上
 	vertexData[26] = { 0.0f,0.5f,0.0f,1.0f };//右下
 
 	vertexData[27] = { 0.0f,0.5f,0.0f,1.0f };//左下
 	vertexData[28] = { 0.25f,1.0f,0.0f,1.0f };//上
-	vertexData[29] = { 0.5f,0.5f,0.0f,1.0f };//右下
+	vertexData[29] = { 0.4f,0.5f,0.0f,1.0f };//右下
 
 }
 
-void Mesh::DrawTriangle(
-	int32_t numTriangle,
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[],
-	UINT backBufferIndex,
-    int NumTriangle) {
+void Mesh::DrawTriangle(int NumTriangle) {
 	float clearColor[] =
 	{
 		0.1f, 0.25f,0.5f,1.0f
 	};
 	DX12Common::GetInstance()->GetCommandList()->ClearRenderTargetView(
-		rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-
-	Mesh::InputDataTriangle(vertexData);
+	    DX12Common::GetInstance()->
+		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex()),
+	    clearColor, 0, nullptr);
 }
 
 void Mesh::Draw(int NumTriangle) {
-	DrawTriangle();
-	DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
-	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
-	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
-	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
-	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
-	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
-	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(NumTriangle * 3, NumTriangle, 0, 0);
+	DrawTriangle(NumTriangle);
+	DX12Common::GetInstance()->GetCommandList()->
+		RSSetViewports(1, &viewport);
+	DX12Common::GetInstance()->GetCommandList()->
+		RSSetScissorRects(1, &scissorRect);
+	DX12Common::GetInstance()->GetCommandList()->
+		SetPipelineState(graphicsPipelineState);
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootSignature(rootSignature);
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetVertexBuffers(0, 1, &vertexBufferView);
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX12Common::GetInstance()->GetCommandList()->
+		DrawInstanced(NumTriangle * 3, NumTriangle, 0, 0);
 }
     
 

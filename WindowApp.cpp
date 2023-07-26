@@ -57,6 +57,7 @@ void WinAPP::ProcessMessage(MSG NewMSG)
 {
 	TranslateMessage(&NewMSG);
 	DispatchMessage(&NewMSG);
+
 }
 WinAPP* WinAPP::GetInstance() {
 	static WinAPP instance;

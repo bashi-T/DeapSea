@@ -33,10 +33,10 @@ public:
 	ID3D12Device* GetDevice() { return device; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
 	UINT GetBackBufferIndex() { return backBufferIndex; }
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	uint64_t fenceValue = 0;
 	static DX12Common* GetInstance();
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
 
 private:
 	DX12Common()=default;
@@ -46,10 +46,11 @@ private:
 
 	Debug* debug_ = nullptr;
 	WinAPP* window_ = nullptr;
-	ID3D12Device* device = nullptr;
+	static inline ID3D12Device* device = nullptr;
 	IDXGIFactory7* dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	IDXGIAdapter4* useAdapter = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 
 	ID3D12CommandQueue* commandQueue = nullptr;
 	ID3D12CommandAllocator* commandAllocator = nullptr;

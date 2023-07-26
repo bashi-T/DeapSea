@@ -8,11 +8,16 @@ Vector4* vertexData = nullptr;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//OutputDebugStringA("HelloDirectX!\n");
-	Mesh* mesh[kNumTriangle] = { nullptr };
+	Mesh* mesh[kNumTriangle];
+	for (int i = 0; i < kNumTriangle; i++)
+	{
+		mesh[i] = new Mesh;
+	}
 	DX12Common* dx12Common = DX12Common::GetInstance();
 	Debug* debug = new Debug;
 	WinAPP* winAPP = WinAPP::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
+
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight);
 	winAPP->CreateWindowView(L"CG2");
@@ -22,35 +27,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif
 	dx12Common->Init();
 
-	for (int i = 0; i < kNumTriangle; i++) {
+	for (int i = 0; i < kNumTriangle; i++)
+	{
 		mesh[i]->Initialize(kWindowWidth, kWindowHeight);
 	}
 
 	while (NewMSG.message != WM_QUIT)
 	{
+			for (int i = 0; i < kNumTriangle; i++)
+			{
+				mesh[i]->Update(kNumTriangle);
+			}
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
 		{
 			winAPP->ProcessMessage(NewMSG);
 		}
 		else
 		{
-			for (int i = 0; i < kNumTriangle; i++)
-			{
-				mesh[i]->MakeVertexResource(kNumTriangle);
-				mesh[i]->MakeVertexBufferView(kNumTriangle);
-			}
 			dx12Common->DrawScreen();
 			for (int i = 0; i < kNumTriangle; i++)
 			{
-				mesh[i]->DrawTriangle(
-					kNumTriangle,
-					dx12Common->rtvHandles,
-					dx12Common->GetBackBufferIndex()
-				);
+				mesh[i]->Draw(kNumTriangle);
 			}
 			dx12Common->ClearScreen();
 		}
 	}
+	//delete mesh;
 
 	CloseHandle(dx12Common->GetFenceEvent());
 	for (int i = 0; i < kNumTriangle; i++)
