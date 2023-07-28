@@ -30,6 +30,7 @@ public:
 
 	void MakePSO();
 	void MakeVertexResource(int NumTriangle);
+	void MakeMaterialResource(int NumTriangle);
 	void MakeVertexBufferView(int NumTriangle);
 	void InputDataTriangle(struct Vector4* vertexData, int numTriangle);
 	void DrawTriangle(int NumTriangle);
@@ -50,6 +51,7 @@ private:
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState=NULL;
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
+	D3D12_ROOT_PARAMETER rootParameters[1] = {};
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
@@ -58,14 +60,14 @@ private:
 	ID3D12Resource* vertexResource = nullptr;
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
-	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-	D3D12_RESOURCE_DESC vertexResourceDesc{};
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	struct Vector4* vertexData = nullptr;
+	ID3D12Resource* materialResource;
+	Vector4* materialData = nullptr;
 };
 struct Vector4 final {
 	float x;
