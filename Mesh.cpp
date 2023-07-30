@@ -301,7 +301,6 @@ void Mesh::DrawTriangle(int NumTriangle) {
 }
 
 void Mesh::Draw(int NumTriangle) {
-	DrawTriangle(NumTriangle);
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetViewports(1, &viewport);
 	DX12Common::GetInstance()->GetCommandList()->

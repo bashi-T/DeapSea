@@ -1,6 +1,7 @@
 #pragma once
 #include<windows.h>
 #include<cstdint>
+#include"MyImGui.h"
 
 class WinAPP {
 public:

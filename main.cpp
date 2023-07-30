@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Debug* debug = new Debug;
 	WinAPP* winAPP = WinAPP::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
-
+	MyImGui* imgui = new MyImGui;
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight);
 	winAPP->CreateWindowView(L"CG2");
@@ -34,10 +34,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	while (NewMSG.message != WM_QUIT)
 	{
-			for (int i = 0; i < kNumTriangle; i++)
-			{
-				mesh[i]->Update(kNumTriangle);
-			}
+		imgui->Update();
+
+		for (int i = 0; i < kNumTriangle; i++) {
+			mesh[i]->Update(kNumTriangle);
+		}
+		ImGui::ShowDemoWindow();
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
 		{
 			winAPP->ProcessMessage(NewMSG);
@@ -45,14 +47,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else
 		{
 			dx12Common->DrawScreen();
-			for (int i = 0; i < kNumTriangle; i++)
-			{
+			ImGui::Render();
+			for (int i = 0; i < kNumTriangle; i++) {
+				mesh[i]->DrawTriangle(kNumTriangle);
+				ID3D12DescriptorHeap* descriptorHeaps[] = {
+				    dx12Common->GetInstance()->GetSrvDescriptorHeap()};
+				dx12Common->GetInstance()->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+
 				mesh[i]->Draw(kNumTriangle);
 			}
+
+			ImGui_ImplDX12_RenderDrawData(
+			    ImGui::GetDrawData(),
+				dx12Common->GetInstance()->GetCommandList());
+
 			dx12Common->ClearScreen();
 		}
 	}
-	//delete mesh;
 
 	CloseHandle(dx12Common->GetFenceEvent());
 	for (int i = 0; i < kNumTriangle; i++)

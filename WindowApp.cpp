@@ -11,6 +11,10 @@ void WinAPP::Initialize(int32_t width, int32_t height)
 
 LRESULT CALLBACK WinAPP::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+	{
+		return true;
+	}
 	switch (msg)
 	{
 	case WM_DESTROY:

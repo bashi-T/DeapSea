@@ -29,7 +29,11 @@ public:
 	void ClearScreen();
 	void MakeFence();
 	void DX12Release(ID3D12Debug1* debugController);
-
+	ID3D12DescriptorHeap* CreateDescriptorHeap(
+	    ID3D12Device* device,
+		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
+		UINT numDesctiptors,
+	    bool shaderVisible);
 	ID3D12Device* GetDevice() { return device; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
 	UINT GetBackBufferIndex() { return backBufferIndex; }
@@ -37,6 +41,8 @@ public:
 	uint64_t fenceValue = 0;
 	static DX12Common* GetInstance();
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
+	ID3D12DescriptorHeap* GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
+	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap; }
 
 private:
 	DX12Common()=default;
@@ -46,6 +52,7 @@ private:
 
 	Debug* debug_ = nullptr;
 	WinAPP* window_ = nullptr;
+	MyImGui* imgui_ = nullptr;
 	static inline ID3D12Device* device = nullptr;
 	IDXGIFactory7* dxgiFactory = nullptr;
 	HRESULT hr = NULL;
@@ -58,7 +65,9 @@ private:
 	IDXGISwapChain4* swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	ID3D12Resource* swapChainResources[10] = { nullptr };
 	ID3D12Fence* fence = nullptr;
 	HANDLE fenceEvent;

@@ -16,7 +16,12 @@ void DX12Common::Init()
 #endif
 	DX12Common::MakeScreen();
 	DX12Common::MakeFence();
-
+	imgui_->Initialize(
+	    WinAPP::GetInstance()->GetHWND(),
+		device,
+	    swapChainDesc,
+		rtvDesc,
+		srvDescriptorHeap);
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -133,7 +138,6 @@ void DX12Common::BringResources()
 
 void DX12Common::MakeRTV()
 {
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
@@ -159,6 +163,19 @@ void DX12Common::MakeScreen()
 		WinAPP::GetHWND()
 	);
 	MakeDescriptorHeap();
+
+	rtvDescriptorHeap = CreateDescriptorHeap(
+		device,
+		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+		2,
+		false);
+	srvDescriptorHeap =
+	    CreateDescriptorHeap(
+			device,
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			128,
+			true);
+	
 	BringResources();
 	MakeRTV();
 }
@@ -234,4 +251,18 @@ void DX12Common::DX12Release(ID3D12Debug1* debugController)
 	debugController->Release();
 #endif
 	CloseWindow(window_->GetHWND());
+}
+
+ID3D12DescriptorHeap* DX12Common::CreateDescriptorHeap(
+    ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDesctiptors,
+    bool shaderVisible) {
+	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	D3D12_DESCRIPTOR_HEAP_DESC DescriptorHeapDesc{};
+	DescriptorHeapDesc.Type = heapType;
+	DescriptorHeapDesc.NumDescriptors = numDesctiptors;
+	DescriptorHeapDesc.Flags =
+	    shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	hr = device->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+	assert(SUCCEEDED(hr));
+	return descriptorHeap;
 }
