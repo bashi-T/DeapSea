@@ -16,12 +16,6 @@ void DX12Common::Init()
 #endif
 	DX12Common::MakeScreen();
 	DX12Common::MakeFence();
-	imgui_->Initialize(
-	    WinAPP::GetInstance()->GetHWND(),
-		device,
-	    swapChainDesc,
-		rtvDesc,
-		srvDescriptorHeap);
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -250,7 +244,7 @@ void DX12Common::DX12Release(ID3D12Debug1* debugController)
 #ifdef _DEBUG
 	debugController->Release();
 #endif
-	CloseWindow(window_->GetHWND());
+	//CloseWindow(window_->GetHWND());
 }
 
 ID3D12DescriptorHeap* DX12Common::CreateDescriptorHeap(

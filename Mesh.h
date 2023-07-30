@@ -6,19 +6,27 @@
 #include"Debug.h"
 #include<d3d12.h>
 #include<dxgi1_6.h>
+#include"MyImGui.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
+
+struct Vector4 final {
+	float x;
+	float y;
+	float z;
+	float w;
+};
 
 class Mesh
 {
 public:
 	//Mesh();
 	~Mesh();
-	void Initialize(int32_t width, int32_t height);
+	void Initialize(int32_t width, int32_t height, int NumTriangle);
 	void ResetDXC();
-	void Update(int NumTriangle);
+	void Update();
 	void Draw(int NumTriangle);
 	IDxcBlob* CompileShader(
 		const std::wstring& filePath,
@@ -32,17 +40,16 @@ public:
 	void MakeVertexResource(int NumTriangle);
 	void MakeMaterialResource(int NumTriangle);
 	void MakeVertexBufferView(int NumTriangle);
-	void InputDataTriangle(struct Vector4* vertexData, int numTriangle);
+	void InputDataTriangle(int numTriangle);
 	void DrawTriangle(int NumTriangle);
 	void MeshRelease();
 
 	ID3D12Resource* GetVertexResource() { return vertexResource; }
-	Vector4* GetVertexData() { return vertexData; }
 
 private:
 	Debug* debug_;
 	WinAPP* sWinApp;
-
+	MyImGui* imgui_;
 	HRESULT hr = NULL;
 	
 	IDxcUtils* dxcUtils = nullptr;
@@ -65,13 +72,6 @@ private:
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	struct Vector4* vertexData = nullptr;
 	ID3D12Resource* materialResource;
-	Vector4* materialData = nullptr;
-};
-struct Vector4 final {
-	float x;
-	float y;
-	float z;
-	float w;
+	Vector4 color = {0.0f, 0.0f, 0.0f, 1.0f};
 };

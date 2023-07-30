@@ -24,4 +24,10 @@ void MyImGui::Update()
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+}
+
+void MyImGui::Endframe(ID3D12GraphicsCommandList* commandList) {
+	ImGui::Render();
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 }

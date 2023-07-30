@@ -9,7 +9,7 @@ Mesh::~Mesh()
 	delete graphicsPipelineState;
 }
 
-void Mesh::Initialize(int32_t width, int32_t height) {
+void Mesh::Initialize(int32_t width, int32_t height, int NumTriangle) {
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.Width = width;
@@ -25,6 +25,10 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	Mesh::ResetDXC();
 
 	Mesh::MakePSO();
+	MakeVertexResource(NumTriangle);
+	MakeVertexBufferView(NumTriangle);
+	MakeMaterialResource(NumTriangle);
+	//InputDataTriangle(NumTriangle);
 }
 
 void Mesh::ResetDXC()
@@ -176,12 +180,13 @@ void Mesh::MakePSO()
 		assert(SUCCEEDED(hr));
 }
 
-void Mesh::Update(int NumTriangle)
+void Mesh::Update()
 {
-	    MakeVertexResource(NumTriangle);
-	    MakeVertexBufferView(NumTriangle);
-	    MakeMaterialResource(NumTriangle);
-		InputDataTriangle(vertexData,NumTriangle);
+	    //imgui_->Update();
+	    ImGui::Begin("color");
+	    ImGui::ColorEdit4("color", (float*)&color);
+	    ImGui::End();
+	    //ImGui::Render();
 }
 
 void Mesh::MakeVertexResource(int NumTriangle)
@@ -240,12 +245,14 @@ void Mesh::MakeVertexBufferView(int NumTriangle)
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 }
 
-void Mesh::InputDataTriangle(Vector4* vertexData,int numTriangle)
+void Mesh::InputDataTriangle(int numTriangle)
 {
+	Vector4* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	Vector4* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	
-	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+	*materialData = color;
 
 	vertexData[0] = { -1.0f,-1.0f,0.0f,1.0f };//左下
 	vertexData[1] = { -0.75f,-0.6f,0.0f,1.0f };//上
@@ -286,7 +293,6 @@ void Mesh::InputDataTriangle(Vector4* vertexData,int numTriangle)
 	vertexData[27] = { 0.0f,0.5f,0.0f,1.0f };//左下
 	vertexData[28] = { 0.25f,1.0f,0.0f,1.0f };//上
 	vertexData[29] = { 0.4f,0.5f,0.0f,1.0f };//右下
-
 }
 
 void Mesh::DrawTriangle(int NumTriangle) {
@@ -303,19 +309,28 @@ void Mesh::DrawTriangle(int NumTriangle) {
 void Mesh::Draw(int NumTriangle) {
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetViewports(1, &viewport);
+
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetScissorRects(1, &scissorRect);
+
+		InputDataTriangle(NumTriangle);
+
 	DX12Common::GetInstance()->GetCommandList()->
 		SetPipelineState(graphicsPipelineState);
+
 	DX12Common::GetInstance()->GetCommandList()->
 		SetGraphicsRootSignature(rootSignature);
+
 	DX12Common::GetInstance()->GetCommandList()->
 		IASetVertexBuffers(0, 1, &vertexBufferView);
+
 	DX12Common::GetInstance()->GetCommandList()->
 		IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	DX12Common::GetInstance()->GetCommandList()->
 	    SetGraphicsRootConstantBufferView(0,
 			materialResource->GetGPUVirtualAddress());
+
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(NumTriangle * 3, NumTriangle, 0, 0);
 }
@@ -335,5 +350,6 @@ void Mesh::MeshRelease()
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
 }
+
 
 

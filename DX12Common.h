@@ -43,6 +43,8 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
 	ID3D12DescriptorHeap* GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap; }
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
+	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 
 private:
 	DX12Common()=default;
@@ -51,9 +53,9 @@ private:
 	DX12Common& oparator(const DX12Common&obj) = delete;
 
 	Debug* debug_ = nullptr;
-	WinAPP* window_ = nullptr;
-	MyImGui* imgui_ = nullptr;
-	static inline ID3D12Device* device = nullptr;
+	//WinAPP* window_ = nullptr;
+	//MyImGui* imgui_ = nullptr;
+	ID3D12Device* device = nullptr;
 	IDXGIFactory7* dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	IDXGIAdapter4* useAdapter = nullptr;

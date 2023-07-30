@@ -1,5 +1,6 @@
 #pragma once
 #include<windows.h>
+#include"DX12Common.h"
 #include<cstdint>
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -26,4 +27,5 @@ public:
 	    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
 		ID3D12DescriptorHeap* srvDescriptorHeap);
 	void Update();
+	void Endframe(ID3D12GraphicsCommandList* commandList);
 };
