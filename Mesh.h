@@ -41,7 +41,7 @@ public:
 	void MakeMaterialResource(int NumTriangle);
 	void MakeVertexBufferView(int NumTriangle);
 	void InputDataTriangle(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
-	void DrawTriangle(int NumTriangle);
+	void DrawTriangle();
 	void MeshRelease();
 
 	ID3D12Resource* GetVertexResource() { return vertexResource; }

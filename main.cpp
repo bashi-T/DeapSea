@@ -121,7 +121,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			dx12Common->DrawScreen();
 
 			for (int i = 0; i < kNumTriangle; i++) {
-				mesh[i]->DrawTriangle(kNumTriangle);
+				mesh[i]->DrawTriangle();
 			}
 			ID3D12DescriptorHeap* descriptorHeaps[] =
 			{
