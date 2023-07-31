@@ -26,7 +26,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #ifdef _DEBUG
 	debug->DebugLayer();
 #endif
-	//ImGui::Begin("color");
 	dx12Common->Init();
 	imgui->Initialize(
 	    winAPP->GetHWND(),

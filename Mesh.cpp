@@ -182,11 +182,6 @@ void Mesh::MakePSO()
 
 void Mesh::Update()
 {
-	    //imgui_->Update();
-	    //ImGui::Begin("color");
-	    //ImGui::ColorEdit4("color", (float*)&color);
-	    //ImGui::End();
-	    //ImGui::Render();
 }
 
 void Mesh::MakeVertexResource(int NumTriangle)
