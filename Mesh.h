@@ -27,7 +27,7 @@ public:
 	void Initialize(int32_t width, int32_t height, int NumTriangle);
 	void ResetDXC();
 	void Update();
-	void Draw(int NumTriangle);
+	void Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
 	IDxcBlob* CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -40,7 +40,7 @@ public:
 	void MakeVertexResource(int NumTriangle);
 	void MakeMaterialResource(int NumTriangle);
 	void MakeVertexBufferView(int NumTriangle);
-	void InputDataTriangle(int numTriangle);
+	void InputDataTriangle(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
 	void DrawTriangle(int NumTriangle);
 	void MeshRelease();
 
@@ -73,5 +73,4 @@ private:
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ID3D12Resource* materialResource;
-	Vector4 color = {0.0f, 0.0f, 0.0f, 1.0f};
 };

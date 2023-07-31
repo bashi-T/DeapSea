@@ -53,8 +53,6 @@ private:
 	DX12Common& oparator(const DX12Common&obj) = delete;
 
 	Debug* debug_ = nullptr;
-	//WinAPP* window_ = nullptr;
-	//MyImGui* imgui_ = nullptr;
 	ID3D12Device* device = nullptr;
 	IDXGIFactory7* dxgiFactory = nullptr;
 	HRESULT hr = NULL;

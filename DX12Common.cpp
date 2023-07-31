@@ -244,7 +244,6 @@ void DX12Common::DX12Release(ID3D12Debug1* debugController)
 #ifdef _DEBUG
 	debugController->Release();
 #endif
-	//CloseWindow(window_->GetHWND());
 }
 
 ID3D12DescriptorHeap* DX12Common::CreateDescriptorHeap(

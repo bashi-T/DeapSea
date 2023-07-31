@@ -183,9 +183,9 @@ void Mesh::MakePSO()
 void Mesh::Update()
 {
 	    //imgui_->Update();
-	    ImGui::Begin("color");
-	    ImGui::ColorEdit4("color", (float*)&color);
-	    ImGui::End();
+	    //ImGui::Begin("color");
+	    //ImGui::ColorEdit4("color", (float*)&color);
+	    //ImGui::End();
 	    //ImGui::Render();
 }
 
@@ -245,7 +245,7 @@ void Mesh::MakeVertexBufferView(int NumTriangle)
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 }
 
-void Mesh::InputDataTriangle(int numTriangle)
+void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 color)
 {
 	Vector4* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
@@ -254,45 +254,45 @@ void Mesh::InputDataTriangle(int numTriangle)
 	
 	*materialData = color;
 
-	vertexData[0] = { -1.0f,-1.0f,0.0f,1.0f };//左下
-	vertexData[1] = { -0.75f,-0.6f,0.0f,1.0f };//上
-	vertexData[2] = { -0.5f,-1.0f,0.0f,1.0f };//右下
+	vertexData[0] = Left; // { -1.0f,-1.0f,0.0f,1.0f };//左下
+	vertexData[1] = Top;  // { -0.75f,-0.6f,0.0f,1.0f };//上
+	vertexData[2] = Right;// { -0.5f,-1.0f,0.0f,1.0f };//右下
 
-	vertexData[3] = { -0.5f,-1.0f,0.0f,1.0f };//左下
-	vertexData[4] = { -0.25f,-0.7f,0.0f,1.0f };//上
-	vertexData[5] = { 0.0f,-1.0f,0.0f,1.0f };//右下
+	//vertexData[3] = { -0.5f,-1.0f,0.0f,1.0f };//左下
+	//vertexData[4] = { -0.25f,-0.7f,0.0f,1.0f };//上
+	//vertexData[5] = { 0.0f,-1.0f,0.0f,1.0f };//右下
 
-	vertexData[6] = { 0.0f,-1.0f,0.0f,1.0f };//左下
-	vertexData[7] = { 0.25f,-0.8f,0.0f,1.0f };//上
-	vertexData[8] = { 0.5f,-1.0f,0.0f,1.0f };//右下
+	//vertexData[6] = { 0.0f,-1.0f,0.0f,1.0f };//左下
+	//vertexData[7] = { 0.25f,-0.8f,0.0f,1.0f };//上
+	//vertexData[8] = { 0.5f,-1.0f,0.0f,1.0f };//右下
 
-	vertexData[9] = { 0.5f,-1.0f,0.0f,1.0f };//左下
-	vertexData[10] = { 0.75f,-0.9f,0.0f,1.0f };//上
-	vertexData[11] = { 1.0f,-1.0f,0.0f,1.0f };//右下
+	//vertexData[9] = { 0.5f,-1.0f,0.0f,1.0f };//左下
+	//vertexData[10] = { 0.75f,-0.9f,0.0f,1.0f };//上
+	//vertexData[11] = { 1.0f,-1.0f,0.0f,1.0f };//右下
 
-	vertexData[12] = { -0.6f,-0.5f,0.0f,1.0f };//左下
-	vertexData[13] = { -0.45f,0.0f,0.0f,1.0f };//上
-	vertexData[14] = { -0.3f,-0.5f,0.0f,1.0f };//右下
+	//vertexData[12] = { -0.6f,-0.5f,0.0f,1.0f };//左下
+	//vertexData[13] = { -0.45f,0.0f,0.0f,1.0f };//上
+	//vertexData[14] = { -0.3f,-0.5f,0.0f,1.0f };//右下
 
-	vertexData[15] = { 0.05f,-0.5f,0.0f,1.0f };//左下
-	vertexData[16] = { 0.25f,0.0f,0.0f,1.0f };//上
-	vertexData[17] = { 0.55f,-0.5f,0.0f,1.0f };//右下
+	//vertexData[15] = { 0.05f,-0.5f,0.0f,1.0f };//左下
+	//vertexData[16] = { 0.25f,0.0f,0.0f,1.0f };//上
+	//vertexData[17] = { 0.55f,-0.5f,0.0f,1.0f };//右下
 
-	vertexData[18] = { -0.9f,0.0f,0.0f,1.0f };//左下
-	vertexData[19] = { -0.45f,0.5f,0.0f,1.0f };//上
-	vertexData[20] = { 0.0f,0.0f,0.0f,1.0f };//右下
+	//vertexData[18] = { -0.9f,0.0f,0.0f,1.0f };//左下
+	//vertexData[19] = { -0.45f,0.5f,0.0f,1.0f };//上
+	//vertexData[20] = { 0.0f,0.0f,0.0f,1.0f };//右下
 
-	vertexData[21] = { -0.0f,0.0f,0.0f,1.0f };//左下
-	vertexData[22] = { 0.25f,0.5f,0.0f,1.0f };//上
-	vertexData[23] = { 0.5f,0.0f,0.0f,1.0f };//右下
+	//vertexData[21] = { -0.0f,0.0f,0.0f,1.0f };//左下
+	//vertexData[22] = { 0.25f,0.5f,0.0f,1.0f };//上
+	//vertexData[23] = { 0.5f,0.0f,0.0f,1.0f };//右下
 
-	vertexData[24] = { -0.25f,0.5f,0.0f,1.0f };//左下
-	vertexData[25] = { -0.25f,1.0f,0.0f,1.0f };//上
-	vertexData[26] = { 0.0f,0.5f,0.0f,1.0f };//右下
+	//vertexData[24] = { -0.25f,0.5f,0.0f,1.0f };//左下
+	//vertexData[25] = { -0.25f,1.0f,0.0f,1.0f };//上
+	//vertexData[26] = { 0.0f,0.5f,0.0f,1.0f };//右下
 
-	vertexData[27] = { 0.0f,0.5f,0.0f,1.0f };//左下
-	vertexData[28] = { 0.25f,1.0f,0.0f,1.0f };//上
-	vertexData[29] = { 0.4f,0.5f,0.0f,1.0f };//右下
+	//vertexData[27] = { 0.0f,0.5f,0.0f,1.0f };//左下
+	//vertexData[28] = { 0.25f,1.0f,0.0f,1.0f };//上
+	//vertexData[29] = { 0.4f,0.5f,0.0f,1.0f };//右下
 }
 
 void Mesh::DrawTriangle(int NumTriangle) {
@@ -306,14 +306,14 @@ void Mesh::DrawTriangle(int NumTriangle) {
 	    clearColor, 0, nullptr);
 }
 
-void Mesh::Draw(int NumTriangle) {
+void Mesh::Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color) {
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetViewports(1, &viewport);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetScissorRects(1, &scissorRect);
 
-		InputDataTriangle(NumTriangle);
+		InputDataTriangle( Top, Right, Left,color);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		SetPipelineState(graphicsPipelineState);
@@ -332,7 +332,7 @@ void Mesh::Draw(int NumTriangle) {
 			materialResource->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
-		DrawInstanced(NumTriangle * 3, NumTriangle, 0, 0);
+		DrawInstanced(3, 1, 0, 0);
 }
     
 

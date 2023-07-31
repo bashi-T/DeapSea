@@ -1,9 +1,10 @@
 #include"WindowApp.h"
 #include"Debug.h"
 #include"Mesh.h"
+
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
-const int32_t kNumTriangle = 10;
+const int32_t kNumTriangle = 2;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//OutputDebugStringA("HelloDirectX!\n");
@@ -33,6 +34,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    dx12Common->GetInstance()->GetSwapChainDesc(),
 	    dx12Common->GetInstance()->GetRtvDesc(),
 	    dx12Common->GetInstance()->GetSrvDescriptorHeap());
+
+	Vector4 Top[kNumTriangle];
+	Vector4 Left[kNumTriangle];
+	Vector4 Right[kNumTriangle];
+	Vector4 Color[kNumTriangle];
+
+	Top[0] = {-0.75f, -0.6f, 0.0f, 1.0f};
+	Left[0] = {-1.0f, -1.0f, 0.0f, 1.0f};
+	Right[0] = {-0.5f, -1.0f, 0.0f, 1.0f};
+	Color[0] = {1.0f, 0.0f, 0.0f, 1.0f};
+	Top[1] =  { -0.25f,-0.7f,0.0f,1.0f };
+	Left[1] = { -0.5f,-1.0f,0.0f,1.0f };
+	Right[1] ={ 0.0f,-1.0f,0.0f,1.0f };
+	Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
+
 	for (int i = 0; i < kNumTriangle; i++)
 	{
 		mesh[i]->Initialize(kWindowWidth, kWindowHeight, kNumTriangle);
@@ -41,11 +57,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	while (NewMSG.message != WM_QUIT)
 	{
 		imgui->Update();
+		ImGui::Begin("TriangleColor");
 
 		for (int i = 0; i < kNumTriangle; i++)
 		{
 			mesh[i]->Update();
+			ImGui::ColorEdit3("Triangle1", (float*)&Color[i]);
 		}
+		ImGui::End();
 
 
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
@@ -64,16 +83,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				    dx12Common->GetInstance()->GetSrvDescriptorHeap()};
 				dx12Common->GetInstance()->GetCommandList()->
 					SetDescriptorHeaps(1, descriptorHeaps);
-			for (int i = 0; i < kNumTriangle; i++) {
 
-				mesh[i]->Draw(kNumTriangle);
+
+			for (int i = 0; i < kNumTriangle; i++)
+			{
+				mesh[i]->Draw(Top[i], Right[i], Left[i], Color[i]);
 			}
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 
 		}	
-		
-		//ImGui::End();
 	}
 
 	CloseHandle(dx12Common->GetFenceEvent());
