@@ -28,7 +28,6 @@ void Mesh::Initialize(int32_t width, int32_t height, int NumTriangle) {
 	MakeVertexResource(NumTriangle);
 	MakeVertexBufferView(NumTriangle);
 	MakeMaterialResource(NumTriangle);
-	//InputDataTriangle(NumTriangle);
 }
 
 void Mesh::ResetDXC()
