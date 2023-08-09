@@ -24,7 +24,7 @@ class Mesh
 public:
 	//Mesh();
 	~Mesh();
-	void Initialize(int32_t width, int32_t height, int NumTriangle);
+	void Initialize(int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
 	void Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
@@ -37,9 +37,10 @@ public:
 	);
 
 	void MakePSO();
-	void MakeVertexResource(int NumTriangle);
-	void MakeMaterialResource(int NumTriangle);
-	void MakeVertexBufferView(int NumTriangle);
+	ID3D12Resource* CreateBufferResource(
+		ID3D12Device* device,
+		size_t sizeInBytes);
+	void MakeVertexBufferView();
 	void InputDataTriangle(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
 	void DrawTriangle();
 	void MeshRelease();

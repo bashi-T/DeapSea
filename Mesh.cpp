@@ -9,7 +9,7 @@ Mesh::~Mesh()
 	delete graphicsPipelineState;
 }
 
-void Mesh::Initialize(int32_t width, int32_t height, int NumTriangle) {
+void Mesh::Initialize(int32_t width, int32_t height) {
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.Width = width;
@@ -25,9 +25,6 @@ void Mesh::Initialize(int32_t width, int32_t height, int NumTriangle) {
 	Mesh::ResetDXC();
 
 	Mesh::MakePSO();
-	MakeVertexResource(NumTriangle);
-	MakeVertexBufferView(NumTriangle);
-	MakeMaterialResource(NumTriangle);
 }
 
 void Mesh::ResetDXC()
@@ -181,69 +178,51 @@ void Mesh::MakePSO()
 
 void Mesh::Update()
 {
+	    vertexResource = CreateBufferResource(
+	        DX12Common::GetInstance()->GetDevice(), sizeof(Vector4) * 3);
+	    MakeVertexBufferView();
+	    materialResource = CreateBufferResource(
+	        DX12Common::GetInstance()->GetDevice(), sizeof(Vector4) * 3);
 }
 
-void Mesh::MakeVertexResource(int NumTriangle)
-{
-	    D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-
-	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-	    D3D12_RESOURCE_DESC vertexResourceDesc{};
-
-	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-
-	vertexResourceDesc.Width = sizeof(Vector4) * NumTriangle*3;
-
-	vertexResourceDesc.Height = 1;
-	vertexResourceDesc.DepthOrArraySize = 1;
-	vertexResourceDesc.MipLevels = 1;
-	vertexResourceDesc.SampleDesc.Count = 1;
-
-	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-	hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
-		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
-		&vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr, IID_PPV_ARGS(&vertexResource));
-	assert(SUCCEEDED(hr));
-}
-
-void Mesh::MakeMaterialResource(int NumTriangle)
-{
+ID3D12Resource* Mesh::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-	D3D12_RESOURCE_DESC materialResourceDesc{};
+	D3D12_RESOURCE_DESC ResourceDesc{};
 
-	materialResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	
-	materialResourceDesc.Width = sizeof(Vector4) * NumTriangle * 3;
-	
-	materialResourceDesc.Height = 1;
-	materialResourceDesc.DepthOrArraySize = 1;
-	materialResourceDesc.MipLevels = 1;
-	materialResourceDesc.SampleDesc.Count = 1;
-	
-	materialResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 
-	hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
-	    &uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &materialResourceDesc,
-	    D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&materialResource));
+	ResourceDesc.Width = sizeInBytes * 3;
+
+	ResourceDesc.Height = 1;
+	ResourceDesc.DepthOrArraySize = 1;
+	ResourceDesc.MipLevels = 1;
+	ResourceDesc.SampleDesc.Count = 1;
+
+	ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	ID3D12Resource* Resource = nullptr;
+
+	hr = device->CreateCommittedResource(
+	    &uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
+	    D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
+	return Resource;
 }
 
-void Mesh::MakeVertexBufferView(int NumTriangle)
+void Mesh::MakeVertexBufferView()
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * NumTriangle*3;
+	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 }
 
 void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 color)
 {
 	Vector4* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	Vector4* materialData = nullptr;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	
 	*materialData = color;

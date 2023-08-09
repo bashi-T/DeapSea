@@ -92,7 +92,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	for (int i = 0; i < kNumTriangle; i++)
 	{
-		mesh[i]->Initialize(kWindowWidth, kWindowHeight, kNumTriangle);
+		mesh[i]->Initialize(kWindowWidth, kWindowHeight);
 	}
 
 	while (NewMSG.message != WM_QUIT) {
