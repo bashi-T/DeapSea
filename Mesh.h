@@ -7,17 +7,12 @@
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include"MyImGui.h"
+#include"CGVector.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
-struct Vector4 final {
-	float x;
-	float y;
-	float z;
-	float w;
-};
 
 class Mesh
 {
@@ -37,9 +32,8 @@ public:
 	);
 
 	void MakePSO();
-	ID3D12Resource* CreateBufferResource(
-		ID3D12Device* device,
-		size_t sizeInBytes);
+	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
+		
 	void MakeVertexBufferView();
 	void InputDataTriangle(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
 	void DrawTriangle();
@@ -59,19 +53,20 @@ private:
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState=NULL;
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	ID3D12Resource* vertexResource = nullptr;
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+	ID3D12Resource* vertexResource = nullptr;
 	ID3D12Resource* materialResource;
+	ID3D12Resource* wvpResource;
+	float clearColor[4] = {0.1f, 0.25f, 0.5f, 1.0f};
 };

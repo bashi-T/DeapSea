@@ -40,15 +40,15 @@ void Mesh::ResetDXC()
 IDxcBlob* Mesh::CompileShader(
 	const std::wstring& filePath,
 	const wchar_t* profile,
-	IDxcUtils* dxcUtils,
-    IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler
+	IDxcUtils* dxcUtils_,
+    IDxcCompiler3* dxcCompiler_,
+	IDxcIncludeHandler* includeHandler_
 	)
 {
 	debug_->Log(debug_->ConvertString(std::format(
 		L"Begin CompileShader,path{},\n", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
-	hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
 
 	DxcBuffer shaderSourceBuffer;
@@ -69,11 +69,11 @@ IDxcBlob* Mesh::CompileShader(
 		L"-Zpr",
 	};
 	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler->Compile(
+	hr = dxcCompiler_->Compile(
 		&shaderSourceBuffer,
 		arguments,
 		_countof(arguments),
-		includeHandler,
+		includeHandler_,
 		IID_PPV_ARGS(&shaderResult)
 	);
 	assert(SUCCEEDED(hr));
@@ -102,7 +102,8 @@ void Mesh::MakePSO()
 		descriptionRootSignature_.Flags =
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	
-		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		D3D12_ROOT_PARAMETER rootParameters[2] = {};
+	    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	    rootParameters[0].Descriptor.ShaderRegister = 0;
 	    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -110,8 +111,6 @@ void Mesh::MakePSO()
 	    rootParameters[1].Descriptor.ShaderRegister = 0;
 	    descriptionRootSignature_.pParameters = rootParameters;
 	    descriptionRootSignature_.NumParameters = _countof(rootParameters);
-
-
 
 		hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
 			D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
@@ -173,7 +172,8 @@ void Mesh::MakePSO()
 		graphicsPipelineStateDesc.SampleDesc.Count = 1;
 		graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	
-		hr = DX12Common::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
+		hr = DX12Common::GetInstance()->GetDevice()->
+			CreateGraphicsPipelineState(
 			&graphicsPipelineStateDesc,
 			IID_PPV_ARGS(&graphicsPipelineState));
 		assert(SUCCEEDED(hr));
@@ -181,14 +181,13 @@ void Mesh::MakePSO()
 
 void Mesh::Update()
 {
-	    vertexResource = CreateBufferResource(
-	        DX12Common::GetInstance()->GetDevice(), sizeof(Vector4) * 3);
+	    vertexResource = CreateBufferResource(sizeof(Vector4) * 3);
 	    MakeVertexBufferView();
-	    materialResource = CreateBufferResource(
-	        DX12Common::GetInstance()->GetDevice(), sizeof(Vector4) * 3);
+	    materialResource = CreateBufferResource(sizeof(Vector4));
+	    wvpResource=CreateBufferResource(sizeof(Matrix4x4));
 }
 
-ID3D12Resource* Mesh::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -207,7 +206,7 @@ ID3D12Resource* Mesh::CreateBufferResource(ID3D12Device* device, size_t sizeInBy
 
 	ID3D12Resource* Resource = nullptr;
 
-	hr = device->CreateCommittedResource(
+	hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
 	    &uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
 	    D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
@@ -225,10 +224,14 @@ void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 colo
 {
 	Vector4* vertexData = nullptr;
 	Vector4* materialData = nullptr;
+	Matrix4x4* wvpData = nullptr;
+
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+
 	*materialData = color;
+	*wvpData = MakeIdentity4x4();
 
 	vertexData[0] = Left; 
 	vertexData[1] = Top;  
@@ -236,10 +239,6 @@ void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 colo
 }
 
 void Mesh::DrawTriangle() {
-	float clearColor[] =
-	{
-		0.1f, 0.25f,0.5f,1.0f
-	};
 	DX12Common::GetInstance()->GetCommandList()->ClearRenderTargetView(
 	    DX12Common::GetInstance()->
 		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex()),
@@ -272,6 +271,10 @@ void Mesh::Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color) {
 			materialResource->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
+	    SetGraphicsRootConstantBufferView(1,
+			wvpResource->GetGPUVirtualAddress());
+
+	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(3, 1, 0, 0);
 }
     
@@ -280,6 +283,7 @@ void Mesh::MeshRelease()
 {
 	vertexResource->Release();
 	materialResource->Release();
+	wvpResource->Release();
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
 	if (errorBlob)

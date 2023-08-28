@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CGVector.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DX12Common.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="MyImGui.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="CGVector.h" />
     <ClInclude Include="WindowApp.h" />
   </ItemGroup>
   <ItemGroup>
