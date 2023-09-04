@@ -46,7 +46,8 @@ private:
 	WinAPP* sWinApp;
 	MyImGui* imgui_;
 	HRESULT hr = NULL;
-	
+	TransformMatrix transformMatrix;
+
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
@@ -69,4 +70,15 @@ private:
 	ID3D12Resource* materialResource;
 	ID3D12Resource* wvpResource;
 	float clearColor[4] = {0.1f, 0.25f, 0.5f, 1.0f};
+	Vector4* vertexData = nullptr;
+	Vector4* materialData = nullptr;
+	Matrix4x4* wvpData = nullptr;
+
+	TransformMatrix cameraTransform;
+
+	Matrix4x4 cameraMatrix;
+	Matrix4x4 viewMatrix;
+	Matrix4x4 projectionMatrix;
+	Matrix4x4 worldViewProjectionMatrix;
 };
+

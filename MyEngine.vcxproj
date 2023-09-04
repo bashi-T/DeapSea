@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CGVector.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DX12Common.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="WindowApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DX12Common.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />

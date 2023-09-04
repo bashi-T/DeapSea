@@ -90,12 +90,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Right[9] = {0.4f, 0.5f, 0.0f, 1.0f};
 	Color[9] = {1.0f, 1.0f, 1.0f, 1.0f};
 
+	 
+
 	for (int i = 0; i < kNumTriangle; i++)
 	{
 		mesh[i]->Initialize(kWindowWidth, kWindowHeight);
 	}
 
 	while (NewMSG.message != WM_QUIT) {
+		
 		imgui->Update();
 
 		for (int i = 0; i < kNumTriangle; i++) {

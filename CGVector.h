@@ -3,16 +3,6 @@
 #include<cmath>
 #include<stdio.h>
 
-//int kWindowWidth = 1280;
-//int kWindowHeight = 720;
-
-//typedef struct Matrix2x2 {
-//	float m[2][2];
-//} Matrix2x2;
-//
-//typedef struct Matrix3x3 {
-//	float m[3][3];
-//} Matrix3x3;
 
 typedef struct Matrix4x4 {
 	float m[4][4];
@@ -34,6 +24,12 @@ struct Vector4 final {
 	float y;
 	float z;
 	float w;
+};
+
+struct TransformMatrix {
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
 };
 
 //Matrix2x2 Add(Matrix2x2 a, Matrix2x2 b) {

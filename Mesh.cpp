@@ -25,6 +25,10 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	Mesh::ResetDXC();
 
 	Mesh::MakePSO();
+
+	transformMatrix={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	cameraTransform={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
 }
 
 void Mesh::ResetDXC()
@@ -185,6 +189,8 @@ void Mesh::Update()
 	    MakeVertexBufferView();
 	    materialResource = CreateBufferResource(sizeof(Vector4));
 	    wvpResource=CreateBufferResource(sizeof(Matrix4x4));
+
+
 }
 
 ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
@@ -222,16 +228,19 @@ void Mesh::MakeVertexBufferView()
 
 void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 color)
 {
-	Vector4* vertexData = nullptr;
-	Vector4* materialData = nullptr;
-	Matrix4x4* wvpData = nullptr;
-
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 
 	*materialData = color;
 	*wvpData = MakeIdentity4x4();
+
+	transformMatrix.rotate.y += 0.03f;
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	viewMatrix = Inverse(cameraMatrix);
+	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	*wvpData = worldViewProjectionMatrix;
 
 	vertexData[0] = Left; 
 	vertexData[1] = Top;  
