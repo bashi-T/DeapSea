@@ -7,6 +7,7 @@ const int32_t kWindowHeight = 720;
 const int32_t kNumTriangle = 10;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	CoInitializeEx(0, COINIT_MULTITHREADED);
 	//OutputDebugStringA("HelloDirectX!\n");
 	Mesh* mesh[kNumTriangle];
 	for (int i = 0; i < kNumTriangle; i++)
@@ -148,5 +149,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	dx12Common->DX12Release(debug->GetDebugController());
 	debug->ReportLiveObject();
+	CoUninitialize();
 	return 0;
 }
