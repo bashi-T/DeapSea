@@ -5,6 +5,7 @@
 #include"Debug.h"
 #include<d3d12.h>
 #include<dxgi1_6.h>
+#include<DirectXTex.h>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
@@ -34,6 +35,10 @@ public:
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 		UINT numDesctiptors,
 	    bool shaderVisible);
+	DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+
 	ID3D12Device* GetDevice() { return device; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
 	UINT GetBackBufferIndex() { return backBufferIndex; }
