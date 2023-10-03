@@ -37,7 +37,9 @@ public:
 	    bool shaderVisible);
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
-	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata);
+
+	void MakeShaderResourceView(const DirectX::TexMetadata& metadata);
 
 	ID3D12Device* GetDevice() { return device; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
@@ -78,5 +80,7 @@ private:
 	HANDLE fenceEvent;
 	D3D12_RESOURCE_BARRIER barrier{};
 	UINT backBufferIndex;
+	ID3D12Resource* textureResource;
+	DirectX::ScratchImage mipImages;
 };
 

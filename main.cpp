@@ -100,6 +100,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	while (NewMSG.message != WM_QUIT) {
 		
+
 		imgui->Update();
 
 		for (int i = 0; i < kNumTriangle; i++) {

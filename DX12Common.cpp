@@ -11,16 +11,17 @@ void DX12Common::Init()
 	DX12Common::MakeDXGIFactory();
 	DX12Common::ChoseUseAdapter();
 	DX12Common::MakeD3D12Device();
-	DirectX::ScratchImage mipImages = DX12Common::LoadTexture("Resource/uvChecker.png");
+	mipImages = DX12Common::LoadTexture("Resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
-	UploadTextureData(textureResource, mipImages);
+	textureResource = CreateTextureResource(device, metadata);
+	DX12Common::UploadTextureData(textureResource, mipImages, metadata);
 
 #ifdef _DEBUG
 	debug_->InfoQueue(GetDevice());
 #endif
 	DX12Common::MakeScreen();
 	DX12Common::MakeFence();
+	DX12Common::MakeShaderResourceView(metadata);
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -318,9 +319,8 @@ ID3D12Resource* DX12Common::CreateTextureResource(ID3D12Device* device, const Di
 	return resource;
 }
 
-void DX12Common::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
+void DX12Common::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
 {
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
 	{
 		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
@@ -333,5 +333,19 @@ void DX12Common::UploadTextureData(ID3D12Resource* texture, const DirectX::Scrat
 		);
 		assert(SUCCEEDED(hr));
 	}
+}
+
+void DX12Common::MakeShaderResourceView(const DirectX::TexMetadata& metadata)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+
+	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 }
 
