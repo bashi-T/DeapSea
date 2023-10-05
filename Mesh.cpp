@@ -173,7 +173,7 @@ void Mesh::MakePSO()
 	
 		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	
+
 		vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0",
 			dxcUtils, dxcCompiler, includeHandler);
 		assert(vertexShaderBlob != nullptr);
@@ -272,7 +272,7 @@ void Mesh::InputDataTriangle(
 	*materialData = color;
 	*wvpData = MakeIdentity4x4();
 
-	//transformMatrix.rotate.y += 0.03f;
+	transformMatrix.rotate.y += 0.015f;
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	viewMatrix = Inverse(cameraMatrix);

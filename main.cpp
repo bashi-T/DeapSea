@@ -4,7 +4,7 @@
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
-const int32_t kNumTriangle = 1;
+const int32_t kNumTriangle = 2;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	debug->DebugLayer();
 #endif
 	//ImGui::Begin("color");
-	dx12Common->Init("Resource/uvChecker.png");
+	dx12Common->Init("Resource/uvChecker.png", kWindowWidth, kWindowHeight);
 	imgui->Initialize(
 	    winAPP->GetHWND(),
 		dx12Common->GetInstance()->GetDevice(),
@@ -52,10 +52,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	texcoordRight[0] = {1.0f,1.0f};
 	texcoordLeft[0] = { 0.0f,1.0f };
 
-	//Top[1] = {-0.25f, -0.7f, 0.0f, 1.0f};
-	//Left[1] = {-0.5f, -1.0f, 0.0f, 1.0f};
-	//Right[1] = {0.0f, -1.0f, 0.0f, 1.0f};
-	//Color[1] = {1.0f, 0.0f, 0.0f, 1.0f};
+	Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
+	Right[1] = { 0.7f, -0.5f, 0.5f, 1.0f };
+	Left[1] = { -0.7f, -0.5f, -0.5f, 1.0f };
+	Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
+	texcoordTop[1] = { 0.5f,0.0f };
+	texcoordRight[1] = { 1.0f,1.0f };
+	texcoordLeft[1] = { 0.0f,1.0f };
 
 	//Top[2] = {0.25f, -0.8f, 0.0f, 1.0f};
 	//Left[2] = {0.0f, -1.0f, 0.0f, 1.0f};
@@ -114,7 +117,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		ImGui::Begin("TriangleColor");
 		ImGui::ColorEdit3("Triangle1", (float*)&Color[0]);
-		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
+		ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
 		//ImGui::ColorEdit3("Triangle3", (float*)&Color[2]);
 		//ImGui::ColorEdit3("Triangle4", (float*)&Color[3]);
 		//ImGui::ColorEdit3("Triangle5", (float*)&Color[4]);

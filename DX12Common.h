@@ -12,7 +12,7 @@
 class DX12Common final
 {
 public:
-	void Init(const std::string& filePath);
+	void Init(const std::string& filePath, int32_t width, int32_t height);
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
 	void MakeD3D12Device();
@@ -40,6 +40,8 @@ public:
 	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata);
 
 	void MakeShaderResourceView(const DirectX::TexMetadata& metadata);
+	ID3D12Resource* CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+
 
 	ID3D12Device* GetDevice() { return device; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
@@ -88,5 +90,6 @@ private:
 	DirectX::ScratchImage mipImages;
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
+	ID3D12Resource* depthStencilResource;
 };
 

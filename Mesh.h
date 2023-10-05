@@ -39,7 +39,6 @@ public:
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
-		
 	void MakeVertexBufferView();
 	void InputDataTriangle(
 		Vector4 Top,

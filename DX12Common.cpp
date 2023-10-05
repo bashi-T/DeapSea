@@ -6,7 +6,7 @@ DX12Common* DX12Common::GetInstance()
 	return &instance;
 }
 
-void DX12Common::Init(const std::string& filePath)
+void DX12Common::Init(const std::string& filePath, int32_t width, int32_t height)
 {
 	DX12Common::MakeDXGIFactory();
 	DX12Common::ChoseUseAdapter();
@@ -15,6 +15,10 @@ void DX12Common::Init(const std::string& filePath)
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource = CreateTextureResource(device, metadata);
 	DX12Common::UploadTextureData(textureResource, mipImages, metadata);
+	depthStencilResource = CreatedepthstencilTextureResource(
+		DX12Common::GetInstance()->GetDevice(),
+		width,
+		height);
 
 #ifdef _DEBUG
 	debug_->InfoQueue(GetDevice());
@@ -126,6 +130,19 @@ void DX12Common::MakeDescriptorHeap()
 	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
 		IID_PPV_ARGS(&rtvDescriptorHeap));
 	assert(SUCCEEDED(hr));
+
+	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(
+		device,
+		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+		1,
+		false);
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	device->CreateDepthStencilView(
+		depthStencilResource,
+		&dsvDesc,
+		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void DX12Common::BringResources()
@@ -350,5 +367,36 @@ void DX12Common::MakeShaderResourceView(const DirectX::TexMetadata& metadata)
 	textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+}
+
+ID3D12Resource* DX12Common::CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&depthClearValue,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+	return resource;
 }
 
