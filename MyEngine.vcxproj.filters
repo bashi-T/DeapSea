@@ -117,5 +117,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Object3d.hlsli" />
   </ItemGroup>
 </Project>

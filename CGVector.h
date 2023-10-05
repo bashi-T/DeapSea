@@ -8,10 +8,10 @@ typedef struct Matrix4x4 {
 	float m[4][4];
 } Matrix4x4;
 
-//typedef struct Vector2 {
-//	float x;
-//	float y;
-//} Vector2;
+typedef struct Vector2 {
+	float x;
+	float y;
+} Vector2;
 
 typedef struct Vector3 {
 	float x;

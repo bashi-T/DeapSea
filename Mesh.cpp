@@ -9,7 +9,8 @@ Mesh::~Mesh()
 	delete graphicsPipelineState;
 }
 
-void Mesh::Initialize(int32_t width, int32_t height) {
+void Mesh::Initialize(int32_t width, int32_t height)
+{
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.Width = width;
@@ -106,15 +107,39 @@ void Mesh::MakePSO()
 		descriptionRootSignature_.Flags =
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	
-		D3D12_ROOT_PARAMETER rootParameters[2] = {};
+		D3D12_ROOT_PARAMETER rootParameters[3] = {};
 	    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	    rootParameters[0].Descriptor.ShaderRegister = 0;
 	    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	    rootParameters[1].Descriptor.ShaderRegister = 0;
+
+		D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+		descriptorRange[0].BaseShaderRegister = 0;
+		descriptorRange[0].NumDescriptors = 1;
+		descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		
+		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
+		rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+
 	    descriptionRootSignature_.pParameters = rootParameters;
 	    descriptionRootSignature_.NumParameters = _countof(rootParameters);
+
+		D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+		staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
+		staticSamplers[0].ShaderRegister = 0;
+		staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		descriptionRootSignature_.pStaticSamplers = staticSamplers;
+		descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers);
 
 		hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
 			D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
@@ -135,7 +160,11 @@ void Mesh::MakePSO()
 		inputElementDescs[0].SemanticIndex = 0;
 		inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	
+		inputElementDescs[1].SemanticName = "TEXCOORD";
+		inputElementDescs[1].SemanticIndex = 0;
+		inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 		inputLayoutDesc.pInputElementDescs = inputElementDescs;
 		inputLayoutDesc.NumElements = _countof(inputElementDescs);
 	
@@ -185,7 +214,7 @@ void Mesh::MakePSO()
 
 void Mesh::Update()
 {
-	    vertexResource = CreateBufferResource(sizeof(Vector4) * 3);
+	    vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 	    MakeVertexBufferView();
 	    materialResource = CreateBufferResource(sizeof(Vector4));
 	    wvpResource=CreateBufferResource(sizeof(Matrix4x4));
@@ -222,12 +251,20 @@ ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
 void Mesh::MakeVertexBufferView()
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
-	vertexBufferView.StrideInBytes = sizeof(Vector4);
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
 }
 
-void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 color)
+void Mesh::InputDataTriangle(
+	Vector4 Top,
+	Vector4 Right,
+	Vector4 Left,
+	Vector4 color,
+	Vector2 coordTop,
+	Vector2 coordRight,
+	Vector2 coordLeft)
 {
+	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
@@ -235,16 +272,19 @@ void Mesh::InputDataTriangle(Vector4 Top,Vector4 Right,Vector4 Left,Vector4 colo
 	*materialData = color;
 	*wvpData = MakeIdentity4x4();
 
-	transformMatrix.rotate.y += 0.03f;
+	//transformMatrix.rotate.y += 0.03f;
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	viewMatrix = Inverse(cameraMatrix);
 	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	*wvpData = worldViewProjectionMatrix;
 
-	vertexData[0] = Left; 
-	vertexData[1] = Top;  
-	vertexData[2] = Right;
+	vertexData[0].position = Top;
+	vertexData[1].position = Right;
+	vertexData[2].position = Left;
+	vertexData[0].texcoord = coordTop;
+	vertexData[1].texcoord = coordRight;
+	vertexData[2].texcoord = coordLeft;
 }
 
 void Mesh::DrawTriangle() {
@@ -254,14 +294,29 @@ void Mesh::DrawTriangle() {
 	    clearColor, 0, nullptr);
 }
 
-void Mesh::Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color) {
+void Mesh::Draw(
+	Vector4 Top,
+	Vector4 Right,
+	Vector4 Left,
+	Vector4 color,
+	Vector2 coordTop,
+	Vector2 coordRight,
+	Vector2 coordLeft)
+{
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetViewports(1, &viewport);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetScissorRects(1, &scissorRect);
 
-		InputDataTriangle( Top, Right, Left,color);
+		InputDataTriangle(
+			Top,
+			Right,
+			Left,
+			color,
+			coordTop,
+			coordRight,
+			coordLeft);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		SetPipelineState(graphicsPipelineState);
@@ -284,9 +339,14 @@ void Mesh::Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color) {
 			wvpResource->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootDescriptorTable(2,
+			DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+
+	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(3, 1, 0, 0);
+
+
 }
-    
 
 void Mesh::MeshRelease()
 {

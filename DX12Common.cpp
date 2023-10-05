@@ -6,12 +6,12 @@ DX12Common* DX12Common::GetInstance()
 	return &instance;
 }
 
-void DX12Common::Init()
+void DX12Common::Init(const std::string& filePath)
 {
 	DX12Common::MakeDXGIFactory();
 	DX12Common::ChoseUseAdapter();
 	DX12Common::MakeD3D12Device();
-	mipImages = DX12Common::LoadTexture("Resource/uvChecker.png");
+	mipImages = DX12Common::LoadTexture(filePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource = CreateTextureResource(device, metadata);
 	DX12Common::UploadTextureData(textureResource, mipImages, metadata);
@@ -312,8 +312,8 @@ ID3D12Resource* DX12Common::CreateTextureResource(ID3D12Device* device, const Di
 		&resourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&resource)
-	);
+		IID_PPV_ARGS(&resource));
+	
 	assert(SUCCEEDED(hr));
 
 	return resource;
@@ -343,8 +343,11 @@ void DX12Common::MakeShaderResourceView(const DirectX::TexMetadata& metadata)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+	textureSrvHandleCPU = GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	textureSrvHandleGPU = GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+
+	textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 }

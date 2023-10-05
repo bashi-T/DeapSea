@@ -12,7 +12,7 @@
 class DX12Common final
 {
 public:
-	void Init();
+	void Init(const std::string& filePath);
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
 	void MakeD3D12Device();
@@ -52,6 +52,10 @@ public:
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap; }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() {return textureSrvHandleCPU; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() {return textureSrvHandleGPU; }
+	
+		
 
 private:
 	DX12Common()=default;
@@ -82,5 +86,7 @@ private:
 	UINT backBufferIndex;
 	ID3D12Resource* textureResource;
 	DirectX::ScratchImage mipImages;
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 };
 

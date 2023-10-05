@@ -17,12 +17,18 @@
 class Mesh
 {
 public:
-	//Mesh();
 	~Mesh();
 	void Initialize(int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
-	void Draw(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
+	void Draw(
+		Vector4 Top,
+		Vector4 Right,
+		Vector4 Left,
+		Vector4 color,
+		Vector2 coordTop,
+		Vector2 coordRight,
+		Vector2 coordLeft);
 	IDxcBlob* CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -35,7 +41,14 @@ public:
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
 		
 	void MakeVertexBufferView();
-	void InputDataTriangle(Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color);
+	void InputDataTriangle(
+		Vector4 Top,
+		Vector4 Right,
+		Vector4 Left,
+		Vector4 color,
+		Vector2 coordTop,
+		Vector2 coordRight,
+		Vector2 coordLeft);
 	void DrawTriangle();
 	void MeshRelease();
 
@@ -61,7 +74,7 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -70,9 +83,14 @@ private:
 	ID3D12Resource* materialResource;
 	ID3D12Resource* wvpResource;
 	float clearColor[4] = {0.1f, 0.25f, 0.5f, 1.0f};
-	Vector4* vertexData = nullptr;
+
 	Vector4* materialData = nullptr;
 	Matrix4x4* wvpData = nullptr;
+	struct VertexData
+	{
+		Vector4 position;
+		Vector2 texcoord;
+	};
 
 	TransformMatrix cameraTransform;
 

@@ -67,6 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Object3d.hlsli" />
     <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

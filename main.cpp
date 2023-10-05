@@ -4,7 +4,7 @@
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
-const int32_t kNumTriangle = 10;
+const int32_t kNumTriangle = 1;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	debug->DebugLayer();
 #endif
 	//ImGui::Begin("color");
-	dx12Common->Init();
+	dx12Common->Init("Resource/uvChecker.png");
 	imgui->Initialize(
 	    winAPP->GetHWND(),
 		dx12Common->GetInstance()->GetDevice(),
@@ -40,11 +40,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector4 Left[kNumTriangle];
 	Vector4 Right[kNumTriangle];
 	Vector4 Color[kNumTriangle];
+	Vector2 texcoordTop[kNumTriangle];
+	Vector2 texcoordLeft[kNumTriangle];
+	Vector2 texcoordRight[kNumTriangle];
 
-	Top[0] = {0.0f, 0.6f, 0.0f, 1.0f};
-	Left[0] = {-1.0f, -0.6f, 0.0f, 1.0f};
-	Right[0] = { 1.0f, -0.6f, 0.0f, 1.0f};
-	Color[0] = {1.0f, 0.0f, 0.0f, 1.0f};
+	Top[0] = {0.0f, 0.5f, 0.0f, 1.0f};
+	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f};
+	Left[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+	Color[0] = {1.0f, 1.0f, 1.0f, 1.0f};
+	texcoordTop[0] = {0.5f,0.0f};
+	texcoordRight[0] = {1.0f,1.0f};
+	texcoordLeft[0] = { 0.0f,1.0f };
 
 	//Top[1] = {-0.25f, -0.7f, 0.0f, 1.0f};
 	//Left[1] = {-0.5f, -1.0f, 0.0f, 1.0f};
@@ -98,9 +104,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		mesh[i]->Initialize(kWindowWidth, kWindowHeight);
 	}
 
-	while (NewMSG.message != WM_QUIT) {
+	while (NewMSG.message != WM_QUIT)
+	{
 		
-
 		imgui->Update();
 
 		for (int i = 0; i < kNumTriangle; i++) {
@@ -108,15 +114,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		ImGui::Begin("TriangleColor");
 		ImGui::ColorEdit3("Triangle1", (float*)&Color[0]);
-		ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
-		ImGui::ColorEdit3("Triangle3", (float*)&Color[2]);
-		ImGui::ColorEdit3("Triangle4", (float*)&Color[3]);
-		ImGui::ColorEdit3("Triangle5", (float*)&Color[4]);
-		ImGui::ColorEdit3("Triangle6", (float*)&Color[5]);
-		ImGui::ColorEdit3("Triangle7", (float*)&Color[6]);
-		ImGui::ColorEdit3("Triangle8", (float*)&Color[7]);
-		ImGui::ColorEdit3("Triangle9", (float*)&Color[8]);
-		ImGui::ColorEdit3("Triangle10", (float*)&Color[9]);
+		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
+		//ImGui::ColorEdit3("Triangle3", (float*)&Color[2]);
+		//ImGui::ColorEdit3("Triangle4", (float*)&Color[3]);
+		//ImGui::ColorEdit3("Triangle5", (float*)&Color[4]);
+		//ImGui::ColorEdit3("Triangle6", (float*)&Color[5]);
+		//ImGui::ColorEdit3("Triangle7", (float*)&Color[6]);
+		//ImGui::ColorEdit3("Triangle8", (float*)&Color[7]);
+		//ImGui::ColorEdit3("Triangle9", (float*)&Color[8]);
+		//ImGui::ColorEdit3("Triangle10", (float*)&Color[9]);
 		ImGui::End();
 
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE)) {
@@ -136,7 +142,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				SetDescriptorHeaps(1, descriptorHeaps);
 
 			for (int i = 0; i < kNumTriangle; i++) {
-				mesh[i]->Draw(Top[i], Right[i], Left[i], Color[i]);
+				mesh[i]->Draw(Top[i], Right[i], Left[i], Color[i], texcoordTop[i], texcoordRight[i], texcoordLeft[i]);
 			}
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
