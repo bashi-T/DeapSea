@@ -16,7 +16,7 @@ void DX12Common::Init(const std::string& filePath, int32_t width, int32_t height
 	textureResource = CreateTextureResource(device, metadata);
 	DX12Common::UploadTextureData(textureResource, mipImages, metadata);
 	depthStencilResource = CreatedepthstencilTextureResource(
-		DX12Common::GetInstance()->GetDevice(),
+		device,
 		width,
 		height);
 
@@ -214,7 +214,7 @@ void DX12Common::DrawScreen()
 	commandList->ResourceBarrier(1, &barrier);
 
 	commandList->ClearDepthStencilView(
-		DX12Common::GetInstance()->GetDsvHandle(),
+		dsvHandle,
 		D3D12_CLEAR_FLAG_DEPTH,
 		1.0f,
 		0,
@@ -223,8 +223,8 @@ void DX12Common::DrawScreen()
 
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
 		false, nullptr);
-	commandList->ClearRenderTargetView(DX12Common::GetInstance()->
-		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex()),
+	commandList->ClearRenderTargetView(
+		rtvHandles[backBufferIndex],
 		clearColor, 0, nullptr);
 
 }
