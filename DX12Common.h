@@ -24,6 +24,7 @@ public:
 	void MakeDescriptorHeap();
 	void BringResources();
 	void MakeRTV();
+	void MakeDSV();
 
 	void MakeScreen();
 	void DrawScreen();
@@ -50,13 +51,16 @@ public:
 	uint64_t fenceValue = 0;
 	static DX12Common* GetInstance();
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
 	ID3D12DescriptorHeap* GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap; }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() {return textureSrvHandleCPU; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() {return textureSrvHandleGPU; }
-	
+	ID3D12DescriptorHeap* GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
+
+
 		
 
 private:
@@ -71,6 +75,8 @@ private:
 	HRESULT hr = NULL;
 	IDXGIAdapter4* useAdapter = nullptr;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+	float clearColor[4] = { 0.1f, 0.25f, 0.5f, 1.0f };
 
 	ID3D12CommandQueue* commandQueue = nullptr;
 	ID3D12CommandAllocator* commandAllocator = nullptr;
@@ -78,9 +84,12 @@ private:
 	IDXGISwapChain4* swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
-	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	ID3D12DescriptorHeap* dsvDescriptorHeap;
+
 	ID3D12Resource* swapChainResources[10] = { nullptr };
 	ID3D12Fence* fence = nullptr;
 	HANDLE fenceEvent;

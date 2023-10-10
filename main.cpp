@@ -53,8 +53,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	texcoordLeft[0] = { 0.0f,1.0f };
 
 	Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
-	Right[1] = { 0.7f, -0.5f, 0.5f, 1.0f };
-	Left[1] = { -0.7f, -0.5f, -0.5f, 1.0f };
+	Right[1] = { 0.5f, -0.5f, 0.5f, 1.0f };
+	Left[1] = { -0.5f, -0.5f, -0.5f, 1.0f };
 	Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
 	texcoordTop[1] = { 0.5f,0.0f };
 	texcoordRight[1] = { 1.0f,1.0f };
@@ -134,9 +134,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else{
 			dx12Common->DrawScreen();
 
-			for (int i = 0; i < kNumTriangle; i++) {
-				mesh[i]->DrawTriangle();
-			}
 			ID3D12DescriptorHeap* descriptorHeaps[] =
 			{
 			    dx12Common->GetInstance()->GetSrvDescriptorHeap()

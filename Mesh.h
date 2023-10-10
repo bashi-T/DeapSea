@@ -81,8 +81,7 @@ private:
 	ID3D12Resource* vertexResource = nullptr;
 	ID3D12Resource* materialResource;
 	ID3D12Resource* wvpResource;
-	float clearColor[4] = {0.1f, 0.25f, 0.5f, 1.0f};
-
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	Vector4* materialData = nullptr;
 	Matrix4x4* wvpData = nullptr;
 	struct VertexData

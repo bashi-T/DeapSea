@@ -182,6 +182,10 @@ void Mesh::MakePSO()
 			dxcUtils, dxcCompiler, includeHandler);
 		assert(pixelShaderBlob != nullptr);
 	
+		depthStencilDesc.DepthEnable = true;
+		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
 		graphicsPipelineStateDesc.pRootSignature = rootSignature;
 		graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 		graphicsPipelineStateDesc.VS =
@@ -204,7 +208,10 @@ void Mesh::MakePSO()
 	
 		graphicsPipelineStateDesc.SampleDesc.Count = 1;
 		graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	
+
+		graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+		graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 		hr = DX12Common::GetInstance()->GetDevice()->
 			CreateGraphicsPipelineState(
 			&graphicsPipelineStateDesc,
@@ -218,7 +225,6 @@ void Mesh::Update()
 	    MakeVertexBufferView();
 	    materialResource = CreateBufferResource(sizeof(Vector4));
 	    wvpResource=CreateBufferResource(sizeof(Matrix4x4));
-
 
 }
 
@@ -272,7 +278,7 @@ void Mesh::InputDataTriangle(
 	*materialData = color;
 	*wvpData = MakeIdentity4x4();
 
-	transformMatrix.rotate.y += 0.015f;
+	transformMatrix.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	viewMatrix = Inverse(cameraMatrix);
@@ -287,12 +293,6 @@ void Mesh::InputDataTriangle(
 	vertexData[2].texcoord = coordLeft;
 }
 
-void Mesh::DrawTriangle() {
-	DX12Common::GetInstance()->GetCommandList()->ClearRenderTargetView(
-	    DX12Common::GetInstance()->
-		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex()),
-	    clearColor, 0, nullptr);
-}
 
 void Mesh::Draw(
 	Vector4 Top,
@@ -338,14 +338,23 @@ void Mesh::Draw(
 	    SetGraphicsRootConstantBufferView(1,
 			wvpResource->GetGPUVirtualAddress());
 
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->
+		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+
+	DX12Common::GetInstance()->GetCommandList()->
+		OMSetRenderTargets(
+			1,
+			&rtv,
+			false,
+			&dsv);
+
 	DX12Common::GetInstance()->GetCommandList()->
 		SetGraphicsRootDescriptorTable(2,
 			DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(3, 1, 0, 0);
-
-
 }
 
 void Mesh::MeshRelease()

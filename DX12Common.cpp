@@ -131,18 +131,6 @@ void DX12Common::MakeDescriptorHeap()
 		IID_PPV_ARGS(&rtvDescriptorHeap));
 	assert(SUCCEEDED(hr));
 
-	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(
-		device,
-		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-		1,
-		false);
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	device->CreateDepthStencilView(
-		depthStencilResource,
-		&dsvDesc,
-		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void DX12Common::BringResources()
@@ -170,6 +158,19 @@ void DX12Common::MakeRTV()
 		swapChainResources[1], &rtvDesc, rtvHandles[1]);
 }
 
+void DX12Common::MakeDSV()
+{
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	device->CreateDepthStencilView(
+		depthStencilResource,
+		&dsvDesc,
+		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	dsvHandle = dsvDescriptorHeap->
+		GetCPUDescriptorHandleForHeapStart();
+}
+
 void DX12Common::MakeScreen()
 {
 	MakeCommandQueue();
@@ -186,15 +187,20 @@ void DX12Common::MakeScreen()
 		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
 		2,
 		false);
-	srvDescriptorHeap =
-	    CreateDescriptorHeap(
-			device,
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			128,
-			true);
-	
+	srvDescriptorHeap = CreateDescriptorHeap(
+		device,
+		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		128,
+		true);
+	dsvDescriptorHeap = CreateDescriptorHeap(
+		device,
+		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+		1,
+		false);
+
 	BringResources();
 	MakeRTV();
+	MakeDSV();
 }
 
 void DX12Common::DrawScreen()
@@ -207,8 +213,20 @@ void DX12Common::DrawScreen()
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
 
+	commandList->ClearDepthStencilView(
+		DX12Common::GetInstance()->GetDsvHandle(),
+		D3D12_CLEAR_FLAG_DEPTH,
+		1.0f,
+		0,
+		0,
+		nullptr);
+
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
 		false, nullptr);
+	commandList->ClearRenderTargetView(DX12Common::GetInstance()->
+		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex()),
+		clearColor, 0, nullptr);
+
 }
 
 void DX12Common::ClearScreen()
@@ -399,4 +417,3 @@ ID3D12Resource* DX12Common::CreatedepthstencilTextureResource(ID3D12Device* devi
 	assert(SUCCEEDED(hr));
 	return resource;
 }
-
