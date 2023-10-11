@@ -64,7 +64,7 @@ private:
 	TransformMatrix transformMatrixSprite;
 	ID3D12Resource* transformationMatrixResourceSprite;
 	Matrix4x4* wvpData = nullptr;
-	Matrix4x4* transformationMatrixDataSprite;
+	Matrix4x4* transformationMatrixDataSprite = nullptr;
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
@@ -75,10 +75,12 @@ private:
 	ID3DBlob* errorBlob = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
+
 	ID3D12Resource* vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	ID3D12Resource* vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
@@ -87,6 +89,7 @@ private:
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ID3D12Resource* materialResource;
+	ID3D12Resource* materialResourceSprite;
 	ID3D12Resource* wvpResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	Vector4* materialData = nullptr;

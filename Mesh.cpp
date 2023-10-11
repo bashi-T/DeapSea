@@ -27,17 +27,16 @@ void Mesh::Initialize(int32_t width, int32_t height)
 
 	Mesh::MakePSO();
 
+	transformMatrix = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
+	
 	transformationMatrixResourceSprite = CreateBufferResource(sizeof(Matrix4x4));
-	transformationMatrixDataSprite = nullptr;
 	transformationMatrixResourceSprite->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 	*transformationMatrixDataSprite = MakeIdentity4x4();
-	transformMatrix = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	transformMatrixSprite = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
-	//cameraTransformSprite = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
-	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
 	projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
+	transformMatrixSprite = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 }
 
 void Mesh::ResetDXC()
@@ -179,7 +178,7 @@ void Mesh::MakePSO()
 		blendDesc.RenderTarget[0].RenderTargetWriteMask =
 			D3D12_COLOR_WRITE_ENABLE_ALL;
 	
-		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 		vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0",
@@ -232,8 +231,8 @@ void Mesh::Update()
 	    vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 		vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
 		MakeVertexBufferView();
-	    materialResource = CreateBufferResource(sizeof(Vector4));
-	    wvpResource=CreateBufferResource(sizeof(Matrix4x4));
+		materialResource = CreateBufferResource(sizeof(Vector4));
+		wvpResource=CreateBufferResource(sizeof(Matrix4x4));
 
 }
 
@@ -269,7 +268,7 @@ void Mesh::MakeVertexBufferView()
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	vertexBufferViewSprite.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 }
@@ -319,15 +318,9 @@ void Mesh::InputDataSprite(
 {
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 
-	*materialData = color;
-
-	//transformMatrix.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSprite.scale, transformMatrixSprite.rotate, transformMatrixSprite.translate);
-	cameraMatrixSprite = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	viewMatrixSprite = Inverse(cameraMatrixSprite);
+	viewMatrixSprite = MakeIdentity4x4();
 	worldViewProjectionMatrixSprite = Multiply(worldMatrix, Multiply(viewMatrixSprite, projectionMatrixSprite));
 	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
@@ -365,18 +358,11 @@ void Mesh::Draw()
 		IASetVertexBuffers(0, 1, &vertexBufferView);
 
 	DX12Common::GetInstance()->GetCommandList()->
-		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-
-	DX12Common::GetInstance()->GetCommandList()->
 		IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		SetGraphicsRootConstantBufferView(0,
 			materialResource->GetGPUVirtualAddress());
-
-	DX12Common::GetInstance()->GetCommandList()->
-		SetGraphicsRootConstantBufferView(1,
-			transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
 	    SetGraphicsRootConstantBufferView(1,
@@ -399,6 +385,15 @@ void Mesh::Draw()
 
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(3, 1, 0, 0);
+
+
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootConstantBufferView(1,
+			transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(6, 1, 0, 0);
 }

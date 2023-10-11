@@ -26,7 +26,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #ifdef _DEBUG
 	debug->DebugLayer();
 #endif
-	//ImGui::Begin("color");
+
 	dx12Common->Init("Resource/uvChecker.png", kWindowWidth, kWindowHeight);
 	imgui->Initialize(
 	    winAPP->GetHWND(),
@@ -78,39 +78,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	texcoordRightTop[0] = {1.0f, 0.0f};
 	texcoordRightBottom[0] = {1.0f, 1.0f};
 	texcoordLeftBottom[0] = {0.0f, 1.0f};
-
-
-	//Top[4] = {-0.45f, 0.0f, 0.0f, 1.0f};
-	//Left[4] = {-0.6f, -0.5f, 0.0f, 1.0f};
-	//Right[4] = {-0.3f, -0.5f, 0.0f, 1.0f};
-	//Color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-
-	//Top[5] = {0.25f, 0.0f, 0.0f, 1.0f};
-	//Left[5] = {0.05f, -0.5f, 0.0f, 1.0f};
-	//Right[5] = {0.55f, -0.5f, 0.0f, 1.0f};
-	//Color[5] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	//Top[6] = {-0.45f, 0.5f, 0.0f, 1.0f};
-	//Left[6] = {-0.9f, 0.0f, 0.0f, 1.0f};
-	//Right[6] = {0.0f, 0.0f, 0.0f, 1.0f};
-	//Color[6] = {1.0f, 0.0f, 0.0f, 1.0f};
-
-	//Top[7] = {0.25f, 0.5f, 0.0f, 1.0f};
-	//Left[7] = {-0.0f, 0.0f, 0.0f, 1.0f};
-	//Right[7] = {0.5f, 0.0f, 0.0f, 1.0f};
-	//Color[7] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	//Top[8] = {-0.25f, 1.0f, 0.0f, 1.0f};
-	//Left[8] = {-0.25f, 0.5f, 0.0f, 1.0f};
-	//Right[8] = {0.0f, 0.5f, 0.0f, 1.0f};
-	//Color[8] = {1.0f, 0.0f, 0.0f, 1.0f};
-
-	//Top[9] = {0.25f, 1.0f, 0.0f, 1.0f};
-	//Left[9] = {0.0f, 0.5f, 0.0f, 1.0f};
-	//Right[9] = {0.4f, 0.5f, 0.0f, 1.0f};
-	//Color[9] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	 
 
 	for (int i = 0; i < kNumTriangle; i++)
 	{
@@ -166,7 +133,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					RightTop[i],
 					RightBottom[i],
 					LeftBottom[i],
-					Color[i],
+					ColorSprite[i],
 					texcoordLeftTop[i],
 					texcoordRightTop[i],
 					texcoordRightBottom[i],
