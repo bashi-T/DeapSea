@@ -21,14 +21,7 @@ public:
 	void Initialize(int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
-	void Draw(
-		Vector4 Top,
-		Vector4 Right,
-		Vector4 Left,
-		Vector4 color,
-		Vector2 coordTop,
-		Vector2 coordRight,
-		Vector2 coordLeft);
+	void Draw();
 	IDxcBlob* CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -48,7 +41,16 @@ public:
 		Vector2 coordTop,
 		Vector2 coordRight,
 		Vector2 coordLeft);
-	void DrawTriangle();
+	void InputDataSprite(
+		Vector4 LeftTop,
+		Vector4 RightTop,
+		Vector4 RightBottom,
+		Vector4 LeftBottom,
+		Vector4 color,
+		Vector2 coordLeftTop,
+		Vector2 coordRightTop,
+		Vector2 coordRightBottom,
+		Vector2 coordLeftBottom);
 	void MeshRelease();
 
 	ID3D12Resource* GetVertexResource() { return vertexResource; }
@@ -59,7 +61,10 @@ private:
 	MyImGui* imgui_;
 	HRESULT hr = NULL;
 	TransformMatrix transformMatrix;
-
+	TransformMatrix transformMatrixSprite;
+	ID3D12Resource* transformationMatrixResourceSprite;
+	Matrix4x4* wvpData = nullptr;
+	Matrix4x4* transformationMatrixDataSprite;
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
@@ -70,7 +75,10 @@ private:
 	ID3DBlob* errorBlob = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
+	ID3D12Resource* vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	ID3D12Resource* vertexResourceSprite = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
@@ -78,23 +86,26 @@ private:
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	ID3D12Resource* vertexResource = nullptr;
 	ID3D12Resource* materialResource;
 	ID3D12Resource* wvpResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	Vector4* materialData = nullptr;
-	Matrix4x4* wvpData = nullptr;
 	struct VertexData
 	{
 		Vector4 position;
 		Vector2 texcoord;
 	};
 
-	TransformMatrix cameraTransform;
 
+
+	TransformMatrix cameraTransform;
 	Matrix4x4 cameraMatrix;
+	Matrix4x4 cameraMatrixSprite;
 	Matrix4x4 viewMatrix;
+	Matrix4x4 viewMatrixSprite;
 	Matrix4x4 projectionMatrix;
+	Matrix4x4 projectionMatrixSprite;
 	Matrix4x4 worldViewProjectionMatrix;
+	Matrix4x4 worldViewProjectionMatrixSprite;
 };
 

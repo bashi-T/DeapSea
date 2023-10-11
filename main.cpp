@@ -4,11 +4,10 @@
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
-const int32_t kNumTriangle = 2;
+const int32_t kNumTriangle = 1;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
-	//OutputDebugStringA("HelloDirectX!\n");
 	Mesh* mesh[kNumTriangle];
 	for (int i = 0; i < kNumTriangle; i++)
 	{
@@ -44,6 +43,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector2 texcoordLeft[kNumTriangle];
 	Vector2 texcoordRight[kNumTriangle];
 
+	Vector4 LeftTop[kNumTriangle];
+	Vector4 RightTop[kNumTriangle];
+	Vector4 RightBottom[kNumTriangle];
+	Vector4 LeftBottom[kNumTriangle];
+	Vector4 ColorSprite[kNumTriangle];
+	Vector2 texcoordLeftTop[kNumTriangle];
+	Vector2 texcoordRightTop[kNumTriangle];
+	Vector2 texcoordRightBottom[kNumTriangle];
+	Vector2 texcoordLeftBottom[kNumTriangle];
+
 	Top[0] = {0.0f, 0.5f, 0.0f, 1.0f};
 	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f};
 	Left[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
@@ -52,23 +61,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	texcoordRight[0] = {1.0f,1.0f};
 	texcoordLeft[0] = { 0.0f,1.0f };
 
-	Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
-	Right[1] = { 0.5f, -0.5f, 0.5f, 1.0f };
-	Left[1] = { -0.5f, -0.5f, -0.5f, 1.0f };
-	Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
-	texcoordTop[1] = { 0.5f,0.0f };
-	texcoordRight[1] = { 1.0f,1.0f };
-	texcoordLeft[1] = { 0.0f,1.0f };
+	//Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
+	//Right[1] = { 0.5f, -0.5f, 0.5f, 1.0f };
+	//Left[1] = { -0.5f, -0.5f, -0.5f, 1.0f };
+	//Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
+	//texcoordTop[1] = { 0.5f,0.0f };
+	//texcoordRight[1] = { 1.0f,1.0f };
+	//texcoordLeft[1] = { 0.0f,1.0f };
 
-	//Top[2] = {0.25f, -0.8f, 0.0f, 1.0f};
-	//Left[2] = {0.0f, -1.0f, 0.0f, 1.0f};
-	//Right[2] = {0.5f, -1.0f, 0.0f, 1.0f};
-	//Color[2] = {1.0f, 1.0f, 1.0f, 1.0f};
+	LeftTop[0] = {0.0f, 0.0f, 0.0f, 1.0f};
+	RightTop[0] = {640.0f, 0.0f, 0.0f, 1.0f};
+	RightBottom[0] = { 640.0f, 360.0f, 0.0f, 1.0f};
+	LeftBottom[0] = { 0.0f, 360.0f, 0.0f, 1.0f};
+	ColorSprite[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	texcoordLeftTop[0] = {0.0f, 0.0f};
+	texcoordRightTop[0] = {1.0f, 0.0f};
+	texcoordRightBottom[0] = {1.0f, 1.0f};
+	texcoordLeftBottom[0] = {0.0f, 1.0f};
 
-	//Top[3] = {0.75f, -0.9f, 0.0f, 1.0f};
-	//Left[3] = {0.5f, -1.0f, 0.0f, 1.0f};
-	//Right[3] = {1.0f, -1.0f, 0.0f, 1.0f};
-	//Color[3] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	//Top[4] = {-0.45f, 0.0f, 0.0f, 1.0f};
 	//Left[4] = {-0.6f, -0.5f, 0.0f, 1.0f};
@@ -117,8 +127,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		ImGui::Begin("TriangleColor");
 		ImGui::ColorEdit3("Triangle1", (float*)&Color[0]);
-		ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
-		//ImGui::ColorEdit3("Triangle3", (float*)&Color[2]);
+		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
+		ImGui::ColorEdit3("Sprite1", (float*)&ColorSprite[0]);
 		//ImGui::ColorEdit3("Triangle4", (float*)&Color[3]);
 		//ImGui::ColorEdit3("Triangle5", (float*)&Color[4]);
 		//ImGui::ColorEdit3("Triangle6", (float*)&Color[5]);
@@ -142,7 +152,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				SetDescriptorHeaps(1, descriptorHeaps);
 
 			for (int i = 0; i < kNumTriangle; i++) {
-				mesh[i]->Draw(Top[i], Right[i], Left[i], Color[i], texcoordTop[i], texcoordRight[i], texcoordLeft[i]);
+				mesh[i]->InputDataTriangle(
+					Top[i],
+					Right[i],
+					Left[i],
+					Color[i],
+					texcoordTop[i],
+					texcoordRight[i],
+					texcoordLeft[i]);
+
+				mesh[i]->InputDataSprite(
+					LeftTop[i],
+					RightTop[i],
+					RightBottom[i],
+					LeftBottom[i],
+					Color[i],
+					texcoordLeftTop[i],
+					texcoordRightTop[i],
+					texcoordRightBottom[i],
+					texcoordLeftBottom[i]);
+
+				mesh[i]->Draw();
 			}
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();

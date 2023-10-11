@@ -27,9 +27,17 @@ void Mesh::Initialize(int32_t width, int32_t height)
 
 	Mesh::MakePSO();
 
-	transformMatrix={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	cameraTransform={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	transformationMatrixResourceSprite = CreateBufferResource(sizeof(Matrix4x4));
+	transformationMatrixDataSprite = nullptr;
+	transformationMatrixResourceSprite->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+	*transformationMatrixDataSprite = MakeIdentity4x4();
+	transformMatrix = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transformMatrixSprite = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	//cameraTransformSprite = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
+	projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
 }
 
 void Mesh::ResetDXC()
@@ -222,7 +230,8 @@ void Mesh::MakePSO()
 void Mesh::Update()
 {
 	    vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
-	    MakeVertexBufferView();
+		vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
+		MakeVertexBufferView();
 	    materialResource = CreateBufferResource(sizeof(Vector4));
 	    wvpResource=CreateBufferResource(sizeof(Matrix4x4));
 
@@ -259,6 +268,10 @@ void Mesh::MakeVertexBufferView()
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+	vertexBufferViewSprite.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 }
 
 void Mesh::InputDataTriangle(
@@ -293,30 +306,54 @@ void Mesh::InputDataTriangle(
 	vertexData[2].texcoord = coordLeft;
 }
 
-
-void Mesh::Draw(
-	Vector4 Top,
-	Vector4 Right,
-	Vector4 Left,
+void Mesh::InputDataSprite(
+	Vector4 LeftTop, 
+	Vector4 RightTop,
+	Vector4 RightBottom,
+	Vector4 LeftBottom,
 	Vector4 color,
-	Vector2 coordTop,
-	Vector2 coordRight,
-	Vector2 coordLeft)
+	Vector2 coordLeftTop,
+	Vector2 coordRightTop,
+	Vector2 coordRightBottom,
+	Vector2 coordLeftBottom)
+{
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+
+	*materialData = color;
+
+	//transformMatrix.rotate.y += 0.02f;
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSprite.scale, transformMatrixSprite.rotate, transformMatrixSprite.translate);
+	cameraMatrixSprite = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	viewMatrixSprite = Inverse(cameraMatrixSprite);
+	worldViewProjectionMatrixSprite = Multiply(worldMatrix, Multiply(viewMatrixSprite, projectionMatrixSprite));
+	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
+
+	vertexDataSprite[0].position = LeftTop;
+	vertexDataSprite[1].position = RightTop;
+	vertexDataSprite[2].position = RightBottom;
+	vertexDataSprite[0].texcoord = coordLeftTop;
+	vertexDataSprite[1].texcoord = coordRightTop;
+	vertexDataSprite[2].texcoord = coordRightBottom;
+
+	vertexDataSprite[3].position = LeftTop;
+	vertexDataSprite[4].position = RightBottom;
+	vertexDataSprite[5].position = LeftBottom;
+	vertexDataSprite[3].texcoord = coordLeftTop;
+	vertexDataSprite[4].texcoord = coordRightBottom;
+	vertexDataSprite[5].texcoord = coordLeftBottom;
+}
+
+
+void Mesh::Draw()
 {
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetViewports(1, &viewport);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetScissorRects(1, &scissorRect);
-
-		InputDataTriangle(
-			Top,
-			Right,
-			Left,
-			color,
-			coordTop,
-			coordRight,
-			coordLeft);
 
 	DX12Common::GetInstance()->GetCommandList()->
 		SetPipelineState(graphicsPipelineState);
@@ -328,11 +365,18 @@ void Mesh::Draw(
 		IASetVertexBuffers(0, 1, &vertexBufferView);
 
 	DX12Common::GetInstance()->GetCommandList()->
+		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+
+	DX12Common::GetInstance()->GetCommandList()->
 		IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DX12Common::GetInstance()->GetCommandList()->
-	    SetGraphicsRootConstantBufferView(0,
+		SetGraphicsRootConstantBufferView(0,
 			materialResource->GetGPUVirtualAddress());
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootConstantBufferView(1,
+			transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
 	    SetGraphicsRootConstantBufferView(1,
@@ -355,11 +399,14 @@ void Mesh::Draw(
 
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(3, 1, 0, 0);
+	DX12Common::GetInstance()->GetCommandList()->
+		DrawInstanced(6, 1, 0, 0);
 }
 
 void Mesh::MeshRelease()
 {
 	vertexResource->Release();
+	vertexResourceSprite->Release();
 	materialResource->Release();
 	wvpResource->Release();
 	graphicsPipelineState->Release();
