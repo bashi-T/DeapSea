@@ -339,9 +339,89 @@ void Mesh::InputDataSprite(
 	vertexDataSprite[5].texcoord = coordLeftBottom;
 }
 
-
-void Mesh::Draw()
+void Mesh::DrawSprite(
+	Vector4 LeftTop,
+	Vector4 RightTop,
+	Vector4 RightBottom,
+	Vector4 LeftBottom,
+	Vector4 color,
+	Vector2 coordLeftTop,
+	Vector2 coordRightTop,
+	Vector2 coordRightBottom,
+	Vector2 coordLeftBottom)
 {
+	InputDataSprite(
+		LeftTop,
+		RightTop,
+		RightBottom,
+		LeftBottom,
+		color,
+		coordLeftTop,
+		coordRightTop,
+		coordRightBottom,
+		coordLeftBottom);
+	DX12Common::GetInstance()->GetCommandList()->
+		RSSetViewports(1, &viewport);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		RSSetScissorRects(1, &scissorRect);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetPipelineState(graphicsPipelineState);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootSignature(rootSignature);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootConstantBufferView(0,
+			materialResource->GetGPUVirtualAddress());
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->
+		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+
+	DX12Common::GetInstance()->GetCommandList()->
+		OMSetRenderTargets(
+			1,
+			&rtv,
+			false,
+			&dsv);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootDescriptorTable(2,
+			DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootConstantBufferView(1,
+			transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
+	DX12Common::GetInstance()->GetCommandList()->
+		DrawInstanced(6, 1, 0, 0);
+}
+
+void Mesh::DrawTriangle(
+	Vector4 Top,
+	Vector4 Right,
+	Vector4 Left,
+	Vector4 color,
+	Vector2 coordTop,
+	Vector2 coordRight,
+	Vector2 coordLeft)
+{
+	InputDataTriangle(
+		Top,
+		Right,
+		Left,
+		color,
+		coordTop,
+		coordRight,
+		coordLeft);
 	DX12Common::GetInstance()->GetCommandList()->
 		RSSetViewports(1, &viewport);
 
@@ -385,17 +465,133 @@ void Mesh::Draw()
 
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(3, 1, 0, 0);
+}
 
+void Mesh::DrawSphere(const Sphere& sphere_,
+	Vector4 color)
+{
+	const uint32_t kSubdivision = 16;
+	float pi = 3.141592f;
+	const float kLonevery = 2.0f / kSubdivision * pi;
+	const float kLatevery = 2.0f / kSubdivision * pi;
 
-	DX12Common::GetInstance()->GetCommandList()->
-		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
+	{
+		float lat = -pi / 2.0f + kLatevery * latIndex;//theta
+		float latB = pi / kSubdivision;
 
-	DX12Common::GetInstance()->GetCommandList()->
-		SetGraphicsRootConstantBufferView(1,
-			transformationMatrixResourceSprite->GetGPUVirtualAddress());
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
+		{
+			float lon = lonIndex * kLonevery;//phi
+			float lonC = 2 * pi / kSubdivision;
 
-	DX12Common::GetInstance()->GetCommandList()->
-		DrawInstanced(6, 1, 0, 0);
+			Vector4 a =
+			{
+				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
+				sphere_.center.y + sphere_.radius * sin(lat),
+				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon),
+				1.0f
+			};
+
+			Vector4 b =
+			{
+				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
+				sphere_.center.y + sphere_.radius * sin(lat + latB),
+				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon),
+				1.0f
+			};
+			Vector4 c =
+			{
+				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
+				sphere_.center.y + sphere_.radius * sin(lat),
+				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC),
+				1.0f
+			};
+
+			Vector4 d =
+			{
+				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
+				sphere_.center.y + sphere_.radius * sin(lat + latB),
+				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC),
+				1.0f
+			};
+			Vector2 texcoordA
+			{
+				float(lonIndex) / float(kSubdivision),
+				1.0f - float(latIndex) / float(kSubdivision)
+			};
+			Vector2 texcoordB
+			{
+				float(lonIndex + 1) / float(kSubdivision),
+				1.0f - float(latIndex) / float(kSubdivision)
+			};
+			Vector2 texcoordC
+			{
+				float(lonIndex) / float(kSubdivision),
+				1.0f - float(latIndex + 1) / float(kSubdivision)
+			};
+			Vector2 texcoordD
+			{
+				float(lonIndex + 1) / float(kSubdivision),
+				1.0f - float(latIndex + 1) / float(kSubdivision)
+			};
+			InputDataSprite(
+				b,
+				d,
+				c,
+				a,
+				color,
+				texcoordB,
+				texcoordD,
+				texcoordC,
+				texcoordA);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				RSSetViewports(1, &viewport);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				RSSetScissorRects(1, &scissorRect);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				SetPipelineState(graphicsPipelineState);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				SetGraphicsRootSignature(rootSignature);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				SetGraphicsRootConstantBufferView(0,
+					materialResource->GetGPUVirtualAddress());
+
+			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->
+				GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+
+			DX12Common::GetInstance()->GetCommandList()->
+				OMSetRenderTargets(
+					1,
+					&rtv,
+					false,
+					&dsv);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				SetGraphicsRootDescriptorTable(2,
+					DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+
+			DX12Common::GetInstance()->GetCommandList()->
+				IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+
+			DX12Common::GetInstance()->GetCommandList()->
+				SetGraphicsRootConstantBufferView(1,
+					transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
+			DX12Common::GetInstance()->GetCommandList()->
+				DrawInstanced(6*kSubdivision, 1, 0, 0);
+
+		}
+	}
 }
 
 void Mesh::MeshRelease()

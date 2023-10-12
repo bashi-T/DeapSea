@@ -4,7 +4,7 @@
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
-const int32_t kNumTriangle = 1;
+const int32_t kNumTriangle = 2;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -61,13 +61,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	texcoordRight[0] = {1.0f,1.0f};
 	texcoordLeft[0] = { 0.0f,1.0f };
 
-	//Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
-	//Right[1] = { 0.5f, -0.5f, 0.5f, 1.0f };
-	//Left[1] = { -0.5f, -0.5f, -0.5f, 1.0f };
-	//Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
-	//texcoordTop[1] = { 0.5f,0.0f };
-	//texcoordRight[1] = { 1.0f,1.0f };
-	//texcoordLeft[1] = { 0.0f,1.0f };
+	Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
+	Right[1] = { 0.5f, -0.5f, 0.5f, 1.0f };
+	Left[1] = { -0.5f, -0.5f, -0.5f, 1.0f };
+	Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
+	texcoordTop[1] = { 0.5f,0.0f };
+	texcoordRight[1] = { 1.0f,1.0f };
+	texcoordLeft[1] = { 0.0f,1.0f };
 
 	LeftTop[0] = {0.0f, 0.0f, 0.0f, 1.0f};
 	RightTop[0] = {640.0f, 0.0f, 0.0f, 1.0f};
@@ -119,7 +119,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				SetDescriptorHeaps(1, descriptorHeaps);
 
 			for (int i = 0; i < kNumTriangle; i++) {
-				mesh[i]->InputDataTriangle(
+				mesh[i]->DrawTriangle(
 					Top[i],
 					Right[i],
 					Left[i],
@@ -127,20 +127,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					texcoordTop[i],
 					texcoordRight[i],
 					texcoordLeft[i]);
-
-				mesh[i]->InputDataSprite(
-					LeftTop[i],
-					RightTop[i],
-					RightBottom[i],
-					LeftBottom[i],
-					ColorSprite[i],
-					texcoordLeftTop[i],
-					texcoordRightTop[i],
-					texcoordRightBottom[i],
-					texcoordLeftBottom[i]);
-
-				mesh[i]->Draw();
 			}
+				mesh[0]->DrawSprite(
+					LeftTop[0],
+					RightTop[0],
+					RightBottom[0],
+					LeftBottom[0],
+					ColorSprite[0],
+					texcoordLeftTop[0],
+					texcoordRightTop[0],
+					texcoordRightBottom[0],
+					texcoordLeftBottom[0]);
+
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}

@@ -21,7 +21,6 @@ public:
 	void Initialize(int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
-	void Draw();
 	IDxcBlob* CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -29,6 +28,27 @@ public:
 		IDxcCompiler3* dxcCompiler,
 		IDxcIncludeHandler* includeHandler
 	);
+	void DrawTriangle(
+		Vector4 Top,
+		Vector4 Right,
+		Vector4 Left,
+		Vector4 color,
+		Vector2 coordTop,
+		Vector2 coordRight,
+		Vector2 coordLeft);
+	void DrawSprite(
+		Vector4 LeftTop,
+		Vector4 RightTop,
+		Vector4 RightBottom,
+		Vector4 LeftBottom,
+		Vector4 color,
+		Vector2 coordLeftTop,
+		Vector2 coordRightTop,
+		Vector2 coordRightBottom,
+		Vector2 coordLeftBottom);
+	void DrawSphere(const Sphere& sphere_,
+		Vector4 color);
+	
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
@@ -98,7 +118,6 @@ private:
 		Vector4 position;
 		Vector2 texcoord;
 	};
-
 
 
 	TransformMatrix cameraTransform;
