@@ -33,8 +33,8 @@ struct TransformMatrix {
 };
 
 struct Sphere {
-	Vector3 center{ 1.0f,1.0f,1.0f };
-	float radius = 1.0f;
+	Vector3 center;
+	float radius;
 };
 
 //Matrix2x2 Add(Matrix2x2 a, Matrix2x2 b) {
