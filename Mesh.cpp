@@ -30,13 +30,21 @@ void Mesh::Initialize(int32_t width, int32_t height)
 	transformMatrix = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	
+	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+
 	transformationMatrixResourceSprite = CreateBufferResource(sizeof(Matrix4x4));
 	transformationMatrixResourceSprite->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 	*transformationMatrixDataSprite = MakeIdentity4x4();
 	projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
 	transformMatrixSprite = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+	transformationMatrixResourceSphere = CreateBufferResource(sizeof(Matrix4x4));
+	transformationMatrixResourceSphere->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
+	projectionMatrixSphere = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
+	*transformationMatrixDataSphere = MakeIdentity4x4();
+	transformMatrixSphere = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 }
 
 void Mesh::ResetDXC()
@@ -230,13 +238,14 @@ void Mesh::Update()
 {
 	    vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 		vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
+		vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6*16*16);
 		MakeVertexBufferView();
 		materialResource = CreateBufferResource(sizeof(Vector4));
 		wvpResource=CreateBufferResource(sizeof(Matrix4x4));
-
 }
 
-ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
+ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes)
+{
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -271,6 +280,10 @@ void Mesh::MakeVertexBufferView()
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+	vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
+	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6*16*16;
+	vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 }
 
 void Mesh::InputDataTriangle(
@@ -292,7 +305,6 @@ void Mesh::InputDataTriangle(
 
 	transformMatrix.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	viewMatrix = Inverse(cameraMatrix);
 	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	*wvpData = worldViewProjectionMatrix;
@@ -306,7 +318,7 @@ void Mesh::InputDataTriangle(
 }
 
 void Mesh::InputDataSprite(
-	Vector4 LeftTop, 
+	Vector4 LeftTop,
 	Vector4 RightTop,
 	Vector4 RightBottom,
 	Vector4 LeftBottom,
@@ -337,6 +349,41 @@ void Mesh::InputDataSprite(
 	vertexDataSprite[3].texcoord = coordLeftTop;
 	vertexDataSprite[4].texcoord = coordRightBottom;
 	vertexDataSprite[5].texcoord = coordLeftBottom;
+}
+
+void Mesh::InputDataSphere(
+	Vector4 LeftTop,
+	Vector4 RightTop,
+	Vector4 RightBottom,
+	Vector4 LeftBottom,
+	Vector4 color,
+	Vector2 coordLeftTop,
+	Vector2 coordRightTop,
+	Vector2 coordRightBottom,
+	Vector2 coordLeftBottom,
+	uint32_t count)
+{
+	VertexData* vertexDataSphere = nullptr;
+	transformMatrixSphere.rotate.y += 0.0002f;
+	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
+	viewMatrixSphere = Inverse(cameraMatrix);
+	worldViewProjectionMatrixSphere = Multiply(worldMatrix, Multiply(viewMatrixSphere, projectionMatrixSphere));
+	*transformationMatrixDataSphere = worldViewProjectionMatrixSphere;
+
+	vertexDataSphere[count * 6].position = LeftTop;
+	vertexDataSphere[count * 6 + 1].position = RightTop;
+	vertexDataSphere[count * 6 + 2].position = RightBottom;
+	vertexDataSphere[count * 6].texcoord = coordLeftTop;
+	vertexDataSphere[count * 6 + 1].texcoord = coordRightTop;
+	vertexDataSphere[count * 6 + 2].texcoord = coordRightBottom;
+
+	vertexDataSphere[count * 6 + 3].position = LeftTop;
+	vertexDataSphere[count * 6 + 4].position = RightBottom;
+	vertexDataSphere[count * 6 + 5].position = LeftBottom;
+	vertexDataSphere[count * 6 + 3].texcoord = coordLeftTop;
+	vertexDataSphere[count * 6 + 4].texcoord = coordRightBottom;
+	vertexDataSphere[count * 6 + 5].texcoord = coordLeftBottom;
 }
 
 void Mesh::DrawSprite(
@@ -379,6 +426,10 @@ void Mesh::DrawSprite(
 		SetGraphicsRootConstantBufferView(0,
 			materialResource->GetGPUVirtualAddress());
 
+	DX12Common::GetInstance()->GetCommandList()->
+		SetGraphicsRootConstantBufferView(1,
+			transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->
 		GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
@@ -396,10 +447,6 @@ void Mesh::DrawSprite(
 
 	DX12Common::GetInstance()->GetCommandList()->
 		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-
-	DX12Common::GetInstance()->GetCommandList()->
-		SetGraphicsRootConstantBufferView(1,
-			transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
 		DrawInstanced(6, 1, 0, 0);
@@ -474,6 +521,7 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
 	const float kLatevery = 2.0f / kSubdivision * pi;
+	uint32_t sphereCount = -1;
 
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
 	{
@@ -482,6 +530,7 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
 		{
+			sphereCount++;
 			float lon = lonIndex * kLonevery;//phi
 			float lonC = 2 * pi / kSubdivision;
 
@@ -507,7 +556,6 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC),
 				1.0f
 			};
-
 			Vector4 d =
 			{
 				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
@@ -522,20 +570,20 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 			};
 			Vector2 texcoordB
 			{
-				float(lonIndex + 1) / float(kSubdivision),
-				1.0f - float(latIndex) / float(kSubdivision)
+				float(lonIndex) / float(kSubdivision),
+				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 			Vector2 texcoordC
 			{
-				float(lonIndex) / float(kSubdivision),
-				1.0f - float(latIndex + 1) / float(kSubdivision)
+				float(lonIndex + 1) / float(kSubdivision),
+				1.0f - float(latIndex) / float(kSubdivision)
 			};
 			Vector2 texcoordD
 			{
 				float(lonIndex + 1) / float(kSubdivision),
 				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
-			InputDataSprite(
+			InputDataSphere(
 				b,
 				d,
 				c,
@@ -544,7 +592,8 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 				texcoordB,
 				texcoordD,
 				texcoordC,
-				texcoordA);
+				texcoordA,
+				sphereCount);
 
 			DX12Common::GetInstance()->GetCommandList()->
 				RSSetViewports(1, &viewport);
@@ -565,6 +614,10 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 				SetGraphicsRootConstantBufferView(0,
 					materialResource->GetGPUVirtualAddress());
 
+			DX12Common::GetInstance()->GetCommandList()->
+				SetGraphicsRootConstantBufferView(1,
+					transformationMatrixResourceSphere->GetGPUVirtualAddress());
+
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->
 				GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
@@ -581,14 +634,10 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 					DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 			DX12Common::GetInstance()->GetCommandList()->
-				IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+				IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
 
 			DX12Common::GetInstance()->GetCommandList()->
-				SetGraphicsRootConstantBufferView(1,
-					transformationMatrixResourceSprite->GetGPUVirtualAddress());
-
-			DX12Common::GetInstance()->GetCommandList()->
-				DrawInstanced(6*kSubdivision, 1, 0, 0);
+				DrawInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0);
 
 		}
 	}
@@ -598,6 +647,7 @@ void Mesh::MeshRelease()
 {
 	vertexResource->Release();
 	vertexResourceSprite->Release();
+	vertexResourceSphere->Release();
 	materialResource->Release();
 	wvpResource->Release();
 	graphicsPipelineState->Release();

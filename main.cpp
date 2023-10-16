@@ -43,6 +43,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector2 texcoordLeft[kNumTriangle];
 	Vector2 texcoordRight[kNumTriangle];
 
+	Top[0] = { 0.0f, 0.5f, 0.0f, 1.0f };
+	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
+	Left[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+	Color[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	texcoordTop[0] = { 0.5f,0.0f };
+	texcoordRight[0] = { 1.0f,1.0f };
+	texcoordLeft[0] = { 0.0f,1.0f };
+
 	Vector4 LeftTop[kNumTriangle];
 	Vector4 RightTop[kNumTriangle];
 	Vector4 RightBottom[kNumTriangle];
@@ -53,31 +61,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector2 texcoordRightBottom[kNumTriangle];
 	Vector2 texcoordLeftBottom[kNumTriangle];
 
-	Top[0] = {0.0f, 0.5f, 0.0f, 1.0f};
-	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f};
-	Left[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
-	Color[0] = {1.0f, 1.0f, 1.0f, 1.0f};
-	texcoordTop[0] = {0.5f,0.0f};
-	texcoordRight[0] = {1.0f,1.0f};
-	texcoordLeft[0] = { 0.0f,1.0f };
-
-	Top[1] = { 0.0f, 0.3f, 0.0f, 1.0f };
-	Right[1] = { 0.5f, -0.5f, 0.5f, 1.0f };
-	Left[1] = { -0.5f, -0.5f, -0.5f, 1.0f };
-	Color[1] = {1.0f, 1.0f, 1.0f, 1.0f};
-	texcoordTop[1] = { 0.5f,0.0f };
-	texcoordRight[1] = { 1.0f,1.0f };
-	texcoordLeft[1] = { 0.0f,1.0f };
-
 	LeftTop[0] = {0.0f, 0.0f, 0.0f, 1.0f};
-	RightTop[0] = {640.0f, 0.0f, 0.0f, 1.0f};
-	RightBottom[0] = { 640.0f, 360.0f, 0.0f, 1.0f};
-	LeftBottom[0] = { 0.0f, 360.0f, 0.0f, 1.0f};
+	RightTop[0] = {320.0f, 0.0f, 0.0f, 1.0f};
+	RightBottom[0] = { 320.0f, 180.0f, 0.0f, 1.0f};
+	LeftBottom[0] = { 0.0f, 180.0f, 0.0f, 1.0f};
 	ColorSprite[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	texcoordLeftTop[0] = {0.0f, 0.0f};
 	texcoordRightTop[0] = {1.0f, 0.0f};
 	texcoordRightBottom[0] = {1.0f, 1.0f};
 	texcoordLeftBottom[0] = {0.0f, 1.0f};
+
+	
+	Sphere sphere = { { 0.0f,0.0f,0.0f },0.75f };
+	
 
 	for (int i = 0; i < kNumTriangle; i++)
 	{
@@ -139,6 +135,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					texcoordRightBottom[0],
 					texcoordLeftBottom[0]);
 
+				mesh[0]->DrawSphere(sphere, Color[0]);
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}

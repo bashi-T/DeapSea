@@ -71,6 +71,18 @@ public:
 		Vector2 coordRightTop,
 		Vector2 coordRightBottom,
 		Vector2 coordLeftBottom);
+	void InputDataSphere(
+		Vector4 LeftTop,
+		Vector4 RightTop,
+		Vector4 RightBottom,
+		Vector4 LeftBottom,
+		Vector4 color,
+		Vector2 coordLeftTop,
+		Vector2 coordRightTop,
+		Vector2 coordRightBottom,
+		Vector2 coordLeftBottom,
+		uint32_t count);
+
 	void MeshRelease();
 
 	ID3D12Resource* GetVertexResource() { return vertexResource; }
@@ -83,8 +95,11 @@ private:
 	TransformMatrix transformMatrix;
 	TransformMatrix transformMatrixSprite;
 	ID3D12Resource* transformationMatrixResourceSprite;
+	TransformMatrix transformMatrixSphere;
+	ID3D12Resource* transformationMatrixResourceSphere;
 	Matrix4x4* wvpData = nullptr;
 	Matrix4x4* transformationMatrixDataSprite = nullptr;
+	Matrix4x4* transformationMatrixDataSphere = nullptr;
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
@@ -100,6 +115,8 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	ID3D12Resource* vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+	ID3D12Resource* vertexResourceSphere = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
 
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
@@ -110,6 +127,7 @@ private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ID3D12Resource* materialResource;
 	ID3D12Resource* materialResourceSprite;
+	ID3D12Resource* materialResourceSphere;
 	ID3D12Resource* wvpResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	Vector4* materialData = nullptr;
@@ -123,11 +141,15 @@ private:
 	TransformMatrix cameraTransform;
 	Matrix4x4 cameraMatrix;
 	Matrix4x4 cameraMatrixSprite;
+	Matrix4x4 cameraMatrixSphere;
 	Matrix4x4 viewMatrix;
 	Matrix4x4 viewMatrixSprite;
+	Matrix4x4 viewMatrixSphere;
 	Matrix4x4 projectionMatrix;
 	Matrix4x4 projectionMatrixSprite;
+	Matrix4x4 projectionMatrixSphere;
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldViewProjectionMatrixSprite;
+	Matrix4x4 worldViewProjectionMatrixSphere;
 };
 
