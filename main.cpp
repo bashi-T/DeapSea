@@ -62,9 +62,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector2 texcoordLeftBottom[kNumTriangle];
 
 	LeftTop[0] = {0.0f, 0.0f, 0.0f, 1.0f};
-	RightTop[0] = {320.0f, 0.0f, 0.0f, 1.0f};
-	RightBottom[0] = { 320.0f, 180.0f, 0.0f, 1.0f};
-	LeftBottom[0] = { 0.0f, 180.0f, 0.0f, 1.0f};
+	RightTop[0] = { kWindowWidth/3, 0.0f, 0.0f, 1.0f};
+	RightBottom[0] = { kWindowWidth/3, kWindowHeight/3, 0.0f, 1.0f};
+	LeftBottom[0] = { 0.0f, kWindowHeight/3, 0.0f, 1.0f};
 	ColorSprite[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	texcoordLeftTop[0] = {0.0f, 0.0f};
 	texcoordRightTop[0] = {1.0f, 0.0f};
@@ -89,16 +89,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			mesh[i]->Update();
 		}
 		ImGui::Begin("TriangleColor");
+		//ImGui::DragFloat3("CameraTranslate", &mesh[0]->GetCameraMatrix().m[3][0], 0.01f);
+		//ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::ColorEdit3("Triangle1", (float*)&Color[0]);
 		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
 		ImGui::ColorEdit3("Sprite1", (float*)&ColorSprite[0]);
-		//ImGui::ColorEdit3("Triangle4", (float*)&Color[3]);
-		//ImGui::ColorEdit3("Triangle5", (float*)&Color[4]);
-		//ImGui::ColorEdit3("Triangle6", (float*)&Color[5]);
-		//ImGui::ColorEdit3("Triangle7", (float*)&Color[6]);
-		//ImGui::ColorEdit3("Triangle8", (float*)&Color[7]);
-		//ImGui::ColorEdit3("Triangle9", (float*)&Color[8]);
-		//ImGui::ColorEdit3("Triangle10", (float*)&Color[9]);
+		//ImGui::DragFloat3("sphere", (float*)&sphere.center,0.01f);
 		ImGui::End();
 
 		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE)) {

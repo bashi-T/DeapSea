@@ -86,6 +86,8 @@ public:
 	void MeshRelease();
 
 	ID3D12Resource* GetVertexResource() { return vertexResource; }
+	TransformMatrix GetCameraTransform() { return cameraTransform; }
+	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 
 private:
 	Debug* debug_;
@@ -140,8 +142,7 @@ private:
 
 	TransformMatrix cameraTransform;
 	Matrix4x4 cameraMatrix;
-	Matrix4x4 cameraMatrixSprite;
-	Matrix4x4 cameraMatrixSphere;
+
 	Matrix4x4 viewMatrix;
 	Matrix4x4 viewMatrixSprite;
 	Matrix4x4 viewMatrixSphere;

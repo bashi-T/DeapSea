@@ -520,7 +520,7 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 	const uint32_t kSubdivision = 16;
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
-	const float kLatevery = 2.0f / kSubdivision * pi;
+	const float kLatevery = pi / kSubdivision;
 	uint32_t sphereCount = -1;
 
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
@@ -541,7 +541,6 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon),
 				1.0f
 			};
-
 			Vector4 b =
 			{
 				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
