@@ -37,11 +37,19 @@ public:
 		UINT numDesctiptors,
 	    bool shaderVisible);
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
-	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata);
+	ID3D12Resource* CreateTextureResource(
+		ID3D12Device* device,
+		const DirectX::TexMetadata& metadata);
+	void UploadTextureData(
+		ID3D12Resource* texture,
+		const DirectX::ScratchImage& mipImages,
+		const DirectX::TexMetadata& metadata);
 
 	void MakeShaderResourceView(const DirectX::TexMetadata& metadata);
-	ID3D12Resource* CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+	ID3D12Resource* CreatedepthstencilTextureResource(
+		ID3D12Device* device,
+		int32_t width,
+		int32_t height);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
 		ID3D12DescriptorHeap* descriptorHeap,
 		uint32_t descriptorSize,
@@ -96,6 +104,7 @@ private:
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	ID3D12DescriptorHeap* dsvDescriptorHeap;
+	//const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	ID3D12Resource* swapChainResources[10] = { nullptr };
 	ID3D12Fence* fence = nullptr;

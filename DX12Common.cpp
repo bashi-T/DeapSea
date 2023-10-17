@@ -145,8 +145,9 @@ void DX12Common::MakeRTV()
 {
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
-		rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 0);
 
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(
@@ -167,8 +168,8 @@ void DX12Common::MakeDSV()
 		&dsvDesc,
 		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-	dsvHandle = dsvDescriptorHeap->
-		GetCPUDescriptorHandleForHeapStart();
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, 0);
 }
 
 void DX12Common::MakeScreen()
