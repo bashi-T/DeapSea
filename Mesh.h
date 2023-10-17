@@ -123,7 +123,7 @@ private:
 
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -138,6 +138,7 @@ private:
 	{
 		Vector4 position;
 		Vector2 texcoord;
+		Vector3 normal;
 	};
 
 

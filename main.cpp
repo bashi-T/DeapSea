@@ -73,7 +73,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	texcoordLeftBottom[0] = {0.0f, 1.0f};
 
 	
-	Sphere sphere = { { 0.0f,0.0f,0.0f },0.75f };
+	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
 	
 
 	for (int i = 0; i < kNumTriangle; i++)
