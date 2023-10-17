@@ -35,7 +35,8 @@ public:
 		Vector4 color,
 		Vector2 coordTop,
 		Vector2 coordRight,
-		Vector2 coordLeft);
+		Vector2 coordLeft,
+		bool useWorldMap);
 	void DrawSprite(
 		Vector4 LeftTop,
 		Vector4 RightTop,
@@ -47,7 +48,7 @@ public:
 		Vector2 coordRightBottom,
 		Vector2 coordLeftBottom);
 	void DrawSphere(const Sphere& sphere_,
-		Vector4 color);
+		Vector4 color, bool useWorldMap);
 	
 
 	void MakePSO();

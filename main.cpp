@@ -99,18 +99,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Checkbox("useWorldMap", &useWorldMap);
 		ImGui::End();
 
-		//dx12Common->GetInstance()->GetCommandList()->
-		//	SetGraphicsRootDescriptorTable(
-		//		2,
-		//		useWorldMap ?
-		//		dx12Common->GetInstance()->GetTextureSrvHandleGPU2() :
-		//		dx12Common->GetInstance()->GetTextureSrvHandleGPU());
-
-		//dx12Common->GetInstance()->GetCommandList()->
-		//	SetGraphicsRootDescriptorTable(
-		//		2,
-		//		dx12Common->GetInstance()->GetTextureSrvHandleGPU());
-
 				if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE)) {
 			winAPP->ProcessMessage(NewMSG);
 			ImGui::Render();
@@ -132,7 +120,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					Color[i],
 					texcoordTop[i],
 					texcoordRight[i],
-					texcoordLeft[i]);
+					texcoordLeft[i],
+					useWorldMap);
 			}
 				mesh[0]->DrawSprite(
 					LeftTop[0],
@@ -145,7 +134,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					texcoordRightBottom[0],
 					texcoordLeftBottom[0]);
 
-				mesh[0]->DrawSphere(sphere, Color[0]);
+				mesh[0]->DrawSphere(sphere, Color[0],useWorldMap);
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}

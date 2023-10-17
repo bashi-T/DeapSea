@@ -460,7 +460,8 @@ void Mesh::DrawTriangle(
 	Vector4 color,
 	Vector2 coordTop,
 	Vector2 coordRight,
-	Vector2 coordLeft)
+	Vector2 coordLeft,
+	bool useWorldMap)
 {
 	InputDataTriangle(
 		Top,
@@ -508,7 +509,10 @@ void Mesh::DrawTriangle(
 			&dsv);
 
 	DX12Common::GetInstance()->GetCommandList()->
-		SetGraphicsRootDescriptorTable(2,
+		SetGraphicsRootDescriptorTable(
+			2,
+			useWorldMap ?
+			DX12Common::GetInstance()->GetTextureSrvHandleGPU2() :
 			DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->
@@ -516,7 +520,7 @@ void Mesh::DrawTriangle(
 }
 
 void Mesh::DrawSphere(const Sphere& sphere_,
-	Vector4 color)
+	Vector4 color, bool useWorldMap)
 {
 	const uint32_t kSubdivision = 16;
 	float pi = 3.141592f;
@@ -630,8 +634,11 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 					&dsv);
 
 			DX12Common::GetInstance()->GetCommandList()->
-				SetGraphicsRootDescriptorTable(2,
-					DX12Common::GetInstance()->GetTextureSrvHandleGPU2());
+				SetGraphicsRootDescriptorTable(
+					2,
+					useWorldMap ?
+					DX12Common::GetInstance()->GetTextureSrvHandleGPU2() :
+					DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 			DX12Common::GetInstance()->GetCommandList()->
 				IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
