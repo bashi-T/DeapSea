@@ -133,7 +133,12 @@ private:
 	ID3D12Resource* materialResourceSphere;
 	ID3D12Resource* wvpResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	Vector4* materialData = nullptr;
+	struct Material
+	{
+		Vector4 color;
+		int32_t enableLighting;
+	};
+
 	struct VertexData
 	{
 		Vector4 position;

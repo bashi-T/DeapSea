@@ -244,7 +244,9 @@ void Mesh::Update()
 		vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
 		vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6*16*16);
 		MakeVertexBufferView();
-		materialResource = CreateBufferResource(sizeof(Vector4));
+		materialResource = CreateBufferResource(sizeof(Material));
+		materialResourceSprite = CreateBufferResource(sizeof(Material));
+		materialResourceSphere = CreateBufferResource(sizeof(Material));
 		wvpResource=CreateBufferResource(sizeof(Matrix4x4));
 }
 
@@ -301,10 +303,11 @@ void Mesh::InputDataTriangle(
 {
 	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	Material* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 
-	*materialData = color;
+	materialData[0].color = color;
 	*wvpData = MakeIdentity4x4();
 
 	transformMatrix.rotate.y += 0.02f;
@@ -344,11 +347,16 @@ void Mesh::InputDataSprite(
 {
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	Material* materialDataSprite = nullptr;
+	materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSprite.scale, transformMatrixSprite.rotate, transformMatrixSprite.translate);
 	viewMatrixSprite = MakeIdentity4x4();
 	worldViewProjectionMatrixSprite = Multiply(worldMatrix, Multiply(viewMatrixSprite, projectionMatrixSprite));
 	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
+	
+	materialDataSprite[0].color = color;
+	materialDataSprite[0].enableLighting = false;
 
 	vertexDataSprite[0].position = LeftTop;
 	vertexDataSprite[1].position = RightTop;
@@ -381,10 +389,14 @@ void Mesh::InputDataSphere(
 	transformMatrixSphere.rotate.y -= 0.0002f;
 	transformMatrixSphere.rotate.z = -23.4 / 360.0f;
 	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+	Material* materialDataSphere = nullptr;
+	materialResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
 	viewMatrixSphere = Inverse(cameraMatrix);
 	worldViewProjectionMatrixSphere = Multiply(worldMatrix, Multiply(viewMatrixSphere, projectionMatrixSphere));
 	*transformationMatrixDataSphere = worldViewProjectionMatrixSphere;
+	
+	materialDataSphere[0].color = color;
 
 	vertexDataSphere[count * 6].position = LeftTop;
 	vertexDataSphere[count * 6 + 1].position = RightTop;
@@ -458,7 +470,7 @@ void Mesh::DrawSprite(
 
 	DX12Common::GetInstance()->GetCommandList()->
 		SetGraphicsRootConstantBufferView(0,
-			materialResource->GetGPUVirtualAddress());
+			materialResourceSprite->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->
 		SetGraphicsRootConstantBufferView(1,
@@ -649,7 +661,7 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 
 			DX12Common::GetInstance()->GetCommandList()->
 				SetGraphicsRootConstantBufferView(0,
-					materialResource->GetGPUVirtualAddress());
+					materialResourceSphere->GetGPUVirtualAddress());
 
 			DX12Common::GetInstance()->GetCommandList()->
 				SetGraphicsRootConstantBufferView(1,
@@ -689,6 +701,8 @@ void Mesh::MeshRelease()
 	vertexResourceSprite->Release();
 	vertexResourceSphere->Release();
 	materialResource->Release();
+	materialResourceSprite->Release();
+	materialResourceSphere->Release();
 	wvpResource->Release();
 	graphicsPipelineState->Release();
 	signatureBlob->Release();

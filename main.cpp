@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector2 texcoordLeft[kNumTriangle];
 	Vector2 texcoordRight[kNumTriangle];
 
-	Top[0] = { 0.0f, 0.5f, 0.0f, 1.0f };
+	Top[0] = { 0.0f, 1.75f, 0.0f, 1.0f };
 	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
 	Left[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 	Color[0] = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -62,6 +62,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector2 texcoordRightBottom[kNumTriangle];
 	Vector2 texcoordLeftBottom[kNumTriangle];
 
+	Vector4 ColorSphere[kNumTriangle];
+	
 	LeftTop[0] = {0.0f, 0.0f, 0.0f, 1.0f};
 	RightTop[0] = { kWindowWidth/3, 0.0f, 0.0f, 1.0f};
 	RightBottom[0] = { kWindowWidth/3, kWindowHeight/3, 0.0f, 1.0f};
@@ -74,7 +76,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	
 	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
-	
+	ColorSphere[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 
 	for (int i = 0; i < kNumTriangle; i++)
 	{
@@ -95,6 +98,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::ColorEdit3("Triangle1", (float*)&Color[0]);
 		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
 		ImGui::ColorEdit3("Sprite1", (float*)&ColorSprite[0]);
+		ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
 		//ImGui::DragFloat3("sphere", (float*)&sphere.center,0.01f);
 		ImGui::Checkbox("useWorldMap", &useWorldMap);
 		ImGui::End();
@@ -134,7 +138,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					texcoordRightBottom[0],
 					texcoordLeftBottom[0]);
 
-				mesh[0]->DrawSphere(sphere, Color[0],useWorldMap);
+				mesh[0]->DrawSphere(sphere, ColorSphere[0],useWorldMap);
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}
