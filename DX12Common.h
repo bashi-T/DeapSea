@@ -45,7 +45,7 @@ public:
 		const DirectX::ScratchImage& mipImages,
 		const DirectX::TexMetadata& metadata);
 
-	void MakeShaderResourceView(const DirectX::TexMetadata& metadata);
+	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
 	ID3D12Resource* CreatedepthstencilTextureResource(
 		ID3D12Device* device,
 		int32_t width,
@@ -71,8 +71,10 @@ public:
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap; }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() {return textureSrvHandleCPU; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() {return textureSrvHandleGPU; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ID3D12DescriptorHeap* GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
 
 
@@ -104,7 +106,6 @@ private:
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	ID3D12DescriptorHeap* dsvDescriptorHeap;
-	//const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	ID3D12Resource* swapChainResources[10] = { nullptr };
 	ID3D12Fence* fence = nullptr;
@@ -112,9 +113,13 @@ private:
 	D3D12_RESOURCE_BARRIER barrier{};
 	UINT backBufferIndex;
 	ID3D12Resource* textureResource;
+	ID3D12Resource* textureResource2;
 	DirectX::ScratchImage mipImages;
+	DirectX::ScratchImage mipImages2;
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
 	ID3D12Resource* depthStencilResource;
 };
 

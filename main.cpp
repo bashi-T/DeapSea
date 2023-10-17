@@ -19,6 +19,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinAPP* winAPP = WinAPP::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
+	bool useWorldMap = true;
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight);
 	winAPP->CreateWindowView(L"CG2");
@@ -46,7 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Top[0] = { 0.0f, 0.5f, 0.0f, 1.0f };
 	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
 	Left[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	Color[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Color[0] = { 0.5f, 0.5f, 0.5f, 1.0f };
 	texcoordTop[0] = { 0.5f,0.0f };
 	texcoordRight[0] = { 1.0f,1.0f };
 	texcoordLeft[0] = { 0.0f,1.0f };
@@ -95,9 +96,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
 		ImGui::ColorEdit3("Sprite1", (float*)&ColorSprite[0]);
 		//ImGui::DragFloat3("sphere", (float*)&sphere.center,0.01f);
+		ImGui::Checkbox("useWorldMap", &useWorldMap);
 		ImGui::End();
 
-		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE)) {
+		//dx12Common->GetInstance()->GetCommandList()->
+		//	SetGraphicsRootDescriptorTable(
+		//		2,
+		//		useWorldMap ?
+		//		dx12Common->GetInstance()->GetTextureSrvHandleGPU2() :
+		//		dx12Common->GetInstance()->GetTextureSrvHandleGPU());
+
+		//dx12Common->GetInstance()->GetCommandList()->
+		//	SetGraphicsRootDescriptorTable(
+		//		2,
+		//		dx12Common->GetInstance()->GetTextureSrvHandleGPU());
+
+				if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE)) {
 			winAPP->ProcessMessage(NewMSG);
 			ImGui::Render();
 		} else{

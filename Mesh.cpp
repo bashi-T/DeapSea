@@ -28,7 +28,7 @@ void Mesh::Initialize(int32_t width, int32_t height)
 	Mesh::MakePSO();
 
 	transformMatrix = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-15.0f} };
 	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
 	cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 
@@ -364,7 +364,8 @@ void Mesh::InputDataSphere(
 	uint32_t count)
 {
 	VertexData* vertexDataSphere = nullptr;
-	transformMatrixSphere.rotate.y += 0.0002f;
+	transformMatrixSphere.rotate.y -= 0.0002f;
+	transformMatrixSphere.rotate.z = -23.4/360.0f;
 	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
 	viewMatrixSphere = Inverse(cameraMatrix);
@@ -630,7 +631,7 @@ void Mesh::DrawSphere(const Sphere& sphere_,
 
 			DX12Common::GetInstance()->GetCommandList()->
 				SetGraphicsRootDescriptorTable(2,
-					DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+					DX12Common::GetInstance()->GetTextureSrvHandleGPU2());
 
 			DX12Common::GetInstance()->GetCommandList()->
 				IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
