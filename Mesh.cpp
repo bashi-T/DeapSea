@@ -319,6 +319,16 @@ void Mesh::InputDataTriangle(
 	vertexData[0].texcoord = coordTop;
 	vertexData[1].texcoord = coordRight;
 	vertexData[2].texcoord = coordLeft;
+	vertexData[0].normal.x = vertexData[0].position.x;
+	vertexData[0].normal.y = vertexData[0].position.y;
+	vertexData[0].normal.z = vertexData[0].position.z;
+	vertexData[1].normal.x = vertexData[1].position.x;
+	vertexData[1].normal.y = vertexData[1].position.y;
+	vertexData[1].normal.z = vertexData[1].position.z;
+	vertexData[2].normal.x = vertexData[2].position.x;
+	vertexData[2].normal.y = vertexData[2].position.y;
+	vertexData[2].normal.z = vertexData[2].position.z;
+
 }
 
 void Mesh::InputDataSprite(
@@ -369,7 +379,7 @@ void Mesh::InputDataSphere(
 {
 	VertexData* vertexDataSphere = nullptr;
 	transformMatrixSphere.rotate.y -= 0.0002f;
-	transformMatrixSphere.rotate.z = -23.4/360.0f;
+	transformMatrixSphere.rotate.z = -23.4 / 360.0f;
 	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
 	viewMatrixSphere = Inverse(cameraMatrix);
@@ -382,6 +392,15 @@ void Mesh::InputDataSphere(
 	vertexDataSphere[count * 6].texcoord = coordLeftTop;
 	vertexDataSphere[count * 6 + 1].texcoord = coordRightTop;
 	vertexDataSphere[count * 6 + 2].texcoord = coordRightBottom;
+	vertexDataSphere[count * 6].normal.x = vertexDataSphere[count * 6].position.x;
+	vertexDataSphere[count * 6].normal.y = vertexDataSphere[count * 6].position.y;
+	vertexDataSphere[count * 6].normal.z = vertexDataSphere[count * 6].position.z;
+	vertexDataSphere[count * 6 + 1].normal.x = vertexDataSphere[count * 6 + 1].position.x;
+	vertexDataSphere[count * 6 + 1].normal.y = vertexDataSphere[count * 6 + 1].position.y;
+	vertexDataSphere[count * 6 + 1].normal.z = vertexDataSphere[count * 6 + 1].position.z;
+	vertexDataSphere[count * 6 + 2].normal.x = vertexDataSphere[count * 6 + 2].position.x;
+	vertexDataSphere[count * 6 + 2].normal.y = vertexDataSphere[count * 6 + 2].position.y;
+	vertexDataSphere[count * 6 + 2].normal.z = vertexDataSphere[count * 6 + 2].position.z;
 
 	vertexDataSphere[count * 6 + 3].position = LeftTop;
 	vertexDataSphere[count * 6 + 4].position = RightBottom;
@@ -389,6 +408,16 @@ void Mesh::InputDataSphere(
 	vertexDataSphere[count * 6 + 3].texcoord = coordLeftTop;
 	vertexDataSphere[count * 6 + 4].texcoord = coordRightBottom;
 	vertexDataSphere[count * 6 + 5].texcoord = coordLeftBottom;
+	vertexDataSphere[count * 6 + 3].normal.x = vertexDataSphere[count * 6 + 3].position.x;
+	vertexDataSphere[count * 6 + 3].normal.y = vertexDataSphere[count * 6 + 3].position.y;
+	vertexDataSphere[count * 6 + 3].normal.z = vertexDataSphere[count * 6 + 3].position.z;
+	vertexDataSphere[count * 6 + 4].normal.x = vertexDataSphere[count * 6 + 4].position.x;
+	vertexDataSphere[count * 6 + 4].normal.y = vertexDataSphere[count * 6 + 4].position.y;
+	vertexDataSphere[count * 6 + 4].normal.z = vertexDataSphere[count * 6 + 4].position.z;
+	vertexDataSphere[count * 6 + 5].normal.x = vertexDataSphere[count * 6 + 5].position.x;
+	vertexDataSphere[count * 6 + 5].normal.y = vertexDataSphere[count * 6 + 5].position.y;
+	vertexDataSphere[count * 6 + 5].normal.z = vertexDataSphere[count * 6 + 5].position.z;
+
 }
 
 void Mesh::DrawSprite(
