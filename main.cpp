@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
 		ImGui::ColorEdit3("Sprite1", (float*)&ColorSprite[0]);
 		ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
-		//ImGui::DragFloat3("sphere", (float*)&sphere.center,0.01f);
+		ImGui::DragFloat3("sphere", (float*)&sphere.center,0.01f);
 		ImGui::Checkbox("useWorldMap", &useWorldMap);
 		ImGui::End();
 
@@ -127,18 +127,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					texcoordLeft[i],
 					useWorldMap);
 			}
-				mesh[0]->DrawSprite(
-					LeftTop[0],
-					RightTop[0],
-					RightBottom[0],
-					LeftBottom[0],
-					ColorSprite[0],
-					texcoordLeftTop[0],
-					texcoordRightTop[0],
-					texcoordRightBottom[0],
-					texcoordLeftBottom[0]);
+			mesh[0]->DrawSprite(
+				LeftTop[0],
+				RightTop[0],
+				RightBottom[0],
+				LeftBottom[0],
+				ColorSprite[0],
+				texcoordLeftTop[0],
+				texcoordRightTop[0],
+				texcoordRightBottom[0],
+				texcoordLeftBottom[0],
+				kWindowWidth,
+				kWindowHeight);
 
-				mesh[0]->DrawSphere(sphere, ColorSphere[0],useWorldMap);
+			mesh[0]->DrawSphere(
+				sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}

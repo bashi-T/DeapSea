@@ -1,88 +1,51 @@
 #pragma once
-#include"DX12Common.h"
-#include<dxcapi.h>
+#include "CGVector.h"
+#include "DX12Common.h"
+#include "Debug.h"
+#include "MyImGui.h"
 #include "list"
-#include<cassert>
-#include"Debug.h"
-#include<d3d12.h>
-#include<dxgi1_6.h>
-#include"MyImGui.h"
-#include"CGVector.h"
+#include <cassert>
+#include <d3d12.h>
+#include <dxcapi.h>
+#include <dxgi1_6.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
-
-class Mesh
-{
+class Mesh {
 public:
 	~Mesh();
 	void Initialize(int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
 	IDxcBlob* CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler,
-		IDxcIncludeHandler* includeHandler
-	);
+		const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils,
+		IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 	void DrawTriangle(
-		Vector4 Top,
-		Vector4 Right,
-		Vector4 Left,
-		Vector4 color,
-		Vector2 coordTop,
-		Vector2 coordRight,
-		Vector2 coordLeft,
-		bool useWorldMap);
+		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+		Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSprite(
-		Vector4 LeftTop,
-		Vector4 RightTop,
-		Vector4 RightBottom,
-		Vector4 LeftBottom,
-		Vector4 color,
-		Vector2 coordLeftTop,
-		Vector2 coordRightTop,
-		Vector2 coordRightBottom,
-		Vector2 coordLeftBottom);
-	void DrawSphere(const Sphere& sphere_,
-		Vector4 color, bool useWorldMap);
-	
+		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+		Vector2 coordLeftBottom, int32_t width, int32_t height);
+	void DrawSphere(
+		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
 	void MakeVertexBufferView();
 	void InputDataTriangle(
-		Vector4 Top,
-		Vector4 Right,
-		Vector4 Left,
-		Vector4 color,
-		Vector2 coordTop,
-		Vector2 coordRight,
-		Vector2 coordLeft);
+		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+		Vector2 coordRight, Vector2 coordLeft);
 	void InputDataSprite(
-		Vector4 LeftTop,
-		Vector4 RightTop,
-		Vector4 RightBottom,
-		Vector4 LeftBottom,
-		Vector4 color,
-		Vector2 coordLeftTop,
-		Vector2 coordRightTop,
-		Vector2 coordRightBottom,
-		Vector2 coordLeftBottom);
+		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+		Vector2 coordLeftBottom, int32_t width, int32_t height);
 	void InputDataSphere(
-		Vector4 LeftTop,
-		Vector4 RightTop,
-		Vector4 RightBottom,
-		Vector4 LeftBottom,
-		Vector4 color,
-		Vector2 coordLeftTop,
-		Vector2 coordRightTop,
-		Vector2 coordRightBottom,
-		Vector2 coordLeftBottom,
-		uint32_t count);
+		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
 	void MeshRelease();
 
@@ -97,17 +60,15 @@ private:
 	HRESULT hr = NULL;
 	TransformMatrix transformMatrix;
 	TransformMatrix transformMatrixSprite;
-	ID3D12Resource* transformationMatrixResourceSprite;
 	TransformMatrix transformMatrixSphere;
+	ID3D12Resource* transformationMatrixResource;
+	ID3D12Resource* transformationMatrixResourceSprite;
 	ID3D12Resource* transformationMatrixResourceSphere;
-	Matrix4x4* wvpData = nullptr;
-	Matrix4x4* transformationMatrixDataSprite = nullptr;
-	Matrix4x4* transformationMatrixDataSphere = nullptr;
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
 	ID3D12RootSignature* rootSignature = nullptr;
-	ID3D12PipelineState* graphicsPipelineState=NULL;
+	ID3D12PipelineState* graphicsPipelineState = NULL;
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
@@ -131,25 +92,32 @@ private:
 	ID3D12Resource* materialResource;
 	ID3D12Resource* materialResourceSprite;
 	ID3D12Resource* materialResourceSphere;
-	ID3D12Resource* wvpResource;
+	ID3D12Resource* directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	struct Material
-	{
+
+	struct Material {
 		Vector4 color;
 		int32_t enableLighting;
 	};
-
-	struct VertexData
-	{
+	struct VertexData {
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
 	};
-
+	struct TransformationMatrix {
+		Matrix4x4 WVP;
+		Matrix4x4 World;
+	};
+	struct DirectionalLight {
+		Vector4 color;
+		Vector3 direction;
+		float intensity;
+	};
 
 	TransformMatrix cameraTransform;
+	TransformationMatrix* transformationMatrixDataSprite = nullptr;
+	TransformationMatrix* transformationMatrixDataSphere = nullptr;
 	Matrix4x4 cameraMatrix;
-
 	Matrix4x4 viewMatrix;
 	Matrix4x4 viewMatrixSprite;
 	Matrix4x4 viewMatrixSphere;
@@ -159,5 +127,7 @@ private:
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldViewProjectionMatrixSprite;
 	Matrix4x4 worldViewProjectionMatrixSphere;
-};
 
+	DirectionalLight* DirectionalLightData = nullptr;
+
+};
