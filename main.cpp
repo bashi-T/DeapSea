@@ -136,9 +136,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					texcoordLeftTop[0],
 					texcoordRightTop[0],
 					texcoordRightBottom[0],
-					texcoordLeftBottom[0]);
+					texcoordLeftBottom[0],
+					kWindowWidth,
+					kWindowHeight);
 
-				mesh[0]->DrawSphere(sphere, ColorSphere[0],useWorldMap);
+				mesh[0]->DrawSphere(
+			        sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
 			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}
