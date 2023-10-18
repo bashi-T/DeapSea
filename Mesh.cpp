@@ -26,32 +26,30 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	Mesh::MakePSO();
 
 	transformMatrix = {
-		{1.0f, 1.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f}
-	};
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f}
+    };
 	cameraTransform = {
-		{1.0f, 1.0f, 1.0f  },
-		{0.0f, 0.0f, 0.0f  },
-		{0.0f, 0.0f, -15.0f}
-	};
+	    {1.0f, 1.0f, 1.0f  },
+        {0.0f, 0.0f, 0.0f  },
+        {0.0f, 0.0f, -15.0f}
+    };
 	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
 	cameraMatrix =
-		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	    MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 
 	transformMatrixSprite = {
-		{1.0f, 1.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f}
-	};
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f}
+    };
 
 	transformMatrixSphere = {
-		{1.0f, 1.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f}
-	};
-
-
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f}
+    };
 }
 
 void Mesh::ResetDXC() {
@@ -64,10 +62,10 @@ void Mesh::ResetDXC() {
 }
 
 IDxcBlob* Mesh::CompileShader(
-	const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils_,
-	IDxcCompiler3* dxcCompiler_, IDxcIncludeHandler* includeHandler_) {
+    const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils_,
+    IDxcCompiler3* dxcCompiler_, IDxcIncludeHandler* includeHandler_) {
 	debug_->Log(
-		debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
+	    debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
 	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
@@ -78,12 +76,12 @@ IDxcBlob* Mesh::CompileShader(
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
 	LPCWSTR arguments[]{
-		filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
+	    filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
 	};
 	IDxcResult* shaderResult = nullptr;
 	hr = dxcCompiler_->Compile(
-		&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
-		IID_PPV_ARGS(&shaderResult));
+	    &shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
+	    IID_PPV_ARGS(&shaderResult));
 	assert(SUCCEEDED(hr));
 
 	IDxcBlobUtf8* shaderError = nullptr;
@@ -96,7 +94,7 @@ IDxcBlob* Mesh::CompileShader(
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	debug_->Log(
-		debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
+	    debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
 	shaderSource->Release();
 	shaderResult->Release();
 	return shaderBlob;
@@ -143,7 +141,7 @@ void Mesh::MakePSO() {
 	descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers);
 
 	hr = D3D12SerializeRootSignature(
-		&descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	    &descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
 	if (FAILED(hr)) {
 		debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
@@ -151,8 +149,8 @@ void Mesh::MakePSO() {
 	}
 
 	hr = DX12Common::GetInstance()->GetDevice()->CreateRootSignature(
-		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&rootSignature));
+	    0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+	    IID_PPV_ARGS(&rootSignature));
 
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
@@ -176,11 +174,11 @@ void Mesh::MakePSO() {
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	vertexShaderBlob =
-		CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-		CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
 	depthStencilDesc.DepthEnable = true;
@@ -190,9 +188,9 @@ void Mesh::MakePSO() {
 	graphicsPipelineStateDesc.pRootSignature = rootSignature;
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 	graphicsPipelineStateDesc.VS = {
-		vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };
+	    vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()};
 	graphicsPipelineStateDesc.PS = {
-		pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };
+	    pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize()};
 	graphicsPipelineStateDesc.BlendState = blendDesc;
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 
@@ -207,7 +205,7 @@ void Mesh::MakePSO() {
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	hr = DX12Common::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
-		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	    &graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 }
 
@@ -223,12 +221,6 @@ void Mesh::Update() {
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	MakeVertexBufferView();
-
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
-	DirectionalLightData->intensity = 1.0f;
-
 }
 
 ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
@@ -272,27 +264,32 @@ void Mesh::MakeVertexBufferView() {
 }
 
 void Mesh::InputDataTriangle(
-	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-	Vector2 coordLeft) {
+    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+    Vector2 coordLeft) {
 	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	Material* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	TransformationMatrix* transformationMatrixData = nullptr;
 	transformationMatrixResource->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 
 	materialData[0].color = color;
 	transformationMatrixData->WVP = MakeIdentity4x4();
 
 	transformMatrix.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix =
-		MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+	    MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 	viewMatrix = Inverse(cameraMatrix);
 	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
 
+	DirectionalLight* DirectionalLightData = nullptr;
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	DirectionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
+	DirectionalLightData->direction = {0.0f, -1.0f, 0.0f};
+	DirectionalLightData->intensity = 1.0f;
 
 	vertexData[0].position = Top;
 	vertexData[1].position = Right;
@@ -312,9 +309,9 @@ void Mesh::InputDataTriangle(
 }
 
 void Mesh::InputDataSprite(
-	Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-	Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
-	int32_t width, int32_t height) {
+    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
+    int32_t width, int32_t height) {
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 	Material* materialDataSprite = nullptr;
@@ -322,19 +319,24 @@ void Mesh::InputDataSprite(
 
 	transformationMatrixResourceSprite = CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResourceSprite->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 	transformationMatrixDataSprite->WVP = MakeIdentity4x4();
 	projectionMatrixSprite =
-		MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
+	    MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
-		transformMatrixSprite.scale, transformMatrixSprite.rotate, transformMatrixSprite.translate);
+	    transformMatrixSprite.scale, transformMatrixSprite.rotate, transformMatrixSprite.translate);
 	viewMatrixSprite = MakeIdentity4x4();
 	worldViewProjectionMatrixSprite =
-		Multiply(worldMatrix, Multiply(viewMatrixSprite, projectionMatrixSprite));
+	    Multiply(worldMatrix, Multiply(viewMatrixSprite, projectionMatrixSprite));
 	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
 	transformationMatrixDataSprite->World = worldMatrix;
 
+	DirectionalLight* DirectionalLightData = nullptr;
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	DirectionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
+	DirectionalLightData->direction = {0.0f, -1.0f, 0.0f};
+	DirectionalLightData->intensity = 1.0f;
 
 	materialDataSprite[0].color = color;
 	materialDataSprite[0].enableLighting = false;
@@ -353,13 +355,13 @@ void Mesh::InputDataSprite(
 	vertexDataSprite[4].texcoord = coordRightBottom;
 	vertexDataSprite[5].texcoord = coordLeftBottom;
 
-	vertexDataSprite[0].normal = { 0.0f, 0.0f, -1.0f };
+	vertexDataSprite[0].normal = {0.0f, 0.0f, -1.0f};
 }
 
 void Mesh::InputDataSphere(
-	Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-	Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
-	uint32_t count, int32_t width, int32_t height) {
+    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
+    uint32_t count, int32_t width, int32_t height) {
 	VertexData* vertexDataSphere = nullptr;
 	transformMatrixSphere.rotate.y -= 0.0002f;
 	transformMatrixSphere.rotate.z = -23.4 / 360.0f;
@@ -368,18 +370,24 @@ void Mesh::InputDataSphere(
 	materialResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResourceSphere->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
+	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
 	projectionMatrixSphere =
-		MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
+	    MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
 	transformationMatrixDataSphere->WVP = MakeIdentity4x4();
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
-		transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
+	    transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
 	viewMatrixSphere = Inverse(cameraMatrix);
 	worldViewProjectionMatrixSphere =
-		Multiply(worldMatrix, Multiply(viewMatrixSphere, projectionMatrixSphere));
+	    Multiply(worldMatrix, Multiply(viewMatrixSphere, projectionMatrixSphere));
 	transformationMatrixDataSphere->WVP = worldViewProjectionMatrixSphere;
 	transformationMatrixDataSphere->World = worldMatrix;
+
+	DirectionalLight* DirectionalLightData = nullptr;
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	DirectionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
+	DirectionalLightData->direction = {0.0f, -1.0f, 0.0f};
+	DirectionalLightData->intensity = 1.0f;
 
 	materialDataSphere[0].color = color;
 
@@ -417,12 +425,12 @@ void Mesh::InputDataSphere(
 }
 
 void Mesh::DrawSprite(
-	Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-	Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
-	int32_t width, int32_t height) {
+    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
+    int32_t width, int32_t height) {
 	InputDataSprite(
-		LeftTop, RightTop, RightBottom, LeftBottom, color, coordLeftTop, coordRightTop,
-		coordRightBottom, coordLeftBottom, width, height);
+	    LeftTop, RightTop, RightBottom, LeftBottom, color, coordLeftTop, coordRightTop,
+	    coordRightBottom, coordLeftBottom,width,height);
 	DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
 
 	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
@@ -432,22 +440,22 @@ void Mesh::DrawSprite(
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
 
 	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
-		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-		0, materialResourceSprite->GetGPUVirtualAddress());
+	    0, materialResourceSprite->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-		1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+	    1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 
 	DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-		2, DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+	    2, DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
@@ -455,8 +463,8 @@ void Mesh::DrawSprite(
 }
 
 void Mesh::DrawTriangle(
-	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-	Vector2 coordLeft, bool useWorldMap) {
+    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+    Vector2 coordLeft, bool useWorldMap) {
 	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
 	DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
 
@@ -469,29 +477,29 @@ void Mesh::DrawTriangle(
 	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
 	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
-		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-		0, materialResource->GetGPUVirtualAddress());
+	    0, materialResource->GetGPUVirtualAddress());
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-		1, transformationMatrixResource->GetGPUVirtualAddress());
+	    1, transformationMatrixResource->GetGPUVirtualAddress());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 
 	DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-		2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-		: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+	    2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
+	                   : DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
 
 void Mesh::DrawSphere(
-	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height) {
+    const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height) {
 	const uint32_t kSubdivision = 16;
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
@@ -508,35 +516,35 @@ void Mesh::DrawSphere(
 			float lonC = 2 * pi / kSubdivision;
 
 			Vector4 a = {
-				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
-				sphere_.center.y + sphere_.radius * sin(lat),
-				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f };
+			    sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
+			    sphere_.center.y + sphere_.radius * sin(lat),
+			    sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f};
 			Vector4 b = {
-				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
-				sphere_.center.y + sphere_.radius * sin(lat + latB),
-				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f };
+			    sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
+			    sphere_.center.y + sphere_.radius * sin(lat + latB),
+			    sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f};
 			Vector4 c = {
-				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
-				sphere_.center.y + sphere_.radius * sin(lat),
-				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f };
+			    sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
+			    sphere_.center.y + sphere_.radius * sin(lat),
+			    sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f};
 			Vector4 d = {
-				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
-				sphere_.center.y + sphere_.radius * sin(lat + latB),
-				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f };
+			    sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
+			    sphere_.center.y + sphere_.radius * sin(lat + latB),
+			    sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f};
 			Vector2 texcoordA{
-				float(lonIndex) / float(kSubdivision),
-				1.0f - float(latIndex) / float(kSubdivision) };
+			    float(lonIndex) / float(kSubdivision),
+			    1.0f - float(latIndex) / float(kSubdivision)};
 			Vector2 texcoordB{
-				float(lonIndex) / float(kSubdivision),
-				1.0f - float(latIndex + 1) / float(kSubdivision) };
+			    float(lonIndex) / float(kSubdivision),
+			    1.0f - float(latIndex + 1) / float(kSubdivision)};
 			Vector2 texcoordC{
-				float(lonIndex + 1) / float(kSubdivision),
-				1.0f - float(latIndex) / float(kSubdivision) };
+			    float(lonIndex + 1) / float(kSubdivision),
+			    1.0f - float(latIndex) / float(kSubdivision)};
 			Vector2 texcoordD{
-				float(lonIndex + 1) / float(kSubdivision),
-				1.0f - float(latIndex + 1) / float(kSubdivision) };
+			    float(lonIndex + 1) / float(kSubdivision),
+			    1.0f - float(latIndex + 1) / float(kSubdivision)};
 			InputDataSphere(
-				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
+			    b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount,width,height);
 
 			DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
 
@@ -547,29 +555,29 @@ void Mesh::DrawSphere(
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
 
 			DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
-				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-				0, materialResourceSphere->GetGPUVirtualAddress());
+			    0, materialResourceSphere->GetGPUVirtualAddress());
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
+			    1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
 
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
-				DX12Common::GetInstance()->GetBackBufferIndex());
+			    DX12Common::GetInstance()->GetBackBufferIndex());
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 
 			DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-				2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-				: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+			    2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
+			                   : DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 			DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(
-				0, 1, &vertexBufferViewSphere);
+			    0, 1, &vertexBufferViewSphere);
 
 			DX12Common::GetInstance()->GetCommandList()->DrawInstanced(
-				6 * kSubdivision * kSubdivision, 1, 0, 0);
+			    6 * kSubdivision * kSubdivision, 1, 0, 0);
 		}
 	}
 }

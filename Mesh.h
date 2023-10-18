@@ -20,32 +20,32 @@ public:
 	void ResetDXC();
 	void Update();
 	IDxcBlob* CompileShader(
-		const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
+	    const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils,
+	    IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 	void DrawTriangle(
-		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-		Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
+	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSprite(
-		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
-		Vector2 coordLeftBottom, int32_t width, int32_t height);
+	    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+	    Vector2 coordLeftBottom, int32_t width, int32_t height);
 	void DrawSphere(
-		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
+	    const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
 	void MakeVertexBufferView();
 	void InputDataTriangle(
-		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-		Vector2 coordRight, Vector2 coordLeft);
+	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+	    Vector2 coordRight, Vector2 coordLeft);
 	void InputDataSprite(
-		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
-		Vector2 coordLeftBottom, int32_t width, int32_t height);
+	    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+	    Vector2 coordLeftBottom, int32_t width, int32_t height);
 	void InputDataSphere(
-		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
-		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
+	    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+	    Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
 	void MeshRelease();
 
