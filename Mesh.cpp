@@ -50,6 +50,22 @@ void Mesh::Initialize(int32_t width, int32_t height) {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
     };
+	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
+	vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
+	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * 16 * 16);
+	materialResource = CreateBufferResource(sizeof(Material));
+	materialResourceSprite = CreateBufferResource(sizeof(Material));
+	materialResourceSphere = CreateBufferResource(sizeof(Material));
+	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResourceSprite = CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
+	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
+	DirectionalLightData->intensity = 1.0f;
+	MakeVertexBufferView();
+
 }
 
 void Mesh::ResetDXC() {
@@ -110,9 +126,6 @@ void Mesh::MakePSO() {
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 0;
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[3].Descriptor.ShaderRegister = 1;
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
@@ -124,6 +137,10 @@ void Mesh::MakePSO() {
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+	
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].Descriptor.ShaderRegister = 1;
 
 	descriptionRootSignature_.pParameters = rootParameters;
 	descriptionRootSignature_.NumParameters = _countof(rootParameters);
@@ -210,17 +227,15 @@ void Mesh::MakePSO() {
 }
 
 void Mesh::Update() {
-	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
-	vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
-	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * 16 * 16);
-	materialResource = CreateBufferResource(sizeof(Material));
-	materialResourceSprite = CreateBufferResource(sizeof(Material));
-	materialResourceSphere = CreateBufferResource(sizeof(Material));
-	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
-	transformationMatrixResourceSprite = CreateBufferResource(sizeof(TransformationMatrix));
-	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
-	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
-	MakeVertexBufferView();
+
+	DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
+	
+	ImGui::Begin("Light");
+	ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
+	ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.1f);
+	ImGui::DragFloat("Intensity", (float*)&DirectionalLightData->intensity, 0.01f);
+	ImGui::End();
+
 }
 
 ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
@@ -275,6 +290,8 @@ void Mesh::InputDataTriangle(
 	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 
 	materialData[0].color = color;
+	materialData[0].enableLighting = true;
+
 	transformationMatrixData->WVP = MakeIdentity4x4();
 
 	transformMatrix.rotate.y += 0.02f;
@@ -284,12 +301,6 @@ void Mesh::InputDataTriangle(
 	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
-
-	DirectionalLight* DirectionalLightData = nullptr;
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	DirectionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
-	DirectionalLightData->direction = {0.0f, -1.0f, 0.0f};
-	DirectionalLightData->intensity = 1.0f;
 
 	vertexData[0].position = Top;
 	vertexData[1].position = Right;
@@ -317,7 +328,6 @@ void Mesh::InputDataSprite(
 	Material* materialDataSprite = nullptr;
 	materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
 
-	transformationMatrixResourceSprite = CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResourceSprite->Map(
 	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 	transformationMatrixDataSprite->WVP = MakeIdentity4x4();
@@ -331,12 +341,6 @@ void Mesh::InputDataSprite(
 	    Multiply(worldMatrix, Multiply(viewMatrixSprite, projectionMatrixSprite));
 	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
 	transformationMatrixDataSprite->World = worldMatrix;
-
-	DirectionalLight* DirectionalLightData = nullptr;
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	DirectionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
-	DirectionalLightData->direction = {0.0f, -1.0f, 0.0f};
-	DirectionalLightData->intensity = 1.0f;
 
 	materialDataSprite[0].color = color;
 	materialDataSprite[0].enableLighting = false;
@@ -366,9 +370,10 @@ void Mesh::InputDataSphere(
 	transformMatrixSphere.rotate.y -= 0.0002f;
 	transformMatrixSphere.rotate.z = -23.4 / 360.0f;
 	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+
 	Material* materialDataSphere = nullptr;
 	materialResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
-	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
+
 	transformationMatrixResourceSphere->Map(
 	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
 	projectionMatrixSphere =
@@ -383,13 +388,8 @@ void Mesh::InputDataSphere(
 	transformationMatrixDataSphere->WVP = worldViewProjectionMatrixSphere;
 	transformationMatrixDataSphere->World = worldMatrix;
 
-	DirectionalLight* DirectionalLightData = nullptr;
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	DirectionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
-	DirectionalLightData->direction = {0.0f, -1.0f, 0.0f};
-	DirectionalLightData->intensity = 1.0f;
-
 	materialDataSphere[0].color = color;
+	materialDataSphere[0].enableLighting = true;
 
 	vertexDataSphere[count * 6].position = LeftTop;
 	vertexDataSphere[count * 6 + 1].position = RightTop;
@@ -457,6 +457,9 @@ void Mesh::DrawSprite(
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
 	    2, DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
+		3, directionalLightResource->GetGPUVirtualAddress());
+
 	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
 	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(6, 1, 0, 0);
@@ -495,23 +498,28 @@ void Mesh::DrawTriangle(
 	    2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
 	                   : DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
+		3, directionalLightResource->GetGPUVirtualAddress());
+
 	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
 
 void Mesh::DrawSphere(
-    const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height) {
+    const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
+{
 	const uint32_t kSubdivision = 16;
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
 	const float kLatevery = pi / kSubdivision;
-	uint32_t sphereCount = -1;
+	uint32_t sphereCount = 0;
 
-	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
+	{
 		float lat = -pi / 2.0f + kLatevery * latIndex; // theta
 		float latB = pi / kSubdivision;
 
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
-			sphereCount++;
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
+		{
 			float lon = lonIndex * kLonevery; // phi
 			float lonC = 2 * pi / kSubdivision;
 
@@ -531,18 +539,27 @@ void Mesh::DrawSphere(
 			    sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
 			    sphere_.center.y + sphere_.radius * sin(lat + latB),
 			    sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f};
-			Vector2 texcoordA{
+			Vector2 texcoordA
+			{
 			    float(lonIndex) / float(kSubdivision),
-			    1.0f - float(latIndex) / float(kSubdivision)};
-			Vector2 texcoordB{
+			    1.0f - float(latIndex) / float(kSubdivision)
+			};
+			Vector2 texcoordB
+			{
 			    float(lonIndex) / float(kSubdivision),
-			    1.0f - float(latIndex + 1) / float(kSubdivision)};
-			Vector2 texcoordC{
+			    1.0f - float(latIndex + 1) / float(kSubdivision)
+			};
+			Vector2 texcoordC
+			{
 			    float(lonIndex + 1) / float(kSubdivision),
-			    1.0f - float(latIndex) / float(kSubdivision)};
-			Vector2 texcoordD{
+			    1.0f - float(latIndex) / float(kSubdivision)
+			};
+			Vector2 texcoordD
+			{
 			    float(lonIndex + 1) / float(kSubdivision),
-			    1.0f - float(latIndex + 1) / float(kSubdivision)};
+			    1.0f - float(latIndex + 1) / float(kSubdivision)
+			};
+
 			InputDataSphere(
 			    b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount,width,height);
 
@@ -561,7 +578,7 @@ void Mesh::DrawSphere(
 			    0, materialResourceSphere->GetGPUVirtualAddress());
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-			    1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
+				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
 
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
 			    DX12Common::GetInstance()->GetBackBufferIndex());
@@ -573,13 +590,17 @@ void Mesh::DrawSphere(
 			    2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
 			                   : DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
+			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
+				3, directionalLightResource->GetGPUVirtualAddress());
+
 			DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(
 			    0, 1, &vertexBufferViewSphere);
 
-			DX12Common::GetInstance()->GetCommandList()->DrawInstanced(
-			    6 * kSubdivision * kSubdivision, 1, 0, 0);
+			sphereCount++;
 		}
 	}
+	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(
+		6 * kSubdivision * kSubdivision, 1, 0, 0);
 }
 
 void Mesh::MeshRelease() {
@@ -590,6 +611,8 @@ void Mesh::MeshRelease() {
 	materialResourceSprite->Release();
 	materialResourceSphere->Release();
 	transformationMatrixResource->Release();
+	transformationMatrixResourceSprite->Release();
+	transformationMatrixResourceSphere->Release();
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
 	if (errorBlob) {

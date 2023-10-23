@@ -53,6 +53,13 @@ public:
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 
+	struct DirectionalLight {
+		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		Vector3 direction = { 0.0f, -1.0f, 0.0f };
+		float intensity = 1.0f;
+	};
+	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
+
 private:
 	Debug* debug_;
 	WinAPP* sWinApp;
@@ -108,13 +115,9 @@ private:
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 	};
-	struct DirectionalLight {
-		Vector4 color;
-		Vector3 direction;
-		float intensity;
-	};
 
 	TransformMatrix cameraTransform;
+	DirectionalLight* DirectionalLightData = nullptr;
 	TransformationMatrix* transformationMatrixDataSprite = nullptr;
 	TransformationMatrix* transformationMatrixDataSphere = nullptr;
 	Matrix4x4 cameraMatrix;
@@ -127,7 +130,5 @@ private:
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldViewProjectionMatrixSprite;
 	Matrix4x4 worldViewProjectionMatrixSphere;
-
-	DirectionalLight* DirectionalLightData = nullptr;
 
 };

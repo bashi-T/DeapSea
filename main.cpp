@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	debug->DebugLayer();
 #endif
 
-	dx12Common->Init("Resource/uvChecker.png", kWindowWidth, kWindowHeight);
+	dx12Common->Init("Resource/monsterBall.png", kWindowWidth, kWindowHeight);
 	imgui->Initialize(
 	    winAPP->GetHWND(),
 		dx12Common->GetInstance()->GetDevice(),
@@ -92,14 +92,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (int i = 0; i < kNumTriangle; i++) {
 			mesh[i]->Update();
 		}
-		ImGui::Begin("TriangleColor");
-		//ImGui::DragFloat3("CameraTranslate", &mesh[0]->GetCameraMatrix().m[3][0], 0.01f);
-		//ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::ColorEdit3("Triangle1", (float*)&Color[0]);
-		//ImGui::ColorEdit3("Triangle2", (float*)&Color[1]);
-		ImGui::ColorEdit3("Sprite1", (float*)&ColorSprite[0]);
+		ImGui::Begin("sphereEdit");
 		ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
-		ImGui::DragFloat3("sphere", (float*)&sphere.center,0.01f);
+		ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
+		ImGui::DragFloat("sphere.radius", (float*)&sphere.radius, 0.01f);
 		ImGui::Checkbox("useWorldMap", &useWorldMap);
 		ImGui::End();
 
@@ -116,17 +112,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			dx12Common->GetInstance()->GetCommandList()->
 				SetDescriptorHeaps(1, descriptorHeaps);
 
-			for (int i = 0; i < kNumTriangle; i++) {
-				mesh[i]->DrawTriangle(
-					Top[i],
-					Right[i],
-					Left[i],
-					Color[i],
-					texcoordTop[i],
-					texcoordRight[i],
-					texcoordLeft[i],
-					useWorldMap);
-			}
+			//for (int i = 0; i < kNumTriangle; i++) {
+			//	mesh[i]->DrawTriangle(
+			//		Top[i],
+			//		Right[i],
+			//		Left[i],
+			//		Color[i],
+			//		texcoordTop[i],
+			//		texcoordRight[i],
+			//		texcoordLeft[i],
+			//		useWorldMap);
+			//}
 				mesh[0]->DrawSprite(
 					LeftTop[0],
 					RightTop[0],
