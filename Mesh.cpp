@@ -232,7 +232,7 @@ void Mesh::Update() {
 	
 	ImGui::Begin("Light");
 	ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
-	ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.1f);
+	ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.01f);
 	ImGui::DragFloat("Intensity", (float*)&DirectionalLightData->intensity, 0.01f);
 	ImGui::End();
 
