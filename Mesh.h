@@ -34,7 +34,7 @@ public:
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
-	void MakeVertexBufferView();
+	void MakeBufferView();
 	void InputDataTriangle(
 	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	    Vector2 coordRight, Vector2 coordLeft);
@@ -88,6 +88,12 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	ID3D12Resource* vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
+
+	ID3D12Resource* indexResourceSprite = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+
+	ID3D12Resource* indexResourceSphere = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
 
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};

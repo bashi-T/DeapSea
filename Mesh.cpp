@@ -61,11 +61,12 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	indexResourceSprite = CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * 16 * 16);
 	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
-	MakeVertexBufferView();
-
+	MakeBufferView();
 }
 
 void Mesh::ResetDXC() {
@@ -264,7 +265,7 @@ ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
 	return Resource;
 }
 
-void Mesh::MakeVertexBufferView() {
+void Mesh::MakeBufferView() {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
@@ -273,9 +274,17 @@ void Mesh::MakeVertexBufferView() {
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
+	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+
 	vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
 	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * 16 * 16;
 	vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
+
+	indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
+	indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * 16 * 16;
+	indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
 }
 
 void Mesh::InputDataTriangle(
@@ -327,9 +336,11 @@ void Mesh::InputDataSprite(
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 	Material* materialDataSprite = nullptr;
 	materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
-
+	uint32_t* indexDataSprite = nullptr;
+	indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
 	transformationMatrixResourceSprite->Map(
 	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+	
 	transformationMatrixDataSprite->WVP = MakeIdentity4x4();
 	projectionMatrixSprite =
 	    MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
@@ -351,15 +362,18 @@ void Mesh::InputDataSprite(
 	vertexDataSprite[0].texcoord = coordLeftTop;
 	vertexDataSprite[1].texcoord = coordRightTop;
 	vertexDataSprite[2].texcoord = coordRightBottom;
-
-	vertexDataSprite[3].position = LeftTop;
-	vertexDataSprite[4].position = RightBottom;
-	vertexDataSprite[5].position = LeftBottom;
-	vertexDataSprite[3].texcoord = coordLeftTop;
-	vertexDataSprite[4].texcoord = coordRightBottom;
-	vertexDataSprite[5].texcoord = coordLeftBottom;
+	vertexDataSprite[3].position = LeftBottom;
+	vertexDataSprite[3].texcoord = coordLeftBottom;
 
 	vertexDataSprite[0].normal = {0.0f, 0.0f, -1.0f};
+
+	indexDataSprite[0] = 0;
+	indexDataSprite[1] = 1;
+	indexDataSprite[2] = 2;
+
+	indexDataSprite[3] = 0;
+	indexDataSprite[4] = 2;
+	indexDataSprite[5] = 3;
 }
 
 void Mesh::InputDataSphere(
@@ -373,6 +387,9 @@ void Mesh::InputDataSphere(
 
 	Material* materialDataSphere = nullptr;
 	materialResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
+
+	uint32_t* indexDataSphere = nullptr;
+	indexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
 
 	transformationMatrixResourceSphere->Map(
 	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
@@ -391,37 +408,37 @@ void Mesh::InputDataSphere(
 	materialDataSphere[0].color = color;
 	materialDataSphere[0].enableLighting = true;
 
-	vertexDataSphere[count * 6].position = LeftTop;
-	vertexDataSphere[count * 6 + 1].position = RightTop;
-	vertexDataSphere[count * 6 + 2].position = RightBottom;
-	vertexDataSphere[count * 6].texcoord = coordLeftTop;
-	vertexDataSphere[count * 6 + 1].texcoord = coordRightTop;
-	vertexDataSphere[count * 6 + 2].texcoord = coordRightBottom;
-	vertexDataSphere[count * 6].normal.x = vertexDataSphere[count * 6].position.x;
-	vertexDataSphere[count * 6].normal.y = vertexDataSphere[count * 6].position.y;
-	vertexDataSphere[count * 6].normal.z = vertexDataSphere[count * 6].position.z;
-	vertexDataSphere[count * 6 + 1].normal.x = vertexDataSphere[count * 6 + 1].position.x;
-	vertexDataSphere[count * 6 + 1].normal.y = vertexDataSphere[count * 6 + 1].position.y;
-	vertexDataSphere[count * 6 + 1].normal.z = vertexDataSphere[count * 6 + 1].position.z;
-	vertexDataSphere[count * 6 + 2].normal.x = vertexDataSphere[count * 6 + 2].position.x;
-	vertexDataSphere[count * 6 + 2].normal.y = vertexDataSphere[count * 6 + 2].position.y;
-	vertexDataSphere[count * 6 + 2].normal.z = vertexDataSphere[count * 6 + 2].position.z;
+	vertexDataSphere[count * 4].position = LeftTop;
+	vertexDataSphere[count * 4].texcoord = coordLeftTop;
+	vertexDataSphere[count * 4].normal.x = vertexDataSphere[count * 4].position.x;
+	vertexDataSphere[count * 4].normal.y = vertexDataSphere[count * 4].position.y;
+	vertexDataSphere[count * 4].normal.z = vertexDataSphere[count * 4].position.z;
+	
+	vertexDataSphere[count * 4 + 1].position = RightTop;
+	vertexDataSphere[count * 4 + 1].texcoord = coordRightTop;
+	vertexDataSphere[count * 4 + 1].normal.x = vertexDataSphere[count * 4 + 1].position.x;
+	vertexDataSphere[count * 4 + 1].normal.y = vertexDataSphere[count * 4 + 1].position.y;
+	vertexDataSphere[count * 4 + 1].normal.z = vertexDataSphere[count * 4 + 1].position.z;
+	
+	vertexDataSphere[count * 4 + 2].position = RightBottom;
+	vertexDataSphere[count * 4 + 2].texcoord = coordRightBottom;
+	vertexDataSphere[count * 4 + 2].normal.x = vertexDataSphere[count * 4 + 2].position.x;
+	vertexDataSphere[count * 4 + 2].normal.y = vertexDataSphere[count * 4 + 2].position.y;
+	vertexDataSphere[count * 4 + 2].normal.z = vertexDataSphere[count * 4 + 2].position.z;
+	
+	vertexDataSphere[count * 4 + 3].position = LeftBottom;
+	vertexDataSphere[count * 4 + 3].texcoord = coordLeftBottom;
+	vertexDataSphere[count * 4 + 3].normal.x = vertexDataSphere[count * 4 + 3].position.x;
+	vertexDataSphere[count * 4 + 3].normal.y = vertexDataSphere[count * 4 + 3].position.y;
+	vertexDataSphere[count * 4 + 3].normal.z = vertexDataSphere[count * 4 + 3].position.z;
 
-	vertexDataSphere[count * 6 + 3].position = LeftTop;
-	vertexDataSphere[count * 6 + 4].position = RightBottom;
-	vertexDataSphere[count * 6 + 5].position = LeftBottom;
-	vertexDataSphere[count * 6 + 3].texcoord = coordLeftTop;
-	vertexDataSphere[count * 6 + 4].texcoord = coordRightBottom;
-	vertexDataSphere[count * 6 + 5].texcoord = coordLeftBottom;
-	vertexDataSphere[count * 6 + 3].normal.x = vertexDataSphere[count * 6 + 3].position.x;
-	vertexDataSphere[count * 6 + 3].normal.y = vertexDataSphere[count * 6 + 3].position.y;
-	vertexDataSphere[count * 6 + 3].normal.z = vertexDataSphere[count * 6 + 3].position.z;
-	vertexDataSphere[count * 6 + 4].normal.x = vertexDataSphere[count * 6 + 4].position.x;
-	vertexDataSphere[count * 6 + 4].normal.y = vertexDataSphere[count * 6 + 4].position.y;
-	vertexDataSphere[count * 6 + 4].normal.z = vertexDataSphere[count * 6 + 4].position.z;
-	vertexDataSphere[count * 6 + 5].normal.x = vertexDataSphere[count * 6 + 5].position.x;
-	vertexDataSphere[count * 6 + 5].normal.y = vertexDataSphere[count * 6 + 5].position.y;
-	vertexDataSphere[count * 6 + 5].normal.z = vertexDataSphere[count * 6 + 5].position.z;
+	indexDataSphere[count * 6 + 0] = count * 4 + 0;
+	indexDataSphere[count * 6 + 1] = count * 4 + 1;
+	indexDataSphere[count * 6 + 2] = count * 4 + 2;
+
+	indexDataSphere[count * 6 + 3] = count * 4 + 0;
+	indexDataSphere[count * 6 + 4] = count * 4 + 2;
+	indexDataSphere[count * 6 + 5] = count * 4 + 3;
 }
 
 void Mesh::DrawSprite(
@@ -460,9 +477,14 @@ void Mesh::DrawSprite(
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
 
-	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
-	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(6, 1, 0, 0);
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetIndexBuffer(&indexBufferViewSprite);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Mesh::DrawTriangle(
@@ -478,6 +500,9 @@ void Mesh::DrawTriangle(
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
 
 	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetIndexBuffer(&indexBufferViewSphere);
 
 	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
 	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -596,11 +621,14 @@ void Mesh::DrawSphere(
 			DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(
 			    0, 1, &vertexBufferViewSphere);
 
+			DX12Common::GetInstance()->GetCommandList()->
+				IASetIndexBuffer(&indexBufferViewSphere);
+
 			sphereCount++;
 		}
 	}
-	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(
-		6 * kSubdivision * kSubdivision, 1, 0, 0);
+	DX12Common::GetInstance()->GetCommandList()->DrawIndexedInstanced(
+		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
 
 void Mesh::MeshRelease() {
