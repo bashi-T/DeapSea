@@ -69,6 +69,7 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
 	MakeBufferView();
+
 }
 
 void Mesh::ResetDXC() {
@@ -237,6 +238,9 @@ void Mesh::Update() {
 	ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
 	ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.01f);
 	ImGui::DragFloat("Intensity", (float*)&DirectionalLightData->intensity, 0.01f);
+	ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 	ImGui::End();
 
 }
@@ -357,6 +361,11 @@ void Mesh::InputDataSprite(
 
 	materialDataSprite[0].color = color;
 	materialDataSprite[0].enableLighting = false;
+	materialDataSprite[0].uvTransform = MakeIdentity4x4();
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformSprite.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+	materialDataSprite[0].uvTransform = uvTransformMatrix;
 
 	vertexDataSprite[0].position = LeftTop;
 	vertexDataSprite[1].position = RightTop;
@@ -409,6 +418,11 @@ void Mesh::InputDataSphere(
 
 	materialDataSphere[0].color = color;
 	materialDataSphere[0].enableLighting = true;
+	materialDataSphere[0].uvTransform = MakeIdentity4x4();
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSphere.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformSphere.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSphere.translate));
+	materialDataSphere[0].uvTransform = uvTransformMatrix;
 
 	vertexDataSphere[count * 4].position = LeftTop;
 	vertexDataSphere[count * 4].texcoord = coordLeftTop;

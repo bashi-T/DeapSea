@@ -111,6 +111,8 @@ private:
 	struct Material {
 		Vector4 color;
 		int32_t enableLighting;
+		float padding[3];
+		Matrix4x4 uvTransform;
 	};
 	struct VertexData {
 		Vector4 position;
@@ -120,6 +122,16 @@ private:
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
 		Matrix4x4 World;
+	};
+	TransformMatrix uvTransformSprite{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
+	TransformMatrix uvTransformSphere{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
 	};
 
 	TransformMatrix cameraTransform;
