@@ -137,4 +137,5 @@ private:
 	Matrix4x4 worldViewProjectionMatrixSprite;
 	Matrix4x4 worldViewProjectionMatrixSphere;
 
+	const uint32_t kSubdivision = 16;
 };

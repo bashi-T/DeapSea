@@ -9,6 +9,8 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Initialize(int32_t width, int32_t height) {
+	kSubdivision == 16;
+	
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.Width = width;
@@ -52,7 +54,7 @@ void Mesh::Initialize(int32_t width, int32_t height) {
     };
 	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 	vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
-	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * 16 * 16);
+	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
 	materialResource = CreateBufferResource(sizeof(Material));
 	materialResourceSprite = CreateBufferResource(sizeof(Material));
 	materialResourceSphere = CreateBufferResource(sizeof(Material));
@@ -62,7 +64,7 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
 	indexResourceSprite = CreateBufferResource(sizeof(uint32_t) * 6);
-	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * 16 * 16);
+	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
 	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
@@ -279,11 +281,11 @@ void Mesh::MakeBufferView() {
 	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
 
 	vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
-	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * 16 * 16;
+	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
 	vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 
 	indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
-	indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * 16 * 16;
+	indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * kSubdivision;
 	indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
 }
 
@@ -532,7 +534,6 @@ void Mesh::DrawTriangle(
 void Mesh::DrawSphere(
     const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
 {
-	const uint32_t kSubdivision = 16;
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
 	const float kLatevery = pi / kSubdivision;
