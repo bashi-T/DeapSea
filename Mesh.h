@@ -8,6 +8,8 @@
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <dxgi1_6.h>
+#include <fstream>
+#include <sstream>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -46,6 +48,16 @@ public:
 	    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
 	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 	    Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
+
+	struct VertexData {
+		Vector4 position;
+		Vector2 texcoord;
+		Vector3 normal;
+	};
+	struct ModelData {
+		std::vector<VertexData> vertices;
+	};
+	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
 	void MeshRelease();
 
@@ -114,11 +126,6 @@ private:
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
-	struct VertexData {
-		Vector4 position;
-		Vector2 texcoord;
-		Vector3 normal;
-	};
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
 		Matrix4x4 World;
@@ -150,4 +157,6 @@ private:
 	Matrix4x4 worldViewProjectionMatrixSphere;
 
 	const uint32_t kSubdivision = 16;
+	ModelData modelData;
+
 };

@@ -52,6 +52,7 @@ void Mesh::Initialize(int32_t width, int32_t height) {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
     };
+	modelData = LoadObjFile("Resource","Plane.obj");
 	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 	vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
 	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
@@ -273,7 +274,7 @@ ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes) {
 
 void Mesh::MakeBufferView() {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData)) * 3;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
@@ -298,6 +299,7 @@ void Mesh::InputDataTriangle(
     Vector2 coordLeft) {
 	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * 3);
 	Material* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	TransformationMatrix* transformationMatrixData = nullptr;
@@ -546,7 +548,7 @@ void Mesh::DrawTriangle(
 }
 
 void Mesh::DrawSphere(
-    const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
+	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
 {
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
@@ -564,44 +566,44 @@ void Mesh::DrawSphere(
 			float lonC = 2 * pi / kSubdivision;
 
 			Vector4 a = {
-			    sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
-			    sphere_.center.y + sphere_.radius * sin(lat),
-			    sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f};
+				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
+				sphere_.center.y + sphere_.radius * sin(lat),
+				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f };
 			Vector4 b = {
-			    sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
-			    sphere_.center.y + sphere_.radius * sin(lat + latB),
-			    sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f};
+				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
+				sphere_.center.y + sphere_.radius * sin(lat + latB),
+				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f };
 			Vector4 c = {
-			    sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
-			    sphere_.center.y + sphere_.radius * sin(lat),
-			    sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f};
+				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
+				sphere_.center.y + sphere_.radius * sin(lat),
+				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f };
 			Vector4 d = {
-			    sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
-			    sphere_.center.y + sphere_.radius * sin(lat + latB),
-			    sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f};
+				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
+				sphere_.center.y + sphere_.radius * sin(lat + latB),
+				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f };
 			Vector2 texcoordA
 			{
-			    float(lonIndex) / float(kSubdivision),
-			    1.0f - float(latIndex) / float(kSubdivision)
+				float(lonIndex) / float(kSubdivision),
+				1.0f - float(latIndex) / float(kSubdivision)
 			};
 			Vector2 texcoordB
 			{
-			    float(lonIndex) / float(kSubdivision),
-			    1.0f - float(latIndex + 1) / float(kSubdivision)
+				float(lonIndex) / float(kSubdivision),
+				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 			Vector2 texcoordC
 			{
-			    float(lonIndex + 1) / float(kSubdivision),
-			    1.0f - float(latIndex) / float(kSubdivision)
+				float(lonIndex + 1) / float(kSubdivision),
+				1.0f - float(latIndex) / float(kSubdivision)
 			};
 			Vector2 texcoordD
 			{
-			    float(lonIndex + 1) / float(kSubdivision),
-			    1.0f - float(latIndex + 1) / float(kSubdivision)
+				float(lonIndex + 1) / float(kSubdivision),
+				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 
 			InputDataSphere(
-			    b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount,width,height);
+				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
 
 			DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
 
@@ -612,29 +614,29 @@ void Mesh::DrawSphere(
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
 
 			DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
-			    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-			    0, materialResourceSphere->GetGPUVirtualAddress());
+				0, materialResourceSphere->GetGPUVirtualAddress());
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
 
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
-			    DX12Common::GetInstance()->GetBackBufferIndex());
+				DX12Common::GetInstance()->GetBackBufferIndex());
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 
 			DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-			    2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-			                   : DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+				2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
+				: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
 
 			DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(
-			    0, 1, &vertexBufferViewSphere);
+				0, 1, &vertexBufferViewSphere);
 
 			DX12Common::GetInstance()->GetCommandList()->
 				IASetIndexBuffer(&indexBufferViewSphere);
@@ -646,7 +648,66 @@ void Mesh::DrawSphere(
 		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
 
-void Mesh::MeshRelease() {
+Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::string& filename)
+{
+	ModelData modelData;
+	std::vector<Vector4> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector2> texcoords;
+	std::string line;
+
+	std::ifstream file(directryPath + "/" + filename);
+	assert(file.is_open());
+
+	while (std::getline(file, line)) {
+		std::string identifier;
+		std::istringstream s(line);
+		s >> identifier;
+
+		if (identifier == "v") {
+			Vector4 position;
+			position.w = 1.0f;
+			s >> position.x >> position.y >> position.z;
+			position.w = 1.0f;
+			positions.push_back(position);
+		}
+		else if (identifier == "vt") {
+			Vector2 texcoord;
+			s >> texcoord.x >> texcoord.y;
+			texcoords.push_back(texcoord);
+		}
+		else if (identifier == "vn") {
+			Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
+		}
+		else if (identifier == "f") {
+			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; ++element) {
+					std::string index;
+					std::getline(v, index, '/');
+					elementIndices[element] = std::stoi(index);
+				}
+
+				Vector4 position = positions[elementIndices[0] - 1];
+				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+				Vector3 normal = normals[elementIndices[2] - 1];
+				VertexData vertex = { position, texcoord, normal };
+				modelData.vertices.push_back(vertex);
+			}
+		}
+	}
+	return modelData;
+}
+
+
+void Mesh::MeshRelease()
+{
 	vertexResource->Release();
 	vertexResourceSprite->Release();
 	vertexResourceSphere->Release();
