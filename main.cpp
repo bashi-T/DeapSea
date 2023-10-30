@@ -136,9 +136,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				//	kWindowWidth,
 				//	kWindowHeight);
 
-				mesh[0]->DrawSphere(
-			        sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
-			imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
+				//mesh[0]->DrawSphere(
+			 //       sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+			mesh[0]->DrawOBJ(sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+
+				imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();
 		}
 	}

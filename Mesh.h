@@ -32,7 +32,9 @@ public:
 	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 	    Vector2 coordLeftBottom, int32_t width, int32_t height);
 	void DrawSphere(
-	    const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
+		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
+	void DrawOBJ(
+		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
@@ -45,9 +47,13 @@ public:
 	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 	    Vector2 coordLeftBottom, int32_t width, int32_t height);
 	void InputDataSphere(
-	    Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
-	    Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
+		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
+	void InputDataOBJ(
+		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
+		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
+		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
 	struct VertexData {
 		Vector4 position;
@@ -80,9 +86,13 @@ private:
 	TransformMatrix transformMatrix;
 	TransformMatrix transformMatrixSprite;
 	TransformMatrix transformMatrixSphere;
+	TransformMatrix transformMatrixObj;
+
 	ID3D12Resource* transformationMatrixResource;
 	ID3D12Resource* transformationMatrixResourceSprite;
 	ID3D12Resource* transformationMatrixResourceSphere;
+	ID3D12Resource* transformationMatrixResourceObj;
+
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
@@ -96,16 +106,24 @@ private:
 
 	ID3D12Resource* vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+
 	ID3D12Resource* vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+
 	ID3D12Resource* vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
+
+	ID3D12Resource* vertexResourceObj = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewObj{};
 
 	ID3D12Resource* indexResourceSprite = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
 
 	ID3D12Resource* indexResourceSphere = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
+
+	ID3D12Resource* indexResourceObj = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewObj{};
 
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
@@ -117,6 +135,8 @@ private:
 	ID3D12Resource* materialResource;
 	ID3D12Resource* materialResourceSprite;
 	ID3D12Resource* materialResourceSphere;
+	ID3D12Resource* materialResourceObj;
+
 	ID3D12Resource* directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
@@ -140,21 +160,33 @@ private:
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
+	TransformMatrix uvTransformObj{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
 
 	TransformMatrix cameraTransform;
 	DirectionalLight* DirectionalLightData = nullptr;
 	TransformationMatrix* transformationMatrixDataSprite = nullptr;
 	TransformationMatrix* transformationMatrixDataSphere = nullptr;
+	TransformationMatrix* transformationMatrixDataObj = nullptr;
+
 	Matrix4x4 cameraMatrix;
 	Matrix4x4 viewMatrix;
 	Matrix4x4 viewMatrixSprite;
 	Matrix4x4 viewMatrixSphere;
+	Matrix4x4 viewMatrixObj;
+
 	Matrix4x4 projectionMatrix;
 	Matrix4x4 projectionMatrixSprite;
 	Matrix4x4 projectionMatrixSphere;
+	Matrix4x4 projectionMatrixObj;
+
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldViewProjectionMatrixSprite;
 	Matrix4x4 worldViewProjectionMatrixSphere;
+	Matrix4x4 worldViewProjectionMatrixObj;
 
 	const uint32_t kSubdivision = 16;
 	ModelData modelData;
