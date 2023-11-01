@@ -5,6 +5,8 @@
 #include<d3d12.h>
 #include<dxgidebug.h>
 #include<dxgi1_3.h>
+#include<WRL.h>
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxguid.lib")
 
@@ -17,11 +19,11 @@ public:
 	void DebugLayer();
 	void InfoQueue(ID3D12Device* device);
 	void ReportLiveObject();
-	ID3D12Debug1* GetDebugController() { return debugController; }
+	Microsoft::WRL::ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 		
 	
 private:
-	IDXGIDebug1* debug;
-	ID3D12Debug1* debugController = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
 };
 

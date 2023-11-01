@@ -34,7 +34,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		dx12Common->GetInstance()->GetDevice(),
 	    dx12Common->GetInstance()->GetSwapChainDesc(),
 	    dx12Common->GetInstance()->GetRtvDesc(),
-	    dx12Common->GetInstance()->GetSrvDescriptorHeap());
+	    dx12Common->GetInstance()->GetSrvDescriptorHeap().Get());
 
 	Vector4 Top[kNumTriangle];
 	Vector4 Left[kNumTriangle];
@@ -107,7 +107,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ID3D12DescriptorHeap* descriptorHeaps[] =
 			{
-			    dx12Common->GetInstance()->GetSrvDescriptorHeap()
+			    dx12Common->GetInstance()->GetSrvDescriptorHeap().Get()
 			};
 			dx12Common->GetInstance()->GetCommandList()->
 				SetDescriptorHeaps(1, descriptorHeaps);
@@ -146,11 +146,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	CloseHandle(dx12Common->GetFenceEvent());
-	for (int i = 0; i < kNumTriangle; i++)
-	{
-		mesh[i]->MeshRelease();
-	}
-	dx12Common->DX12Release(debug->GetDebugController());
+	//for (int i = 0; i < kNumTriangle; i++)
+	//{
+	//	mesh[i]->MeshRelease();
+	//}
+	dx12Common->DX12Release(debug->GetDebugController().Get());
 	debug->ReportLiveObject();
 	CoUninitialize();
 	return 0;

@@ -2,19 +2,19 @@
 
 void MyImGui::Initialize(
     HWND hwnd,
-	ID3D12Device* device,
+	Microsoft::WRL::ComPtr<ID3D12Device> device,
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
-	ID3D12DescriptorHeap* srvDescriptorHeap) {
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX12_Init(
-		device,
+		device.Get(),
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
-		srvDescriptorHeap,
+		srvDescriptorHeap.Get(),
 	    srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 	    srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 }

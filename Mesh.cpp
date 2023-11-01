@@ -1,11 +1,11 @@
 #include "Mesh.h"
 
 Mesh::~Mesh() {
-	delete dxcUtils;
-	delete dxcCompiler;
-	delete includeHandler;
-	delete rootSignature;
-	delete graphicsPipelineState;
+	//delete dxcUtils;
+	//delete dxcCompiler;
+	//delete includeHandler;
+	//delete rootSignature;
+	//delete graphicsPipelineState;
 }
 
 void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
@@ -86,10 +86,10 @@ transformMatrix = {
 	mipImages2 = LoadTexture(modelData.material.textureFilePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	textureResource = CreateTextureResource(DX12Common::GetInstance()->GetDevice(), metadata);
-	textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice(), metadata2);
-	UploadTextureData(textureResource, mipImages, metadata);
-	UploadTextureData(textureResource2, mipImages2, metadata2);
+	textureResource = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata);
+	textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata2);
+	UploadTextureData(textureResource.Get(), mipImages, metadata);
+	UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
 	MakeShaderResourceView(metadata, metadata2);
 
 	MakeBufferView();
@@ -220,18 +220,18 @@ void Mesh::MakePSO()
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	vertexShaderBlob =
-	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 	graphicsPipelineStateDesc.VS = {
 	    vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()};
@@ -277,10 +277,10 @@ void Mesh::Update()
 
 }
 
-ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes)
+Microsoft::WRL::ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-
+	
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 	D3D12_RESOURCE_DESC ResourceDesc{};
 
@@ -295,7 +295,7 @@ ID3D12Resource* Mesh::CreateBufferResource(size_t sizeInBytes)
 
 	ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	ID3D12Resource* Resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
 
 	hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
@@ -507,9 +507,9 @@ void Mesh::DrawSprite(
 
 	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
+	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 
-	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 
 	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
 	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -550,9 +550,9 @@ void Mesh::DrawTriangle(
 
 	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
+	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 
-	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 
 	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
@@ -646,9 +646,9 @@ void Mesh::DrawSphere(
 
 			DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-			DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
+			DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 
-			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
+			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 
 			DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -776,9 +776,9 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 
 	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
+	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 
-	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 
 	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -912,30 +912,15 @@ Mesh::MaterialData Mesh::LoadMaterialTemplateFile(const std::string& directoryPa
 	return materialData;
 }
 
-void Mesh::MeshRelease()
-{
-	vertexResource->Release();
-	vertexResourceSprite->Release();
-	vertexResourceSphere->Release();
-	vertexResourceObj->Release();
-	materialResource->Release();
-	materialResourceSprite->Release();
-	materialResourceSphere->Release();
-	materialResourceObj->Release();
-	transformationMatrixResource->Release();
-	transformationMatrixResourceSprite->Release();
-	transformationMatrixResourceSphere->Release();
-	transformationMatrixResourceObj->Release();
-	directionalLightResource->Release();
-	graphicsPipelineState->Release();
-	signatureBlob->Release();
-	if (errorBlob) {
-		errorBlob->Release();
-	}
-	rootSignature->Release();
-	pixelShaderBlob->Release();
-	vertexShaderBlob->Release();
-}
+//void Mesh::MeshRelease()
+//{
+//	signatureBlob->Release();
+//	if (errorBlob) {
+//		errorBlob->Release();
+//	}
+//	pixelShaderBlob->Release();
+//	vertexShaderBlob->Release();
+//}
 
 void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
 {
@@ -952,14 +937,14 @@ void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const Di
 	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
 
 	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleCPU = DX12Common::GetInstance()->GetCPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 1);
-	textureSrvHandleGPU = DX12Common::GetInstance()->GetGPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 1);
+	textureSrvHandleCPU = DX12Common::GetInstance()->GetCPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+	textureSrvHandleGPU = DX12Common::GetInstance()->GetGPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
 
-	textureSrvHandleCPU2 = DX12Common::GetInstance()->GetCPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 2);
-	textureSrvHandleGPU2 = DX12Common::GetInstance()->GetGPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 2);
+	textureSrvHandleCPU2 = DX12Common::GetInstance()->GetCPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+	textureSrvHandleGPU2 = DX12Common::GetInstance()->GetGPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
 
-	DX12Common::GetInstance()->GetDevice()->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
-	DX12Common::GetInstance()->GetDevice()->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+	DX12Common::GetInstance()->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+	DX12Common::GetInstance()->GetDevice()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 }
 
 DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
@@ -985,7 +970,7 @@ DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
-ID3D12Resource* Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+Microsoft::WRL::ComPtr<ID3D12Resource> Mesh::CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);
@@ -1001,7 +986,7 @@ ID3D12Resource* Mesh::CreateTextureResource(ID3D12Device* device, const DirectX:
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -1015,7 +1000,7 @@ ID3D12Resource* Mesh::CreateTextureResource(ID3D12Device* device, const DirectX:
 	return resource;
 }
 
-void Mesh::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
+void Mesh::UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
 {
 	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
 	{

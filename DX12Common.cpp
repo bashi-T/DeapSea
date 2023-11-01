@@ -17,7 +17,7 @@ void DX12Common::Init(int32_t width, int32_t height)
 		height);
 
 #ifdef _DEBUG
-	debug_->InfoQueue(GetDevice());
+	debug_->InfoQueue(GetDevice().Get());
 #endif
 	DX12Common::MakeScreen();
 	DX12Common::MakeFence();
@@ -66,7 +66,7 @@ void DX12Common::MakeD3D12Device()
 	};
 	for (size_t i = 0; i < _countof(featureLevels); ++i)
 	{
-		hr = D3D12CreateDevice(useAdapter, featureLevels[i],
+		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i],
 			IID_PPV_ARGS(&device));
 		if (SUCCEEDED(hr))
 		{
@@ -93,7 +93,7 @@ void DX12Common::MakeCommandList()
 		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 	assert(SUCCEEDED(hr));
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
-		commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
+		commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 	assert(SUCCEEDED(hr));
 }
 
@@ -108,12 +108,12 @@ void DX12Common::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	hr = dxgiFactory->CreateSwapChainForHwnd
 	(
-		commandQueue,
+		commandQueue.Get(),
 		hwnd_,
 		&swapChainDesc,
 		nullptr,
 		nullptr,
-		reinterpret_cast<IDXGISwapChain1**>(&swapChain)
+		reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf())
 	);
 	assert(SUCCEEDED(hr));
 }
@@ -142,16 +142,16 @@ void DX12Common::MakeRTV()
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
-		GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 0);
+		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, 0);
 
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(
-		swapChainResources[0], &rtvDesc, rtvHandles[0]);
+		swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
 
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(
-		swapChainResources[1], &rtvDesc, rtvHandles[1]);
+		swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 }
 
 void DX12Common::MakeScreen()
@@ -191,7 +191,7 @@ void DX12Common::DrawScreen()
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
@@ -228,7 +228,7 @@ void DX12Common::ClearScreen()
 	commandQueue->ExecuteCommandLists(1, commandLists);
 	swapChain->Present(1, 0);
 	fenceValue++;
-	commandQueue->Signal(fence, fenceValue);
+	commandQueue->Signal(fence.Get(), fenceValue);
 
 	if (fence->GetCompletedValue() < fenceValue)
 	{
@@ -238,7 +238,7 @@ void DX12Common::ClearScreen()
 
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator, nullptr);
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr));
 }
 
@@ -253,18 +253,7 @@ void DX12Common::MakeFence()
 
 void DX12Common::DX12Release(ID3D12Debug1* debugController)
 {
-	depthStencilResource->Release();
-	fence->Release();
-	rtvDescriptorHeap->Release();
-	swapChainResources[0]->Release();
-	swapChainResources[1]->Release();
-	swapChain->Release();
 	commandList->Release();
-	commandAllocator->Release();
-	commandQueue->Release();
-	device->Release();
-	useAdapter->Release();
-	dxgiFactory->Release();
 
 #ifdef _DEBUG
 	debugController->Release();
@@ -272,7 +261,7 @@ void DX12Common::DX12Release(ID3D12Debug1* debugController)
 }
 
 ID3D12DescriptorHeap* DX12Common::CreateDescriptorHeap(
-    ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDesctiptors,
+	Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDesctiptors,
     bool shaderVisible) {
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC DescriptorHeapDesc{};
@@ -291,16 +280,16 @@ void DX12Common::MakeDSV()
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	device->CreateDepthStencilView(
-		depthStencilResource,
+		depthStencilResource.Get(),
 		&dsvDesc,
 		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, 0);
+	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
 }
 
 
-ID3D12Resource* DX12Common::CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+Microsoft::WRL::ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
