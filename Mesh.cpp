@@ -917,12 +917,16 @@ void Mesh::MeshRelease()
 	vertexResource->Release();
 	vertexResourceSprite->Release();
 	vertexResourceSphere->Release();
+	vertexResourceObj->Release();
 	materialResource->Release();
 	materialResourceSprite->Release();
 	materialResourceSphere->Release();
+	materialResourceObj->Release();
 	transformationMatrixResource->Release();
 	transformationMatrixResourceSprite->Release();
 	transformationMatrixResourceSphere->Release();
+	transformationMatrixResourceObj->Release();
+	directionalLightResource->Release();
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
 	if (errorBlob) {

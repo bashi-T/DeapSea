@@ -253,6 +253,7 @@ void DX12Common::MakeFence()
 
 void DX12Common::DX12Release(ID3D12Debug1* debugController)
 {
+	depthStencilResource->Release();
 	fence->Release();
 	rtvDescriptorHeap->Release();
 	swapChainResources[0]->Release();
