@@ -56,8 +56,14 @@ public:
 		Vector2 texcoord;
 		Vector3 normal;
 	};
+	struct MaterialData {
+		std::string textureFilePath;
+	};
+	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	
 	struct ModelData {
 		std::vector<VertexData> vertices;
+		MaterialData material;
 	};
 	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 

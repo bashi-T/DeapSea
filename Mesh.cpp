@@ -801,7 +801,7 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 		UINT(modelData.vertices.size()), 1, 0, 0);
 }
 
-Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::string& filename)
+Mesh::ModelData Mesh::LoadObjFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;
 	std::vector<Vector4> positions;
@@ -809,7 +809,7 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::st
 	std::vector<Vector2> texcoords;
 	std::string line;
 
-	std::ifstream file(directryPath + "/" + filename);
+	std::ifstream file(directoryPath + "/" + filename);
 	assert(file.is_open());
 
 	while (std::getline(file, line))
@@ -839,6 +839,12 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::st
 			s >> normal.x >> normal.y >> normal.z;
 			normal.x *= -1.0f;
 			normals.push_back(normal);
+		}
+		else if (identifier == "mtllib")
+		{
+			std::string materialFilemane;
+			s >> materialFilemane;
+			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilemane);
 		}
 		else if (identifier == "f")
 		{
@@ -872,6 +878,28 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::st
 }
 
 
+Mesh::MaterialData Mesh::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+{
+	MaterialData materialData;
+	std::string line;
+
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+
+	while (std::getline(file, line)) {
+		std::string identifier;
+		std::stringstream s(line);
+		s >> identifier;
+
+		if (identifier == "map_kd") {
+			std::string textureFilename;
+			s >> textureFilename;
+			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+		}
+	}
+	return materialData;
+}
+
 void Mesh::MeshRelease()
 {
 	vertexResource->Release();
@@ -892,3 +920,4 @@ void Mesh::MeshRelease()
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
 }
+
