@@ -8,7 +8,7 @@ Mesh::~Mesh() {
 	delete graphicsPipelineState;
 }
 
-void Mesh::Initialize(int32_t width, int32_t height) {
+void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
 	kSubdivision == 16;
 	
 	viewport.TopLeftX = 0.0f;
@@ -27,7 +27,7 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 
 	Mesh::MakePSO();
 
-	transformMatrix = {
+transformMatrix = {
 	    {1.0f, 1.0f, 1.0f},
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
@@ -56,7 +56,7 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 		{0.0f, 0.0f, 0.0f},
 		{0.0f, 0.0f, 0.0f}
 	};
-	modelData = LoadObjFile("Resource","Plane.obj");
+	modelData = LoadObjFile("Resource",filename);
 	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 	vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
 	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
@@ -81,6 +81,17 @@ void Mesh::Initialize(int32_t width, int32_t height) {
 	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
+
+	mipImages = LoadTexture(modelData.material.textureFilePath);
+	mipImages2 = LoadTexture(modelData.material.textureFilePath);
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	textureResource = CreateTextureResource(DX12Common::GetInstance()->GetDevice(), metadata);
+	textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice(), metadata2);
+	UploadTextureData(textureResource, mipImages, metadata);
+	UploadTextureData(textureResource2, mipImages2, metadata2);
+	MakeShaderResourceView(metadata, metadata2);
+
 	MakeBufferView();
 
 }
@@ -516,7 +527,7 @@ void Mesh::DrawSprite(
 	DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-	    2, DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+	    2, GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
@@ -564,8 +575,8 @@ void Mesh::DrawTriangle(
 	DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-	    2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-	                   : DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+	    2, useWorldMap ? GetTextureSrvHandleGPU2()
+	                   : GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
@@ -655,8 +666,8 @@ void Mesh::DrawSphere(
 			DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-				2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-				: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+				2, useWorldMap ? GetTextureSrvHandleGPU2()
+				: GetTextureSrvHandleGPU());
 
 			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
@@ -785,8 +796,8 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 	DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-		2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-		: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+		2, useWorldMap ? GetTextureSrvHandleGPU2()
+		: GetTextureSrvHandleGPU());
 
 	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
@@ -823,7 +834,7 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directoryPath, const std::s
 			Vector4 position;
 			position.w = 1.0f;
 			s >> position.x >> position.y >> position.z;
-			position.x *= -1.0f;
+			//position.x *= -1.0f;
 			position.w = 1.0f;
 			positions.push_back(position);
 		}
@@ -831,13 +842,14 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directoryPath, const std::s
 		{
 			Vector2 texcoord;
 			s >> texcoord.x >> texcoord.y;
+			texcoord.y = 1.0f - texcoord.y;
 			texcoords.push_back(texcoord);
 		}
 		else if (identifier == "vn")
 		{
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
-			normal.x *= -1.0f;
+			//normal.x *= -1.0f;
 			normals.push_back(normal);
 		}
 		else if (identifier == "mtllib")
@@ -869,9 +881,9 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directoryPath, const std::s
 				modelData.vertices.push_back(vertex);
 				triangle[faceVertex]={ position, texcoord, normal };
 			}
-			modelData.vertices.push_back(triangle[2]);
-			modelData.vertices.push_back(triangle[1]);
 			modelData.vertices.push_back(triangle[0]);
+			modelData.vertices.push_back(triangle[1]);
+			modelData.vertices.push_back(triangle[2]);
 		}
 	}
 	return modelData;
@@ -891,7 +903,7 @@ Mesh::MaterialData Mesh::LoadMaterialTemplateFile(const std::string& directoryPa
 		std::stringstream s(line);
 		s >> identifier;
 
-		if (identifier == "map_kd") {
+		if (identifier == "map_Kd") {
 			std::string textureFilename;
 			s >> textureFilename;
 			materialData.textureFilePath = directoryPath + "/" + textureFilename;
@@ -920,4 +932,99 @@ void Mesh::MeshRelease()
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
 }
+
+void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	srvDesc2.Format = metadata2.format;
+	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+
+	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleCPU = DX12Common::GetInstance()->GetCPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 1);
+	textureSrvHandleGPU = DX12Common::GetInstance()->GetGPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 1);
+
+	textureSrvHandleCPU2 = DX12Common::GetInstance()->GetCPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 2);
+	textureSrvHandleGPU2 = DX12Common::GetInstance()->GetGPUDescriptorHandle(DX12Common::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 2);
+
+	DX12Common::GetInstance()->GetDevice()->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+	DX12Common::GetInstance()->GetDevice()->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+}
+
+DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
+{
+	DirectX::ScratchImage image{};
+	std::wstring filePathW = debug_->ConvertString(filePath);
+	HRESULT hr = DirectX::LoadFromWICFile(
+		filePathW.c_str(),
+		DirectX::WIC_FLAGS_FORCE_SRGB,
+		nullptr,
+		image);
+	assert(SUCCEEDED(hr));
+
+	DirectX::ScratchImage mipImages{};
+	hr = DirectX::GenerateMipMaps(
+		image.GetImages(),
+		image.GetImageCount(),
+		image.GetMetadata(),
+		DirectX::TEX_FILTER_SRGB,
+		0,
+		mipImages);
+
+	return mipImages;
+}
+
+ID3D12Resource* Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = UINT(metadata.width);
+	resourceDesc.Height = UINT(metadata.height);
+	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
+	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+	resourceDesc.Format = metadata.format;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&resource));
+
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
+void Mesh::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
+{
+	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
+	{
+		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+		HRESULT hr = texture->WriteToSubresource(
+			UINT(mipLevel),
+			nullptr,
+			img->pixels,
+			UINT(img->rowPitch),
+			UINT(img->slicePitch)
+		);
+		assert(SUCCEEDED(hr));
+	}
+}
+
 

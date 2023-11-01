@@ -18,7 +18,7 @@
 class Mesh {
 public:
 	~Mesh();
-	void Initialize(int32_t width, int32_t height);
+	void Initialize(const std::string& filename, int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
 	IDxcBlob* CompileShader(
@@ -51,6 +51,8 @@ public:
 		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
+	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
+
 	struct VertexData {
 		Vector4 position;
 		Vector2 texcoord;
@@ -67,11 +69,24 @@ public:
 	};
 	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
+	DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	ID3D12Resource* CreateTextureResource(
+		ID3D12Device* device,
+		const DirectX::TexMetadata& metadata);
+	void UploadTextureData(
+		ID3D12Resource* texture,
+		const DirectX::ScratchImage& mipImages,
+		const DirectX::TexMetadata& metadata);
+
 	void MeshRelease();
 
 	ID3D12Resource* GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -192,5 +207,14 @@ private:
 
 	const uint32_t kSubdivision = 16;
 	ModelData modelData;
+
+	ID3D12Resource* textureResource;
+	ID3D12Resource* textureResource2;
+	DirectX::ScratchImage mipImages;
+	DirectX::ScratchImage mipImages2;
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
 
 };

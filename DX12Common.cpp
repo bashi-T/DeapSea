@@ -6,19 +6,11 @@ DX12Common* DX12Common::GetInstance()
 	return &instance;
 }
 
-void DX12Common::Init(const std::string& filePath, int32_t width, int32_t height)
+void DX12Common::Init(int32_t width, int32_t height)
 {
 	DX12Common::MakeDXGIFactory();
 	DX12Common::ChoseUseAdapter();
 	DX12Common::MakeD3D12Device();
-	mipImages = DX12Common::LoadTexture(filePath);
-	mipImages2= DX12Common::LoadTexture("Resource/worldMap.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	textureResource = CreateTextureResource(device, metadata);
-	textureResource2 = CreateTextureResource(device, metadata2);
-	DX12Common::UploadTextureData(textureResource, mipImages, metadata);
-	DX12Common::UploadTextureData(textureResource2, mipImages2, metadata2);
 	depthStencilResource = CreatedepthstencilTextureResource(
 		device,
 		width,
@@ -29,7 +21,6 @@ void DX12Common::Init(const std::string& filePath, int32_t width, int32_t height
 #endif
 	DX12Common::MakeScreen();
 	DX12Common::MakeFence();
-	DX12Common::MakeShaderResourceView(metadata, metadata2);
 }
 
 void DX12Common::MakeDXGIFactory()
@@ -163,19 +154,6 @@ void DX12Common::MakeRTV()
 		swapChainResources[1], &rtvDesc, rtvHandles[1]);
 }
 
-void DX12Common::MakeDSV()
-{
-	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	device->CreateDepthStencilView(
-		depthStencilResource,
-		&dsvDesc,
-		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, 0);
-}
-
 void DX12Common::MakeScreen()
 {
 	MakeCommandQueue();
@@ -306,99 +284,20 @@ ID3D12DescriptorHeap* DX12Common::CreateDescriptorHeap(
 	return descriptorHeap;
 }
 
-DirectX::ScratchImage DX12Common::LoadTexture(const std::string& filePath)
+
+void DX12Common::MakeDSV()
 {
-	DirectX::ScratchImage image{};
-	std::wstring filePathW = debug_->ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(
-		filePathW.c_str(),
-		DirectX::WIC_FLAGS_FORCE_SRGB,
-		nullptr,
-		image);
-	assert(SUCCEEDED(hr));
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	device->CreateDepthStencilView(
+		depthStencilResource,
+		&dsvDesc,
+		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(
-		image.GetImages(),
-		image.GetImageCount(),
-		image.GetMetadata(),
-		DirectX::TEX_FILTER_SRGB,
-		0,
-		mipImages);
-
-	return mipImages;
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, 0);
 }
 
-ID3D12Resource* DX12Common::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);
-	resourceDesc.Height = UINT(metadata.height);
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
-	resourceDesc.Format = metadata.format;
-	resourceDesc.SampleDesc.Count = 1;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
-
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-
-	ID3D12Resource* resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&resource));
-	
-	assert(SUCCEEDED(hr));
-
-	return resource;
-}
-
-void DX12Common::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
-{
-	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
-	{
-		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		HRESULT hr = texture->WriteToSubresource(
-			UINT(mipLevel),
-			nullptr,
-			img->pixels,
-			UINT(img->rowPitch),
-			UINT(img->slicePitch)
-		);
-		assert(SUCCEEDED(hr));
-	}
-}
-
-void DX12Common::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
-{
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
-	srvDesc2.Format = metadata2.format;
-	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
-
-	const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
-	textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
-
-	textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-	textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-
-	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
-	device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
-}
 
 ID3D12Resource* DX12Common::CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
 {

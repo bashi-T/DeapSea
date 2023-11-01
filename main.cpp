@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	debug->DebugLayer();
 #endif
 
-	dx12Common->Init("Resource/monsterBall.png", kWindowWidth, kWindowHeight);
+	dx12Common->Init( kWindowWidth, kWindowHeight);
 	imgui->Initialize(
 	    winAPP->GetHWND(),
 		dx12Common->GetInstance()->GetDevice(),
@@ -81,7 +81,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	for (int i = 0; i < kNumTriangle; i++)
 	{
-		mesh[i]->Initialize(kWindowWidth, kWindowHeight);
+		mesh[i]->Initialize("axis.obj", kWindowWidth, kWindowHeight);
 	}
 
 	while (NewMSG.message != WM_QUIT)

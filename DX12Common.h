@@ -12,7 +12,7 @@
 class DX12Common final
 {
 public:
-	void Init(const std::string& filePath, int32_t width, int32_t height);
+	void Init(int32_t width, int32_t height);
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
 	void MakeD3D12Device();
@@ -36,16 +36,6 @@ public:
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 		UINT numDesctiptors,
 	    bool shaderVisible);
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-	ID3D12Resource* CreateTextureResource(
-		ID3D12Device* device,
-		const DirectX::TexMetadata& metadata);
-	void UploadTextureData(
-		ID3D12Resource* texture,
-		const DirectX::ScratchImage& mipImages,
-		const DirectX::TexMetadata& metadata);
-
-	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
 	ID3D12Resource* CreatedepthstencilTextureResource(
 		ID3D12Device* device,
 		int32_t width,
@@ -71,13 +61,7 @@ public:
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap; }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ID3D12DescriptorHeap* GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
-
-
 		
 
 private:
@@ -112,14 +96,7 @@ private:
 	HANDLE fenceEvent;
 	D3D12_RESOURCE_BARRIER barrier{};
 	UINT backBufferIndex;
-	ID3D12Resource* textureResource;
-	ID3D12Resource* textureResource2;
-	DirectX::ScratchImage mipImages;
-	DirectX::ScratchImage mipImages2;
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
 	ID3D12Resource* depthStencilResource;
+
 };
 
