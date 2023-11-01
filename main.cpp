@@ -92,12 +92,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (int i = 0; i < kNumTriangle; i++) {
 			mesh[i]->Update();
 		}
-		ImGui::Begin("sphereEdit");
-		ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
-		ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
-		ImGui::DragFloat("sphere.radius", (float*)&sphere.radius, 0.01f);
-		ImGui::Checkbox("useWorldMap", &useWorldMap);
-		ImGui::End();
+		//ImGui::Begin("sphereEdit");
+		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
+		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
+		//ImGui::DragFloat("sphere.radius", (float*)&sphere.radius, 0.01f);
+		//ImGui::Checkbox("useWorldMap", &useWorldMap);
+		//ImGui::End();
 
 				if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE)) {
 			winAPP->ProcessMessage(NewMSG);
@@ -138,7 +138,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				//mesh[0]->DrawSphere(
 			 //       sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
-			mesh[0]->DrawOBJ(sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+			mesh[0]->DrawOBJ(ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
 
 				imgui->Endframe(dx12Common->GetInstance()->GetCommandList());
 			dx12Common->ClearScreen();

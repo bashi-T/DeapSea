@@ -252,6 +252,8 @@ void Mesh::Update()
 	ImGui::Begin("Light");
 	ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
 	ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.01f);
+	ImGui::DragFloat3("CameraRotate", (float*)&cameraTransform.rotate.x, 0.01f);
+	ImGui::DragFloat3("CameraTranslate", (float*)&cameraTransform.translate.x, 0.01f);
 	ImGui::DragFloat("Intensity", (float*)&DirectionalLightData->intensity, 0.01f);
 	ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
 	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
@@ -259,6 +261,8 @@ void Mesh::Update()
 	ImGui::DragFloat3("Sphere.rotate", (float*)&transformMatrixSphere.rotate, 0.01f);
 
 	ImGui::End();
+	cameraMatrix =
+		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 
 }
 
@@ -481,74 +485,6 @@ void Mesh::InputDataSphere(
 	indexDataSphere[count * 6 + 5] = count * 4 + 3;
 }
 
-void Mesh::InputDataOBJ(
-	Vector4 LeftTop,
-	Vector4 RightTop,
-	Vector4 RightBottom,
-	Vector4 LeftBottom,
-	Vector4 color,
-	Vector2 coordLeftTop,
-	Vector2 coordRightTop,
-	Vector2 coordRightBottom,
-	Vector2 coordLeftBottom,
-	uint32_t count,
-	int32_t width,
-	int32_t height)
-{
-	VertexData* vertexDataObj = nullptr;
-	vertexResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataObj));
-	std::memcpy(vertexDataObj, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-
-	Material* materialDataObj = nullptr;
-	materialResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&materialDataObj));
-
-	transformationMatrixResourceObj->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataObj));
-	projectionMatrixObj =
-		MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	transformationMatrixDataObj->WVP = MakeIdentity4x4();
-
-	Matrix4x4 worldMatrix = MakeAffineMatrix(
-		transformMatrixObj.scale, transformMatrixObj.rotate, transformMatrixObj.translate);
-	viewMatrixObj = Inverse(cameraMatrix);
-	worldViewProjectionMatrixObj =
-		Multiply(worldMatrix, Multiply(viewMatrixObj, projectionMatrixObj));
-	transformationMatrixDataObj->WVP = worldViewProjectionMatrixObj;
-	transformationMatrixDataObj->World = worldMatrix;
-
-	materialDataObj[0].color = color;
-	materialDataObj[0].enableLighting = true;
-	materialDataObj[0].uvTransform = MakeIdentity4x4();
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformObj.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformObj.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformObj.translate));
-	materialDataObj[0].uvTransform = uvTransformMatrix;
-
-	vertexDataObj[count * 4].position = { LeftTop.x * -1.0f,LeftTop.y,LeftTop.z };
-	vertexDataObj[count * 4].texcoord = coordLeftTop;
-	vertexDataObj[count * 4].normal.x = vertexDataObj[count * 4].position.x * -1.0f;
-	vertexDataObj[count * 4].normal.y = vertexDataObj[count * 4].position.y;
-	vertexDataObj[count * 4].normal.z = vertexDataObj[count * 4].position.z;
-
-	vertexDataObj[count * 4 + 1].position = {RightTop.x * -1.0f,LeftTop.y,LeftTop.z };
-	vertexDataObj[count * 4 + 1].texcoord = coordRightTop;
-	vertexDataObj[count * 4 + 1].normal.x = vertexDataObj[count * 4 + 1].position.x * -1.0f;
-	vertexDataObj[count * 4 + 1].normal.y = vertexDataObj[count * 4 + 1].position.y;
-	vertexDataObj[count * 4 + 1].normal.z = vertexDataObj[count * 4 + 1].position.z;
-
-	vertexDataObj[count * 4 + 2].position = {RightBottom.x * -1.0f,LeftTop.y,LeftTop.z };
-	vertexDataObj[count * 4 + 2].texcoord = coordRightBottom;
-	vertexDataObj[count * 4 + 2].normal.x = vertexDataObj[count * 4 + 2].position.x * -1.0f;
-	vertexDataObj[count * 4 + 2].normal.y = vertexDataObj[count * 4 + 2].position.y;
-	vertexDataObj[count * 4 + 2].normal.z = vertexDataObj[count * 4 + 2].position.z;
-
-	vertexDataObj[count * 4 + 3].position = {LeftBottom.x * -1.0f,LeftTop.y,LeftTop.z };
-	vertexDataObj[count * 4 + 3].texcoord = coordLeftBottom;
-	vertexDataObj[count * 4 + 3].normal.x = vertexDataObj[count * 4 + 3].position.x * -1.0f;
-	vertexDataObj[count * 4 + 3].normal.y = vertexDataObj[count * 4 + 3].position.y;
-	vertexDataObj[count * 4 + 3].normal.z = vertexDataObj[count * 4 + 3].position.z;
-}
-
 void Mesh::DrawSprite(
     Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
     Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
@@ -738,104 +674,129 @@ void Mesh::DrawSphere(
 		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
 
-void Mesh::DrawOBJ(const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
+void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t height)
 {
-	modelData.vertices;
 
-	float pi = 3.141592f;
-	const float kLonevery = 2.0f / kSubdivision * pi;
-	const float kLatevery = pi / kSubdivision;
-	uint32_t sphereCount = 0;
-	
-	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
-	{
-		float lat = -pi / 2.0f + kLatevery * latIndex; // theta
-		float latB = pi / kSubdivision;
+	//float pi = 3.141592f;
+	//const float kLonevery = 2.0f / kSubdivision * pi;
+	//const float kLatevery = pi / kSubdivision;
+	//uint32_t sphereCount = 0;
+	//
+	//for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
+	//{
+	//	float lat = -pi / 2.0f + kLatevery * latIndex; // theta
+	//	float latB = pi / kSubdivision;
+	//	for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
+	//	{
+	//		float lon = lonIndex * kLonevery; // phi
+	//		float lonC = 2 * pi / kSubdivision;
+	//		Vector4 a = {
+	//			sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
+	//			sphere_.center.y + sphere_.radius * sin(lat),
+	//			sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f };
+	//		Vector4 b = {
+	//			sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
+	//			sphere_.center.y + sphere_.radius * sin(lat + latB),
+	//			sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f };
+	//		Vector4 c = {
+	//			sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
+	//			sphere_.center.y + sphere_.radius * sin(lat),
+	//			sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f };
+	//		Vector4 d = {
+	//			sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
+	//			sphere_.center.y + sphere_.radius * sin(lat + latB),
+	//			sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f };
+	//		Vector2 texcoordA
+	//		{
+	//			float(lonIndex) / float(kSubdivision),
+	//			1.0f - float(latIndex) / float(kSubdivision)
+	//		};
+	//		Vector2 texcoordB
+	//		{
+	//			float(lonIndex) / float(kSubdivision),
+	//			1.0f - float(latIndex + 1) / float(kSubdivision)
+	//		};
+	//		Vector2 texcoordC
+	//		{
+	//			float(lonIndex + 1) / float(kSubdivision),
+	//			1.0f - float(latIndex) / float(kSubdivision)
+	//		};
+	//		Vector2 texcoordD
+	//		{
+	//			float(lonIndex + 1) / float(kSubdivision),
+	//			1.0f - float(latIndex + 1) / float(kSubdivision)
+	//		};
+	//		InputDataOBJ(
+	//			b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
+	//		sphereCount++;
+	//	}
+	//}
 
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
-		{
-			float lon = lonIndex * kLonevery; // phi
-			float lonC = 2 * pi / kSubdivision;
+	VertexData* vertexDataObj = nullptr;
+	vertexResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataObj));
+	std::memcpy(vertexDataObj, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 
-			Vector4 a = {
-				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
-				sphere_.center.y + sphere_.radius * sin(lat),
-				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f };
-			Vector4 b = {
-				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
-				sphere_.center.y + sphere_.radius * sin(lat + latB),
-				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f };
-			Vector4 c = {
-				sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
-				sphere_.center.y + sphere_.radius * sin(lat),
-				sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f };
-			Vector4 d = {
-				sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
-				sphere_.center.y + sphere_.radius * sin(lat + latB),
-				sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f };
-			Vector2 texcoordA
-			{
-				float(lonIndex) / float(kSubdivision),
-				1.0f - float(latIndex) / float(kSubdivision)
-			};
-			Vector2 texcoordB
-			{
-				float(lonIndex) / float(kSubdivision),
-				1.0f - float(latIndex + 1) / float(kSubdivision)
-			};
-			Vector2 texcoordC
-			{
-				float(lonIndex + 1) / float(kSubdivision),
-				1.0f - float(latIndex) / float(kSubdivision)
-			};
-			Vector2 texcoordD
-			{
-				float(lonIndex + 1) / float(kSubdivision),
-				1.0f - float(latIndex + 1) / float(kSubdivision)
-			};
+	Material* materialDataObj = nullptr;
+	materialResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&materialDataObj));
 
-			InputDataOBJ(
-				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
+	transformationMatrixResourceObj->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataObj));
+	projectionMatrixObj =
+		MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
+	transformationMatrixDataObj->WVP = MakeIdentity4x4();
 
-			DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(
+		transformMatrixObj.scale, transformMatrixObj.rotate, transformMatrixObj.translate);
+	viewMatrixObj = Inverse(cameraMatrix);
+	worldViewProjectionMatrixObj =
+		Multiply(worldMatrix, Multiply(viewMatrixObj, projectionMatrixObj));
+	transformationMatrixDataObj->WVP = worldViewProjectionMatrixObj;
+	transformationMatrixDataObj->World = worldMatrix;
 
-			DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
+	materialDataObj[0].color = color;
+	materialDataObj[0].enableLighting = true;
+	materialDataObj[0].uvTransform = MakeIdentity4x4();
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformObj.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformObj.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformObj.translate));
+	materialDataObj[0].uvTransform = uvTransformMatrix;
 
-			DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
+	DX12Common::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport);
 
-			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	DX12Common::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-			DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
-				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX12Common::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState);
 
-			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-				0, materialResourceObj->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature);
 
-			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-				1, transformationMatrixResourceObj->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList()->IASetPrimitiveTopology(
+		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
-				DX12Common::GetInstance()->GetBackBufferIndex());
-			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
+		0, materialResourceObj->GetGPUVirtualAddress());
 
-			DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
+		1, transformationMatrixResourceObj->GetGPUVirtualAddress());
 
-			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
-				2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
-				: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
+		DX12Common::GetInstance()->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 
-			DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
-				3, directionalLightResource->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
-			DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(
-				0, 1, &vertexBufferViewSphere);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(
+		2, useWorldMap ? DX12Common::GetInstance()->GetTextureSrvHandleGPU2()
+		: DX12Common::GetInstance()->GetTextureSrvHandleGPU());
 
-			DX12Common::GetInstance()->GetCommandList()->
-				IASetIndexBuffer(&indexBufferViewObj);
+	DX12Common::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(
+		3, directionalLightResource->GetGPUVirtualAddress());
 
-			sphereCount++;
-		}
-	}
+	DX12Common::GetInstance()->GetCommandList()->IASetVertexBuffers(
+		0, 1, &vertexBufferViewObj);
+
+	DX12Common::GetInstance()->GetCommandList()->
+		IASetIndexBuffer(&indexBufferViewObj);
+
 	DX12Common::GetInstance()->GetCommandList()->DrawInstanced(
 		UINT(modelData.vertices.size()), 1, 0, 0);
 }
@@ -851,29 +812,36 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::st
 	std::ifstream file(directryPath + "/" + filename);
 	assert(file.is_open());
 
-	while (std::getline(file, line)) {
+	while (std::getline(file, line))
+	{
 		std::string identifier;
 		std::istringstream s(line);
 		s >> identifier;
 
-		if (identifier == "v") {
+		if (identifier == "v")
+		{
 			Vector4 position;
 			position.w = 1.0f;
 			s >> position.x >> position.y >> position.z;
+			position.x *= -1.0f;
 			position.w = 1.0f;
 			positions.push_back(position);
 		}
-		else if (identifier == "vt") {
+		else if (identifier == "vt")
+		{
 			Vector2 texcoord;
 			s >> texcoord.x >> texcoord.y;
 			texcoords.push_back(texcoord);
 		}
-		else if (identifier == "vn") {
+		else if (identifier == "vn")
+		{
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
+			normal.x *= -1.0f;
 			normals.push_back(normal);
 		}
-		else if (identifier == "f") {
+		else if (identifier == "f")
+		{
 			VertexData triangle[3];
 
 			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
@@ -892,11 +860,12 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directryPath, const std::st
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
 				VertexData vertex = { position, texcoord, normal };
+				modelData.vertices.push_back(vertex);
 				triangle[faceVertex]={ position, texcoord, normal };
-				modelData.vertices.push_back(triangle[2]);
-				modelData.vertices.push_back(triangle[1]);
-				modelData.vertices.push_back(triangle[0]);
 			}
+			modelData.vertices.push_back(triangle[2]);
+			modelData.vertices.push_back(triangle[1]);
+			modelData.vertices.push_back(triangle[0]);
 		}
 	}
 	return modelData;

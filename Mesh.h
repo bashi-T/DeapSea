@@ -34,7 +34,7 @@ public:
 	void DrawSphere(
 		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 	void DrawOBJ(
-		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
+		Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 
 	void MakePSO();
 	ID3D12Resource* CreateBufferResource(size_t sizeInBytes);
@@ -47,10 +47,6 @@ public:
 	    Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 	    Vector2 coordLeftBottom, int32_t width, int32_t height);
 	void InputDataSphere(
-		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
-		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
-	void InputDataOBJ(
 		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
 		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
