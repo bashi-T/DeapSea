@@ -1,5 +1,9 @@
 #include "Debug.h"
 #include"WindowApp.h"
+
+Debug::~Debug()
+{
+}
 void Debug::Log(const std::string& message)
 {
 	OutputDebugStringA(message.c_str());
@@ -48,9 +52,9 @@ void Debug::DebugLayer()
     }
 }
 
-void Debug::InfoQueue(ID3D12Device* device)
+void Debug::InfoQueue(Microsoft::WRL::ComPtr<ID3D12Device> device)
 {
-    ID3D12InfoQueue* InfoQueue = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12InfoQueue> InfoQueue = nullptr;
     if(SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&InfoQueue))))
     {
         InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -82,4 +86,13 @@ void Debug::ReportLiveObject()
     }
 }
 
-
+Debug::D3DResourceLeakChecker::~D3DResourceLeakChecker()
+{
+    Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
+    {
+        debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+    }
+}

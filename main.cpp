@@ -6,7 +6,9 @@ const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
 const int32_t kNumTriangle = 2;
 Vector4* vertexData = nullptr;
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+	Debug::D3DResourceLeakChecker leakCheck;
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 	Mesh* mesh[kNumTriangle];
 	for (int i = 0; i < kNumTriangle; i++)
@@ -105,12 +107,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else{
 			dx12Common->DrawScreen();
 
-			ID3D12DescriptorHeap* descriptorHeaps[] =
+			Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
 			{
 			    dx12Common->GetInstance()->GetSrvDescriptorHeap().Get()
 			};
 			dx12Common->GetInstance()->GetCommandList()->
-				SetDescriptorHeaps(1, descriptorHeaps);
+				SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 			//for (int i = 0; i < kNumTriangle; i++) {
 			//	mesh[i]->DrawTriangle(

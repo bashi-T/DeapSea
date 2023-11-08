@@ -221,11 +221,11 @@ void DX12Common::ClearScreen()
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
-	ID3D12CommandList* commandLists[] =
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] =
 	{
-		commandList
+		commandList.Get()
 	};
-	commandQueue->ExecuteCommandLists(1, commandLists);
+	commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
 	swapChain->Present(1, 0);
 	fenceValue++;
 	commandQueue->Signal(fence.Get(), fenceValue);
@@ -251,19 +251,21 @@ void DX12Common::MakeFence()
 	assert(fenceEvent != nullptr);
 }
 
-void DX12Common::DX12Release(ID3D12Debug1* debugController)
+void DX12Common::DX12Release(Microsoft::WRL::ComPtr<ID3D12Debug1> debugController)
 {
-	commandList->Release();
+	//commandList->Release();
 
 #ifdef _DEBUG
 	debugController->Release();
 #endif
 }
 
-ID3D12DescriptorHeap* DX12Common::CreateDescriptorHeap(
-	Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDesctiptors,
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DX12Common::CreateDescriptorHeap(
+	Microsoft::WRL::ComPtr<ID3D12Device> device,
+	D3D12_DESCRIPTOR_HEAP_TYPE heapType,
+	UINT numDesctiptors,
     bool shaderVisible) {
-	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC DescriptorHeapDesc{};
 	DescriptorHeapDesc.Type = heapType;
 	DescriptorHeapDesc.NumDescriptors = numDesctiptors;
@@ -308,7 +310,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureReso
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -321,7 +323,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureReso
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DX12Common::GetCPUDescriptorHandle(
-	ID3D12DescriptorHeap* descriptorHeap,
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 	uint32_t descriptorSize,
 	uint32_t index)
 {
@@ -331,7 +333,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DX12Common::GetCPUDescriptorHandle(
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetGPUDescriptorHandle(
-	ID3D12DescriptorHeap* descriptorHeap,
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 	uint32_t descriptorSize,
 	uint32_t index)
 {

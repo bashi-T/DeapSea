@@ -13,14 +13,17 @@
 class Debug
 {
 public:
+	~Debug();
 	void Log(const std::string& message);
 	std::string ConvertString(const std::wstring& str);
 	std::wstring ConvertString(const std::string& str);
 	void DebugLayer();
-	void InfoQueue(ID3D12Device* device);
+	void InfoQueue(Microsoft::WRL::ComPtr<ID3D12Device> device);
 	void ReportLiveObject();
 	Microsoft::WRL::ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
-		
+	struct D3DResourceLeakChecker {
+		~D3DResourceLeakChecker();
+	};
 	
 private:
 	Microsoft::WRL::ComPtr<IDXGIDebug1> debug;

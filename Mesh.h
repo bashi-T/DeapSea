@@ -21,9 +21,12 @@ public:
 	void Initialize(const std::string& filename, int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
-	IDxcBlob* CompileShader(
-	    const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils,
-	    IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+	    const std::wstring& filePath,
+		const wchar_t* profile,
+		Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils,
+		Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler,
+		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler);
 	void DrawTriangle(
 	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
@@ -53,12 +56,14 @@ public:
 
 	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
 
-	struct VertexData {
+	struct VertexData
+	{
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
 	};
-	struct MaterialData {
+	struct MaterialData
+	{
 		std::string textureFilePath;
 	};
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
@@ -111,8 +116,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceObj;
 
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
@@ -210,6 +215,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2;
+
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;

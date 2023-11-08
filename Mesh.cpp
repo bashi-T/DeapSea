@@ -1,11 +1,6 @@
 #include "Mesh.h"
 
 Mesh::~Mesh() {
-	//delete dxcUtils;
-	//delete dxcCompiler;
-	//delete includeHandler;
-	//delete rootSignature;
-	//delete graphicsPipelineState;
 }
 
 void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
@@ -105,13 +100,17 @@ void Mesh::ResetDXC() {
 	assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* Mesh::CompileShader(
-    const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils_,
-    IDxcCompiler3* dxcCompiler_, IDxcIncludeHandler* includeHandler_) {
+Microsoft::WRL::ComPtr<IDxcBlob> Mesh::CompileShader(
+	const std::wstring& filePath,
+	const wchar_t* profile,
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_,
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_,
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_)
+{
 	debug_->Log(
 	    debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
-	IDxcBlobEncoding* shaderSource = nullptr;
-	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
+	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	assert(SUCCEEDED(hr));
 
 	DxcBuffer shaderSourceBuffer;
@@ -122,19 +121,19 @@ IDxcBlob* Mesh::CompileShader(
 	LPCWSTR arguments[]{
 	    filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
 	};
-	IDxcResult* shaderResult = nullptr;
+	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler_->Compile(
-	    &shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
+	    &shaderSourceBuffer, arguments, _countof(arguments), includeHandler_.Get(),
 	    IID_PPV_ARGS(&shaderResult));
 	assert(SUCCEEDED(hr));
 
-	IDxcBlobUtf8* shaderError = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		debug_->Log(shaderError->GetStringPointer());
 		assert(SUCCEEDED(hr));
 	}
-	IDxcBlob* shaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	debug_->Log(
@@ -220,11 +219,11 @@ void Mesh::MakePSO()
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	vertexShaderBlob =
-	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler, includeHandler);
+	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler, includeHandler);
+	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	depthStencilDesc.DepthEnable = true;
@@ -687,62 +686,6 @@ void Mesh::DrawSphere(
 
 void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t height)
 {
-
-	//float pi = 3.141592f;
-	//const float kLonevery = 2.0f / kSubdivision * pi;
-	//const float kLatevery = pi / kSubdivision;
-	//uint32_t sphereCount = 0;
-	//
-	//for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
-	//{
-	//	float lat = -pi / 2.0f + kLatevery * latIndex; // theta
-	//	float latB = pi / kSubdivision;
-	//	for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
-	//	{
-	//		float lon = lonIndex * kLonevery; // phi
-	//		float lonC = 2 * pi / kSubdivision;
-	//		Vector4 a = {
-	//			sphere_.center.x + sphere_.radius * cos(lat) * cos(lon),
-	//			sphere_.center.y + sphere_.radius * sin(lat),
-	//			sphere_.center.z + sphere_.radius * cos(lat) * sin(lon), 1.0f };
-	//		Vector4 b = {
-	//			sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon),
-	//			sphere_.center.y + sphere_.radius * sin(lat + latB),
-	//			sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon), 1.0f };
-	//		Vector4 c = {
-	//			sphere_.center.x + sphere_.radius * cos(lat) * cos(lon + lonC),
-	//			sphere_.center.y + sphere_.radius * sin(lat),
-	//			sphere_.center.z + sphere_.radius * cos(lat) * sin(lon + lonC), 1.0f };
-	//		Vector4 d = {
-	//			sphere_.center.x + sphere_.radius * cos(lat + latB) * cos(lon + lonC),
-	//			sphere_.center.y + sphere_.radius * sin(lat + latB),
-	//			sphere_.center.z + sphere_.radius * cos(lat + latB) * sin(lon + lonC), 1.0f };
-	//		Vector2 texcoordA
-	//		{
-	//			float(lonIndex) / float(kSubdivision),
-	//			1.0f - float(latIndex) / float(kSubdivision)
-	//		};
-	//		Vector2 texcoordB
-	//		{
-	//			float(lonIndex) / float(kSubdivision),
-	//			1.0f - float(latIndex + 1) / float(kSubdivision)
-	//		};
-	//		Vector2 texcoordC
-	//		{
-	//			float(lonIndex + 1) / float(kSubdivision),
-	//			1.0f - float(latIndex) / float(kSubdivision)
-	//		};
-	//		Vector2 texcoordD
-	//		{
-	//			float(lonIndex + 1) / float(kSubdivision),
-	//			1.0f - float(latIndex + 1) / float(kSubdivision)
-	//		};
-	//		InputDataOBJ(
-	//			b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
-	//		sphereCount++;
-	//	}
-	//}
-
 	VertexData* vertexDataObj = nullptr;
 	vertexResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataObj));
 	std::memcpy(vertexDataObj, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
@@ -834,7 +777,6 @@ Mesh::ModelData Mesh::LoadObjFile(const std::string& directoryPath, const std::s
 			Vector4 position;
 			position.w = 1.0f;
 			s >> position.x >> position.y >> position.z;
-			//position.x *= -1.0f;
 			position.w = 1.0f;
 			positions.push_back(position);
 		}

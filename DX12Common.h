@@ -31,8 +31,8 @@ public:
 	void DrawScreen();
 	void ClearScreen();
 	void MakeFence();
-	void DX12Release(ID3D12Debug1* debugController);
-	ID3D12DescriptorHeap* CreateDescriptorHeap(
+	void DX12Release(Microsoft::WRL::ComPtr<ID3D12Debug1> debugController);
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 		Microsoft::WRL::ComPtr<ID3D12Device> device,
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 		UINT numDesctiptors,
@@ -42,11 +42,11 @@ public:
 		int32_t width,
 		int32_t height);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
-		ID3D12DescriptorHeap* descriptorHeap,
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 		uint32_t descriptorSize,
 		uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(
-		ID3D12DescriptorHeap* descriptorHeap,
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 		uint32_t descriptorSize,
 		uint32_t index);
 
@@ -58,7 +58,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
 	
 	Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device; }
-	ID3D12GraphicsCommandList* GetCommandList() { return commandList; }
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList; }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return srvDescriptorHeap; }
@@ -83,7 +83,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
-	ID3D12GraphicsCommandList* commandList = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
