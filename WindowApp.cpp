@@ -3,6 +3,14 @@
 int32_t WinAPP::clientWidth_ = 0;
 int32_t WinAPP::clientHeight_ = 0;
 
+//WinAPP::~WinAPP()
+//{
+//}
+//
+//WinAPP::WinAPP()
+//{
+//}
+
 void WinAPP::Initialize(int32_t width, int32_t height)
 {
 	clientWidth_ = width;

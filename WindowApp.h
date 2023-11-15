@@ -3,7 +3,8 @@
 #include<cstdint>
 #include"MyImGui.h"
 
-class WinAPP {
+class WinAPP
+ {
 public:
 	static void Initialize(int32_t width, int32_t height);
 
