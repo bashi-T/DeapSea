@@ -236,7 +236,7 @@ void DX12Common::ClearScreen()
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
-	ComPtr<ID3D12CommandList> commandLists[] =
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] =
 	{
 		commandList.Get()
 	};
@@ -273,13 +273,13 @@ void DX12Common::DX12Release()
 #endif
 }
 
-ComPtr<ID3D12DescriptorHeap> DX12Common::CreateDescriptorHeap(
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DX12Common::CreateDescriptorHeap(
 	ID3D12Device* device,
 	D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 	UINT numDesctiptors,
     bool shaderVisible)
 {
-	ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC DescriptorHeapDesc{};
 	DescriptorHeapDesc.Type = heapType;
 	DescriptorHeapDesc.NumDescriptors = numDesctiptors;
@@ -305,7 +305,7 @@ void DX12Common::MakeDSV()
 }
 
 
-ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+Microsoft::WRL::ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
@@ -324,7 +324,7 @@ ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(ID3D12Devic
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ComPtr<ID3D12Resource> resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -367,7 +367,7 @@ void DX12Common::DebugLayer()
 
 void DX12Common::InfoQueue(ID3D12Device* device)
 {
-	ComPtr<ID3D12InfoQueue> InfoQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> InfoQueue = nullptr;
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&InfoQueue))))
 	{
 		InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
