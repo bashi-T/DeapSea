@@ -10,21 +10,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	Debug::D3DResourceLeakChecker* leakCheck = new Debug::D3DResourceLeakChecker;
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	CoInitializeEx(0, COINIT_MULTITHREADED);
-	Mesh* mesh[kNumTriangle];
-	for (int i = 0; i < kNumTriangle; i++)
-	{
-		mesh[i] = new Mesh;
-	}
 
 	DX12Common* dx12Common = DX12Common::GetInstance();
 	WinAPP* winAPP = WinAPP::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
+	Mesh* mesh[kNumTriangle];
+	for (int i = 0; i < kNumTriangle; i++)
+	{
+		mesh[i] = new Mesh;
+	}
 	bool useWorldMap = true;
 
-	winAPP->Initialize(kWindowWidth, kWindowHeight);
-	winAPP->CreateWindowView(L"CG2");
+	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
 
 	dx12Common->Init(kWindowWidth, kWindowHeight);
 	imgui->Initialize(

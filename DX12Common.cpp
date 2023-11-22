@@ -20,7 +20,6 @@ void DX12Common::DeleteInstance()
 
 void DX12Common::Init(int32_t width, int32_t height)
 {
-
 #ifdef _DEBUG
 	DebugLayer();
 #endif

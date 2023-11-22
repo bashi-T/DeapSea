@@ -6,12 +6,11 @@
 class WinAPP
  {
 public:
-	static void Initialize(int32_t width, int32_t height);
-
+	static void Initialize(int32_t width, int32_t height, const wchar_t* title);
+	static void Update();
 	static LRESULT CALLBACK WindowProc(HWND hwnd,
 		UINT msg, WPARAM wparam, LPARAM lparam);
 	const wchar_t* title = L"CG2";
-	static void CreateWindowView(const wchar_t* title = L"CG2");
 	static int32_t GetClientWidth() { return clientWidth_; }
 	static int32_t GetClientHeight() { return clientHeight_; }
 	static HWND GetHWND() { return hwnd_; }
