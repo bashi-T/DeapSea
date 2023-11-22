@@ -125,21 +125,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//		texcoordLeft[i],
 			//		useWorldMap);
 			//}
-				//mesh[0]->DrawSprite(
-				//	LeftTop[0],
-				//	RightTop[0],
-				//	RightBottom[0],
-				//	LeftBottom[0],
-				//	ColorSprite[0],
-				//	texcoordLeftTop[0],
-				//	texcoordRightTop[0],
-				//	texcoordRightBottom[0],
-				//	texcoordLeftBottom[0],
-				//	kWindowWidth,
-				//	kWindowHeight);
+				mesh[0]->DrawSprite(
+					LeftTop[0],
+					RightTop[0],
+					RightBottom[0],
+					LeftBottom[0],
+					ColorSprite[0],
+					texcoordLeftTop[0],
+					texcoordRightTop[0],
+					texcoordRightBottom[0],
+					texcoordLeftBottom[0],
+					kWindowWidth,
+					kWindowHeight);
 
-				//mesh[0]->DrawSphere(
-			 //       sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+				mesh[0]->DrawSphere(
+			        sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
 			mesh[0]->DrawOBJ(ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
 
 				imgui->Endframe(dx12Common->GetCommandList().Get());

@@ -162,12 +162,12 @@ void DX12Common::MakeRTV()
 
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(
-		swapChainResources[0], &rtvDesc, rtvHandles[0]);
+		swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
 
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(
-		swapChainResources[1], &rtvDesc, rtvHandles[1]);
+		swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 }
 
 void DX12Common::MakeScreen()
@@ -207,7 +207,7 @@ void DX12Common::DrawScreen()
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);

@@ -106,8 +106,7 @@ private:
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 
-	//ComPtr<ID3D12Resource> swapChainResources[10] = { nullptr };
-	ID3D12Resource* swapChainResources[10] = { nullptr };
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[10] = { nullptr };
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	HANDLE fenceEvent;
 	D3D12_RESOURCE_BARRIER barrier{};
