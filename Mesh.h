@@ -18,11 +18,12 @@
 class Mesh
 {
 public:
+	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Mesh();
 	void Initialize(const std::string& filename, int32_t width, int32_t height);
 	void ResetDXC();
 	void Update();
-	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+	ComPtr<IDxcBlob> CompileShader(
 	    const std::wstring& filePath,
 		const wchar_t* profile,
 		IDxcUtils* dxcUtils,
@@ -41,7 +42,7 @@ public:
 		Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 
 	void MakePSO();
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void MakeBufferView();
 	void InputDataTriangle(
 	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
@@ -77,7 +78,7 @@ public:
 	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(
+	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
 		const DirectX::TexMetadata& metadata);
 	void UploadTextureData(
@@ -87,7 +88,7 @@ public:
 
 	//void MeshRelease();
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
+	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
@@ -112,41 +113,41 @@ private:
 	TransformMatrix transformMatrixSphere;
 	TransformMatrix transformMatrixObj;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceObj;
+	ComPtr<ID3D12Resource> transformationMatrixResource;
+	ComPtr<ID3D12Resource> transformationMatrixResourceSprite;
+	ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
+	ComPtr<ID3D12Resource> transformationMatrixResourceObj;
 
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
+	ComPtr<IDxcUtils> dxcUtils = nullptr;
+	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
+	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+	ComPtr<ID3DBlob> signatureBlob = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
+	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite = nullptr;
+	ComPtr<ID3D12Resource> vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSphere = nullptr;
+	ComPtr<ID3D12Resource> vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceObj = nullptr;
+	ComPtr<ID3D12Resource> vertexResourceObj = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewObj{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = nullptr;
+	ComPtr<ID3D12Resource> indexResourceSprite = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSphere = nullptr;
+	ComPtr<ID3D12Resource> indexResourceSphere = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceObj = nullptr;
+	ComPtr<ID3D12Resource> indexResourceObj = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewObj{};
 
 	D3D12_VIEWPORT viewport{};
@@ -156,12 +157,12 @@ private:
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSphere;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceObj;
+	ComPtr<ID3D12Resource> materialResource;
+	ComPtr<ID3D12Resource> materialResourceSprite;
+	ComPtr<ID3D12Resource> materialResourceSphere;
+	ComPtr<ID3D12Resource> materialResourceObj;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource;
+	ComPtr<ID3D12Resource> directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
 	struct Material {
@@ -215,8 +216,8 @@ private:
 	const uint32_t kSubdivision = 16;
 	ModelData modelData;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2;
+	ComPtr<ID3D12Resource> textureResource;
+	ComPtr<ID3D12Resource> textureResource2;
 
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;

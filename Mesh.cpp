@@ -100,7 +100,7 @@ void Mesh::ResetDXC() {
 	assert(SUCCEEDED(hr));
 }
 
-Microsoft::WRL::ComPtr<IDxcBlob> Mesh::CompileShader(
+ComPtr<IDxcBlob> Mesh::CompileShader(
 	const std::wstring& filePath,
 	const wchar_t* profile,
 	IDxcUtils* dxcUtils_,
@@ -109,7 +109,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> Mesh::CompileShader(
 {
 	debug_->Log(
 	    debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
-	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
+	ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
 	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	assert(SUCCEEDED(hr));
 
@@ -121,19 +121,19 @@ Microsoft::WRL::ComPtr<IDxcBlob> Mesh::CompileShader(
 	LPCWSTR arguments[]{
 	    filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
 	};
-	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
+	ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler_->Compile(
 	    &shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
 	    IID_PPV_ARGS(&shaderResult));
 	assert(SUCCEEDED(hr));
 
-	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+	ComPtr<IDxcBlobUtf8> shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		debug_->Log(shaderError->GetStringPointer());
 		assert(SUCCEEDED(hr));
 	}
-	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
+	ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	debug_->Log(
@@ -276,7 +276,7 @@ void Mesh::Update()
 
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
+ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	
@@ -294,7 +294,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInB
 
 	ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
+	ComPtr<ID3D12Resource> Resource = nullptr;
 
 	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
@@ -865,7 +865,7 @@ DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);
@@ -881,7 +881,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device*
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,

@@ -1,6 +1,7 @@
 #include"WindowApp.h"
 #include"Debug.h"
 #include"Mesh.h"
+#include"Input.h"
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
