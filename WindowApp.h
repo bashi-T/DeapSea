@@ -7,9 +7,9 @@ class WinAPP
  {
 public:
 	static void Initialize(int32_t width, int32_t height, const wchar_t* title);
-	static void Update();
 	static LRESULT CALLBACK WindowProc(HWND hwnd,
 		UINT msg, WPARAM wparam, LPARAM lparam);
+	bool ProcessMessage();
 	static void Finalize();
 	const wchar_t* title = L"CG2";
 	static int32_t GetClientWidth() { return clientWidth_; }
@@ -32,7 +32,6 @@ private:
 	static int32_t clientHeight_;
 	static HWND hwnd_;
 	static HINSTANCE hInstance;
-
 };
 
 

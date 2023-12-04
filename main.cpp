@@ -83,7 +83,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	while (NewMSG.message != WM_QUIT)
 	{
-		
+
 		imgui->Update();
 
 		for (int i = 0; i < kNumTriangle; i++)
@@ -97,53 +97,53 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//ImGui::Checkbox("useWorldMap", &useWorldMap);
 		//ImGui::End();
 
-		if (PeekMessage(&NewMSG, NULL, 0, 0, PM_REMOVE))
+		if (winAPP->ProcessMessage())
 		{
-			winAPP->ProcessMessage(NewMSG);
+			//winAPP->ProcessMessage(NewMSG);
 			ImGui::Render();
-		} else
-		{
-			dx12Common->DrawScreen();
-
-			ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
-			{
-			    dx12Common->GetSrvDescriptorHeap().Get()
-			};
-			dx12Common->GetCommandList().Get()->
-				SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
-			//for (int i = 0; i < kNumTriangle; i++)
-			//{
-			//	mesh[i]->DrawTriangle(
-			//		Top[i],
-			//		Right[i],
-			//		Left[i],
-			//		Color[i],
-			//		texcoordTop[i],
-			//		texcoordRight[i],
-			//		texcoordLeft[i],
-			//		useWorldMap);
-			//}
-				mesh[0]->DrawSprite(
-					LeftTop[0],
-					RightTop[0],
-					RightBottom[0],
-					LeftBottom[0],
-					ColorSprite[0],
-					texcoordLeftTop[0],
-					texcoordRightTop[0],
-					texcoordRightBottom[0],
-					texcoordLeftBottom[0],
-					kWindowWidth,
-					kWindowHeight);
-
-				mesh[0]->DrawSphere(
-			        sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
-			mesh[0]->DrawOBJ(ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
-
-				imgui->Endframe(dx12Common->GetCommandList().Get());
-			dx12Common->ClearScreen();
+			break;
 		}
+		dx12Common->DrawScreen();
+
+		ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
+		{
+			dx12Common->GetSrvDescriptorHeap().Get()
+		};
+		dx12Common->GetCommandList().Get()->
+			SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+
+		//for (int i = 0; i < kNumTriangle; i++)
+		//{
+		//	mesh[i]->DrawTriangle(
+		//		Top[i],
+		//		Right[i],
+		//		Left[i],
+		//		Color[i],
+		//		texcoordTop[i],
+		//		texcoordRight[i],
+		//		texcoordLeft[i],
+		//		useWorldMap);
+		//}
+		mesh[0]->DrawSprite(
+			LeftTop[0],
+			RightTop[0],
+			RightBottom[0],
+			LeftBottom[0],
+			ColorSprite[0],
+			texcoordLeftTop[0],
+			texcoordRightTop[0],
+			texcoordRightBottom[0],
+			texcoordLeftBottom[0],
+			kWindowWidth,
+			kWindowHeight);
+
+		mesh[0]->DrawSphere(
+			sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+		mesh[0]->DrawOBJ(ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+
+		imgui->Endframe(dx12Common->GetCommandList().Get());
+		dx12Common->ClearScreen();
+
 	}
 
 	CloseHandle(dx12Common->GetFenceEvent());

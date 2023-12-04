@@ -3,14 +3,6 @@
 int32_t WinAPP::clientWidth_ = 0;
 int32_t WinAPP::clientHeight_ = 0;
 
-//WinAPP::~WinAPP()
-//{
-//}
-//
-//WinAPP::WinAPP()
-//{
-//}
-
 void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 {
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -48,10 +40,6 @@ void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 	ShowWindow(hwnd_, SW_SHOW);
 }
 
-void WinAPP::Update()
-{
-}
-
 LRESULT CALLBACK WinAPP::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
@@ -65,6 +53,22 @@ LRESULT CALLBACK WinAPP::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 		return 0;
 	}
 	return DefWindowProc(hwnd, msg, wparam, lparam);
+}
+
+bool WinAPP::ProcessMessage()
+{
+	MSG msg{};
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	if (msg.message == WM_QUIT)
+	{
+		return true;
+	}
+	return false;
 }
 
 void WinAPP::Finalize()
