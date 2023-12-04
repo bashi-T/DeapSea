@@ -155,7 +155,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		delete mesh[i];
 	}
-	CoUninitialize();
+	winAPP->Finalize();
 
 	delete leakCheck;
 	return 0;

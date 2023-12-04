@@ -67,6 +67,12 @@ LRESULT CALLBACK WinAPP::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+void WinAPP::Finalize()
+{
+	CloseWindow(hwnd_);
+	CoUninitialize();
+}
+
 void WinAPP::ProcessMessage(MSG NewMSG)
 {
 	TranslateMessage(&NewMSG);

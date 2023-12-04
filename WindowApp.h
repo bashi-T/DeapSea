@@ -10,6 +10,7 @@ public:
 	static void Update();
 	static LRESULT CALLBACK WindowProc(HWND hwnd,
 		UINT msg, WPARAM wparam, LPARAM lparam);
+	static void Finalize();
 	const wchar_t* title = L"CG2";
 	static int32_t GetClientWidth() { return clientWidth_; }
 	static int32_t GetClientHeight() { return clientHeight_; }

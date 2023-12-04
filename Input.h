@@ -12,15 +12,14 @@ class Input
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	void Initialize(HINSTANCE hInstance, HWND hwnd);
+	void Initialize(WinAPP* winApp);
 	void Update();
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
 
 private:
-	WinAPP* winApp = nullptr;
+	WinAPP* winApp_ = nullptr;
 	HRESULT hr;
-	HINSTANCE hInstance;
 	ComPtr<IDirectInput8>directInput = nullptr;
 	ComPtr<IDirectInputDevice8> keyboard;
 	BYTE key[256] = {};

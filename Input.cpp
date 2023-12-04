@@ -1,9 +1,10 @@
 #include "Input.h"
 
-void Input::Initialize(HINSTANCE hInstance,HWND hwnd)
+void Input::Initialize(WinAPP* winApp)
 {
+	this->winApp_ = winApp;
 	hr = DirectInput8Create(
-		hInstance,
+		winApp_->GetHInstance(),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
 		(void**)&directInput,
@@ -17,7 +18,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd)
 	assert(SUCCEEDED(hr));
 
 	hr = keyboard->SetCooperativeLevel(
-		hwnd,
+		winApp_->GetHWND(),
 		DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
 }

@@ -341,3 +341,5 @@ Matrix4x4 MakeViewportMatrix(
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
