@@ -14,7 +14,7 @@ class DX12Common final
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	void Init(int32_t width, int32_t height);
+	void Init(int32_t width, int32_t height, WinAPP* winApp);
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
 	void MakeD3D12Device();
@@ -117,6 +117,6 @@ private:
 	ComPtr<IDXGIDebug1> debug;
 	ComPtr<ID3D12DebugDevice> debugDevice;
 	ComPtr<ID3D12Debug1> debugController = nullptr;
-
+	WinAPP* winApp_ = nullptr;
 };
 

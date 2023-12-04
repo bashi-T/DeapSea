@@ -18,8 +18,10 @@ void DX12Common::DeleteInstance()
 	instance = NULL;
 }
 
-void DX12Common::Init(int32_t width, int32_t height)
+void DX12Common::Init(int32_t width, int32_t height, WinAPP* winApp)
 {
+	assert(winApp_);
+	this->winApp_ = winApp;
 #ifdef _DEBUG
 	DebugLayer();
 #endif
@@ -174,9 +176,9 @@ void DX12Common::MakeScreen()
 	MakeCommandQueue();
 	MakeCommandList();
 	MakeSwapchain(
-		WinAPP::GetClientWidth(),
-		WinAPP::GetClientHeight(),
-		WinAPP::GetHWND()
+		winApp_->GetClientWidth(),
+		winApp_->GetClientHeight(),
+		winApp_->GetHWND()
 	);
 	MakeDescriptorHeap();
 

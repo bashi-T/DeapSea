@@ -12,8 +12,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Debug::D3DResourceLeakChecker* leakCheck = new Debug::D3DResourceLeakChecker;
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	DX12Common* dx12Common = DX12Common::GetInstance();
 	WinAPP* winAPP = WinAPP::GetInstance();
+	DX12Common* dx12Common = DX12Common::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
 	Mesh* mesh[kNumTriangle];
