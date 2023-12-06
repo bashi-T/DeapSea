@@ -4,19 +4,19 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
-	kSubdivision == 16;
+	kSubdivision = 16;
 	
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
-	viewport.Width = width;
-	viewport.Height = height;
+	viewport.Width = float(width);
+	viewport.Height = float(height);
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
-	scissorRect.left = 0.0f;
-	scissorRect.right = width;
-	scissorRect.top = 0.0f;
-	scissorRect.bottom = height;
+	scissorRect.left = LONG(0.0f);
+	scissorRect.right = LONG(width);
+	scissorRect.top = LONG(0.0f);
+	scissorRect.bottom = LONG(height);
 
 	Mesh::ResetDXC();
 
@@ -508,10 +508,12 @@ void Mesh::DrawSprite(
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
 	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 	    0, materialResourceSprite->GetGPUVirtualAddress());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 	    1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
@@ -542,10 +544,12 @@ void Mesh::DrawTriangle(
 		IASetIndexBuffer(&indexBufferViewSphere);
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
 	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 	    0, materialResource->GetGPUVirtualAddress());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 	    1, transformationMatrixResource->GetGPUVirtualAddress());
+
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
@@ -617,19 +621,13 @@ void Mesh::DrawSphere(
 				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 
-			InputDataSphere(
-				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
-
 			DX12Common::GetInstance()->GetCommandList().Get()->RSSetViewports(1, &viewport);
 			DX12Common::GetInstance()->GetCommandList().Get()->RSSetScissorRects(1, &scissorRect);
 			DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 			DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-				0, materialResourceSphere->GetGPUVirtualAddress());
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
+
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
 				DX12Common::GetInstance()->GetBackBufferIndex());
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
@@ -639,6 +637,15 @@ void Mesh::DrawSphere(
 				: GetTextureSrvHandleGPU());
 			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
+
+			InputDataSphere(
+				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
+
+			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+				0, materialResourceSphere->GetGPUVirtualAddress());
+			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
+
 			DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(
 				0, 1, &vertexBufferViewSphere);
 			DX12Common::GetInstance()->GetCommandList().Get()->
@@ -688,10 +695,6 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		0, materialResourceObj->GetGPUVirtualAddress());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		1, transformationMatrixResourceObj->GetGPUVirtualAddress());
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
 		DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
@@ -701,6 +704,12 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 		: GetTextureSrvHandleGPU());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		0, materialResourceObj->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		1, transformationMatrixResourceObj->GetGPUVirtualAddress());
+
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(
 		0, 1, &vertexBufferViewObj);
 	DX12Common::GetInstance()->GetCommandList().Get()->

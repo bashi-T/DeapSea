@@ -9,7 +9,6 @@
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxguid.lib")
-//using Microsoft::WRL::ComPtr;
 
 class Debug
 {

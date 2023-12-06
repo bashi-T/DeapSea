@@ -25,7 +25,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
 
-	dx12Common->Init(kWindowWidth, kWindowHeight);
+	dx12Common->Init(kWindowWidth, kWindowHeight, winAPP);
 	imgui->Initialize(
 	    winAPP->GetHWND(),
 		dx12Common->GetDevice().Get(),

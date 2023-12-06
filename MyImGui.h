@@ -1,6 +1,5 @@
 #pragma once
 #include<windows.h>
-#include"DX12Common.h"
 #include<cstdint>
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"

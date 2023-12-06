@@ -213,7 +213,7 @@ private:
 	Matrix4x4 worldViewProjectionMatrixSphere;
 	Matrix4x4 worldViewProjectionMatrixObj;
 
-	const uint32_t kSubdivision = 16;
+	uint32_t kSubdivision = 16;
 	ModelData modelData;
 
 	ComPtr<ID3D12Resource> textureResource;

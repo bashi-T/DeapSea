@@ -30,14 +30,13 @@ void DX12Common::Init(int32_t width, int32_t height, WinAPP* winApp)
 	DX12Common::ChoseUseAdapter();
 	DX12Common::MakeD3D12Device();
 	depthStencilResource = CreatedepthstencilTextureResource(
-		device.Get(),
 		width,
 		height);
 
 #ifdef _DEBUG
 	InfoQueue(device.Get());
 #endif
-	DX12Common::MakeScreen();
+	DX12Common::MakeScreen(winApp_);
 	DX12Common::MakeFence();
 }
 
@@ -171,29 +170,26 @@ void DX12Common::MakeRTV()
 		swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 }
 
-void DX12Common::MakeScreen()
+void DX12Common::MakeScreen(WinAPP* winApp)
 {
 	MakeCommandQueue();
 	MakeCommandList();
 	MakeSwapchain(
-		winApp_->GetClientWidth(),
-		winApp_->GetClientHeight(),
-		winApp_->GetHWND()
+		winApp->GetClientWidth(),
+		winApp->GetClientHeight(),
+		winApp->GetHWND()
 	);
 	MakeDescriptorHeap();
 
 	rtvDescriptorHeap = CreateDescriptorHeap(
-		device.Get(),
 		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
 		2,
 		false);
 	srvDescriptorHeap = CreateDescriptorHeap(
-		device.Get(),
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
 		128,
 		true);
 	dsvDescriptorHeap = CreateDescriptorHeap(
-		device.Get(),
 		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
 		1,
 		false);
@@ -275,15 +271,14 @@ void DX12Common::DX12Release()
 }
 
 ComPtr<ID3D12DescriptorHeap> DX12Common::CreateDescriptorHeap(
-	ID3D12Device* device,
 	D3D12_DESCRIPTOR_HEAP_TYPE heapType,
-	UINT numDesctiptors,
+	UINT numDescriptors,
     bool shaderVisible)
 {
 	ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC DescriptorHeapDesc{};
 	DescriptorHeapDesc.Type = heapType;
-	DescriptorHeapDesc.NumDescriptors = numDesctiptors;
+	DescriptorHeapDesc.NumDescriptors = numDescriptors;
 	DescriptorHeapDesc.Flags =
 	    shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	hr = device->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
@@ -306,7 +301,7 @@ void DX12Common::MakeDSV()
 }
 
 
-ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(int32_t width, int32_t height)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
@@ -355,6 +350,17 @@ D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetGPUDescriptorHandle(
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DX12Common::GetSRVCPUDescriptorHandle(uint32_t index)
+{
+	//return GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,index);
+	return D3D12_CPU_DESCRIPTOR_HANDLE();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetSRVGPUDescriptorHandle(uint32_t index)
+{
+	return D3D12_GPU_DESCRIPTOR_HANDLE();
 }
 
 void DX12Common::DebugLayer()

@@ -7,6 +7,7 @@
 #include<dxgi1_6.h>
 #include<DirectXTex.h>
 #include<WRL.h>
+#include<array>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
@@ -28,27 +29,30 @@ public:
 	void MakeRTV();
 	void MakeDSV();
 
-	void MakeScreen();
+	void MakeScreen(WinAPP* winApp);
 	void DrawScreen();
 	void ClearScreen();
 	void MakeFence();
 	void DX12Release();
 	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
-		ID3D12Device* device,
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
-		UINT numDesctiptors,
+		UINT numDescriptors,
 	    bool shaderVisible);
 	ComPtr<ID3D12Resource> CreatedepthstencilTextureResource(
-		ID3D12Device* device,
 		int32_t width,
 		int32_t height);
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
 		ID3D12DescriptorHeap* descriptorHeap,
 		uint32_t descriptorSize,
 		uint32_t index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(
+	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(
 		ID3D12DescriptorHeap* descriptorHeap,
 		uint32_t descriptorSize,
+		uint32_t index);
+
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(
+		uint32_t index);
+	static D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(
 		uint32_t index);
 
 	void DebugLayer();
@@ -87,6 +91,8 @@ private:
 	static inline DX12Common* instance;
 
 	Debug* debug_ = nullptr;
+	WinAPP* winApp_ = nullptr;
+
 	ComPtr<ID3D12Device> device = nullptr;
 	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	HRESULT hr = NULL;
@@ -107,7 +113,7 @@ private:
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 
-	ComPtr<ID3D12Resource> swapChainResources[10] = { nullptr };
+	std::array<ComPtr<ID3D12Resource>, 10> swapChainResources;
 	ComPtr<ID3D12Fence> fence = nullptr;
 	HANDLE fenceEvent;
 	D3D12_RESOURCE_BARRIER barrier{};
@@ -117,6 +123,5 @@ private:
 	ComPtr<IDXGIDebug1> debug;
 	ComPtr<ID3D12DebugDevice> debugDevice;
 	ComPtr<ID3D12Debug1> debugController = nullptr;
-	WinAPP* winApp_ = nullptr;
 };
 
