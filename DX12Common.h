@@ -30,8 +30,8 @@ public:
 	void MakeDSV();
 
 	void MakeScreen(WinAPP* winApp);
-	void DrawScreen();
-	void ClearScreen();
+	void PreDraw();
+	void PostDraw();
 	void MakeFence();
 	void DX12Release();
 	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
@@ -123,5 +123,9 @@ private:
 	ComPtr<IDXGIDebug1> debug;
 	ComPtr<ID3D12DebugDevice> debugDevice;
 	ComPtr<ID3D12Debug1> debugController = nullptr;
+
+	D3D12_VIEWPORT viewport{};
+	D3D12_RECT scissorRect{};
+
 };
 

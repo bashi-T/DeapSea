@@ -29,6 +29,7 @@ public:
 		IDxcUtils* dxcUtils,
 		IDxcCompiler3* dxcCompiler,
 		IDxcIncludeHandler* includeHandler);
+
 	void DrawTriangle(
 	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
@@ -150,8 +151,6 @@ private:
 	ComPtr<ID3D12Resource> indexResourceObj = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewObj{};
 
-	D3D12_VIEWPORT viewport{};
-	D3D12_RECT scissorRect{};
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
@@ -207,6 +206,8 @@ private:
 	Matrix4x4 projectionMatrixSprite;
 	Matrix4x4 projectionMatrixSphere;
 	Matrix4x4 projectionMatrixObj;
+
+	Matrix4x4 ViewProjectionMatrix;
 
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldViewProjectionMatrixSprite;

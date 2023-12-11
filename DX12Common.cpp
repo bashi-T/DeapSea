@@ -26,6 +26,18 @@ void DX12Common::Init(int32_t width, int32_t height, WinAPP* winApp)
 	DebugLayer();
 #endif
 
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	viewport.Width = float(width);
+	viewport.Height = float(height);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	scissorRect.left = LONG(0.0f);
+	scissorRect.right = LONG(width);
+	scissorRect.top = LONG(0.0f);
+	scissorRect.bottom = LONG(height);
+
 	DX12Common::MakeDXGIFactory();
 	DX12Common::ChoseUseAdapter();
 	DX12Common::MakeD3D12Device();
@@ -199,7 +211,7 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 	MakeDSV();
 }
 
-void DX12Common::DrawScreen()
+void DX12Common::PreDraw()
 {
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -222,10 +234,19 @@ void DX12Common::DrawScreen()
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex],
 		clearColor, 0, nullptr);
+	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
+	{
+		srvDescriptorHeap
+	};
+	commandList->
+		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
 }
 
-void DX12Common::ClearScreen()
+void DX12Common::PostDraw()
 {
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList->ResourceBarrier(1, &barrier);

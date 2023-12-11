@@ -118,14 +118,15 @@ Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	return multiply;
 }
 
-Matrix4x4 Inverse(Matrix4x4 a) {
+Matrix4x4 Inverse(Matrix4x4 a)
+{
 	Matrix4x4 result = {0};
 	float x = a.m[0][0] * a.m[1][1] * a.m[2][2] * a.m[3][3] +
 	          a.m[0][0] * a.m[1][2] * a.m[2][3] * a.m[3][1] +
 	          a.m[0][0] * a.m[1][3] * a.m[2][1] * a.m[3][2] -
 	          a.m[0][0] * a.m[1][3] * a.m[2][2] * a.m[3][1] -
 	          a.m[0][0] * a.m[1][2] * a.m[2][1] * a.m[3][3] -
-	          a.m[0][0] * a.m[1][1] * a.m[2][3] * a.m[3][1] -
+	          a.m[0][0] * a.m[1][1] * a.m[2][3] * a.m[3][2] -
 	          a.m[0][1] * a.m[1][0] * a.m[2][2] * a.m[3][3] -
 	          a.m[0][2] * a.m[1][0] * a.m[2][3] * a.m[3][1] -
 	          a.m[0][3] * a.m[1][0] * a.m[2][1] * a.m[3][2] +
@@ -145,83 +146,84 @@ Matrix4x4 Inverse(Matrix4x4 a) {
 	          a.m[0][2] * a.m[1][1] * a.m[2][3] * a.m[3][0] +
 	          a.m[0][1] * a.m[1][3] * a.m[2][2] * a.m[3][0];
 
-	if (x != 0) {
-		result.m[0][0] = 1 / x *
+	if (x != 0)
+	{
+		result.m[0][0] = 1.0f / x *
 		                 (a.m[1][1] * a.m[2][2] * a.m[3][3] + a.m[1][2] * a.m[2][3] * a.m[3][1] +
 		                  a.m[1][3] * a.m[2][1] * a.m[3][2] - a.m[1][3] * a.m[2][2] * a.m[3][1] -
 		                  a.m[1][2] * a.m[2][1] * a.m[3][3] - a.m[1][1] * a.m[2][3] * a.m[3][2]);
 
-		result.m[0][1] = 1 / x *
+		result.m[0][1] = 1.0f / x *
 		                 (-a.m[0][1] * a.m[2][2] * a.m[3][3] - a.m[0][2] * a.m[2][3] * a.m[3][1] -
 		                  a.m[0][3] * a.m[2][1] * a.m[3][2] + a.m[0][3] * a.m[2][2] * a.m[3][1] +
-		                  a.m[1][2] * a.m[2][1] * a.m[3][3] + a.m[0][1] * a.m[2][3] * a.m[3][2]);
+		                  a.m[0][2] * a.m[2][1] * a.m[3][3] + a.m[0][1] * a.m[2][3] * a.m[3][2]);
 
-		result.m[0][2] = 1 / x *
+		result.m[0][2] = 1.0f / x *
 		                 (a.m[0][1] * a.m[1][2] * a.m[3][3] + a.m[0][2] * a.m[1][3] * a.m[3][1] +
 		                  a.m[0][3] * a.m[1][1] * a.m[3][2] - a.m[0][3] * a.m[1][2] * a.m[3][1] -
 		                  a.m[0][2] * a.m[1][1] * a.m[3][3] - a.m[0][1] * a.m[1][3] * a.m[3][2]);
 
-		result.m[0][3] = 1 / x *
-		                 (-a.m[0][1] * a.m[1][2] * a.m[2][3] - a.m[1][2] * a.m[1][3] * a.m[2][1] -
-		                  a.m[0][3] * a.m[1][1] * a.m[2][2] + a.m[0][3] * a.m[1][2] * a.m[2][1] -
+		result.m[0][3] = 1.0f / x *
+		                 (-a.m[0][1] * a.m[1][2] * a.m[2][3] - a.m[0][2] * a.m[1][3] * a.m[2][1] -
+		                  a.m[0][3] * a.m[1][1] * a.m[2][2] + a.m[0][3] * a.m[1][2] * a.m[2][1] +
 		                  a.m[0][2] * a.m[1][1] * a.m[2][3] + a.m[0][1] * a.m[1][3] * a.m[2][2]);
 
-		result.m[1][0] = 1 / x *
+		result.m[1][0] = 1.0f / x *
 		                 (-a.m[1][0] * a.m[2][2] * a.m[3][3] - a.m[1][2] * a.m[2][3] * a.m[3][0] -
 		                  a.m[1][3] * a.m[2][0] * a.m[3][2] + a.m[1][3] * a.m[2][2] * a.m[3][0] +
 		                  a.m[1][2] * a.m[2][0] * a.m[3][3] + a.m[1][0] * a.m[2][3] * a.m[3][2]);
 
-		result.m[1][1] = 1 / x *
+		result.m[1][1] = 1.0f / x *
 		                 (a.m[0][0] * a.m[2][2] * a.m[3][3] + a.m[0][2] * a.m[2][3] * a.m[3][0] +
 		                  a.m[0][3] * a.m[2][0] * a.m[3][2] - a.m[0][3] * a.m[2][2] * a.m[3][0] -
 		                  a.m[0][2] * a.m[2][0] * a.m[3][3] - a.m[0][0] * a.m[2][3] * a.m[3][2]);
 
-		result.m[1][2] = 1 / x *
+		result.m[1][2] = 1.0f / x *
 		                 (-a.m[0][0] * a.m[1][2] * a.m[3][3] - a.m[0][2] * a.m[1][3] * a.m[3][0] -
 		                  a.m[0][3] * a.m[1][0] * a.m[3][2] + a.m[0][3] * a.m[1][2] * a.m[3][0] +
 		                  a.m[0][2] * a.m[1][0] * a.m[3][3] + a.m[0][0] * a.m[1][3] * a.m[3][2]);
 
-		result.m[1][3] = 1 / x *
+		result.m[1][3] = 1.0f / x *
 		                 (a.m[0][0] * a.m[1][2] * a.m[2][3] + a.m[0][2] * a.m[1][3] * a.m[2][0] +
 		                  a.m[0][3] * a.m[1][0] * a.m[2][2] - a.m[0][3] * a.m[1][2] * a.m[2][0] -
-		                  a.m[1][2] * a.m[1][0] * a.m[2][3] - a.m[0][0] * a.m[1][3] * a.m[2][2]);
+		                  a.m[0][2] * a.m[1][0] * a.m[2][3] - a.m[0][0] * a.m[1][3] * a.m[2][2]);
 
-		result.m[2][0] = 1 / x *
+		result.m[2][0] = 1.0f / x *
 		                 (a.m[1][0] * a.m[2][1] * a.m[3][3] + a.m[1][1] * a.m[2][3] * a.m[3][0] +
 		                  a.m[1][3] * a.m[2][0] * a.m[3][1] - a.m[1][3] * a.m[2][1] * a.m[3][0] -
 		                  a.m[1][1] * a.m[2][0] * a.m[3][3] - a.m[1][0] * a.m[2][3] * a.m[3][1]);
-
-		result.m[2][1] = 1 / x *
-		                 (-a.m[0][0] * a.m[2][1] * a.m[3][3] - a.m[1][0] * a.m[2][3] * a.m[3][0] -
+		
+		result.m[2][1] = 1.0f / x *
+		                 (-a.m[0][0] * a.m[2][1] * a.m[3][3] - a.m[0][1] * a.m[2][3] * a.m[3][0] -
 		                  a.m[0][3] * a.m[2][0] * a.m[3][1] + a.m[0][3] * a.m[2][1] * a.m[3][0] +
 		                  a.m[0][1] * a.m[2][0] * a.m[3][3] + a.m[0][0] * a.m[2][3] * a.m[3][1]);
 
-		result.m[2][2] = 1 / x *
+		result.m[2][2] = 1.0f / x *
 		                 (a.m[0][0] * a.m[1][1] * a.m[3][3] + a.m[0][1] * a.m[1][3] * a.m[3][0] +
 		                  a.m[0][3] * a.m[1][0] * a.m[3][1] - a.m[0][3] * a.m[1][1] * a.m[3][0] -
-		                  a.m[0][1] * a.m[1][3] * a.m[2][0] - a.m[0][0] * a.m[1][3] * a.m[3][1]);
+		                  a.m[0][1] * a.m[1][0] * a.m[3][3] - a.m[0][0] * a.m[1][3] * a.m[3][1]);
 
-		result.m[2][3] = 1 / x *
+		result.m[2][3] = 1.0f / x *
 		                 (-a.m[0][0] * a.m[1][1] * a.m[2][3] - a.m[0][1] * a.m[1][3] * a.m[2][0] -
 		                  a.m[0][3] * a.m[1][0] * a.m[2][1] + a.m[0][3] * a.m[1][1] * a.m[2][0] +
 		                  a.m[0][1] * a.m[1][0] * a.m[2][3] + a.m[0][0] * a.m[1][3] * a.m[2][1]);
 
-		result.m[3][0] = 1 / x *
+		result.m[3][0] = 1.0f / x *
 		                 (-a.m[1][0] * a.m[2][1] * a.m[3][2] - a.m[1][1] * a.m[2][2] * a.m[3][0] -
 		                  a.m[1][2] * a.m[2][0] * a.m[3][1] + a.m[1][2] * a.m[2][1] * a.m[3][0] +
 		                  a.m[1][1] * a.m[2][0] * a.m[3][2] + a.m[1][0] * a.m[2][2] * a.m[3][1]);
 
-		result.m[3][1] = 1 / x *
+		result.m[3][1] = 1.0f / x *
 		                 (a.m[0][0] * a.m[2][1] * a.m[3][2] + a.m[0][1] * a.m[2][2] * a.m[3][0] +
 		                  a.m[0][2] * a.m[2][0] * a.m[3][1] - a.m[0][2] * a.m[2][1] * a.m[3][0] -
 		                  a.m[0][1] * a.m[2][0] * a.m[3][2] - a.m[0][0] * a.m[2][2] * a.m[3][1]);
 
-		result.m[3][2] = 1 / x *
+		result.m[3][2] = 1.0f / x *
 		                 (-a.m[0][0] * a.m[1][1] * a.m[3][2] - a.m[0][1] * a.m[1][2] * a.m[3][0] -
 		                  a.m[0][2] * a.m[1][0] * a.m[3][1] + a.m[0][2] * a.m[1][1] * a.m[3][0] +
 		                  a.m[0][1] * a.m[1][0] * a.m[3][2] + a.m[0][0] * a.m[1][2] * a.m[3][1]);
 
-		result.m[3][3] = 1 / x *
+		result.m[3][3] = 1.0f / x *
 		                 (a.m[0][0] * a.m[1][1] * a.m[2][2] + a.m[0][1] * a.m[1][2] * a.m[2][0] +
 		                  a.m[0][2] * a.m[1][0] * a.m[2][1] - a.m[0][2] * a.m[1][1] * a.m[2][0] -
 		                  a.m[0][1] * a.m[1][0] * a.m[2][2] - a.m[0][0] * a.m[1][2] * a.m[2][1]);
@@ -256,14 +258,17 @@ Matrix4x4 MakeIdentity4x4() {
 	result.m[0][1] = 0.0f;
 	result.m[0][2] = 0.0f;
 	result.m[0][3] = 0.0f;
+
 	result.m[1][0] = 0.0f;
 	result.m[1][1] = 1.0f;
 	result.m[1][2] = 0.0f;
 	result.m[1][3] = 0.0f;
+
 	result.m[2][0] = 0.0f;
 	result.m[2][1] = 0.0f;
 	result.m[2][2] = 1.0f;
 	result.m[2][3] = 0.0f;
+
 	result.m[3][0] = 0.0f;
 	result.m[3][1] = 0.0f;
 	result.m[3][2] = 0.0f;
@@ -399,28 +404,13 @@ Matrix4x4 MakerotateZMatrix(float radian) {
 }
 
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
-	Matrix4x4 result;
 	Matrix4x4 rotateX = MakerotateXMatrix(rotate.x);
 	Matrix4x4 rotateY = MakerotateYMatrix(rotate.y);
 	Matrix4x4 rotateZ = MakerotateZMatrix(rotate.z);
 	Matrix4x4 ROTATE = Multiply(rotateX, Multiply(rotateY, rotateZ));
-
-	result.m[0][0] = scale.x * ROTATE.m[0][0];
-	result.m[0][1] = scale.x * ROTATE.m[0][1];
-	result.m[0][2] = scale.x * ROTATE.m[0][2];
-	result.m[0][3] = 0.0f;
-	result.m[1][0] = scale.y * ROTATE.m[1][0];
-	result.m[1][1] = scale.y * ROTATE.m[1][1];
-	result.m[1][2] = scale.y * ROTATE.m[1][2];
-	result.m[1][3] = 0.0f;
-	result.m[2][0] = scale.z * ROTATE.m[2][0];
-	result.m[2][1] = scale.z * ROTATE.m[2][1];
-	result.m[2][2] = scale.z * ROTATE.m[2][2];
-	result.m[2][3] = 0.0f;
-	result.m[3][0] = translate.x;
-	result.m[3][1] = translate.y;
-	result.m[3][2] = translate.z;
-	result.m[3][3] = 1.0f;
+	Matrix4x4 SCALE = MakeScaleMatrix(scale);
+	Matrix4x4 TRANSLATE = MakeTranslateMatrix(translate);
+	Matrix4x4 result= Multiply(SCALE, Multiply(ROTATE, TRANSLATE));
 
 	return result;
 };
@@ -428,18 +418,18 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 	Matrix4x4 result;
 
-	result.m[0][0] = 1 / aspectRatio * 1 / std::tan(fovY / 2);
+	result.m[0][0] = 1.0f / aspectRatio * 1.0f / tanf(fovY / 2);
 	result.m[0][1] = 0;
 	result.m[0][2] = 0;
 	result.m[0][3] = 0;
 	result.m[1][0] = 0;
-	result.m[1][1] = 1 / std::tan(fovY / 2);
+	result.m[1][1] = 1.0f / tanf(fovY / 2);
 	result.m[1][2] = 0;
 	result.m[1][3] = 0;
 	result.m[2][0] = 0;
 	result.m[2][1] = 0;
 	result.m[2][2] = farClip / (farClip - nearClip);
-	result.m[2][3] = 1;
+	result.m[2][3] = 1.0f;
 	result.m[3][0] = 0;
 	result.m[3][1] = 0;
 	result.m[3][2] = -nearClip * farClip / (farClip - nearClip);
@@ -452,17 +442,17 @@ Matrix4x4 MakeOrthographicMatrix(
     float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result;
 
-	result.m[0][0] = 2 / (right - left);
+	result.m[0][0] = 2.0f / (right - left);
 	result.m[0][1] = 0;
 	result.m[0][2] = 0;
 	result.m[0][3] = 0;
 	result.m[1][0] = 0;
-	result.m[1][1] = 2 / (top - bottom);
+	result.m[1][1] = 2.0f / (top - bottom);
 	result.m[1][2] = 0;
 	result.m[1][3] = 0;
 	result.m[2][0] = 0;
 	result.m[2][1] = 0;
-	result.m[2][2] = 1 / (nearClip - farClip);
+	result.m[2][2] = 1.0f / (nearClip - farClip);
 	result.m[2][3] = 0;
 	result.m[3][0] = (left + right) / (left - right);
 	result.m[3][1] = (top + bottom) / (bottom - top);
@@ -476,20 +466,20 @@ Matrix4x4 MakeViewportMatrix(
     float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 result;
 
-	result.m[0][0] = width / 2;
+	result.m[0][0] = width / 2.0f;
 	result.m[0][1] = 0;
 	result.m[0][2] = 0;
 	result.m[0][3] = 0;
 	result.m[1][0] = 0;
-	result.m[1][1] = -height / 2;
+	result.m[1][1] = -height / 2.0f;
 	result.m[1][2] = 0;
 	result.m[1][3] = 0;
 	result.m[2][0] = 0;
 	result.m[2][1] = 0;
 	result.m[2][2] = maxDepth - minDepth;
 	result.m[2][3] = 0;
-	result.m[3][0] = left + width / 2;
-	result.m[3][1] = top + height / 2;
+	result.m[3][0] = left + width / 2.0f;
+	result.m[3][1] = top + height / 2.0f;
 	result.m[3][2] = minDepth;
 	result.m[3][3] = 1;
 

@@ -103,27 +103,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Render();
 			break;
 		}
-		dx12Common->DrawScreen();
+		dx12Common->PreDraw();
 
-		ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
-		{
-			dx12Common->GetSrvDescriptorHeap().Get()
-		};
-		dx12Common->GetCommandList().Get()->
-			SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
-		//for (int i = 0; i < kNumTriangle; i++)
-		//{
-		//	mesh[i]->DrawTriangle(
-		//		Top[i],
-		//		Right[i],
-		//		Left[i],
-		//		Color[i],
-		//		texcoordTop[i],
-		//		texcoordRight[i],
-		//		texcoordLeft[i],
-		//		useWorldMap);
-		//}
 		mesh[0]->DrawSprite(
 			LeftTop[0],
 			RightTop[0],
@@ -142,7 +123,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		mesh[0]->DrawOBJ(ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
-		dx12Common->ClearScreen();
+
+		dx12Common->PostDraw();
 
 	}
 

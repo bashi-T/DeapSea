@@ -6,18 +6,6 @@ Mesh::~Mesh() {
 void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
 	kSubdivision = 16;
 	
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-	viewport.Width = float(width);
-	viewport.Height = float(height);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	scissorRect.left = LONG(0.0f);
-	scissorRect.right = LONG(width);
-	scissorRect.top = LONG(0.0f);
-	scissorRect.bottom = LONG(height);
-
 	Mesh::ResetDXC();
 
 	Mesh::MakePSO();
@@ -32,9 +20,7 @@ transformMatrix = {
         {0.0f, 0.0f, 0.0f  },
         {0.0f, 0.0f, -15.0f}
     };
-	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	cameraMatrix =
-	    MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
 	transformMatrixSprite = {
 	    {1.0f, 1.0f, 1.0f},
@@ -256,9 +242,8 @@ void Mesh::MakePSO()
 
 void Mesh::Update()
 {
-
-	DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
 	
+	DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
 	ImGui::Begin("Light");
 	ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
 	ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.01f);
@@ -269,10 +254,12 @@ void Mesh::Update()
 	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
 	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 	ImGui::DragFloat3("Sphere.rotate", (float*)&transformMatrixSphere.rotate, 0.01f);
-
 	ImGui::End();
+
 	cameraMatrix =
 		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	viewMatrix = Inverse(cameraMatrix);
+	ViewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
 }
 
@@ -346,15 +333,14 @@ void Mesh::InputDataTriangle(
 	materialData[0].enableLighting = true;
 
 	transformationMatrixData->WVP = MakeIdentity4x4();
-
+	
 	transformMatrix.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix =
 	    MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	viewMatrix = Inverse(cameraMatrix);
 	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
-
+	
 	vertexData[0].position = Top;
 	vertexData[1].position = Right;
 	vertexData[2].position = Left;
@@ -448,9 +434,8 @@ void Mesh::InputDataSphere(
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
 	    transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
-	viewMatrixSphere = Inverse(cameraMatrix);
 	worldViewProjectionMatrixSphere =
-	    Multiply(worldMatrix, Multiply(viewMatrixSphere, projectionMatrixSphere));
+	    Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrixSphere));
 	transformationMatrixDataSphere->WVP = worldViewProjectionMatrixSphere;
 	transformationMatrixDataSphere->World = worldMatrix;
 
@@ -502,8 +487,6 @@ void Mesh::DrawSprite(
 	InputDataSprite(
 	    LeftTop, RightTop, RightBottom, LeftBottom, color, coordLeftTop, coordRightTop,
 	    coordRightBottom, coordLeftBottom,width,height);
-	DX12Common::GetInstance()->GetCommandList().Get()->RSSetViewports(1, &viewport);
-	DX12Common::GetInstance()->GetCommandList().Get()->RSSetScissorRects(1, &scissorRect);
 	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
@@ -535,8 +518,6 @@ void Mesh::DrawTriangle(
     Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
     Vector2 coordLeft, bool useWorldMap) {
 	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
-	DX12Common::GetInstance()->GetCommandList().Get()->RSSetViewports(1, &viewport);
-	DX12Common::GetInstance()->GetCommandList().Get()->RSSetScissorRects(1, &scissorRect);
 	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -621,8 +602,6 @@ void Mesh::DrawSphere(
 				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 
-			DX12Common::GetInstance()->GetCommandList().Get()->RSSetViewports(1, &viewport);
-			DX12Common::GetInstance()->GetCommandList().Get()->RSSetScissorRects(1, &scissorRect);
 			DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 			DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
@@ -675,9 +654,8 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
 		transformMatrixObj.scale, transformMatrixObj.rotate, transformMatrixObj.translate);
-	viewMatrixObj = Inverse(cameraMatrix);
 	worldViewProjectionMatrixObj =
-		Multiply(worldMatrix, Multiply(viewMatrixObj, projectionMatrixObj));
+		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrixObj));
 	transformationMatrixDataObj->WVP = worldViewProjectionMatrixObj;
 	transformationMatrixDataObj->World = worldMatrix;
 
@@ -689,8 +667,6 @@ void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t heigh
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformObj.translate));
 	materialDataObj[0].uvTransform = uvTransformMatrix;
 
-	DX12Common::GetInstance()->GetCommandList().Get()->RSSetViewports(1, &viewport);
-	DX12Common::GetInstance()->GetCommandList().Get()->RSSetScissorRects(1, &scissorRect);
 	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
