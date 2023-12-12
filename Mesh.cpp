@@ -16,12 +16,10 @@ transformMatrix = {
         {0.0f, 0.0f, 0.0f}
     };
 	cameraTransform = {
-	    {1.0f, 1.0f, 1.0f  },
-        {0.0f, 0.0f, 0.0f  },
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, -15.0f}
     };
-	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
-
 	transformMatrixSprite = {
 	    {1.0f, 1.0f, 1.0f},
         {0.0f, 0.0f, 0.0f},
@@ -37,6 +35,8 @@ transformMatrix = {
 		{0.0f, 0.0f, 0.0f},
 		{0.0f, 0.0f, 0.0f}
 	};
+	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
+
 	modelData = LoadObjFile("Resource",filename);
 	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 	vertexResourceSprite = CreateBufferResource(sizeof(VertexData) * 6);
@@ -242,7 +242,7 @@ void Mesh::MakePSO()
 
 void Mesh::Update()
 {
-	
+	cameraTransform.translate.x += 0.02f;
 	DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
 	ImGui::Begin("Light");
 	ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
@@ -254,13 +254,14 @@ void Mesh::Update()
 	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
 	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 	ImGui::DragFloat3("Sphere.rotate", (float*)&transformMatrixSphere.rotate, 0.01f);
+	ImGui::DragFloat3("Sphere.translate", (float*)&transformMatrixSphere.translate, 0.01f);
 	ImGui::End();
 
 	cameraMatrix =
 		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	viewMatrix = Inverse(cameraMatrix);
 	ViewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
-
+	
 }
 
 ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)

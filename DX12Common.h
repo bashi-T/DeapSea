@@ -8,6 +8,7 @@
 #include<DirectXTex.h>
 #include<WRL.h>
 #include<array>
+#include<chrono>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
@@ -16,6 +17,7 @@ class DX12Common final
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	void Init(int32_t width, int32_t height, WinAPP* winApp);
+	void update();
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
 	void MakeD3D12Device();
@@ -57,6 +59,7 @@ public:
 
 	void DebugLayer();
 	void InfoQueue(ID3D12Device* device);
+
 
 	ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 	ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
@@ -126,6 +129,11 @@ private:
 
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
+
+	void InitializefixFPS();
+	void UpdateFixFPS();
+
+	std::chrono::steady_clock::time_point reference_;
 
 };
 

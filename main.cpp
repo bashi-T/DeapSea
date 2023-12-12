@@ -83,7 +83,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	while (NewMSG.message != WM_QUIT)
 	{
-
+		dx12Common->update();
 		imgui->Update();
 
 		for (int i = 0; i < kNumTriangle; i++)
