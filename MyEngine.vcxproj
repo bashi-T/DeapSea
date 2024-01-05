@@ -26,6 +26,8 @@
     <ClCompile Include="MyImGui.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteCommon.cpp" />
     <ClCompile Include="WindowApp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +46,8 @@
     <ClInclude Include="MyImGui.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="CGVector.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteCommon.h" />
     <ClInclude Include="WindowApp.h" />
   </ItemGroup>
   <ItemGroup>

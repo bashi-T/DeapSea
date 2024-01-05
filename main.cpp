@@ -2,6 +2,8 @@
 #include"Debug.h"
 #include"Mesh.h"
 #include"Input.h"
+#include"SpriteCommon.h"
+#include"Sprite.h"
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
@@ -17,6 +19,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
 	Mesh* mesh[kNumTriangle];
+	SpriteCommon* SPCommon = new SpriteCommon;
+	Sprite* sprite = new Sprite;
+
 	for (int i = 0; i < kNumTriangle; i++)
 	{
 		mesh[i] = new Mesh;
@@ -33,53 +38,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	    dx12Common->GetRtvDesc(),
 	    dx12Common->GetSrvDescriptorHeap().Get());
 
-	Vector4 Top[kNumTriangle];
-	Vector4 Left[kNumTriangle];
-	Vector4 Right[kNumTriangle];
-	Vector4 Color[kNumTriangle];
-	Vector2 texcoordTop[kNumTriangle];
-	Vector2 texcoordLeft[kNumTriangle];
-	Vector2 texcoordRight[kNumTriangle];
-
-	Top[0] = { 0.0f, 1.75f, 0.0f, 1.0f };
-	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
-	Left[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	Color[0] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	texcoordTop[0] = { 0.5f,0.0f };
-	texcoordRight[0] = { 1.0f,1.0f };
-	texcoordLeft[0] = { 0.0f,1.0f };
-
-	Vector4 LeftTop[kNumTriangle];
-	Vector4 RightTop[kNumTriangle];
-	Vector4 RightBottom[kNumTriangle];
-	Vector4 LeftBottom[kNumTriangle];
-	Vector4 ColorSprite[kNumTriangle];
-	Vector2 texcoordLeftTop[kNumTriangle];
-	Vector2 texcoordRightTop[kNumTriangle];
-	Vector2 texcoordRightBottom[kNumTriangle];
-	Vector2 texcoordLeftBottom[kNumTriangle];
-
-	Vector4 ColorSphere[kNumTriangle];
-	
-	LeftTop[0] = {0.0f, 0.0f, 0.0f, 1.0f};
-	RightTop[0] = { kWindowWidth/3, 0.0f, 0.0f, 1.0f};
-	RightBottom[0] = { kWindowWidth/3, kWindowHeight/3, 0.0f, 1.0f};
-	LeftBottom[0] = { 0.0f, kWindowHeight/3, 0.0f, 1.0f};
-	ColorSprite[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	texcoordLeftTop[0] = {0.0f, 0.0f};
-	texcoordRightTop[0] = {1.0f, 0.0f};
-	texcoordRightBottom[0] = {1.0f, 1.0f};
-	texcoordLeftBottom[0] = {0.0f, 1.0f};
-
-	
-	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
-	ColorSphere[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-
-	for (int i = 0; i < kNumTriangle; i++)
-	{
-		mesh[i]->Initialize("axis.obj", kWindowWidth, kWindowHeight);
-	}
+	//for (int i = 0; i < kNumTriangle; i++)
+	//{
+	//}
+	SPCommon->Initialize(kWindowWidth, kWindowHeight, dx12Common);
+	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon);
 
 	while (NewMSG.message != WM_QUIT)
 	{
@@ -88,8 +51,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		for (int i = 0; i < kNumTriangle; i++)
 		{
-			mesh[i]->Update();
 		}
+		sprite->Update();
 		//ImGui::Begin("sphereEdit");
 		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
 		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
@@ -105,22 +68,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		dx12Common->PreDraw();
 
-		mesh[0]->DrawSprite(
-			LeftTop[0],
-			RightTop[0],
-			RightBottom[0],
-			LeftBottom[0],
-			ColorSprite[0],
-			texcoordLeftTop[0],
-			texcoordRightTop[0],
-			texcoordRightBottom[0],
-			texcoordLeftBottom[0],
-			kWindowWidth,
-			kWindowHeight);
-
-		mesh[0]->DrawSphere(
-			sphere, ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
-		mesh[0]->DrawOBJ(ColorSphere[0], useWorldMap, kWindowWidth, kWindowHeight);
+		sprite->Draw();
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
@@ -135,8 +83,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dx12Common->DeleteInstance();
 	for (int i = 0; i < kNumTriangle; i++)
 	{
-		delete mesh[i];
 	}
+	delete sprite;
 	winAPP->Finalize();
 
 	delete leakCheck;
