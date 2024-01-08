@@ -68,8 +68,8 @@ void Sprite::InputData(
 	int32_t width, int32_t height)
 {
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	transformationMatrixResource->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 
@@ -107,14 +107,14 @@ void Sprite::InputData(
 void Sprite::Draw(SpriteCommon* spriteCommon)
 {
 	this->spriteCommon_ = spriteCommon;
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->IASetPrimitiveTopology(
+	spriteCommon_->GetDx12Common()->GetCommandList()->SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
+	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+	spriteCommon_->GetDx12Common()->GetCommandList()->IASetPrimitiveTopology(
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	spriteCommon_->GetDx12Common()->GetCommandList()->
 		IASetVertexBuffers(0, 1, &vertexBufferView);
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	spriteCommon_->GetDx12Common()->GetCommandList()->
 		IASetIndexBuffer(&indexBufferView);
 	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootConstantBufferView(
 		0, materialResource->GetGPUVirtualAddress());
@@ -124,11 +124,11 @@ void Sprite::Draw(SpriteCommon* spriteCommon)
 	//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 	//	spriteCommon_->GetDx12Common()->GetRtvHandles(spriteCommon_->GetDx12Common()->GetBackBufferIndex());
 	//D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+	//spriteCommon_->GetDx12Common()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
+	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootDescriptorTable(
 		2, GetTextureSrvHandleGPU());
 
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	spriteCommon_->GetDx12Common()->GetCommandList()->
 		DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
@@ -152,7 +152,7 @@ ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeInBytes)
 
 	ComPtr<ID3D12Resource> Resource = nullptr;
 
-	hr = spriteCommon_->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
+	hr = spriteCommon_->GetDx12Common()->GetDevice()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));

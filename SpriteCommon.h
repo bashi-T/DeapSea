@@ -59,7 +59,6 @@ public:
 		std::vector<VertexData> vertices;
 		MaterialData material;
 	};
-	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(
@@ -80,7 +79,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
-	DX12Common* GetDx12Common(){return  dx12Common_;}
+	DX12Common* GetDx12Common(){return  DX12Common::GetInstance();}
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
