@@ -5,82 +5,82 @@ Mesh::~Mesh() {
 
 void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
 	spriteCom_->Initialize(width , height,DX12Common::GetInstance());
-	//kSubdivision = 16;
-	//
-	//ResetDXC();
+	kSubdivision = 16;
+	
+	ResetDXC();
 
-	//MakePSO();
+	MakePSO();
 
-	//Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
-	//ColorSphere[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
+	ColorSphere[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	//Top[0] = { 0.0f, 1.75f, 0.0f, 1.0f };
-	//Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
-	//Left[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	//Color[0] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	//texcoordTop[0] = { 0.5f,0.0f };
-	//texcoordRight[0] = { 1.0f,1.0f };
-	//texcoordLeft[0] = { 0.0f,1.0f };
-
-
-	//transformMatrix = {
-	//		{1.0f, 1.0f, 1.0f},
-	//		{0.0f, 0.0f, 0.0f},
-	//		{0.0f, 0.0f, 0.0f}
-	//};
-	//transformMatrixSphere = {
-	//	{1.0f, 1.0f, 1.0f},
-	//	{0.0f, 0.0f, 0.0f},
-	//	{0.0f, 0.0f, 0.0f}
-	//};
-	//transformMatrixObj = {
-	//	{1.0f, 1.0f, 1.0f},
-	//	{0.0f, 0.0f, 0.0f},
-	//	{0.0f, 0.0f, 0.0f}
-	//};
-	//cameraTransform = {
-	//    {1.0f, 1.0f, 1.0f},
- //       {0.0f, 0.0f, 0.0f},
- //       {0.0f, 0.0f, -15.0f}
- //   };
-	//projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
-
-	//modelData = LoadObjFile("Resource",filename);
-	//vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
-	//vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
-	//vertexResourceObj = CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
-	//
-	//materialResource = CreateBufferResource(sizeof(Material));
-	//materialResourceSphere = CreateBufferResource(sizeof(Material));
-	//materialResourceObj = CreateBufferResource(sizeof(Material));
-
-	//transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
-	//transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
-	//transformationMatrixResourceObj = CreateBufferResource(sizeof(TransformationMatrix));
-
-	//directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
-	//directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	//
-	//indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
-	//
-	//DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
-	//DirectionalLightData->intensity = 1.0f;
+	Top[0] = { 0.0f, 1.75f, 0.0f, 1.0f };
+	Right[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
+	Left[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+	Color[0] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	texcoordTop[0] = { 0.5f,0.0f };
+	texcoordRight[0] = { 1.0f,1.0f };
+	texcoordLeft[0] = { 0.0f,1.0f };
 
 
-	//mipImages = LoadTexture(modelData.material.textureFilePath);
-	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	//textureResource = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata);
-	//UploadTextureData(textureResource.Get(), mipImages, metadata);
-	//
-	//mipImages2 = LoadTexture(modelData.material.textureFilePath);
-	//const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	//textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata2);
-	//UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
+	transformMatrix = {
+			{1.0f, 1.0f, 1.0f},
+			{0.0f, 0.0f, 0.0f},
+			{0.0f, 0.0f, 0.0f}
+	};
+	transformMatrixSphere = {
+		{1.0f, 1.0f, 1.0f},
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 0.0f, 0.0f}
+	};
+	transformMatrixObj = {
+		{1.0f, 1.0f, 1.0f},
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 0.0f, 0.0f}
+	};
+	cameraTransform = {
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, -15.0f}
+    };
+	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
-	//MakeShaderResourceView(metadata, metadata2);
+	modelData = LoadObjFile("Resource",filename);
+	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
+	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
+	vertexResourceObj = CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	
+	materialResource = CreateBufferResource(sizeof(Material));
+	materialResourceSphere = CreateBufferResource(sizeof(Material));
+	materialResourceObj = CreateBufferResource(sizeof(Material));
 
-	//MakeBufferView();
+	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResourceObj = CreateBufferResource(sizeof(TransformationMatrix));
+
+	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	
+	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
+	
+	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
+	DirectionalLightData->intensity = 1.0f;
+
+
+	mipImages = LoadTexture(modelData.material.textureFilePath);
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textureResource = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata);
+	UploadTextureData(textureResource.Get(), mipImages, metadata);
+	
+	mipImages2 = LoadTexture(modelData.material.textureFilePath);
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata2);
+	UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
+
+	MakeShaderResourceView(metadata, metadata2);
+
+	MakeBufferView();
 
 }
 
@@ -333,46 +333,46 @@ void Mesh::MakeBufferView()
 	vertexBufferViewObj.StrideInBytes = sizeof(VertexData);
 }
 
-void Mesh::InputDataTriangle(
-    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-    Vector2 coordLeft) {
-	VertexData* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * 3);
-	Material* materialData = nullptr;
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	TransformationMatrix* transformationMatrixData = nullptr;
-	transformationMatrixResource->Map(
-	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-
-	materialData[0].color = color;
-	materialData[0].enableLighting = true;
-
-	transformationMatrixData->WVP = MakeIdentity4x4();
-	
-	transformMatrix.rotate.y += 0.02f;
-	Matrix4x4 worldMatrix =
-	    MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData->WVP = worldViewProjectionMatrix;
-	transformationMatrixData->World = worldMatrix;
-	
-	vertexData[0].position = Top;
-	vertexData[1].position = Right;
-	vertexData[2].position = Left;
-	vertexData[0].texcoord = coordTop;
-	vertexData[1].texcoord = coordRight;
-	vertexData[2].texcoord = coordLeft;
-	vertexData[0].normal.x = vertexData[0].position.x;
-	vertexData[0].normal.y = vertexData[0].position.y;
-	vertexData[0].normal.z = vertexData[0].position.z;
-	vertexData[1].normal.x = vertexData[1].position.x;
-	vertexData[1].normal.y = vertexData[1].position.y;
-	vertexData[1].normal.z = vertexData[1].position.z;
-	vertexData[2].normal.x = vertexData[2].position.x;
-	vertexData[2].normal.y = vertexData[2].position.y;
-	vertexData[2].normal.z = vertexData[2].position.z;
-}
+//void Mesh::InputDataTriangle(
+//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+//    Vector2 coordLeft) {
+//	VertexData* vertexData = nullptr;
+//	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+//	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * 3);
+//	Material* materialData = nullptr;
+//	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+//	TransformationMatrix* transformationMatrixData = nullptr;
+//	transformationMatrixResource->Map(
+//	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+//
+//	materialData[0].color = color;
+//	materialData[0].enableLighting = true;
+//
+//	transformationMatrixData->WVP = MakeIdentity4x4();
+//	
+//	transformMatrix.rotate.y += 0.02f;
+//	Matrix4x4 worldMatrix =
+//	    MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+//	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+//	transformationMatrixData->WVP = worldViewProjectionMatrix;
+//	transformationMatrixData->World = worldMatrix;
+//	
+//	vertexData[0].position = Top;
+//	vertexData[1].position = Right;
+//	vertexData[2].position = Left;
+//	vertexData[0].texcoord = coordTop;
+//	vertexData[1].texcoord = coordRight;
+//	vertexData[2].texcoord = coordLeft;
+//	vertexData[0].normal.x = vertexData[0].position.x;
+//	vertexData[0].normal.y = vertexData[0].position.y;
+//	vertexData[0].normal.z = vertexData[0].position.z;
+//	vertexData[1].normal.x = vertexData[1].position.x;
+//	vertexData[1].normal.y = vertexData[1].position.y;
+//	vertexData[1].normal.z = vertexData[1].position.z;
+//	vertexData[2].normal.x = vertexData[2].position.x;
+//	vertexData[2].normal.y = vertexData[2].position.y;
+//	vertexData[2].normal.z = vertexData[2].position.z;
+//}
 
 void Mesh::InputDataSphere(
     Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
@@ -444,38 +444,38 @@ void Mesh::InputDataSphere(
 }
 
 
-void Mesh::DrawTriangle(
-    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-    Vector2 coordLeft, bool useWorldMap) {
-	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
-	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
-	DX12Common::GetInstance()->GetCommandList().Get()->
-		IASetIndexBuffer(&indexBufferViewSphere);
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
-	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-	    0, materialResource->GetGPUVirtualAddress());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-	    1, transformationMatrixResource->GetGPUVirtualAddress());
-
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-
-	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-	    2, useWorldMap ? GetTextureSrvHandleGPU2()
-	                   : GetTextureSrvHandleGPU());
-
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		3, directionalLightResource->GetGPUVirtualAddress());
-
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
-}
+//void Mesh::DrawTriangle(
+//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+//    Vector2 coordLeft, bool useWorldMap) {
+//	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
+//	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
+//	DX12Common::GetInstance()->GetCommandList().Get()->
+//		IASetIndexBuffer(&indexBufferViewSphere);
+//	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+//	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+//	    0, materialResource->GetGPUVirtualAddress());
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+//	    1, transformationMatrixResource->GetGPUVirtualAddress());
+//
+//	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+//	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+//	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+//	    2, useWorldMap ? GetTextureSrvHandleGPU2()
+//	                   : GetTextureSrvHandleGPU());
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+//		3, directionalLightResource->GetGPUVirtualAddress());
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
+//}
 
 void Mesh::DrawSphere(
 	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)

@@ -30,8 +30,7 @@ public:
 		IDxcIncludeHandler* includeHandler);
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
-	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
-	void MakeBufferView();
+	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes, DX12Common* dxcommon);
 
 	//void InputDataTriangle(
 	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
@@ -41,7 +40,7 @@ public:
 	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	//	Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 
-	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2, DX12Common* dxcommon);
+	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, DX12Common* dxcommon);
 
 	struct VertexData
 	{
@@ -81,6 +80,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
+	DX12Common* GetDx12Common(){return  dx12Common_;}
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };

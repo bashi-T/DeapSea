@@ -23,23 +23,18 @@ void SpriteCommon::Initialize(int32_t width, int32_t height,DX12Common* dxcommon
 	};
 	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
-	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight), dx12Common_);
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
 	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
 
-	//mipImages = LoadTexture(modelData.material.textureFilePath);
+	//mipImages = LoadTexture("Resource/civ6.png");
 	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	//textureResource = CreateTextureResource(dx12Common_->GetDevice().Get(), metadata);
 	//UploadTextureData(textureResource.Get(), mipImages, metadata);
 
-	//mipImages2 = LoadTexture(modelData.material.textureFilePath);
-	//const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	//textureResource2 = CreateTextureResource(dx12Common_->GetDevice().Get(), metadata2);
-	//UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
-
-	//MakeShaderResourceView(metadata, metadata2, dxcommon);
+	//MakeShaderResourceView(metadata, dxcommon);
 }
 
 void SpriteCommon::ResetDXC()
@@ -149,6 +144,7 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 
+	//
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -214,8 +210,9 @@ void SpriteCommon::Draw(int32_t width, int32_t height)
 {
 };
 
-ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes)
+ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes, DX12Common* dxcommon)
 {
+	dx12Common_ = dxcommon;
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -223,13 +220,12 @@ ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes)
 
 	ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 
-	ResourceDesc.Width = sizeInBytes * 3;
+	ResourceDesc.Width = sizeInBytes;
 
 	ResourceDesc.Height = 1;
 	ResourceDesc.DepthOrArraySize = 1;
 	ResourceDesc.MipLevels = 1;
 	ResourceDesc.SampleDesc.Count = 1;
-
 	ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	ComPtr<ID3D12Resource> Resource = nullptr;
@@ -263,7 +259,7 @@ SpriteCommon::MaterialData SpriteCommon::LoadMaterialTemplateFile(const std::str
 	return materialData;
 }
 
-void SpriteCommon::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2, DX12Common* dxcommon)
+void SpriteCommon::MakeShaderResourceView(const DirectX::TexMetadata& metadata, DX12Common* dxcommon)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -271,11 +267,11 @@ void SpriteCommon::MakeShaderResourceView(const DirectX::TexMetadata& metadata, 
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
-	srvDesc2.Format = metadata2.format;
-	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	//srvDesc2.Format = metadata2.format;
+	//srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
 
 	const uint32_t descriptorSizeSRV = dxcommon->GetDevice().Get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	textureSrvHandleCPU = dxcommon->GetCPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
@@ -285,7 +281,7 @@ void SpriteCommon::MakeShaderResourceView(const DirectX::TexMetadata& metadata, 
 	textureSrvHandleGPU2 = dxcommon->GetGPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
 
 	dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-	dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+	//dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 }
 
 DirectX::ScratchImage SpriteCommon::LoadTexture(const std::string& filePath)

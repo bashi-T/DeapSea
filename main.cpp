@@ -29,8 +29,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	bool useWorldMap = true;
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
-
-	dx12Common->Init(kWindowWidth, kWindowHeight, winAPP);
+	dx12Common->Initialize(kWindowWidth, kWindowHeight, winAPP);
 	imgui->Initialize(
 	    winAPP->GetHWND(),
 		dx12Common->GetDevice().Get(),
@@ -38,9 +37,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	    dx12Common->GetRtvDesc(),
 	    dx12Common->GetSrvDescriptorHeap().Get());
 
-	//for (int i = 0; i < kNumTriangle; i++)
-	//{
-	//}
+	//mesh[0]->Initialize("multiMaterial.obj", kWindowWidth, kWindowHeight);
 	SPCommon->Initialize(kWindowWidth, kWindowHeight, dx12Common);
 	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon);
 
@@ -48,11 +45,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		dx12Common->update();
 		imgui->Update();
-
-		for (int i = 0; i < kNumTriangle; i++)
-		{
-		}
-		sprite->Update();
+		
+		//mesh[0]->Update();
+		sprite->Update(kWindowWidth, kWindowHeight);
 		//ImGui::Begin("sphereEdit");
 		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
 		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
@@ -68,8 +63,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		dx12Common->PreDraw();
 
-		sprite->Draw();
-
+		sprite->Draw(SPCommon);
+		//mesh[0]->DrawOBJ({ 1.0f,1.0f,1.0f,1.0f }, true, kWindowWidth, kWindowHeight);
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();

@@ -39,7 +39,7 @@ void DX12Common::UpdateFixFPS()
 	reference_ = std::chrono::steady_clock::now();
 }
 
-void DX12Common::Init(int32_t width, int32_t height, WinAPP* winApp)
+void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
 {
 	assert(winApp_);
 	this->winApp_ = winApp;
@@ -240,13 +240,20 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 void DX12Common::PreDraw()
 {
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
 
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
+		false, nullptr);
+
+	commandList->ClearRenderTargetView(
+		rtvHandles[backBufferIndex],
+		clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(
 		dsvHandle,
 		D3D12_CLEAR_FLAG_DEPTH,
@@ -255,11 +262,6 @@ void DX12Common::PreDraw()
 		0,
 		nullptr);
 
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
-		false, nullptr);
-	commandList->ClearRenderTargetView(
-		rtvHandles[backBufferIndex],
-		clearColor, 0, nullptr);
 	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
 	{
 		srvDescriptorHeap
@@ -399,16 +401,16 @@ D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetGPUDescriptorHandle(
 	return handleGPU;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DX12Common::GetSRVCPUDescriptorHandle(uint32_t index)
-{
-	//return GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,index);
-	return D3D12_CPU_DESCRIPTOR_HANDLE();
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetSRVGPUDescriptorHandle(uint32_t index)
-{
-	return D3D12_GPU_DESCRIPTOR_HANDLE();
-}
+//D3D12_CPU_DESCRIPTOR_HANDLE DX12Common::GetSRVCPUDescriptorHandle(uint32_t index)
+//{
+//	//return GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,index);
+//	return D3D12_CPU_DESCRIPTOR_HANDLE();
+//}
+//
+//D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetSRVGPUDescriptorHandle(uint32_t index)
+//{
+//	return D3D12_GPU_DESCRIPTOR_HANDLE();
+//}
 
 void DX12Common::DebugLayer()
 {

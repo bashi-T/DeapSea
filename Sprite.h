@@ -10,24 +10,21 @@
 #include <dxgi1_6.h>
 #include <fstream>
 #include <sstream>
-#include"SpriteCommon.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
-class Mesh;
+class SpriteCommon;
 class Sprite
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Sprite();
 	void Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon);
-	void Update();
-	void Draw();
+	void Update(int32_t width, int32_t height);
+	void Draw(SpriteCommon* spriteCommon);
 
-	void ResetDXC();
-	void MakePSO();
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -96,14 +93,13 @@ public:
 	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 private:
-	SpriteCommon* spriteCommon_ = nullptr;
+	SpriteCommon* spriteCommon_;
 	Debug* debug_;
 	WinAPP* sWinApp;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
 	HRESULT hr = NULL;
 	TransformMatrix transformMatrix;
-	ComPtr<ID3D12Resource> transformationMatrixResource;
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
 	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
 	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
@@ -115,25 +111,30 @@ private:
 	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 
+	VertexData* vertexData = nullptr;
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
+	uint32_t* indexData = nullptr;
 	ComPtr<ID3D12Resource> indexResource = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+
+	struct Material
+	{
+		Vector4 color;
+		int32_t enableLighting;
+		float padding[3];
+		Matrix4x4 uvTransform;
+	};
+	Material* materialData = nullptr;
+	ComPtr<ID3D12Resource> materialResource = nullptr;
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	ComPtr<ID3D12Resource> materialResource;
 
-	struct Material {
-		Vector4 color;
-		int32_t enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-	};
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
 		Matrix4x4 World;
@@ -143,6 +144,9 @@ private:
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
+	ComPtr<ID3D12Resource> transformationMatrixResource;
+	TransformationMatrix* transformationMatrixData = nullptr;
+
 	Vector4 LeftTop[10];
 	Vector4 RightTop[10];
 	Vector4 RightBottom[10];
@@ -153,10 +157,8 @@ private:
 	Vector2 coordRightBottom[10];
 	Vector2 coordLeftBottom[10];
 
-
 	TransformMatrix cameraTransform;
 	DirectionalLight* DirectionalLightData = nullptr;
-	TransformationMatrix* transformationMatrixData = nullptr;
 
 	Matrix4x4 cameraMatrix;
 
