@@ -9,35 +9,41 @@ Sprite::~Sprite()
 void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon)
 {
 	this->spriteCommon_ = spriteCommon;
-	vertexResource = spriteCommon_->CreateBufferResource(sizeof(VertexData) * 6, spriteCommon_->GetDx12Common());
-	indexResource = spriteCommon_->CreateBufferResource(sizeof(uint32_t) * 6, spriteCommon_->GetDx12Common());
-	materialResource = spriteCommon_->CreateBufferResource(sizeof(Material), spriteCommon_->GetDx12Common());
-	transformationMatrixResource = spriteCommon_->CreateBufferResource(sizeof(TransformationMatrix), spriteCommon_->GetDx12Common());
+	vertexResource = CreateBufferResource( spriteCommon_, sizeof(VertexData) * 6);
+	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
+	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
+	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
 
 	MakeBufferView();
-	
-	LeftTop[0] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	RightTop[0] = { float(width) / 3, 0.0f, 0.0f, 1.0f };
-	RightBottom[0] = { float(width) / 3, float(height) / 3, 0.0f, 1.0f };
-	LeftBottom[0] = { 0.0f, float(height) / 3, 0.0f, 1.0f };
-	Color[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	coordLeftTop[0] = { 0.0f, 0.0f };
-	coordRightTop[0] = { 1.0f, 0.0f };
-	coordRightBottom[0] = { 1.0f, 1.0f };
-	coordLeftBottom[0] = { 0.0f, 1.0f };
+
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	transformationMatrixResource->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+
+
+	LeftTop = { 0.0f, 0.0f, 0.0f, 1.0f };
+	RightTop = { float(width) / 3, 0.0f, 0.0f, 1.0f };
+	RightBottom = { float(width) / 3, float(height) / 3, 0.0f, 1.0f };
+	LeftBottom = { 0.0f, float(height) / 3, 0.0f, 1.0f };
+	Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	coordLeftTop = { 0.0f, 0.0f };
+	coordRightTop = { 1.0f, 0.0f };
+	coordRightBottom = { 1.0f, 1.0f };
+	coordLeftBottom = { 0.0f, 1.0f };
 	
 	InputData(
-		LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], Color[0], coordLeftTop[0], coordRightTop[0],
-		coordRightBottom[0], coordLeftBottom[0], width, height);
+		LeftTop, RightTop, RightBottom, LeftBottom, Color, coordLeftTop, coordRightTop,
+		coordRightBottom, coordLeftBottom, width, height);
 
 }
 
 void Sprite::Update(int32_t width, int32_t height)
 {
+
 	cameraMatrix =
 		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	viewMatrix = Inverse(cameraMatrix);
-	ViewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 	projectionMatrix =
 		MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
 
@@ -48,7 +54,12 @@ void Sprite::Update(int32_t width, int32_t height)
 		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
-
+	InputData(
+		LeftTop, RightTop, RightBottom, LeftBottom, Color, coordLeftTop, coordRightTop,
+		coordRightBottom, coordLeftBottom, width, height);
+	//ImGui::Begin("spriteEdit");
+	
+	//ImGui::End();
 }
 
 void Sprite::MakeBufferView()
@@ -67,20 +78,6 @@ void Sprite::InputData(
 	Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
 	int32_t width, int32_t height)
 {
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	transformationMatrixResource->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-
-	materialData[0].color = color;
-	materialData[0].enableLighting = false;
-	materialData[0].uvTransform = MakeIdentity4x4();
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
-	materialData[0].uvTransform = uvTransformMatrix;
-
 	vertexData[0].position = LeftTop;
 	vertexData[1].position = RightTop;
 	vertexData[2].position = RightBottom;
@@ -100,40 +97,55 @@ void Sprite::InputData(
 	indexData[4] = 2;
 	indexData[5] = 3;
 
-	transformationMatrixData->WVP = MakeIdentity4x4();
-	transformationMatrixData->World = MakeIdentity4x4();
+	materialData[0].color = color;
+	materialData[0].enableLighting = false;
+	materialData[0].uvTransform = MakeIdentity4x4();
+
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
+	materialData[0].uvTransform = uvTransformMatrix;
+
 }
 
 void Sprite::Draw(SpriteCommon* spriteCommon)
 {
 	this->spriteCommon_ = spriteCommon;
-	spriteCommon_->GetDx12Common()->GetCommandList()->SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
-	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-	spriteCommon_->GetDx12Common()->GetCommandList()->IASetPrimitiveTopology(
-		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	spriteCommon_->GetDx12Common()->GetCommandList()->
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetVertexBuffers(0, 1, &vertexBufferView);
-	spriteCommon_->GetDx12Common()->GetCommandList()->
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferView);
-	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootConstantBufferView(
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootConstantBufferView(
 		0, materialResource->GetGPUVirtualAddress());
-	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootConstantBufferView(
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootConstantBufferView(
 		1, transformationMatrixResource->GetGPUVirtualAddress());
 
-	//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-	//	spriteCommon_->GetDx12Common()->GetRtvHandles(spriteCommon_->GetDx12Common()->GetBackBufferIndex());
-	//D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
-	//spriteCommon_->GetDx12Common()->GetCommandList()->OMSetRenderTargets(1, &rtv, false, &dsv);
-	spriteCommon_->GetDx12Common()->GetCommandList()->SetGraphicsRootDescriptorTable(
-		2, GetTextureSrvHandleGPU());
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+		spriteCommon_->GetDx12Common()->
+		GetRtvHandles(spriteCommon_->GetDx12Common()->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		OMSetRenderTargets(1, &rtv, false, &dsv);
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootDescriptorTable(
+		2, spriteCommon_->GetTextureSrvHandleGPU());
 
-	spriteCommon_->GetDx12Common()->GetCommandList()->
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
-ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeInBytes)
+ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes)
 {
+	this->spriteCommon_ = spriteCommon;
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -152,7 +164,7 @@ ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeInBytes)
 
 	ComPtr<ID3D12Resource> Resource = nullptr;
 
-	hr = spriteCommon_->GetDx12Common()->GetDevice()->CreateCommittedResource(
+	hr = spriteCommon_->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));

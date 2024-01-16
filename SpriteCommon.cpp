@@ -21,7 +21,6 @@ void SpriteCommon::Initialize(int32_t width, int32_t height,DX12Common* dxcommon
 		{0.0f, 0.0f, 0.0f},
 		{0.0f, 0.0f, -15.0f}
 	};
-	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight), dx12Common_);
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
@@ -29,12 +28,12 @@ void SpriteCommon::Initialize(int32_t width, int32_t height,DX12Common* dxcommon
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
 
-	//mipImages = LoadTexture("Resource/civ6.png");
-	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	//textureResource = CreateTextureResource(dx12Common_->GetDevice().Get(), metadata);
-	//UploadTextureData(textureResource.Get(), mipImages, metadata);
+	mipImages = LoadTexture("Resource/civ6.png");
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textureResource = CreateTextureResource(dx12Common_->GetDevice().Get(), metadata);
+	UploadTextureData(textureResource.Get(), mipImages, metadata);
 
-	//MakeShaderResourceView(metadata, dxcommon);
+	MakeShaderResourceView(metadata, dxcommon);
 }
 
 void SpriteCommon::ResetDXC()
@@ -98,6 +97,7 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
+
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 0;
@@ -135,7 +135,8 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	hr = D3D12SerializeRootSignature(
 		&descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(hr)) {
+	if (FAILED(hr))
+	{
 		debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
@@ -144,7 +145,6 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 
-	//
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -277,8 +277,8 @@ void SpriteCommon::MakeShaderResourceView(const DirectX::TexMetadata& metadata, 
 	textureSrvHandleCPU = dxcommon->GetCPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
 	textureSrvHandleGPU = dxcommon->GetGPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
 
-	textureSrvHandleCPU2 = dxcommon->GetCPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
-	textureSrvHandleGPU2 = dxcommon->GetGPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+	//textureSrvHandleCPU2 = dxcommon->GetCPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+	//textureSrvHandleGPU2 = dxcommon->GetGPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
 
 	dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 	//dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);

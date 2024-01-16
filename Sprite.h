@@ -33,7 +33,7 @@ public:
 		IDxcIncludeHandler* includeHandler);
 
 
-	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();
 	void InputData(
 		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
@@ -73,17 +73,15 @@ public:
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
-	Vector4 GetLeftTop(int i) { return LeftTop[i]; }
-	Vector4 GetRightTop(int i) { return RightTop[i]; }
-	Vector4 GetRightBottom(int i){ return RightBottom[i]; }
-	Vector4 GetLeftBottom(int i){ return LeftBottom[i]; }
-	Vector4 GetColor(int i){ return LeftTop[i]; }
-	Vector2 GetTexcoordLeftTop(int i){ return coordLeftTop[i]; }
-	Vector2 GetTexcoordRightTop(int i){ return coordRightTop[i]; }
-	Vector2 GetTexcoordRightBottom(int i){ return coordRightBottom[i]; }
-	Vector2 GetTexcoordLeftBottom(int i) { return coordLeftBottom[i]; }
+	Vector4 GetLeftTop() { return LeftTop; }
+	Vector4 GetRightTop() { return RightTop; }
+	Vector4 GetRightBottom(){ return RightBottom; }
+	Vector4 GetLeftBottom(){ return LeftBottom; }
+	Vector4 GetColor(){ return LeftTop; }
+	Vector2 GetTexcoordLeftTop(){ return coordLeftTop; }
+	Vector2 GetTexcoordRightTop(){ return coordRightTop; }
+	Vector2 GetTexcoordRightBottom(){ return coordRightBottom; }
+	Vector2 GetTexcoordLeftBottom() { return coordLeftBottom; }
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -103,7 +101,6 @@ private:
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
 	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
 	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	ComPtr<ID3DBlob> signatureBlob = nullptr;
@@ -147,15 +144,15 @@ private:
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	TransformationMatrix* transformationMatrixData = nullptr;
 
-	Vector4 LeftTop[10];
-	Vector4 RightTop[10];
-	Vector4 RightBottom[10];
-	Vector4 LeftBottom[10];
-	Vector4 Color[10];
-	Vector2 coordLeftTop[10];
-	Vector2 coordRightTop[10];
-	Vector2 coordRightBottom[10];
-	Vector2 coordLeftBottom[10];
+	Vector4 LeftTop;
+	Vector4 RightTop;
+	Vector4 RightBottom;
+	Vector4 LeftBottom;
+	Vector4 Color;
+	Vector2 coordLeftTop;
+	Vector2 coordRightTop;
+	Vector2 coordRightBottom;
+	Vector2 coordLeftBottom;
 
 	TransformMatrix cameraTransform;
 	DirectionalLight* DirectionalLightData = nullptr;

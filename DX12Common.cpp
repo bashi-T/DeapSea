@@ -41,8 +41,8 @@ void DX12Common::UpdateFixFPS()
 
 void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
 {
-	assert(winApp_);
 	this->winApp_ = winApp;
+	assert(winApp_);
 #ifdef _DEBUG
 	DebugLayer();
 #endif

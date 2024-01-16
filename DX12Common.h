@@ -75,7 +75,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
 	
 	ComPtr<ID3D12Device> GetDevice() { return device; }
-	ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList; }
+	ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList.Get(); }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return srvDescriptorHeap; }

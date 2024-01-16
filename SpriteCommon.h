@@ -79,7 +79,8 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
-	DX12Common* GetDx12Common(){return  DX12Common::GetInstance();}
+	ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
+	DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -122,13 +123,15 @@ private:
 	ComPtr<ID3D12Resource> directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
-	struct Material {
+	struct Material 
+	{
 		Vector4 color;
 		int32_t enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
-	struct TransformationMatrix {
+	struct TransformationMatrix
+	{
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 	};

@@ -48,6 +48,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		
 		//mesh[0]->Update();
 		sprite->Update(kWindowWidth, kWindowHeight);
+
 		//ImGui::Begin("sphereEdit");
 		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
 		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
@@ -63,8 +64,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		dx12Common->PreDraw();
 
-		sprite->Draw(SPCommon);
 		//mesh[0]->DrawOBJ({ 1.0f,1.0f,1.0f,1.0f }, true, kWindowWidth, kWindowHeight);
+		sprite->Draw(SPCommon);
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
