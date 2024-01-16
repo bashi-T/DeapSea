@@ -20,8 +20,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	MyImGui* imgui = new MyImGui;
 	Mesh* mesh[kNumTriangle];
 	SpriteCommon* SPCommon = new SpriteCommon;
-	Sprite* sprite = new Sprite;
-
+	std::vector<Sprite*> sprites;
+	Vector2 posSprite = { 0.0f,0.0f };
 	for (int i = 0; i < kNumTriangle; i++)
 	{
 		mesh[i] = new Mesh;
@@ -39,7 +39,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//mesh[0]->Initialize("multiMaterial.obj", kWindowWidth, kWindowHeight);
 	SPCommon->Initialize(kWindowWidth, kWindowHeight, dx12Common);
-	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon);
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon);
+		sprite->SetPositoin(posSprite);
+		posSprite.x += 100.0f;
+		posSprite.y += 50.0f;
+		sprites.push_back(sprite);
+	}
 
 	while (NewMSG.message != WM_QUIT)
 	{
@@ -47,8 +55,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		imgui->Update();
 		
 		//mesh[0]->Update();
-		sprite->Update(kWindowWidth, kWindowHeight);
-
+		for (Sprite* sprite:sprites)
+		{
+			sprite->Update(kWindowWidth, kWindowHeight);
+		}
 		//ImGui::Begin("sphereEdit");
 		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
 		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
@@ -65,7 +75,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dx12Common->PreDraw();
 
 		//mesh[0]->DrawOBJ({ 1.0f,1.0f,1.0f,1.0f }, true, kWindowWidth, kWindowHeight);
-		sprite->Draw(SPCommon);
+		for (Sprite* sprite : sprites)
+		{
+			sprite->Draw(SPCommon);
+		}
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
@@ -80,7 +93,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	for (int i = 0; i < kNumTriangle; i++)
 	{
 	}
-	delete sprite;
+	for (Sprite* sprite : sprites)
+	{
+		delete sprite;
+	}
 	winAPP->Finalize();
 
 	delete leakCheck;

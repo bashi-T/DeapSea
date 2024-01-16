@@ -35,11 +35,7 @@ public:
 
 	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();
-	void InputData(
-		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
-		Vector2 coordLeftBottom, int32_t width, int32_t height);
-	//void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
+	void InputData(Vector4 color);
 
 	struct VertexData
 	{
@@ -51,7 +47,6 @@ public:
 	{
 		std::string textureFilePath;
 	};
-	//MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	struct ModelData
 	{
@@ -67,8 +62,10 @@ public:
 		ID3D12Resource* texture,
 		const DirectX::ScratchImage& mipImages,
 		const DirectX::TexMetadata& metadata);
-
-	//void MeshRelease();
+	void SetPositoin(const Vector2& position) { this->position = position; }
+	void SetRotation(float rotation) { this->rotation = rotation; }
+	void SetColor(const Vector4& color) { materialData->color = color; }
+	void SetSize(const Vector2& size) { this->size = size; }
 
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
@@ -82,6 +79,10 @@ public:
 	Vector2 GetTexcoordRightTop(){ return coordRightTop; }
 	Vector2 GetTexcoordRightBottom(){ return coordRightBottom; }
 	Vector2 GetTexcoordLeftBottom() { return coordLeftBottom; }
+	const Vector2& GetPosition()const { return position; }
+	float GetRotation()const { return rotation; }
+	const Vector4& GetColor()const { return materialData->color; }
+	const Vector2& GetSize()const { return size; }
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -95,18 +96,12 @@ private:
 	Debug* debug_;
 	WinAPP* sWinApp;
 	MyImGui* imgui_;
-	SpriteCommon* spriteCom_;
 	HRESULT hr = NULL;
+
 	TransformMatrix transformMatrix;
-	ComPtr<IDxcUtils> dxcUtils = nullptr;
-	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-	ComPtr<ID3DBlob> signatureBlob = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+	Vector2 position = { 0.0f,0.0f };
+	float rotation = 0.0f;
+	Vector2 size = { 100.0f,100.0f };
 
 	VertexData* vertexData = nullptr;
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
@@ -125,12 +120,6 @@ private:
 	};
 	Material* materialData = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;
-
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	D3D12_BLEND_DESC blendDesc{};
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
 	struct TransformationMatrix {
 		Matrix4x4 WVP;

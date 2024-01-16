@@ -22,9 +22,9 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	};
 	transformMatrix =
 	{
-		{1.0f, 1.0f, 1.0f},
-		{ 0.0f,0.0f,0.0f },
-		{ 0.0f,0.0f,0.0f },
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
 	};
 	MakeBufferView();
 
@@ -45,10 +45,7 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	coordRightBottom = { 1.0f, 1.0f };
 	coordLeftBottom = { 0.0f, 1.0f };
 	
-	InputData(
-		LeftTop, RightTop, RightBottom, LeftBottom, Color, coordLeftTop, coordRightTop,
-		coordRightBottom, coordLeftBottom, width, height);
-
+	InputData(Color);
 }
 
 void Sprite::Update(int32_t width, int32_t height)
@@ -58,10 +55,10 @@ void Sprite::Update(int32_t width, int32_t height)
 		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	projectionMatrix =
 		MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
-
-	InputData(
-		LeftTop, RightTop, RightBottom, LeftBottom, Color, coordLeftTop, coordRightTop,
-		coordRightBottom, coordLeftBottom, width, height);
+	transformMatrix.translate = { position.x,position.y,0.0f };
+	transformMatrix.rotate = { 0.0f,0.0f,rotation };
+	transformMatrix.scale = { size.x,size.y,1.0f };
+	InputData(Color);
 	//ImGui::Begin("spriteEdit");
 	
 	//ImGui::End();
@@ -78,21 +75,21 @@ void Sprite::MakeBufferView()
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
-void Sprite::InputData(
-	Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
-	Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
-	int32_t width, int32_t height)
+void Sprite::InputData(Vector4 color)
 {
-	vertexData[0].position = LeftTop;
-	vertexData[1].position = RightTop;
-	vertexData[2].position = RightBottom;
-	vertexData[3].position = LeftBottom;
-	vertexData[0].texcoord = coordLeftTop;
-	vertexData[1].texcoord = coordRightTop;
-	vertexData[2].texcoord = coordRightBottom;
-	vertexData[3].texcoord = coordLeftBottom;
+	vertexData[0].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexData[1].position = { 1.0f,0.0f,0.0f,1.0f };
+	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };
+	vertexData[3].position = { 0.0f,1.0f,0.0f,1.0f };
+	vertexData[0].texcoord = { 0.0f,0.0f };
+	vertexData[1].texcoord = { 1.0f,0.0f };
+	vertexData[2].texcoord = { 1.0f,1.0f };
+	vertexData[3].texcoord = { 0.0f,1.0f };
 
 	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
 
 	indexData[0] = 0;
 	indexData[1] = 1;
