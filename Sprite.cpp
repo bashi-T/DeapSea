@@ -14,6 +14,18 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
 	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
 
+	uvTransform =
+	{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
+	transformMatrix =
+	{
+		{1.0f, 1.0f, 1.0f},
+		{ 0.0f,0.0f,0.0f },
+		{ 0.0f,0.0f,0.0f },
+	};
 	MakeBufferView();
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
@@ -47,13 +59,6 @@ void Sprite::Update(int32_t width, int32_t height)
 	projectionMatrix =
 		MakeOrthographicMatrix(0.0f, 0.0f, float(width), float(height), 0.0f, 100.0f);
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(
-		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	viewMatrix = MakeIdentity4x4();
-	worldViewProjectionMatrix =
-		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData->WVP = worldViewProjectionMatrix;
-	transformationMatrixData->World = worldMatrix;
 	InputData(
 		LeftTop, RightTop, RightBottom, LeftBottom, Color, coordLeftTop, coordRightTop,
 		coordRightBottom, coordLeftBottom, width, height);
@@ -100,12 +105,18 @@ void Sprite::InputData(
 	materialData[0].color = color;
 	materialData[0].enableLighting = false;
 	materialData[0].uvTransform = MakeIdentity4x4();
-
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 	materialData[0].uvTransform = uvTransformMatrix;
 
+	Matrix4x4 worldMatrix = MakeAffineMatrix(
+		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+	viewMatrix = MakeIdentity4x4();
+	worldViewProjectionMatrix =
+		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	transformationMatrixData->WVP = worldViewProjectionMatrix;
+	transformationMatrixData->World = worldMatrix;
 }
 
 void Sprite::Draw(SpriteCommon* spriteCommon)
