@@ -1,5 +1,6 @@
 #include "DX12Common.h"
 
+const uint32_t DX12Common::kMaxSRVCount = 512;
 DX12Common* DX12Common::GetInstance()
 {
 	if (instance == NULL)
@@ -225,7 +226,7 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 		false);
 	srvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-		128,
+		kMaxSRVCount,
 		true);
 	dsvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,

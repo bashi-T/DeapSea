@@ -1,18 +1,13 @@
 #pragma once
 #include "CGVector.h"
 #include "DX12Common.h"
-#include "Debug.h"
 #include "MyImGui.h"
-#include "list"
 #include <cassert>
-#include <d3d12.h>
 #include <dxcapi.h>
-#include <dxgi1_6.h>
 #include <fstream>
 #include <sstream>
+#include"TextureManager.h"
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
 class SpriteCommon;
@@ -21,7 +16,11 @@ class Sprite
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Sprite();
-	void Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon);
+	void Initialize(
+		int32_t width,
+		int32_t height,
+		SpriteCommon* spriteCommon,
+		std::string texturefilePath);
 	void Update(int32_t width, int32_t height);
 	void Draw(SpriteCommon* spriteCommon);
 
@@ -54,13 +53,8 @@ public:
 		MaterialData material;
 	};
 
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
-		const DirectX::TexMetadata& metadata);
-	void UploadTextureData(
-		ID3D12Resource* texture,
-		const DirectX::ScratchImage& mipImages,
 		const DirectX::TexMetadata& metadata);
 	void SetPositoin(const Vector2& position) { this->position = position; }
 	void SetRotation(float rotation) { this->rotation = rotation; }
@@ -97,6 +91,7 @@ private:
 	WinAPP* sWinApp;
 	MyImGui* imgui_;
 	HRESULT hr = NULL;
+	uint32_t textureIndex = 0;
 
 	TransformMatrix transformMatrix;
 	Vector2 position = { 0.0f,0.0f };

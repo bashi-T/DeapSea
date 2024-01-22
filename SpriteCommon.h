@@ -1,27 +1,22 @@
 #pragma once
 #include "CGVector.h"
 #include "DX12Common.h"
-#include "Debug.h"
 #include "MyImGui.h"
-#include "list"
 #include <cassert>
-#include <d3d12.h>
 #include <dxcapi.h>
-#include <dxgi1_6.h>
 #include <fstream>
 #include <sstream>
+#include"TextureManager.h"
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
 class SpriteCommon
 {
 public:
 	~SpriteCommon();
-	void Initialize(int32_t width, int32_t height, DX12Common* dxcommon);
-	void Update();
-	void Draw(int32_t width, int32_t height);
+	void Initialize(DX12Common* dxcommon);
+	//void Update();
+	//void Draw(int32_t width, int32_t height);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -60,10 +55,6 @@ public:
 		MaterialData material;
 	};
 
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-	ComPtr<ID3D12Resource> CreateTextureResource(
-		ID3D12Device* device,
-		const DirectX::TexMetadata& metadata);
 	void UploadTextureData(
 		ID3D12Resource* texture,
 		const DirectX::ScratchImage& mipImages,
@@ -74,10 +65,6 @@ public:
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 	ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
 	DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
@@ -96,7 +83,7 @@ private:
 	HRESULT hr = NULL;
 	DX12Common* dx12Common_;
 	TransformMatrix transformMatrix;
-
+	TextureManager* textureManager_;
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
@@ -156,11 +143,6 @@ private:
 
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
-
 	const int32_t kNumTriangle = 1;
 
 	Vector4 Top[1];

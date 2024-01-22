@@ -3,7 +3,7 @@
 SpriteCommon::~SpriteCommon() {
 }
 
-void SpriteCommon::Initialize(int32_t width, int32_t height,DX12Common* dxcommon)
+void SpriteCommon::Initialize(DX12Common* dxcommon)
 {
 	dx12Common_ = dxcommon;
 	kSubdivision = 16;
@@ -28,12 +28,8 @@ void SpriteCommon::Initialize(int32_t width, int32_t height,DX12Common* dxcommon
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
 
-	mipImages = LoadTexture("Resource/civ6.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textureResource = CreateTextureResource(dx12Common_->GetDevice().Get(), metadata);
-	UploadTextureData(textureResource.Get(), mipImages, metadata);
+	//UploadTextureData(textureResource.Get(), mipImages);
 
-	MakeShaderResourceView(metadata, dxcommon);
 }
 
 void SpriteCommon::ResetDXC()
@@ -202,13 +198,6 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	assert(SUCCEEDED(hr));
 }
 
-void SpriteCommon::Update()
-{
-}
-
-void SpriteCommon::Draw(int32_t width, int32_t height)
-{
-};
 
 ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes, DX12Common* dxcommon)
 {
@@ -237,105 +226,27 @@ ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes, DX
 	return Resource;
 }
 
-SpriteCommon::MaterialData SpriteCommon::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-{
-	MaterialData materialData;
-	std::string line;
-
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::stringstream s(line);
-		s >> identifier;
-
-		if (identifier == "map_Kd") {
-			std::string textureFilename;
-			s >> textureFilename;
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-		}
-	}
-	return materialData;
-}
-
-void SpriteCommon::MakeShaderResourceView(const DirectX::TexMetadata& metadata, DX12Common* dxcommon)
-{
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
-	//srvDesc2.Format = metadata2.format;
-	//srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	//srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	//srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
-
-	const uint32_t descriptorSizeSRV = dxcommon->GetDevice().Get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleCPU = dxcommon->GetCPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
-	textureSrvHandleGPU = dxcommon->GetGPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
-
-	//textureSrvHandleCPU2 = dxcommon->GetCPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
-	//textureSrvHandleGPU2 = dxcommon->GetGPUDescriptorHandle(dxcommon->GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
-
-	dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-	//dxcommon->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
-}
-
-DirectX::ScratchImage SpriteCommon::LoadTexture(const std::string& filePath)
-{
-	DirectX::ScratchImage image{};
-	std::wstring filePathW = debug_->ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(
-		filePathW.c_str(),
-		DirectX::WIC_FLAGS_FORCE_SRGB,
-		nullptr,
-		image);
-	assert(SUCCEEDED(hr));
-
-	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(
-		image.GetImages(),
-		image.GetImageCount(),
-		image.GetMetadata(),
-		DirectX::TEX_FILTER_SRGB,
-		0,
-		mipImages);
-
-	return mipImages;
-}
-
-ComPtr<ID3D12Resource> SpriteCommon::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);
-	resourceDesc.Height = UINT(metadata.height);
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
-	resourceDesc.Format = metadata.format;
-	resourceDesc.SampleDesc.Count = 1;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
-
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-
-	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&resource));
-
-	assert(SUCCEEDED(hr));
-
-	return resource;
-}
+//SpriteCommon::MaterialData SpriteCommon::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+//{
+//	MaterialData materialData;
+//	std::string line;
+//
+//	std::ifstream file(directoryPath + "/" + filename);
+//	assert(file.is_open());
+//
+//	while (std::getline(file, line)) {
+//		std::string identifier;
+//		std::stringstream s(line);
+//		s >> identifier;
+//
+//		if (identifier == "map_Kd") {
+//			std::string textureFilename;
+//			s >> textureFilename;
+//			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+//		}
+//	}
+//	return materialData;
+//}
 
 void SpriteCommon::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
 {

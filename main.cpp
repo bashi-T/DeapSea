@@ -4,6 +4,7 @@
 #include"Input.h"
 #include"SpriteCommon.h"
 #include"Sprite.h"
+#include"TextureManager.h"
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
@@ -18,15 +19,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DX12Common* dx12Common = DX12Common::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
-	Mesh* mesh[kNumTriangle];
 	SpriteCommon* SPCommon = new SpriteCommon;
 	std::vector<Sprite*> sprites;
 	Vector2 posSprite = { 0.0f,0.0f };
-	for (int i = 0; i < kNumTriangle; i++)
-	{
-		mesh[i] = new Mesh;
-	}
-	bool useWorldMap = true;
+	//for (int i = 0; i < kNumTriangle; i++)
+	//{
+	//	mesh[i] = new Mesh;
+	//}
+	//bool useWorldMap = true;
+
+	//std::string filePath[2] =
+	//{
+	//	"Resource/civ6.png",
+	//	"Resource/worldMap.png"
+	//};
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
 	dx12Common->Initialize(kWindowWidth, kWindowHeight, winAPP);
@@ -36,13 +42,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	    dx12Common->GetSwapChainDesc(),
 	    dx12Common->GetRtvDesc(),
 	    dx12Common->GetSrvDescriptorHeap().Get());
-
+	TextureManager::GetInstance()->Initialize();
 	//mesh[0]->Initialize("multiMaterial.obj", kWindowWidth, kWindowHeight);
-	SPCommon->Initialize(kWindowWidth, kWindowHeight, dx12Common);
+	SPCommon->Initialize(dx12Common);
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon);
+		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, "uvChecker.png");
 		sprite->SetPositoin(posSprite);
 		posSprite.x += 100.0f;
 		posSprite.y += 50.0f;
@@ -87,16 +93,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	CloseHandle(dx12Common->GetFenceEvent());
 	dx12Common->DX12Release();
-
 	delete imgui;
-	dx12Common->DeleteInstance();
-	for (int i = 0; i < kNumTriangle; i++)
-	{
-	}
 	for (Sprite* sprite : sprites)
 	{
 		delete sprite;
 	}
+	TextureManager::GetInstance()->Finalize();
+	imgui->Finalize();
+	dx12Common->DeleteInstance();
 	winAPP->Finalize();
 
 	delete leakCheck;

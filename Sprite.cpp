@@ -6,9 +6,10 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon)
+void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	this->spriteCommon_ = spriteCommon;
+
 	vertexResource = CreateBufferResource( spriteCommon_, sizeof(VertexData) * 6);
 	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
@@ -26,6 +27,13 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
+	cameraTransform = {
+		{1.0f, 1.0f, 1.0f},
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 0.0f, -15.0f}
+	};
+	cameraMatrix =
+		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	MakeBufferView();
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
@@ -46,6 +54,10 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	coordLeftBottom = { 0.0f, 1.0f };
 	
 	InputData(Color);
+
+	TextureManager::GetInstance()->LoadTexture(textureFilePath);
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+
 }
 
 void Sprite::Update(int32_t width, int32_t height)
@@ -145,7 +157,7 @@ void Sprite::Draw(SpriteCommon* spriteCommon)
 		OMSetRenderTargets(1, &rtv, false, &dsv);
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(
-		2, spriteCommon_->GetTextureSrvHandleGPU());
+		2, TextureManager::GetInstance()->GetSRVHandleGPU(textureIndex));
 
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -179,29 +191,6 @@ ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, 
 	return Resource;
 }
 
-DirectX::ScratchImage Sprite::LoadTexture(const std::string& filePath)
-{
-	DirectX::ScratchImage image{};
-	std::wstring filePathW = debug_->ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(
-		filePathW.c_str(),
-		DirectX::WIC_FLAGS_FORCE_SRGB,
-		nullptr,
-		image);
-	assert(SUCCEEDED(hr));
-
-	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(
-		image.GetImages(),
-		image.GetImageCount(),
-		image.GetMetadata(),
-		DirectX::TEX_FILTER_SRGB,
-		0,
-		mipImages);
-
-	return mipImages;
-}
-
 ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -231,23 +220,6 @@ ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const
 
 	return resource;
 }
-
-void Sprite::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
-{
-	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
-	{
-		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		HRESULT hr = texture->WriteToSubresource(
-			UINT(mipLevel),
-			nullptr,
-			img->pixels,
-			UINT(img->rowPitch),
-			UINT(img->slicePitch)
-		);
-		assert(SUCCEEDED(hr));
-	}
-}
-
 
 ComPtr<IDxcBlob> Sprite::CompileShader(
 	const std::wstring& filePath,

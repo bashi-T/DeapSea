@@ -1,6 +1,5 @@
 #pragma once
 #include"WindowApp.h"
-#include "list"
 #include<cassert>
 #include"Debug.h"
 #include<d3d12.h>
@@ -52,11 +51,6 @@ public:
 		uint32_t descriptorSize,
 		uint32_t index);
 
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(
-		uint32_t index);
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(
-		uint32_t index);
-
 	void DebugLayer();
 	void InfoQueue(ID3D12Device* device);
 
@@ -86,6 +80,8 @@ public:
 		swapChain.Reset();
 		device.Reset();
 	}
+	static const uint32_t kMaxSRVCount;
+
 private:
 	DX12Common() = default;
 	//~DX12Common() = default;

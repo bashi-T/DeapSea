@@ -39,3 +39,10 @@ void MyImGui::Endframe(ID3D12GraphicsCommandList* commandList)
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(),commandList);
 }
+
+void MyImGui::Finalize()
+{
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
