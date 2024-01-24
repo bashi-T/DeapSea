@@ -532,30 +532,44 @@ void Mesh::DrawSphere(
 				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 
-			DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-			DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				SetPipelineState(graphicsPipelineState.Get());
+
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				SetGraphicsRootSignature(rootSignature.Get());
+
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
 				DX12Common::GetInstance()->GetBackBufferIndex());
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-			DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				OMSetRenderTargets(1, &rtv, false, &dsv);
+
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				SetGraphicsRootDescriptorTable(
 				2, useWorldMap ? GetTextureSrvHandleGPU2()
 				: GetTextureSrvHandleGPU());
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
 
 			InputDataSphere(
 				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
 
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				SetGraphicsRootConstantBufferView(
 				0, materialResourceSphere->GetGPUVirtualAddress());
-			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				SetGraphicsRootConstantBufferView(
 				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
 
-			DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(
+			DX12Common::GetInstance()->GetCommandList().Get()->
+				IASetVertexBuffers(
 				0, 1, &vertexBufferViewSphere);
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				IASetIndexBuffer(&indexBufferViewSphere);

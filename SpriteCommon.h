@@ -6,7 +6,6 @@
 #include <dxcapi.h>
 #include <fstream>
 #include <sstream>
-#include"TextureManager.h"
 
 #pragma comment(lib, "dxcompiler.lib")
 
@@ -83,7 +82,6 @@ private:
 	HRESULT hr = NULL;
 	DX12Common* dx12Common_;
 	TransformMatrix transformMatrix;
-	TextureManager* textureManager_;
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
@@ -91,24 +89,15 @@ private:
 	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	ComPtr<ID3DBlob> signatureBlob = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
-	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	D3D12_BLEND_DESC blendDesc{};
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ComPtr<ID3D12Resource> materialResource;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
 	struct Material 
 	{
@@ -138,9 +127,6 @@ private:
 	uint32_t kSubdivision = 16;
 	ModelData modelData;
 
-	ComPtr<ID3D12Resource> textureResource;
-	ComPtr<ID3D12Resource> textureResource2;
-
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;
 	const int32_t kNumTriangle = 1;
@@ -152,6 +138,4 @@ private:
 	Vector2 texcoordTop[1];
 	Vector2 texcoordLeft[1];
 	Vector2 texcoordRight[1];
-
 };
-

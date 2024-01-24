@@ -14,22 +14,25 @@ private:
 	~TextureManager() = default;
 	TextureManager(TextureManager&) = delete;
 	TextureManager& operator=(TextureManager&) = delete;
-	struct TextureData {
+	struct TextureData
+	{
 		std::string filePath;
 		DirectX::TexMetadata metadata;
 		ComPtr<ID3D12Resource> resource;
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
 	};
-	std::vector<TextureData> textureDatas;
 
+	std::vector<TextureData> textureDatas;
+	DX12Common* dx12Common_;
 	Debug* debug_;
 	static uint32_t kSRVIndexTop;
+
 public:
 	static TextureManager* GetInstance();
 	void Finalize();
 	void Initialize();
-	void LoadTexture(const std::string& filePath);
+	void LoadTexture(DX12Common* dxcommon,const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 	uint32_t GetTextureIndexByFilePath(const std::string& filePath);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVHandleGPU(uint32_t textureIndex);

@@ -12,6 +12,7 @@ const int32_t kNumTriangle = 1;
 Vector4* vertexData = nullptr;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
+	CoInitializeEx(0, COINIT_MULTITHREADED);
 	Debug::D3DResourceLeakChecker* leakCheck = new Debug::D3DResourceLeakChecker;
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -28,11 +29,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//}
 	//bool useWorldMap = true;
 
-	//std::string filePath[2] =
-	//{
-	//	"Resource/civ6.png",
-	//	"Resource/worldMap.png"
-	//};
+		std::string textureFilePath[10] =
+		{
+			"Resource/uvChecker.png",
+			"Resource/civ6.png",
+			"Resource/monsterBall.png",
+			"Resource/worldMap.png",
+			"Resource/uvChecker.png",
+			"Resource/uvChecker.png",
+			"Resource/uvChecker.png",
+			"Resource/uvChecker.png",
+			"Resource/uvChecker.png",
+			"Resource/cursor.png"
+		};
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
 	dx12Common->Initialize(kWindowWidth, kWindowHeight, winAPP);
@@ -43,12 +52,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	    dx12Common->GetRtvDesc(),
 	    dx12Common->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize();
-	//mesh[0]->Initialize("multiMaterial.obj", kWindowWidth, kWindowHeight);
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		TextureManager::GetInstance()->LoadTexture(dx12Common, textureFilePath[i]);
+	}
+
 	SPCommon->Initialize(dx12Common);
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, "uvChecker.png");
+
+		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
 		sprite->SetPositoin(posSprite);
 		posSprite.x += 100.0f;
 		posSprite.y += 50.0f;
@@ -92,8 +106,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	}
 
 	CloseHandle(dx12Common->GetFenceEvent());
-	dx12Common->DX12Release();
-	delete imgui;
+	//dx12Common->DX12Release();
+	//delete imgui;
 	for (Sprite* sprite : sprites)
 	{
 		delete sprite;
@@ -102,7 +116,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	imgui->Finalize();
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();
-
+	CoUninitialize();
 	delete leakCheck;
 	return 0;
 }

@@ -55,7 +55,7 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	
 	InputData(Color);
 
-	TextureManager::GetInstance()->LoadTexture(textureFilePath);
+	//TextureManager::GetInstance()->LoadTexture(spriteCommon_->GetDx12Common(),textureFilePath);
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 }
@@ -71,9 +71,11 @@ void Sprite::Update(int32_t width, int32_t height)
 	transformMatrix.rotate = { 0.0f,0.0f,rotation };
 	transformMatrix.scale = { size.x,size.y,1.0f };
 	InputData(Color);
-	//ImGui::Begin("spriteEdit");
-	
-	//ImGui::End();
+	int num = textureIndex;
+	ImGui::Begin("spriteEdit");
+	ImGui::InputInt("texture", &num);
+	ImGui::DragFloat2("pos", &position.x);
+	ImGui::End();
 }
 
 void Sprite::MakeBufferView()
@@ -185,8 +187,12 @@ ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, 
 	ComPtr<ID3D12Resource> Resource = nullptr;
 
 	hr = spriteCommon_->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
-		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
+		&uploadHeapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&ResourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
 	return Resource;
 }

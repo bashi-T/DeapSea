@@ -22,13 +22,11 @@ void SpriteCommon::Initialize(DX12Common* dxcommon)
 		{0.0f, 0.0f, -15.0f}
 	};
 
-	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight), dx12Common_);
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
-	DirectionalLightData->intensity = 1.0f;
-
-	//UploadTextureData(textureResource.Get(), mipImages);
+	//directionalLightResource = CreateBufferResource(sizeof(DirectionalLight), dx12Common_);
+	//directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
+	//DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
+	//DirectionalLightData->intensity = 1.0f;
 
 }
 
@@ -87,7 +85,14 @@ ComPtr<IDxcBlob> SpriteCommon::CompileShader(
 
 void SpriteCommon::MakePSO(DX12Common* dxcommon)
 {
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;
+	descriptorRange[0].NumDescriptors = 1;
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -97,12 +102,6 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 0;
-
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].BaseShaderRegister = 0;
-	descriptorRange[0].NumDescriptors = 1;
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -141,6 +140,9 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+	
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -157,11 +159,15 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
+	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
+	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	vertexShaderBlob =
 		CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
@@ -170,10 +176,12 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 		CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	//D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//depthStencilDesc.DepthEnable = true;
+	//depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	//depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 	graphicsPipelineStateDesc.VS = {
@@ -190,7 +198,7 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	hr = dxcommon->GetDevice().Get()->CreateGraphicsPipelineState(
@@ -212,14 +220,14 @@ ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes, DX
 	ResourceDesc.Width = sizeInBytes;
 
 	ResourceDesc.Height = 1;
-	ResourceDesc.DepthOrArraySize = 1;
+	//ResourceDesc.DepthOrArraySize = 1;
 	ResourceDesc.MipLevels = 1;
 	ResourceDesc.SampleDesc.Count = 1;
 	ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	ComPtr<ID3D12Resource> Resource = nullptr;
 
-	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateCommittedResource(
+	hr = dx12Common_->GetDevice().Get()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
@@ -247,21 +255,4 @@ ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes, DX
 //	}
 //	return materialData;
 //}
-
-void SpriteCommon::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
-{
-	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
-	{
-		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		HRESULT hr = texture->WriteToSubresource(
-			UINT(mipLevel),
-			nullptr,
-			img->pixels,
-			UINT(img->rowPitch),
-			UINT(img->slicePitch)
-		);
-		assert(SUCCEEDED(hr));
-	}
-}
-
 

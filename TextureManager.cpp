@@ -22,8 +22,9 @@ void TextureManager::Initialize()
 	textureDatas.reserve(DX12Common::kMaxSRVCount);
 }
 
-void TextureManager::LoadTexture(const std::string& filePath)
+void TextureManager::LoadTexture(DX12Common* dxcommon,const std::string& filePath)
 {
+	dx12Common_ = dxcommon;
 	auto it = std::find_if(
 		textureDatas.begin(),
 		textureDatas.end(),
@@ -32,10 +33,11 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	{
 		return;
 	}
+
 	assert(textureDatas.size() + kSRVIndexTop < DX12Common::kMaxSRVCount);
 
 	DirectX::ScratchImage image{};
-	std::wstring filePathW = debug_->ConvertString("Resource/" + filePath);
+	std::wstring filePathW = debug_->ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(
 		filePathW.c_str(),
 		DirectX::WIC_FLAGS_FORCE_SRGB,
@@ -59,9 +61,24 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = CreateTextureResource(textureData.metadata);
-	//UploadTextureData(textureData.resource.Get(), mipImages, textureData.metadata);
+	UploadTextureData(textureData.resource.Get(), mipImages, textureData.metadata);
 
-	uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1) + kSRVIndexTop;
+	uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1 + kSRVIndexTop);
+
+	const uint32_t descriptorSizeSRV = dx12Common_->GetDevice().Get()->
+		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	textureData.srvHandleCPU = dx12Common_->
+		GetCPUDescriptorHandle(dx12Common_->
+			GetSrvDescriptorHeap().Get(),
+			descriptorSizeSRV,
+			srvIndex);
+
+	textureData.srvHandleGPU = dx12Common_->
+		GetGPUDescriptorHandle(dx12Common_->
+			GetSrvDescriptorHeap().Get(),
+			descriptorSizeSRV,
+			srvIndex);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = textureData.metadata.format;
@@ -69,17 +86,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 	
-	textureData.srvHandleCPU = DX12Common::GetInstance()->
-		GetCPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), srvIndex, 1);
-	textureData.srvHandleGPU = DX12Common::GetInstance()->
-		GetGPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), srvIndex, 1);
-	textureData.srvHandleCPU.ptr = DX12Common::GetInstance()->GetDevice().Get()->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureData.srvHandleGPU.ptr = DX12Common::GetInstance()->GetDevice().Get()->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	DX12Common::GetInstance()->GetDevice().Get()->
+	dx12Common_->GetDevice().Get()->
 		CreateShaderResourceView(
 			textureData.resource.Get(),
 			&srvDesc,
@@ -103,7 +110,7 @@ ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexM
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
+	HRESULT hr = dx12Common_->GetDevice()->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -133,8 +140,8 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSRVHandleGPU(uint32_t textureIndex)
 {
-	assert(textureIndex);
-	TextureData& textureData = textureDatas.back();
+	assert(textureIndex< DX12Common::kMaxSRVCount);
+	TextureData& textureData = textureDatas[textureIndex];
 	return textureData.srvHandleGPU;
 }
 
