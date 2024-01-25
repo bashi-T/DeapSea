@@ -57,7 +57,7 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 
 	//TextureManager::GetInstance()->LoadTexture(spriteCommon_->GetDx12Common(),textureFilePath);
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
-
+	//AdjestTextureSize();
 }
 
 void Sprite::Update(int32_t width, int32_t height)
@@ -71,10 +71,18 @@ void Sprite::Update(int32_t width, int32_t height)
 	transformMatrix.rotate = { 0.0f,0.0f,rotation };
 	transformMatrix.scale = { size.x,size.y,1.0f };
 	InputData(Color);
-	int num = textureIndex;
+
 	ImGui::Begin("spriteEdit");
-	ImGui::InputInt("texture", &num);
-	ImGui::DragFloat2("pos", &position.x);
+	//int num = textureIndex;
+	//ImGui::InputInt("texture", &num);
+	ImGui::DragFloat2("position", &position.x, 0.1f);
+	ImGui::DragFloat("rotate", &rotation, 0.1f);
+	ImGui::DragFloat2("size", &size.x);
+	ImGui::DragFloat2("anchor", &anchorPoint.x, 0.1f);
+	ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+	ImGui::DragFloat2("textureSize", &textureSize.x);
+	ImGui::Checkbox("flipX", &isFlipX_);
+	ImGui::Checkbox("flipY", &isFlipY_);
 	ImGui::End();
 }
 
@@ -91,14 +99,37 @@ void Sprite::MakeBufferView()
 
 void Sprite::InputData(Vector4 color)
 {
-	vertexData[0].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexData[1].position = { 1.0f,0.0f,0.0f,1.0f };
-	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };
-	vertexData[3].position = { 0.0f,1.0f,0.0f,1.0f };
-	vertexData[0].texcoord = { 0.0f,0.0f };
-	vertexData[1].texcoord = { 1.0f,0.0f };
-	vertexData[2].texcoord = { 1.0f,1.0f };
-	vertexData[3].texcoord = { 0.0f,1.0f };
+	float left = 0.0f - anchorPoint.x;
+	float right = 1.0f - anchorPoint.x;
+	float top = 0.0f - anchorPoint.y;
+	float bottom = 1.0f - anchorPoint.y;
+
+	if (isFlipX_)
+	{
+		left = -left;
+		right = -right;
+	}
+	if (isFlipY_)
+	{
+		top = -top;
+		bottom = -bottom;
+	}
+
+	const DirectX::TexMetadata& metadata =
+		TextureManager::GetInstance()->GetMetaData(textureIndex);
+	float tex_left = textureLeftTop.x / metadata.width;
+	float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
+	float tex_top = textureLeftTop.y / metadata.width;
+	float tex_bottom = (textureLeftTop.y + textureSize.y) / metadata.width;
+
+	vertexData[0].position = { left,top,0.0f,1.0f };
+	vertexData[1].position = { right,top,0.0f,1.0f };
+	vertexData[2].position = { right,bottom,0.0f,1.0f };
+	vertexData[3].position = { left,bottom,0.0f,1.0f };
+	vertexData[0].texcoord = { tex_left,tex_top };
+	vertexData[1].texcoord = { tex_right,tex_top };
+	vertexData[2].texcoord = { tex_right,tex_bottom };
+	vertexData[3].texcoord = { tex_left,tex_bottom };
 
 	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
 	vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
@@ -225,6 +256,14 @@ ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const
 	assert(SUCCEEDED(hr));
 
 	return resource;
+}
+
+void Sprite::AdjestTextureSize()
+{
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	textureSize.x = static_cast<float>(metadata.width);
+	textureSize.y = static_cast<float>(metadata.height);
+	size = textureSize;
 }
 
 ComPtr<IDxcBlob> Sprite::CompileShader(

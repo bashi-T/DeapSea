@@ -164,4 +164,11 @@ void TextureManager::UploadTextureData(
 	}
 }
 
+const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex)
+{
+	assert(textureIndex < DX12Common::kMaxSRVCount);
+	TextureData& textureData = textureDatas[textureIndex];
+	return textureData.metadata;
+}
+
 

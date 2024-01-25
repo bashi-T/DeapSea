@@ -40,6 +40,7 @@ public:
 		ID3D12Resource* texture,
 		const DirectX::ScratchImage& mipImages,
 		const DirectX::TexMetadata& metadata);
+	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex);
 
 };
 

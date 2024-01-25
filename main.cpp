@@ -31,8 +31,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		std::string textureFilePath[10] =
 		{
-			"Resource/uvChecker.png",
 			"Resource/civ6.png",
+			"Resource/uvChecker.png",
 			"Resource/monsterBall.png",
 			"Resource/worldMap.png",
 			"Resource/uvChecker.png",
@@ -54,18 +54,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	TextureManager::GetInstance()->Initialize();
 	for (uint32_t i = 0; i < 10; i++)
 	{
-		TextureManager::GetInstance()->LoadTexture(dx12Common, textureFilePath[i]);
 	}
 
 	SPCommon->Initialize(dx12Common);
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		Sprite* sprite = new Sprite();
-
+		TextureManager::GetInstance()->LoadTexture(dx12Common, textureFilePath[i]);
 		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
+		if (i == 0) {
+			posSprite.x = -50.0f;
+			posSprite.y = -50.0f;
+
+		}else
+		{
+			posSprite.x = 100.0f * i;
+			posSprite.y = 50.0f * i;
+		}
 		sprite->SetPositoin(posSprite);
-		posSprite.x += 100.0f;
-		posSprite.y += 50.0f;
 		sprites.push_back(sprite);
 	}
 
@@ -73,12 +79,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		dx12Common->update();
 		imgui->Update();
-		
-		//mesh[0]->Update();
-		for (Sprite* sprite:sprites)
+		int i = 0;
+		for (Sprite* sprite : sprites)
 		{
 			sprite->Update(kWindowWidth, kWindowHeight);
 		}
+
 		//ImGui::Begin("sphereEdit");
 		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
 		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);

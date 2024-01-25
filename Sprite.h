@@ -60,6 +60,12 @@ public:
 	void SetRotation(float rotation) { this->rotation = rotation; }
 	void SetColor(const Vector4& color) { materialData->color = color; }
 	void SetSize(const Vector2& size) { this->size = size; }
+	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	void SetIsFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
+	void SetIsFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
+	void SetTextureLeftTop(const Vector2& texturelefttop) { this->textureLeftTop = texturelefttop; }
+	void SetTextureSize(const Vector2& texturesize) { this->textureSize = texturesize; }
+	void AdjestTextureSize();
 
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
@@ -77,6 +83,11 @@ public:
 	float GetRotation()const { return rotation; }
 	const Vector4& GetColor()const { return materialData->color; }
 	const Vector2& GetSize()const { return size; }
+	const Vector2& GetAnchorPoint()const { return anchorPoint; }
+	const bool& GetIsFlipX() { return isFlipX_; }
+	const bool& GetIsFlipY() { return isFlipY_; }
+	const Vector2& GetTextureLeftTop()const { return textureLeftTop; }
+	const Vector2& GetTextureSize()const { return textureSize; }
 
 	struct DirectionalLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -97,6 +108,7 @@ private:
 	Vector2 position = { 0.0f,0.0f };
 	float rotation = 0.0f;
 	Vector2 size = { 100.0f,100.0f };
+	Vector2 anchorPoint = { 0.0f,0.0f };
 
 	VertexData* vertexData = nullptr;
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
@@ -157,6 +169,9 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 
-
+	bool isFlipX_ = false;
+	bool isFlipY_ = false;
+	Vector2 textureLeftTop = { 0.0f,0.0f };
+	Vector2 textureSize = { 100.0f,100.0f };
 };
 
