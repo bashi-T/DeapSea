@@ -37,15 +37,13 @@ public:
 	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSphere(
 		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
-	void DrawOBJ(
-		Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 	void ResetDXC();
 	void MakePSO();
 	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void MakeBufferView();
-	void InputDataTriangle(
-	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	    Vector2 coordRight, Vector2 coordLeft);
+	//void InputDataTriangle(
+	//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+	//    Vector2 coordRight, Vector2 coordLeft);
 	void InputDataSphere(
 		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
 		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
@@ -63,14 +61,13 @@ public:
 	{
 		std::string textureFilePath;
 	};
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	
 	struct ModelData
 	{
 		std::vector<VertexData> vertices;
 		MaterialData material;
 	};
-	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
+	ModelData modelData;
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(
@@ -107,11 +104,9 @@ private:
 	HRESULT hr = NULL;
 	TransformMatrix transformMatrix;
 	TransformMatrix transformMatrixSphere;
-	TransformMatrix transformMatrixObj;
 
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
-	ComPtr<ID3D12Resource> transformationMatrixResourceObj;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
 	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
@@ -130,14 +125,10 @@ private:
 	ComPtr<ID3D12Resource> vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
 
-	ComPtr<ID3D12Resource> vertexResourceObj = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewObj{};
 
 	ComPtr<ID3D12Resource> indexResourceSphere = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
 
-	ComPtr<ID3D12Resource> indexResourceObj = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewObj{};
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
@@ -146,7 +137,6 @@ private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ComPtr<ID3D12Resource> materialResource;
 	ComPtr<ID3D12Resource> materialResourceSphere;
-	ComPtr<ID3D12Resource> materialResourceObj;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -166,34 +156,24 @@ private:
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	TransformMatrix uvTransformObj{
-		{1.0f,1.0f,1.0f},
-		{0.0f,0.0f,0.0f},
-		{0.0f,0.0f,0.0f},
-	};
 
 	TransformMatrix cameraTransform;
 	DirectionalLight* DirectionalLightData = nullptr;
 	TransformationMatrix* transformationMatrixDataSphere = nullptr;
-	TransformationMatrix* transformationMatrixDataObj = nullptr;
 
 	Matrix4x4 cameraMatrix;
 	Matrix4x4 viewMatrix;
 	Matrix4x4 viewMatrixSphere;
-	Matrix4x4 viewMatrixObj;
 
 	Matrix4x4 projectionMatrix;
 	Matrix4x4 projectionMatrixSphere;
-	Matrix4x4 projectionMatrixObj;
 
 	Matrix4x4 ViewProjectionMatrix;
 
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldViewProjectionMatrixSphere;
-	Matrix4x4 worldViewProjectionMatrixObj;
 
 	uint32_t kSubdivision = 16;
-	ModelData modelData;
 
 	ComPtr<ID3D12Resource> textureResource;
 	ComPtr<ID3D12Resource> textureResource2;

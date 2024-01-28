@@ -3,6 +3,8 @@
 #include"Mesh.h"
 #include"Input.h"
 #include"SpriteCommon.h"
+#include"Object3dCommon.h"
+#include"Object3d.h"
 #include"Sprite.h"
 #include"TextureManager.h"
 
@@ -21,6 +23,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
 	SpriteCommon* SPCommon = new SpriteCommon;
+	Object3dCommon* object3dCommon = nullptr;
+	object3dCommon = new Object3dCommon;
+	Object3d* object3d = new Object3d();
 	std::vector<Sprite*> sprites;
 	Vector2 posSprite = { 0.0f,0.0f };
 	//for (int i = 0; i < kNumTriangle; i++)
@@ -52,38 +57,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	    dx12Common->GetRtvDesc(),
 	    dx12Common->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize();
-	for (uint32_t i = 0; i < 10; i++)
-	{
-	}
 
-	SPCommon->Initialize(dx12Common);
-	for (uint32_t i = 0; i < 10; i++)
-	{
-		Sprite* sprite = new Sprite();
-		TextureManager::GetInstance()->LoadTexture(dx12Common, textureFilePath[i]);
-		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
-		if (i == 0) {
-			posSprite.x = -50.0f;
-			posSprite.y = -50.0f;
+	object3dCommon->Initialize(dx12Common);
+	object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight, textureFilePath[0]);
 
-		}else
-		{
-			posSprite.x = 100.0f * i;
-			posSprite.y = 50.0f * i;
-		}
-		sprite->SetPositoin(posSprite);
-		sprites.push_back(sprite);
-	}
-
+	//SPCommon->Initialize(dx12Common);
+	//for (uint32_t i = 0; i < 10; i++)
+	//{
+	//	Sprite* sprite = new Sprite();
+	//	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
+	//	if (i == 0) {
+	//		posSprite.x = -50.0f;
+	//		posSprite.y = -50.0f;
+	//	}else
+	//	{
+	//		posSprite.x = 100.0f * i;
+	//		posSprite.y = 50.0f * i;
+	//	}
+	//	sprite->SetPositoin(posSprite);
+	//	sprites.push_back(sprite);
+	//}
 	while (NewMSG.message != WM_QUIT)
 	{
 		dx12Common->update();
 		imgui->Update();
+		object3d->Update();
 		int i = 0;
-		for (Sprite* sprite : sprites)
-		{
-			sprite->Update(kWindowWidth, kWindowHeight);
-		}
+		//for (Sprite* sprite : sprites)
+		//{
+		//	sprite->Update(kWindowWidth, kWindowHeight);
+		//}
 
 		//ImGui::Begin("sphereEdit");
 		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
@@ -101,10 +104,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dx12Common->PreDraw();
 
 		//mesh[0]->DrawOBJ({ 1.0f,1.0f,1.0f,1.0f }, true, kWindowWidth, kWindowHeight);
-		for (Sprite* sprite : sprites)
-		{
-			sprite->Draw(SPCommon);
-		}
+		
+		object3d->Draw(object3dCommon, true);
+		//for (Sprite* sprite : sprites)
+		//{
+		//	sprite->Draw(SPCommon);
+		//}
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
@@ -114,10 +119,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	CloseHandle(dx12Common->GetFenceEvent());
 	//dx12Common->DX12Release();
 	//delete imgui;
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-	}
+	//for (Sprite* sprite : sprites)
+	//{
+	//	delete sprite;
+	//}
+	delete object3d;
+	delete object3dCommon;
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
 	dx12Common->DeleteInstance();

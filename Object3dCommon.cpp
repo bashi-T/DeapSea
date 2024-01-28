@@ -1,9 +1,6 @@
-#include "SpriteCommon.h"
+#include "Object3dCommon.h"
 
-SpriteCommon::~SpriteCommon() {
-}
-
-void SpriteCommon::Initialize(DX12Common* dxcommon)
+void Object3dCommon::Initialize(DX12Common* dxcommon)
 {
 	dx12Common_ = dxcommon;
 	ResetDXC();
@@ -12,7 +9,7 @@ void SpriteCommon::Initialize(DX12Common* dxcommon)
 
 }
 
-void SpriteCommon::ResetDXC()
+void Object3dCommon::ResetDXC()
 {
 	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	assert(SUCCEEDED(hr));
@@ -22,7 +19,7 @@ void SpriteCommon::ResetDXC()
 	assert(SUCCEEDED(hr));
 }
 
-ComPtr<IDxcBlob> SpriteCommon::CompileShader(
+ComPtr<IDxcBlob> Object3dCommon::CompileShader(
 	const std::wstring& filePath,
 	const wchar_t* profile,
 	IDxcUtils* dxcUtils_,
@@ -65,7 +62,7 @@ ComPtr<IDxcBlob> SpriteCommon::CompileShader(
 	return shaderBlob;
 }
 
-void SpriteCommon::MakePSO(DX12Common* dxcommon)
+void Object3dCommon::MakePSO(DX12Common* dxcommon)
 {
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -124,7 +121,7 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	
+
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -158,10 +155,10 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 		CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
-	//D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	//depthStencilDesc.DepthEnable = true;
-	//depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	//depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
@@ -180,7 +177,7 @@ void SpriteCommon::MakePSO(DX12Common* dxcommon)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	hr = dxcommon->GetDevice().Get()->CreateGraphicsPipelineState(

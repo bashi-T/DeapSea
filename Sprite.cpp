@@ -10,7 +10,7 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 {
 	this->spriteCommon_ = spriteCommon;
 
-	vertexResource = CreateBufferResource( spriteCommon_, sizeof(VertexData) * 6);
+	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 6);
 	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
 	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
@@ -55,7 +55,7 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	
 	InputData(Color);
 
-	//TextureManager::GetInstance()->LoadTexture(spriteCommon_->GetDx12Common(),textureFilePath);
+	TextureManager::GetInstance()->LoadTexture(spriteCommon_->GetDx12Common(),textureFilePath);
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 	//AdjestTextureSize();
 }
@@ -266,45 +266,4 @@ void Sprite::AdjestTextureSize()
 	size = textureSize;
 }
 
-ComPtr<IDxcBlob> Sprite::CompileShader(
-	const std::wstring& filePath,
-	const wchar_t* profile,
-	IDxcUtils* dxcUtils_,
-	IDxcCompiler3* dxcCompiler_,
-	IDxcIncludeHandler* includeHandler_)
-{
-	debug_->Log(
-		debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
-	ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
-	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
-	assert(SUCCEEDED(hr));
 
-	DxcBuffer shaderSourceBuffer;
-	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-	LPCWSTR arguments[]{
-		filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
-	};
-	ComPtr<IDxcResult> shaderResult = nullptr;
-	hr = dxcCompiler_->Compile(
-		&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
-		IID_PPV_ARGS(&shaderResult));
-	assert(SUCCEEDED(hr));
-
-	ComPtr<IDxcBlobUtf8> shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		debug_->Log(shaderError->GetStringPointer());
-		assert(SUCCEEDED(hr));
-	}
-	ComPtr<IDxcBlob> shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
-	debug_->Log(
-		debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
-	shaderSource->Release();
-	shaderResult->Release();
-	return shaderBlob;
-}

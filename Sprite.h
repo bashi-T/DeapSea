@@ -24,14 +24,6 @@ public:
 	void Update(int32_t width, int32_t height);
 	void Draw(SpriteCommon* spriteCommon);
 
-	ComPtr<IDxcBlob> CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler,
-		IDxcIncludeHandler* includeHandler);
-
-
 	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();
 	void InputData(Vector4 color);
@@ -46,13 +38,6 @@ public:
 	{
 		std::string textureFilePath;
 	};
-
-	struct ModelData
-	{
-		std::vector<VertexData> vertices;
-		MaterialData material;
-	};
-
 	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
 		const DirectX::TexMetadata& metadata);

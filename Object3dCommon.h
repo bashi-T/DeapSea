@@ -9,13 +9,10 @@
 
 #pragma comment(lib, "dxcompiler.lib")
 
-class SpriteCommon
+class Object3dCommon
 {
 public:
-	~SpriteCommon();
 	void Initialize(DX12Common* dxcommon);
-	//void Update();
-	//void Draw(int32_t width, int32_t height);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -25,24 +22,10 @@ public:
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
 
-	//void InputDataTriangle(
-	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	//	Vector2 coordRight, Vector2 coordLeft);
-
-	//void DrawTriangle(
-	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	//	Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
-
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 	ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
 	DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
-
-	struct DirectionalLight {
-		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Vector3 direction = { 0.0f, -1.0f, 0.0f };
-		float intensity = 1.0f;
-	};
 
 private:
 	Debug* debug_;

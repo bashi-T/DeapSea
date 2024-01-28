@@ -33,11 +33,6 @@ void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height
 		{0.0f, 0.0f, 0.0f},
 		{0.0f, 0.0f, 0.0f}
 	};
-	transformMatrixObj = {
-		{1.0f, 1.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f}
-	};
 	cameraTransform = {
 	    {1.0f, 1.0f, 1.0f},
         {0.0f, 0.0f, 0.0f},
@@ -45,19 +40,12 @@ void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height
     };
 	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
-	modelData = LoadObjFile("Resource",filename);
 	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
 	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
-	vertexResourceObj = CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
-	
 	materialResource = CreateBufferResource(sizeof(Material));
 	materialResourceSphere = CreateBufferResource(sizeof(Material));
-	materialResourceObj = CreateBufferResource(sizeof(Material));
-
 	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
-	transformationMatrixResourceObj = CreateBufferResource(sizeof(TransformationMatrix));
-
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
 	
@@ -328,9 +316,6 @@ void Mesh::MakeBufferView()
 	indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * kSubdivision;
 	indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
 
-	vertexBufferViewObj.BufferLocation = vertexResourceObj->GetGPUVirtualAddress();
-	vertexBufferViewObj.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
-	vertexBufferViewObj.StrideInBytes = sizeof(VertexData);
 }
 
 //void Mesh::InputDataTriangle(
@@ -580,171 +565,6 @@ void Mesh::DrawSphere(
 	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(
 		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
-
-void Mesh::DrawOBJ(Vector4 color, bool useWorldMap, int32_t width, int32_t height)
-{
-	VertexData* vertexDataObj = nullptr;
-	vertexResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataObj));
-	std::memcpy(vertexDataObj, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-
-	Material* materialDataObj = nullptr;
-	materialResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&materialDataObj));
-
-	transformationMatrixResourceObj->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataObj));
-	projectionMatrixObj =
-		MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	transformationMatrixDataObj->WVP = MakeIdentity4x4();
-
-	Matrix4x4 worldMatrix = MakeAffineMatrix(
-		transformMatrixObj.scale, transformMatrixObj.rotate, transformMatrixObj.translate);
-	worldViewProjectionMatrixObj =
-		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrixObj));
-	transformationMatrixDataObj->WVP = worldViewProjectionMatrixObj;
-	transformationMatrixDataObj->World = worldMatrix;
-
-	materialDataObj[0].color = color;
-	materialDataObj[0].enableLighting = true;
-	materialDataObj[0].uvTransform = MakeIdentity4x4();
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformObj.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformObj.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformObj.translate));
-	materialDataObj[0].uvTransform = uvTransformMatrix;
-
-	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
-		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
-		DX12Common::GetInstance()->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-		2, useWorldMap ? GetTextureSrvHandleGPU2()
-		: GetTextureSrvHandleGPU());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		3, directionalLightResource->GetGPUVirtualAddress());
-
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		0, materialResourceObj->GetGPUVirtualAddress());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		1, transformationMatrixResourceObj->GetGPUVirtualAddress());
-
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(
-		0, 1, &vertexBufferViewObj);
-	DX12Common::GetInstance()->GetCommandList().Get()->
-		IASetIndexBuffer(&indexBufferViewObj);
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(
-		UINT(modelData.vertices.size()), 1, 0, 0);
-}
-
-Mesh::ModelData Mesh::LoadObjFile(const std::string& directoryPath, const std::string& filename)
-{
-	ModelData modelData;
-	std::vector<Vector4> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector2> texcoords;
-	std::string line;
-
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line))
-	{
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		if (identifier == "v")
-		{
-			Vector4 position;
-			position.w = 1.0f;
-			s >> position.x >> position.y >> position.z;
-			position.w = 1.0f;
-			positions.push_back(position);
-		}
-		else if (identifier == "vt")
-		{
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			texcoord.y = 1.0f - texcoord.y;
-			texcoords.push_back(texcoord);
-		}
-		else if (identifier == "vn")
-		{
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			normals.push_back(normal);
-		}
-		else if (identifier == "mtllib")
-		{
-			std::string materialFilemane;
-			s >> materialFilemane;
-			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilemane);
-		}
-		else if (identifier == "f")
-		{
-			VertexData triangle[3];
-
-			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-
-				std::istringstream v(vertexDefinition);
-				uint32_t elementIndices[3];
-				for (int32_t element = 0; element < 3; ++element) {
-					std::string index;
-					std::getline(v, index, '/');
-					elementIndices[element] = std::stoi(index);
-				}
-
-				Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
-				Vector3 normal = normals[elementIndices[2] - 1];
-				VertexData vertex = { position, texcoord, normal };
-				modelData.vertices.push_back(vertex);
-				triangle[faceVertex]={ position, texcoord, normal };
-			}
-			modelData.vertices.push_back(triangle[0]);
-			modelData.vertices.push_back(triangle[1]);
-			modelData.vertices.push_back(triangle[2]);
-		}
-	}
-	return modelData;
-}
-
-
-Mesh::MaterialData Mesh::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-{
-	MaterialData materialData;
-	std::string line;
-
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::stringstream s(line);
-		s >> identifier;
-
-		if (identifier == "map_Kd") {
-			std::string textureFilename;
-			s >> textureFilename;
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-		}
-	}
-	return materialData;
-}
-
-//void Mesh::MeshRelease()
-//{
-//	signatureBlob->Release();
-//	if (errorBlob) {
-//		errorBlob->Release();
-//	}
-//	pixelShaderBlob->Release();
-//	vertexShaderBlob->Release();
-//}
 
 void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
 {
