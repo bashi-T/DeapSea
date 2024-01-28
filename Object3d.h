@@ -81,7 +81,7 @@ private:
 
 	ComPtr<ID3D12Resource> directionalLightResource;
 public:
-	void Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t height, std::string textureFilePath);
+	void Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t height, std::string textureFilePath, std::string objFilePath);
 	void Update();
 	void Draw(Object3dCommon* object3dCommon,bool useWorldMap);
 	

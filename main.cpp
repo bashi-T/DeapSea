@@ -47,6 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			"Resource/uvChecker.png",
 			"Resource/cursor.png"
 		};
+		std::string objFilePath = "axis.obj";
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
 	dx12Common->Initialize(kWindowWidth, kWindowHeight, winAPP);
@@ -59,7 +60,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	TextureManager::GetInstance()->Initialize();
 
 	object3dCommon->Initialize(dx12Common);
-	object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight, textureFilePath[0]);
+	object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight, textureFilePath[0], objFilePath);
 
 	//SPCommon->Initialize(dx12Common);
 	//for (uint32_t i = 0; i < 10; i++)

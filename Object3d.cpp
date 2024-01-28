@@ -1,10 +1,10 @@
 #include "Object3d.h"
 #include "Object3dCommon.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t height, std::string textureFilePath)
+void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t height, std::string textureFilePath, std::string objFilePath)
 {
 	this->object3dCommon_ = object3dCommon;
-	modelData = LoadObjFile("Resource", "plane.obj");
+	modelData = LoadObjFile("Resource", objFilePath);
 
 	vertexResource = CreateBufferResource(object3dCommon_,sizeof(VertexData) * modelData.vertices.size());
 	materialResource = CreateBufferResource(object3dCommon_,sizeof(Material));
