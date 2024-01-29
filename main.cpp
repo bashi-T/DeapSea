@@ -3,9 +3,11 @@
 #include"Mesh.h"
 #include"Input.h"
 #include"SpriteCommon.h"
+#include"Sprite.h"
 #include"Object3dCommon.h"
 #include"Object3d.h"
-#include"Sprite.h"
+#include"ModelCommon.h"
+#include"model.h"
 #include"TextureManager.h"
 
 const int32_t kWindowWidth = 1280;
@@ -25,7 +27,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SpriteCommon* SPCommon = new SpriteCommon;
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon;
-	Object3d* object3d = new Object3d();
+	std::vector<Object3d*> objects3d;
+	ModelCommon* modelCommon = new ModelCommon;
+	std::vector<Model*> models;
 	std::vector<Sprite*> sprites;
 	Vector2 posSprite = { 0.0f,0.0f };
 	//for (int i = 0; i < kNumTriangle; i++)
@@ -34,34 +38,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//}
 	//bool useWorldMap = true;
 
-		std::string textureFilePath[10] =
-		{
-			"Resource/civ6.png",
-			"Resource/uvChecker.png",
-			"Resource/monsterBall.png",
-			"Resource/worldMap.png",
-			"Resource/uvChecker.png",
-			"Resource/uvChecker.png",
-			"Resource/uvChecker.png",
-			"Resource/uvChecker.png",
-			"Resource/uvChecker.png",
-			"Resource/cursor.png"
-		};
-		std::string objFilePath = "axis.obj";
+	std::string textureFilePath[10] =
+	{
+		"Resource/civ6.png",
+		"Resource/uvChecker.png",
+		"Resource/monsterBall.png",
+		"Resource/worldMap.png",
+		"Resource/uvChecker.png",
+		"Resource/uvChecker.png",
+		"Resource/uvChecker.png",
+		"Resource/uvChecker.png",
+		"Resource/uvChecker.png",
+		"Resource/cursor.png"
+	};
+
+	std::string objFilePath[10] =
+	{
+		"axis.obj",
+		"plane.obj"
+	};
 
 	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
 	dx12Common->Initialize(kWindowWidth, kWindowHeight, winAPP);
 	imgui->Initialize(
-	    winAPP->GetHWND(),
+		winAPP->GetHWND(),
 		dx12Common->GetDevice().Get(),
-	    dx12Common->GetSwapChainDesc(),
-	    dx12Common->GetRtvDesc(),
-	    dx12Common->GetSrvDescriptorHeap().Get());
+		dx12Common->GetSwapChainDesc(),
+		dx12Common->GetRtvDesc(),
+		dx12Common->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize();
 
 	object3dCommon->Initialize(dx12Common);
-	object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight, textureFilePath[0], objFilePath);
-
+	modelCommon->Initialize(dx12Common);
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		Model* model = new Model;
+		Object3d* object3d = new Object3d;
+		model->Initialize(modelCommon, textureFilePath[0], objFilePath[0]);
+		object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight);
+		object3d->SetModel(model);
+		object3d->SetTranslate({ 0.2f * i, 0.2f * i, 0.2f * i });
+		objects3d.push_back(object3d);
+	};
 	//SPCommon->Initialize(dx12Common);
 	//for (uint32_t i = 0; i < 10; i++)
 	//{
@@ -78,35 +96,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//	sprite->SetPositoin(posSprite);
 	//	sprites.push_back(sprite);
 	//}
+
 	while (NewMSG.message != WM_QUIT)
 	{
 		dx12Common->update();
 		imgui->Update();
-		object3d->Update();
-		int i = 0;
+		ImGui::Begin("sphereEdit");
+		for (Object3d* object3d : objects3d)
+		{
+			object3d->Update();
+			ImGui::DragFloat3("sphere.center", (float*)&object3d->GetTranslate(), 0.01f);
+			//ImGui::Checkbox("useWorldMap", &useWorldMap);
+		}
+		ImGui::End();
+
 		//for (Sprite* sprite : sprites)
 		//{
 		//	sprite->Update(kWindowWidth, kWindowHeight);
 		//}
 
-		//ImGui::Begin("sphereEdit");
-		//ImGui::ColorEdit3("Sphere", (float*)&ColorSphere[0]);
-		//ImGui::DragFloat3("sphere.center", (float*)&sphere.center, 0.01f);
-		//ImGui::DragFloat("sphere.radius", (float*)&sphere.radius, 0.01f);
-		//ImGui::Checkbox("useWorldMap", &useWorldMap);
-		//ImGui::End();
 
 		if (winAPP->ProcessMessage())
 		{
-			//winAPP->ProcessMessage(NewMSG);
 			ImGui::Render();
 			break;
 		}
 		dx12Common->PreDraw();
 
-		//mesh[0]->DrawOBJ({ 1.0f,1.0f,1.0f,1.0f }, true, kWindowWidth, kWindowHeight);
-		
-		object3d->Draw(object3dCommon, true);
+		for (Object3d* object3d : objects3d)
+		{
+			object3d->Draw(object3dCommon, true, modelCommon);
+		}
+		//for(Model*model:models)
+		//{
+		//	model->Draw(modelCommon);
+		//}
 		//for (Sprite* sprite : sprites)
 		//{
 		//	sprite->Draw(SPCommon);
@@ -124,7 +148,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//{
 	//	delete sprite;
 	//}
-	delete object3d;
+	for (Model* model : models)
+	{
+		delete model;
+	}
+	delete modelCommon;
+	for (Object3d* object3d : objects3d)
+	{
+		delete object3d;
+	}
 	delete object3dCommon;
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
