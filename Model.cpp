@@ -1,13 +1,13 @@
 #include "Model.h"
 
-void Model::Initialize(ModelCommon* modelCommon, std::string textureFilePath, std::string objFilePath)
+void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 {
 	this->modelCommon_ = modelCommon;
 
 	modelData = LoadObjFile("Resource", objFilePath);
 
-	vertexResource = CreateBufferResource(modelCommon, sizeof(VertexData) * modelData.vertices.size());
-	materialResource = CreateBufferResource(modelCommon, sizeof(Material));
+	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
+	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
 
 	MakeBufferView();
 

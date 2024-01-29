@@ -6,7 +6,7 @@
 #include"Sprite.h"
 #include"Object3dCommon.h"
 #include"Object3d.h"
-#include"ModelCommon.h"
+#include"ModelManager.h"
 #include"model.h"
 #include"TextureManager.h"
 
@@ -27,8 +27,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SpriteCommon* SPCommon = new SpriteCommon;
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon;
-	std::vector<Object3d*> objects3d;
 	ModelCommon* modelCommon = new ModelCommon;
+	std::vector<Object3d*> objects3d;
 	std::vector<Model*> models;
 	std::vector<Sprite*> sprites;
 	Vector2 posSprite = { 0.0f,0.0f };
@@ -69,15 +69,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	TextureManager::GetInstance()->Initialize();
 
 	object3dCommon->Initialize(dx12Common);
-	modelCommon->Initialize(dx12Common);
+	ModelManager::GetInstance()->Initialize(dx12Common);
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		Model* model = new Model;
 		Object3d* object3d = new Object3d;
-		model->Initialize(modelCommon, textureFilePath[0], objFilePath[0]);
 		object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight);
+		ModelManager::GetInstance()->LoadModel(objFilePath[0]);
 		object3d->SetModel(model);
-		object3d->SetTranslate({ 0.2f * i, 0.2f * i, 0.2f * i });
+		object3d->SetModel(objFilePath[0]);
+		object3d->SetTranslate({0.2f * i, 0.2f * i, 0.2f * i});
 		objects3d.push_back(object3d);
 	};
 	//SPCommon->Initialize(dx12Common);
@@ -125,7 +126,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		for (Object3d* object3d : objects3d)
 		{
-			object3d->Draw(object3dCommon, true, modelCommon);
+			object3d->Draw(object3dCommon, true, ModelManager::GetInstance()->GetModelCommon());
 		}
 		//for(Model*model:models)
 		//{
@@ -152,8 +153,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		delete model;
 	}
-	delete modelCommon;
-	for (Object3d* object3d : objects3d)
+	ModelManager::GetInstance()->Finalize();
+for (Object3d* object3d : objects3d)
 	{
 		delete object3d;
 	}

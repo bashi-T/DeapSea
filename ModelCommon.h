@@ -36,7 +36,6 @@ public:
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
 
-
 	DX12Common* GetDx12Common()const { return dxCommon_; }
 };
 

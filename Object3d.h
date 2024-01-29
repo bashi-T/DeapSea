@@ -8,7 +8,7 @@
 #include <sstream>
 #include"TextureManager.h"
 #include"Model.h"
-#include"ModelCommon.h"
+#include"ModelManager.h"
 
 #pragma comment(lib, "dxcompiler.lib")
 
@@ -87,6 +87,7 @@ public:
 
 	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
+	void SetModel(const std::string& filePath);
 	void SetModel(Model* model) { this->model_ = model; }
 	void SetScale(const Vector3& scale) { transformMatrix.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }

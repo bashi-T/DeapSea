@@ -116,3 +116,8 @@ ComPtr<ID3D12Resource> Object3d::CreateBufferResource(Object3dCommon* object3dCo
 	assert(SUCCEEDED(hr));
 	return Resource;
 }
+
+void Object3d::SetModel(const std::string& filePath)
+{
+	model_ = ModelManager::GetInstance()->FindModel(filePath);
+}
