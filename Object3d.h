@@ -29,41 +29,8 @@ private:
 	};
 	DirectionalLight* DirectionalLightData = nullptr;
 
-	TransformMatrix transformMatrix;
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	TransformMatrix cameraTransform;
-
-	//struct VertexData
-	//{
-	//	Vector4 position;
-	//	Vector2 texcoord;
-	//	Vector3 normal;
-	//};
-	//VertexData* vertexData = nullptr;
-	//ComPtr<ID3D12Resource> vertexResource = nullptr;
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-
-	//struct Material {
-	//	Vector4 color;
-	//	int32_t enableLighting;
-	//	float padding[3];
-	//	Matrix4x4 uvTransform;
-	//};
-	//Material* materialData = nullptr;
-	//ComPtr<ID3D12Resource> materialResource = nullptr;
-
-	//struct MaterialData
-	//{
-	//	std::string textureFilePath;
-	//	uint32_t textureIndex = 0;
-	//};
-
-	//struct ModelData
-	//{
-	//	std::vector<VertexData> vertices;
-	//	MaterialData material;
-	//};
-	//ModelData modelData;
 
 	struct TransformationMatrix
 	{
@@ -73,6 +40,8 @@ private:
 
 	TransformationMatrix* transformationMatrixData = nullptr;
 
+	TransformMatrix transformMatrix;
+	Matrix4x4 worldMatrix;
 	Matrix4x4 viewMatrix;
 	Matrix4x4 projectionMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
