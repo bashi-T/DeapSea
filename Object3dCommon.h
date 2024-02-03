@@ -2,6 +2,7 @@
 #include "CGVector.h"
 #include "DX12Common.h"
 #include "MyImGui.h"
+#include"Camera.h"
 #include <cassert>
 #include <dxcapi.h>
 #include <fstream>
@@ -21,11 +22,13 @@ public:
 		IDxcIncludeHandler* includeHandler);
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
+	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 	ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
 	DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
+	Camera* GetDefaultCamera()const { return defaultCamera; }
 
 private:
 	Debug* debug_;
@@ -34,6 +37,7 @@ private:
 	HRESULT hr = NULL;
 	DX12Common* dx12Common_;
 	TransformMatrix transformMatrix;
+	Camera* defaultCamera = nullptr;
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;

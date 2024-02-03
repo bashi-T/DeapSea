@@ -7,32 +7,27 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t
 
 	transformationMatrixResource = CreateBufferResource(object3dCommon_,sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(object3dCommon_, sizeof(DirectionalLight));
-	
+	this->camera = object3dCommon->GetDefaultCamera();
 	transformMatrix =
 	{
 	{1.0f, 1.0f, 1.0f},
 	{0.0f, 0.0f, 0.0f},
 	{0.0f, 0.0f, 0.0f}
 	};
-	cameraTransform = {
-	{1.0f, 1.0f, 1.0f},
-	{0.3f, 0.0f, 0.0f},
-	{0.0f, 4.0f, -10.0f}
-	};
 
 	transformationMatrixResource->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
     directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
 	
-	projectionMatrix =
-		MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	transformationMatrixData->WVP = MakeIdentity4x4();
-	worldMatrix = MakeAffineMatrix(
-		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	worldViewProjectionMatrix =
-		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData->WVP = worldViewProjectionMatrix;
-	transformationMatrixData->World = worldMatrix;
+	//projectionMatrix =
+	//	MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
+	//transformationMatrixData->WVP = MakeIdentity4x4();
+	//worldMatrix = MakeAffineMatrix(
+	//	transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+	//worldViewProjectionMatrix =
+	//	Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	//transformationMatrixData->WVP = worldViewProjectionMatrix;
+	//transformationMatrixData->World = worldMatrix;
 
     DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
     DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
@@ -43,11 +38,13 @@ void Object3d::Update()
 {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
 		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	Matrix4x4 cameraMatrix =
-		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	viewMatrix = Inverse(cameraMatrix);
-	worldViewProjectionMatrix =
-		Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+
+	if (camera)
+	{
+		const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+	}
+
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
 
@@ -69,9 +66,6 @@ void Object3d::Draw(Object3dCommon* object3dCommon,bool useWorldMap, ModelCommon
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
-	//object3dCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-	//	2, useWorldMap ? GetTextureSrvHandleGPU2()
-	//	: GetTextureSrvHandleGPU());
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
 

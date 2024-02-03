@@ -9,6 +9,7 @@
 #include"TextureManager.h"
 #include"Model.h"
 #include"ModelManager.h"
+#include"Camera.h"
 
 #pragma comment(lib, "dxcompiler.lib")
 
@@ -20,6 +21,7 @@ private:
 	HRESULT hr = NULL;
 	Model* model_ = nullptr;
 	ModelCommon* modelCommon_ = nullptr;
+	Camera* camera = nullptr;
 
 	struct DirectionalLight
 	{
@@ -30,7 +32,6 @@ private:
 	DirectionalLight* DirectionalLightData = nullptr;
 
 	ComPtr<ID3D12Resource> transformationMatrixResource;
-	TransformMatrix cameraTransform;
 
 	struct TransformationMatrix
 	{
@@ -41,9 +42,6 @@ private:
 	TransformationMatrix* transformationMatrixData = nullptr;
 
 	TransformMatrix transformMatrix;
-	Matrix4x4 worldMatrix;
-	Matrix4x4 viewMatrix;
-	Matrix4x4 projectionMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
@@ -61,6 +59,7 @@ public:
 	void SetScale(const Vector3& scale) { transformMatrix.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
+	void SetCamera(Camera* camera) { this->camera = camera; }
 	const Vector3& GetScale()const { return transformMatrix.scale; }
 	const Vector3& GetRotate()const { return transformMatrix.rotate; }
 	const Vector3& GetTranslate()const { return transformMatrix.translate; }

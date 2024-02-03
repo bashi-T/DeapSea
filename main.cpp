@@ -28,6 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon;
 	ModelCommon* modelCommon = new ModelCommon;
+	Camera* camera = new Camera();
 	std::vector<Object3d*> objects3d;
 	std::vector<Model*> models;
 	std::vector<Sprite*> sprites;
@@ -54,12 +55,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	std::string objFilePath[10] =
 	{
+		"plane.obj",
 		"axis.obj",
-		"plane.obj"
 	};
 
-	winAPP->Initialize(kWindowWidth, kWindowHeight, L"GE3");
-	dx12Common->Initialize(kWindowWidth, kWindowHeight, winAPP);
+	winAPP->Initialize(WinAPP::clientWidth_,WinAPP::clientHeight_, L"GE3");
+	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
 	imgui->Initialize(
 		winAPP->GetHWND(),
 		dx12Common->GetDevice().Get(),
@@ -70,11 +71,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
+	camera->SetRotate({ 0.0f,0.0f,0.0f });
+	camera->SetTranslate({ 0.0f,0.0f,-20.0f });
+	object3dCommon->SetDefaultCamera(camera);
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		Model* model = new Model;
 		Object3d* object3d = new Object3d;
-		object3d->Initialize(object3dCommon, kWindowWidth, kWindowHeight);
+		object3d->Initialize(object3dCommon, WinAPP::clientWidth_, WinAPP::clientHeight_);
 		ModelManager::GetInstance()->LoadModel(objFilePath[0]);
 		object3d->SetModel(model);
 		object3d->SetModel(objFilePath[0]);
@@ -101,6 +105,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	while (NewMSG.message != WM_QUIT)
 	{
 		dx12Common->update();
+		camera->Update();
 		imgui->Update();
 		ImGui::Begin("sphereEdit");
 		for (Object3d* object3d : objects3d)

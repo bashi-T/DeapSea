@@ -22,14 +22,14 @@ public:
 	static inline WNDCLASS wc_{};
 	static HINSTANCE GetHInstance() { return wc_.hInstance; }
 
+	static int32_t clientWidth_;
+	static int32_t clientHeight_;
 private:
 	WinAPP() = default;
 	~WinAPP() = default;
 	WinAPP(const WinAPP& obj) = delete;
 	WinAPP& oparator(const WinAPP& obj) = delete;
 
-	static int32_t clientWidth_;
-	static int32_t clientHeight_;
 	static HWND hwnd_;
 	static HINSTANCE hInstance;
 };

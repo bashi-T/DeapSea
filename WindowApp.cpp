@@ -1,7 +1,7 @@
 #include "WindowApp.h"
 
-int32_t WinAPP::clientWidth_ = 0;
-int32_t WinAPP::clientHeight_ = 0;
+int32_t WinAPP::clientWidth_ = 1280;
+int32_t WinAPP::clientHeight_ = 720;
 
 void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 {
