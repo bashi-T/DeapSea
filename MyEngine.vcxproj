@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CGVector.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="DX12Common.cpp" />
+    <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="Math\CGVector.cpp" />
+    <ClCompile Include="Systems\Debug.cpp" />
+    <ClCompile Include="Commons\DX12Common.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -22,24 +22,24 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModelCommon.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="MyImGui.cpp" />
+    <ClCompile Include="Input\Input.cpp" />
+    <ClCompile Include="Objects\Model.cpp" />
+    <ClCompile Include="Commons\ModelCommon.cpp" />
+    <ClCompile Include="Managers\ModelManager.cpp" />
+    <ClCompile Include="Systems\MyImGui.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Object3d.cpp" />
-    <ClCompile Include="Object3dCommon.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteCommon.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="WindowApp.cpp" />
+    <ClCompile Include="Objects\Mesh.cpp" />
+    <ClCompile Include="Objects\Object3d.cpp" />
+    <ClCompile Include="Commons\Object3dCommon.cpp" />
+    <ClCompile Include="Sprites\Sprite.cpp" />
+    <ClCompile Include="Commons\SpriteCommon.cpp" />
+    <ClCompile Include="Managers\TextureManager.cpp" />
+    <ClCompile Include="Systems\WindowApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="DX12Common.h" />
+    <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="Systems\Debug.h" />
+    <ClInclude Include="Commons\DX12Common.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -48,28 +48,28 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelCommon.h" />
-    <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="MyImGui.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="CGVector.h" />
-    <ClInclude Include="Object3d.h" />
-    <ClInclude Include="Object3dCommon.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteCommon.h" />
-    <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="WindowApp.h" />
+    <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="Objects\Model.h" />
+    <ClInclude Include="Commons\ModelCommon.h" />
+    <ClInclude Include="Managers\ModelManager.h" />
+    <ClInclude Include="Systems\MyImGui.h" />
+    <ClInclude Include="Objects\Mesh.h" />
+    <ClInclude Include="Math\CGVector.h" />
+    <ClInclude Include="Objects\Object3d.h" />
+    <ClInclude Include="Commons\Object3dCommon.h" />
+    <ClInclude Include="Sprites\Sprite.h" />
+    <ClInclude Include="Commons\SpriteCommon.h" />
+    <ClInclude Include="Managers\TextureManager.h" />
+    <ClInclude Include="Systems\WindowApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.VS.hlsl">
+    <FxCompile Include="HLSL\Object3d.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Object3d.PS.hlsl">
+    <FxCompile Include="HLSL\Object3d.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -85,7 +85,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli" />
+    <None Include="HLSL\Object3d.hlsli" />
     <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -130,8 +130,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Commons\;$(ProjectDir)Camera\;$(ProjectDir)Math\;$(ProjectDir)Managers\;$(ProjectDir)Systems\;$(ProjectDir)Sprites\;$(ProjectDir)Objects\;$(ProjectDir)Input\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,8 +155,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Commons\;$(ProjectDir)Camera\;$(ProjectDir)Math\;$(ProjectDir)Managers\;$(ProjectDir)Systems\;$(ProjectDir)Sprites\;$(ProjectDir)Objects\;$(ProjectDir)Input\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

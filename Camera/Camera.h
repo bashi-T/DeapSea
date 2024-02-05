@@ -1,6 +1,6 @@
 #pragma once
-#include"CGVector.h"
-#include"WindowApp.h"
+#include"Math/CGVector.h"
+#include"Systems/WindowApp.h"
 
 class Camera
 {

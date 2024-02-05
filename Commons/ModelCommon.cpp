@@ -1,15 +1,15 @@
-#include "Object3dCommon.h"
+#include "ModelCommon.h"
 
-void Object3dCommon::Initialize(DX12Common* dxcommon)
+void ModelCommon::Initialize(DX12Common* dxCommon)
 {
-	dx12Common_ = dxcommon;
+	this->dxCommon_ = dxCommon;
 	ResetDXC();
 
-	MakePSO(dx12Common_);
+	MakePSO(dxCommon_);
 
 }
 
-void Object3dCommon::ResetDXC()
+void ModelCommon::ResetDXC()
 {
 	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	assert(SUCCEEDED(hr));
@@ -19,7 +19,7 @@ void Object3dCommon::ResetDXC()
 	assert(SUCCEEDED(hr));
 }
 
-ComPtr<IDxcBlob> Object3dCommon::CompileShader(
+ComPtr<IDxcBlob> ModelCommon::CompileShader(
 	const std::wstring& filePath,
 	const wchar_t* profile,
 	IDxcUtils* dxcUtils_,
@@ -62,7 +62,7 @@ ComPtr<IDxcBlob> Object3dCommon::CompileShader(
 	return shaderBlob;
 }
 
-void Object3dCommon::MakePSO(DX12Common* dxcommon)
+void ModelCommon::MakePSO(DX12Common* dxcommon)
 {
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -148,11 +148,11 @@ void Object3dCommon::MakePSO(DX12Common* dxcommon)
 	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	vertexShaderBlob =
-		CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-		CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};

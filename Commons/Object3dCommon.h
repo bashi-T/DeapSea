@@ -1,8 +1,8 @@
 #pragma once
-#include "CGVector.h"
+#include "Math/CGVector.h"
 #include "DX12Common.h"
-#include "MyImGui.h"
-#include"Camera.h"
+#include "Systems/MyImGui.h"
+#include"Camera/Camera.h"
 #include <cassert>
 #include <dxcapi.h>
 #include <fstream>

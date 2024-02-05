@@ -1,15 +1,15 @@
 #pragma once
-#include "CGVector.h"
-#include "DX12Common.h"
-#include "MyImGui.h"
+#include "Math/CGVector.h"
+#include "Commons/DX12Common.h"
+#include "Systems/MyImGui.h"
 #include <cassert>
 #include <dxcapi.h>
 #include <fstream>
 #include <sstream>
-#include"TextureManager.h"
+#include"Managers/TextureManager.h"
 #include"Model.h"
-#include"ModelManager.h"
-#include"Camera.h"
+#include"Managers/ModelManager.h"
+#include"Camera/Camera.h"
 
 #pragma comment(lib, "dxcompiler.lib")
 

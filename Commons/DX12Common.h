@@ -1,7 +1,7 @@
 #pragma once
-#include"WindowApp.h"
+#include"Systems/WindowApp.h"
 #include<cassert>
-#include"Debug.h"
+#include"Systems/Debug.h"
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<DirectXTex.h>

@@ -2,8 +2,8 @@
 #include<string>
 #include<map>
 #include<memory>
-#include"Model.h"
-#include "DX12Common.h"
+#include"Objects/Model.h"
+#include "Commons/DX12Common.h"
 
 class ModelManager
 {

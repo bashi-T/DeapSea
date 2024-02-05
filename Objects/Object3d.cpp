@@ -1,5 +1,5 @@
 #include "Object3d.h"
-#include "Object3dCommon.h"
+#include "Commons/Object3dCommon.h"
 
 void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t height)
 {
@@ -19,16 +19,6 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
     directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
 	
-	//projectionMatrix =
-	//	MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	//transformationMatrixData->WVP = MakeIdentity4x4();
-	//worldMatrix = MakeAffineMatrix(
-	//	transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	//worldViewProjectionMatrix =
-	//	Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	//transformationMatrixData->WVP = worldViewProjectionMatrix;
-	//transformationMatrixData->World = worldMatrix;
-
     DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
     DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
     DirectionalLightData->intensity = 1.0f;

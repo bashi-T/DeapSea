@@ -1,8 +1,8 @@
 #pragma once
-#include "CGVector.h"
-#include "DX12Common.h"
-#include "Debug.h"
-#include "MyImGui.h"
+#include "Math/CGVector.h"
+#include "Commons/DX12Common.h"
+#include "Systems/Debug.h"
+#include "Systems/MyImGui.h"
 #include "list"
 #include <cassert>
 #include <d3d12.h>
@@ -10,8 +10,8 @@
 #include <dxgi1_6.h>
 #include <fstream>
 #include <sstream>
-#include"Sprite.h"
-#include"SpriteCommon.h"
+#include"Sprites/Sprite.h"
+#include"Commons/SpriteCommon.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")

@@ -1,7 +1,7 @@
 #pragma once
-#include "CGVector.h"
+#include "Math/CGVector.h"
 #include "DX12Common.h"
-#include "MyImGui.h"
+#include "Systems/MyImGui.h"
 #include <cassert>
 #include <dxcapi.h>
 #include <fstream>

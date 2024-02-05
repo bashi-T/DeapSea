@@ -2,7 +2,7 @@
 #include<string>
 #include<DirectXTex.h>
 #include<WRL.h>
-#include "DX12Common.h"
+#include "Commons/DX12Common.h"
 
 class TextureManager
 {
