@@ -12,16 +12,17 @@
 #include <sstream>
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
+#include"Camera/Camera.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
-class Mesh
+class Particle
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	~Mesh();
+	~Particle();
 	void Initialize(const std::string& filename, int32_t width, int32_t height);
 	void Update();
 	void Draw(int32_t width, int32_t height);
@@ -78,7 +79,7 @@ public:
 		const DirectX::ScratchImage& mipImages,
 		const DirectX::TexMetadata& metadata);
 
-	//void MeshRelease();
+	//void ParticleRelease();
 
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
@@ -96,7 +97,6 @@ public:
 	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 private:
-	Mesh* mesh_;
 	Debug* debug_;
 	WinAPP* sWinApp;
 	MyImGui* imgui_;

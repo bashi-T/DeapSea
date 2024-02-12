@@ -21,6 +21,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	WinAPP* winAPP = WinAPP::GetInstance();
 	DX12Common* dx12Common = DX12Common::GetInstance();
+	Input* input = new Input;
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
 	SpriteCommon* SPCommon = new SpriteCommon;
@@ -60,12 +61,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	winAPP->Initialize(WinAPP::clientWidth_,WinAPP::clientHeight_, L"GE3");
 	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
-	imgui->Initialize(
-		winAPP->GetHWND(),
-		dx12Common->GetDevice().Get(),
-		dx12Common->GetSwapChainDesc(),
-		dx12Common->GetRtvDesc(),
-		dx12Common->GetSrvDescriptorHeap().Get());
+	input->Initialize(winAPP);
+	//imgui->Initialize(
+	//	winAPP->GetHWND(),
+	//	dx12Common->GetDevice().Get(),
+	//	dx12Common->GetSwapChainDesc(),
+	//	dx12Common->GetRtvDesc(),
+	//	dx12Common->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize();
 
 	object3dCommon->Initialize(dx12Common);
@@ -84,46 +86,47 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		object3d->SetTranslate({0.2f * i, 0.2f * i, 0.2f * i});
 		objects3d.push_back(object3d);
 	};
-	//SPCommon->Initialize(dx12Common);
-	//for (uint32_t i = 0; i < 10; i++)
-	//{
-	//	Sprite* sprite = new Sprite();
-	//	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
-	//	if (i == 0) {
-	//		posSprite.x = -50.0f;
-	//		posSprite.y = -50.0f;
-	//	}else
-	//	{
-	//		posSprite.x = 100.0f * i;
-	//		posSprite.y = 50.0f * i;
-	//	}
-	//	sprite->SetPositoin(posSprite);
-	//	sprites.push_back(sprite);
-	//}
+	SPCommon->Initialize(dx12Common);
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
+		posSprite.x = 100.0f * i;
+		posSprite.y = 50.0f * i;
+		sprite->SetPositoin(posSprite);
+		sprites.push_back(sprite);
+	}
 
 	while (NewMSG.message != WM_QUIT)
 	{
 		dx12Common->update();
+		input->Update();
 		camera->Update();
-		imgui->Update();
-		ImGui::Begin("sphereEdit");
+		//imgui->Update();
+		//ImGui::Begin("sphereEdit");
 		for (Object3d* object3d : objects3d)
 		{
+			if (input->PushKey(DIK_D)) {
+				object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+			}
+			if (input->PushKey(DIK_A)) {
+				object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+			}
 			object3d->Update();
-			ImGui::DragFloat3("sphere.center", (float*)&object3d->GetTranslate(), 0.01f);
+			//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
 			//ImGui::Checkbox("useWorldMap", &useWorldMap);
 		}
-		ImGui::End();
+		//ImGui::End();
 
-		//for (Sprite* sprite : sprites)
-		//{
-		//	sprite->Update(kWindowWidth, kWindowHeight);
-		//}
+		for (Sprite* sprite : sprites)
+		{
+			sprite->Update(kWindowWidth, kWindowHeight);
+		}
 
 
 		if (winAPP->ProcessMessage())
 		{
-			ImGui::Render();
+			//ImGui::Render();
 			break;
 		}
 		dx12Common->PreDraw();
@@ -136,23 +139,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//{
 		//	model->Draw(modelCommon);
 		//}
-		//for (Sprite* sprite : sprites)
-		//{
-		//	sprite->Draw(SPCommon);
-		//}
-		imgui->Endframe(dx12Common->GetCommandList().Get());
+		if (input->PushKey(DIK_SPACE)!=0) {
+			for (Sprite* sprite : sprites)
+			{
+				sprite->Draw(SPCommon);
+			}
+		}
+		//imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
 
 	}
 
 	CloseHandle(dx12Common->GetFenceEvent());
-	//dx12Common->DX12Release();
-	//delete imgui;
-	//for (Sprite* sprite : sprites)
-	//{
-	//	delete sprite;
-	//}
+	for (Sprite* sprite : sprites)
+	{
+		delete sprite;
+	}
 	for (Model* model : models)
 	{
 		delete model;
@@ -164,7 +167,7 @@ for (Object3d* object3d : objects3d)
 	}
 	delete object3dCommon;
 	TextureManager::GetInstance()->Finalize();
-	imgui->Finalize();
+	//imgui->Finalize();
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();
 	CoUninitialize();

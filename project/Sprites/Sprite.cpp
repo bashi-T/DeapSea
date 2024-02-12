@@ -72,18 +72,18 @@ void Sprite::Update(int32_t width, int32_t height)
 	transformMatrix.scale = { size.x,size.y,1.0f };
 	InputData(Color);
 
-	ImGui::Begin("spriteEdit");
+	//ImGui::Begin("spriteEdit");
 	//int num = textureIndex;
 	//ImGui::InputInt("texture", &num);
-	ImGui::DragFloat2("position", &position.x, 0.1f);
-	ImGui::DragFloat("rotate", &rotation, 0.1f);
-	ImGui::DragFloat2("size", &size.x);
-	ImGui::DragFloat2("anchor", &anchorPoint.x, 0.1f);
-	ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
-	ImGui::DragFloat2("textureSize", &textureSize.x);
-	ImGui::Checkbox("flipX", &isFlipX_);
-	ImGui::Checkbox("flipY", &isFlipY_);
-	ImGui::End();
+	//ImGui::DragFloat2("position", &position.x, 0.1f);
+	//ImGui::DragFloat("rotate", &rotation, 0.1f);
+	//ImGui::DragFloat2("size", &size.x);
+	//ImGui::DragFloat2("anchor", &anchorPoint.x, 0.1f);
+	//ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+	//ImGui::DragFloat2("textureSize", &textureSize.x);
+	//ImGui::Checkbox("flipX", &isFlipX_);
+	//ImGui::Checkbox("flipY", &isFlipY_);
+	//ImGui::End();
 }
 
 void Sprite::MakeBufferView()

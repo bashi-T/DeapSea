@@ -1,9 +1,9 @@
-#include "Mesh.h"
+#include "Particle.h"
 
-Mesh::~Mesh() {
+Particle::~Particle() {
 }
 
-void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
+void Particle::Initialize(const std::string& filename, int32_t width, int32_t height) {
 	spriteCom_->Initialize(DX12Common::GetInstance());
 	kSubdivision = 16;
 	
@@ -72,7 +72,7 @@ void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height
 
 }
 
-void Mesh::ResetDXC()
+void Particle::ResetDXC()
 {
 	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	assert(SUCCEEDED(hr));
@@ -82,7 +82,7 @@ void Mesh::ResetDXC()
 	assert(SUCCEEDED(hr));
 }
 
-ComPtr<IDxcBlob> Mesh::CompileShader(
+ComPtr<IDxcBlob> Particle::CompileShader(
 	const std::wstring& filePath,
 	const wchar_t* profile,
 	IDxcUtils* dxcUtils_,
@@ -125,7 +125,7 @@ ComPtr<IDxcBlob> Mesh::CompileShader(
 	return shaderBlob;
 }
 
-void Mesh::MakePSO()
+void Particle::MakePSO()
 {
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -236,7 +236,7 @@ void Mesh::MakePSO()
 	assert(SUCCEEDED(hr));
 }
 
-void Mesh::Update()
+void Particle::Update()
 {
 	//cameraTransform.translate.x += 0.02f;
 	//DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
@@ -254,7 +254,7 @@ void Mesh::Update()
 	//ImGui::End();
 }
 
-void Mesh::Draw(int32_t width, int32_t height)
+void Particle::Draw(int32_t width, int32_t height)
 {
 	//sprite_->DrawSprite(
 	//	sprite_->GetLeftTop(0),
@@ -275,7 +275,7 @@ void Mesh::Draw(int32_t width, int32_t height)
 
 };
 
-ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
+ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	
@@ -302,7 +302,7 @@ ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
 	return Resource;
 }
 
-void Mesh::MakeBufferView()
+void Particle::MakeBufferView()
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData)) * 3;
@@ -318,7 +318,7 @@ void Mesh::MakeBufferView()
 
 }
 
-//void Mesh::InputDataTriangle(
+//void Particle::InputDataTriangle(
 //    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
 //    Vector2 coordLeft) {
 //	VertexData* vertexData = nullptr;
@@ -359,7 +359,7 @@ void Mesh::MakeBufferView()
 //	vertexData[2].normal.z = vertexData[2].position.z;
 //}
 
-void Mesh::InputDataSphere(
+void Particle::InputDataSphere(
     Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
     Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
     uint32_t count, int32_t width, int32_t height)
@@ -429,7 +429,7 @@ void Mesh::InputDataSphere(
 }
 
 
-//void Mesh::DrawTriangle(
+//void Particle::DrawTriangle(
 //    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
 //    Vector2 coordLeft, bool useWorldMap) {
 //	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
@@ -462,7 +462,7 @@ void Mesh::InputDataSphere(
 //	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
 //}
 
-void Mesh::DrawSphere(
+void Particle::DrawSphere(
 	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
 {
 	float pi = 3.141592f;
@@ -566,7 +566,7 @@ void Mesh::DrawSphere(
 		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
 
-void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
+void Particle::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -602,7 +602,7 @@ void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const Di
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 }
 
-DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
+DirectX::ScratchImage Particle::LoadTexture(const std::string& filePath)
 {
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = debug_->ConvertString(filePath);
@@ -625,7 +625,7 @@ DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
-ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+ComPtr<ID3D12Resource> Particle::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);
@@ -655,7 +655,7 @@ ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device* device, const D
 	return resource;
 }
 
-void Mesh::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
+void Particle::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
 {
 	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
 	{
