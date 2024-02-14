@@ -13,6 +13,7 @@
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
 #include"Camera/Camera.h"
+#include"Managers/TextureManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -34,23 +35,31 @@ public:
 		IDxcIncludeHandler* includeHandler);
 
 	void DrawTriangle(
-	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
+		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+		Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
+	void DrawPlane(
+		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
+		Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft, bool useWorldMap);
 	void DrawSphere(
 		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 	void ResetDXC();
 	void MakePSO();
 	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void MakeBufferView();
-	//void InputDataTriangle(
-	//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	//    Vector2 coordRight, Vector2 coordLeft);
+	void InputDataTriangle(
+		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+		Vector2 coordRight, Vector2 coordLeft);
+	void InputDataPlane(
+		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
+		Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft);
 	void InputDataSphere(
 		Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
 		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
 	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
+
+	void MakeShaderResourceView(const DirectX::TexMetadata& metadata);
 
 	struct VertexData
 	{
@@ -81,7 +90,7 @@ public:
 
 	//void ParticleRelease();
 
-	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
+	//ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
@@ -102,10 +111,12 @@ private:
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
 	HRESULT hr = NULL;
-	TransformMatrix transformMatrix;
+	TransformMatrix transformMatrixTriangle;
+	TransformMatrix transformMatrixPlane;
 	TransformMatrix transformMatrixSphere;
 
-	ComPtr<ID3D12Resource> transformationMatrixResource;
+	ComPtr<ID3D12Resource> transformationMatrixResourceTriangle;
+	ComPtr<ID3D12Resource> transformationMatrixResourcePlane;
 	ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
@@ -119,8 +130,11 @@ private:
 	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 
-	ComPtr<ID3D12Resource> vertexResource = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	ComPtr<ID3D12Resource> vertexResourceTriangle = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewTriangle{};
+
+	ComPtr<ID3D12Resource> vertexResourcePlane = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewPlane{};
 
 	ComPtr<ID3D12Resource> vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
@@ -129,13 +143,13 @@ private:
 	ComPtr<ID3D12Resource> indexResourceSphere = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
 
-
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	D3D12_BLEND_DESC blendDesc{};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	ComPtr<ID3D12Resource> materialResource;
+	ComPtr<ID3D12Resource> materialResourceTriangle;
+	ComPtr<ID3D12Resource> materialResourcePlane;
 	ComPtr<ID3D12Resource> materialResourceSphere;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
@@ -151,6 +165,16 @@ private:
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 	};
+	TransformMatrix uvTransformTriangle{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
+	TransformMatrix uvTransformPlane{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
 	TransformMatrix uvTransformSphere{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
@@ -159,18 +183,21 @@ private:
 
 	TransformMatrix cameraTransform;
 	DirectionalLight* DirectionalLightData = nullptr;
-	TransformationMatrix* transformationMatrixDataSphere = nullptr;
 
 	Matrix4x4 cameraMatrix;
-	Matrix4x4 viewMatrix;
+
+	Matrix4x4 viewMatrixTriangle;
+	Matrix4x4 viewMatrixPlane;
 	Matrix4x4 viewMatrixSphere;
 
-	Matrix4x4 projectionMatrix;
+	Matrix4x4 projectionMatrixTriangle;
+	Matrix4x4 projectionMatrixPlane;
 	Matrix4x4 projectionMatrixSphere;
 
 	Matrix4x4 ViewProjectionMatrix;
 
-	Matrix4x4 worldViewProjectionMatrix;
+	Matrix4x4 worldViewProjectionMatrixTriangle;
+	Matrix4x4 worldViewProjectionMatrixPlane;
 	Matrix4x4 worldViewProjectionMatrixSphere;
 
 	uint32_t kSubdivision = 16;
@@ -197,6 +224,4 @@ private:
 	Vector2 texcoordTop[1];
 	Vector2 texcoordLeft[1];
 	Vector2 texcoordRight[1];
-
-
 };

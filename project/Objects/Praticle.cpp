@@ -4,14 +4,13 @@ Particle::~Particle() {
 }
 
 void Particle::Initialize(const std::string& filename, int32_t width, int32_t height) {
-	spriteCom_->Initialize(DX12Common::GetInstance());
+	//spriteCom_->Initialize(DX12Common::GetInstance());
 	kSubdivision = 16;
 	
 	ResetDXC();
 
 	MakePSO();
 
-	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
 	ColorSphere[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	Top[0] = { 0.0f, 1.75f, 0.0f, 1.0f };
@@ -23,7 +22,12 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	texcoordLeft[0] = { 0.0f,1.0f };
 
 
-	transformMatrix = {
+	transformMatrixTriangle = {
+			{1.0f, 1.0f, 1.0f},
+			{0.0f, 0.0f, 0.0f},
+			{0.0f, 0.0f, 0.0f}
+	};
+	transformMatrixPlane = {
 			{1.0f, 1.0f, 1.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 0.0f, 0.0f}
@@ -38,18 +42,25 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, -15.0f}
     };
-	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
+	projectionMatrixTriangle = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
+	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
-	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
+	vertexResourceTriangle = CreateBufferResource(sizeof(VertexData) * 3);
+	materialResourceTriangle = CreateBufferResource(sizeof(Material));
+	transformationMatrixResourceTriangle = CreateBufferResource(sizeof(TransformationMatrix));
+
+	vertexResourcePlane = CreateBufferResource(sizeof(VertexData) * 6);
+	materialResourcePlane = CreateBufferResource(sizeof(Material));
+	transformationMatrixResourcePlane = CreateBufferResource(sizeof(TransformationMatrix));
+
 	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
-	materialResource = CreateBufferResource(sizeof(Material));
 	materialResourceSphere = CreateBufferResource(sizeof(Material));
-	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
+	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
+	
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
 	
-	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
 	
 	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
@@ -65,6 +76,9 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
 	textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata2);
 	UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
+
+	//TextureManager::GetInstance()->LoadTexture(DX12Common::GetInstance(), filename);
+	//uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(filename);
 
 	MakeShaderResourceView(metadata, metadata2);
 
@@ -201,11 +215,11 @@ void Particle::MakePSO()
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	vertexShaderBlob =
-	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	    CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	    CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	depthStencilDesc.DepthEnable = true;
@@ -256,7 +270,7 @@ void Particle::Update()
 
 void Particle::Draw(int32_t width, int32_t height)
 {
-	//sprite_->DrawSprite(
+	//sprite_->DrawPlane(
 	//	sprite_->GetLeftTop(0),
 	//	sprite_->GetRightTop(0),
 	//	sprite_->GetRightBottom(0),
@@ -269,10 +283,8 @@ void Particle::Draw(int32_t width, int32_t height)
 	//	width,
 	//	height);
 
-	//DrawSphere(sphere, ColorSphere[0], true, width, height);
-	//	
-	//DrawOBJ(ColorSphere[0], true, width, height);
-
+	DrawSphere(sphere, ColorSphere[0], true, width, height);
+		
 };
 
 ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
@@ -304,9 +316,13 @@ ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
 
 void Particle::MakeBufferView()
 {
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData)) * 3;
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	vertexBufferViewTriangle.BufferLocation = vertexResourceTriangle->GetGPUVirtualAddress();
+	vertexBufferViewTriangle.SizeInBytes = UINT(sizeof(VertexData)) * 3;
+	vertexBufferViewTriangle.StrideInBytes = sizeof(VertexData);
+
+	vertexBufferViewPlane.BufferLocation = vertexResourcePlane->GetGPUVirtualAddress();
+	vertexBufferViewPlane.SizeInBytes = UINT(sizeof(VertexData)) * 3;
+	vertexBufferViewPlane.StrideInBytes = sizeof(VertexData);
 
 	vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
 	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
@@ -318,106 +334,155 @@ void Particle::MakeBufferView()
 
 }
 
-//void Particle::InputDataTriangle(
-//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-//    Vector2 coordLeft) {
-//	VertexData* vertexData = nullptr;
-//	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-//	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * 3);
-//	Material* materialData = nullptr;
-//	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-//	TransformationMatrix* transformationMatrixData = nullptr;
-//	transformationMatrixResource->Map(
-//	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-//
-//	materialData[0].color = color;
-//	materialData[0].enableLighting = true;
-//
-//	transformationMatrixData->WVP = MakeIdentity4x4();
-//	
-//	transformMatrix.rotate.y += 0.02f;
-//	Matrix4x4 worldMatrix =
-//	    MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-//	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-//	transformationMatrixData->WVP = worldViewProjectionMatrix;
-//	transformationMatrixData->World = worldMatrix;
-//	
-//	vertexData[0].position = Top;
-//	vertexData[1].position = Right;
-//	vertexData[2].position = Left;
-//	vertexData[0].texcoord = coordTop;
-//	vertexData[1].texcoord = coordRight;
-//	vertexData[2].texcoord = coordLeft;
-//	vertexData[0].normal.x = vertexData[0].position.x;
-//	vertexData[0].normal.y = vertexData[0].position.y;
-//	vertexData[0].normal.z = vertexData[0].position.z;
-//	vertexData[1].normal.x = vertexData[1].position.x;
-//	vertexData[1].normal.y = vertexData[1].position.y;
-//	vertexData[1].normal.z = vertexData[1].position.z;
-//	vertexData[2].normal.x = vertexData[2].position.x;
-//	vertexData[2].normal.y = vertexData[2].position.y;
-//	vertexData[2].normal.z = vertexData[2].position.z;
-//}
+void Particle::InputDataTriangle(
+    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+    Vector2 coordLeft) {
+	VertexData* vertexData = nullptr;
+	vertexResourceTriangle->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * 3);
+	Material* materialData = nullptr;
+	materialResourceTriangle->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	TransformationMatrix* transformationMatrixData = nullptr;
+	transformationMatrixResourceTriangle->Map(
+	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+
+	materialData[0].color = color;
+	materialData[0].enableLighting = true;
+
+	transformationMatrixData->WVP = MakeIdentity4x4();
+	
+	transformMatrixTriangle.rotate.y += 0.02f;
+	Matrix4x4 worldMatrix =
+	    MakeAffineMatrix(transformMatrixTriangle.scale, transformMatrixTriangle.rotate, transformMatrixTriangle.translate);
+	worldViewProjectionMatrixTriangle = Multiply(worldMatrix, Multiply(viewMatrixTriangle, projectionMatrixTriangle));
+	transformationMatrixData->WVP = worldViewProjectionMatrixTriangle;
+	transformationMatrixData->World = worldMatrix;
+	
+	vertexData[0].position = Top;
+	vertexData[1].position = Right;
+	vertexData[2].position = Left;
+	vertexData[0].texcoord = coordTop;
+	vertexData[1].texcoord = coordRight;
+	vertexData[2].texcoord = coordLeft;
+	vertexData[0].normal.x = vertexData[0].position.x;
+	vertexData[0].normal.y = vertexData[0].position.y;
+	vertexData[0].normal.z = vertexData[0].position.z;
+	vertexData[1].normal.x = vertexData[1].position.x;
+	vertexData[1].normal.y = vertexData[1].position.y;
+	vertexData[1].normal.z = vertexData[1].position.z;
+	vertexData[2].normal.x = vertexData[2].position.x;
+	vertexData[2].normal.y = vertexData[2].position.y;
+	vertexData[2].normal.z = vertexData[2].position.z;
+}
+
+void Particle::InputDataPlane(
+	Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
+	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft)
+{
+	VertexData* vertexData = nullptr;
+	vertexResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * 6);
+	Material* materialData = nullptr;
+	materialResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	TransformationMatrix* transformationMatrixData = nullptr;
+	transformationMatrixResourcePlane->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+
+	materialData[0].color = color;
+	materialData[0].enableLighting = true;
+
+	transformationMatrixData->WVP = MakeIdentity4x4();
+
+	transformMatrixPlane.rotate.y += 0.02f;
+	Matrix4x4 worldMatrix =
+		MakeAffineMatrix(transformMatrixPlane.scale, transformMatrixPlane.rotate, transformMatrixPlane.translate);
+	worldViewProjectionMatrixPlane = Multiply(worldMatrix, Multiply(viewMatrixPlane, projectionMatrixPlane));
+	transformationMatrixData->WVP = worldViewProjectionMatrixPlane;
+	transformationMatrixData->World = worldMatrix;
+
+	vertexData[0].position = TopLeft;
+	vertexData[1].position = TopRight;
+	vertexData[2].position = BottomRight;
+	vertexData[3].position = BottomLeft;
+	vertexData[0].texcoord = coordTopLeft;
+	vertexData[1].texcoord = coordTopRight;
+	vertexData[2].texcoord = coordBottomRight;
+	vertexData[3].texcoord = coordBottomLeft;
+	vertexData[0].normal.x = vertexData[0].position.x;
+	vertexData[0].normal.y = vertexData[0].position.y;
+	vertexData[0].normal.z = vertexData[0].position.z;
+	vertexData[1].normal.x = vertexData[1].position.x;
+	vertexData[1].normal.y = vertexData[1].position.y;
+	vertexData[1].normal.z = vertexData[1].position.z;
+	vertexData[2].normal.x = vertexData[2].position.x;
+	vertexData[2].normal.y = vertexData[2].position.y;
+	vertexData[2].normal.z = vertexData[2].position.z;
+	vertexData[3].normal.x = vertexData[2].position.x;
+	vertexData[3].normal.y = vertexData[2].position.y;
+	vertexData[3].normal.z = vertexData[2].position.z;
+
+}
 
 void Particle::InputDataSphere(
     Vector4 LeftTop, Vector4 RightTop, Vector4 RightBottom, Vector4 LeftBottom, Vector4 color,
     Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom, Vector2 coordLeftBottom,
     uint32_t count, int32_t width, int32_t height)
 {
-	VertexData* vertexDataSphere = nullptr;
+	VertexData* vertexData = nullptr;
 
-	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+	vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-	Material* materialDataSphere = nullptr;
-	materialResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
+	Material* materialData = nullptr;
+	materialResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 
 	uint32_t* indexDataSphere = nullptr;
 	indexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
 
+	TransformationMatrix* transformationMatrixData = nullptr;
 	transformationMatrixResourceSphere->Map(
-	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
+	    0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	projectionMatrixSphere =
 	    MakePerspectiveFovMatrix(0.45f, float(width) / float(height), 0.1f, 100.0f);
-	transformationMatrixDataSphere->WVP = MakeIdentity4x4();
+	transformationMatrixData->WVP = MakeIdentity4x4();
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
 	    transformMatrixSphere.scale, transformMatrixSphere.rotate, transformMatrixSphere.translate);
 	worldViewProjectionMatrixSphere =
-	    Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrixSphere));
-	transformationMatrixDataSphere->WVP = worldViewProjectionMatrixSphere;
-	transformationMatrixDataSphere->World = worldMatrix;
+	    Multiply(worldMatrix, Multiply(viewMatrixSphere, projectionMatrixSphere));
+	transformationMatrixData->WVP = worldViewProjectionMatrixSphere;
+	transformationMatrixData->World = worldMatrix;
 
-	materialDataSphere[0].color = color;
-	materialDataSphere[0].enableLighting = true;
-	materialDataSphere[0].uvTransform = MakeIdentity4x4();
+	materialData[0].color = color;
+	materialData[0].enableLighting = true;
+	materialData[0].uvTransform = MakeIdentity4x4();
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSphere.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformSphere.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSphere.translate));
-	materialDataSphere[0].uvTransform = uvTransformMatrix;
+	materialData[0].uvTransform = uvTransformMatrix;
 
-	vertexDataSphere[count * 4].position = LeftTop;
-	vertexDataSphere[count * 4].texcoord = coordLeftTop;
-	vertexDataSphere[count * 4].normal.x = vertexDataSphere[count * 4].position.x;
-	vertexDataSphere[count * 4].normal.y = vertexDataSphere[count * 4].position.y;
-	vertexDataSphere[count * 4].normal.z = vertexDataSphere[count * 4].position.z;
+	vertexData[count * 4].position = LeftTop;
+	vertexData[count * 4].texcoord = coordLeftTop;
+	vertexData[count * 4].normal.x = vertexData[count * 4].position.x;
+	vertexData[count * 4].normal.y = vertexData[count * 4].position.y;
+	vertexData[count * 4].normal.z = vertexData[count * 4].position.z;
 	
-	vertexDataSphere[count * 4 + 1].position = RightTop;
-	vertexDataSphere[count * 4 + 1].texcoord = coordRightTop;
-	vertexDataSphere[count * 4 + 1].normal.x = vertexDataSphere[count * 4 + 1].position.x;
-	vertexDataSphere[count * 4 + 1].normal.y = vertexDataSphere[count * 4 + 1].position.y;
-	vertexDataSphere[count * 4 + 1].normal.z = vertexDataSphere[count * 4 + 1].position.z;
+	vertexData[count * 4 + 1].position = RightTop;
+	vertexData[count * 4 + 1].texcoord = coordRightTop;
+	vertexData[count * 4 + 1].normal.x = vertexData[count * 4 + 1].position.x;
+	vertexData[count * 4 + 1].normal.y = vertexData[count * 4 + 1].position.y;
+	vertexData[count * 4 + 1].normal.z = vertexData[count * 4 + 1].position.z;
 	
-	vertexDataSphere[count * 4 + 2].position = RightBottom;
-	vertexDataSphere[count * 4 + 2].texcoord = coordRightBottom;
-	vertexDataSphere[count * 4 + 2].normal.x = vertexDataSphere[count * 4 + 2].position.x;
-	vertexDataSphere[count * 4 + 2].normal.y = vertexDataSphere[count * 4 + 2].position.y;
-	vertexDataSphere[count * 4 + 2].normal.z = vertexDataSphere[count * 4 + 2].position.z;
+	vertexData[count * 4 + 2].position = RightBottom;
+	vertexData[count * 4 + 2].texcoord = coordRightBottom;
+	vertexData[count * 4 + 2].normal.x = vertexData[count * 4 + 2].position.x;
+	vertexData[count * 4 + 2].normal.y = vertexData[count * 4 + 2].position.y;
+	vertexData[count * 4 + 2].normal.z = vertexData[count * 4 + 2].position.z;
 	
-	vertexDataSphere[count * 4 + 3].position = LeftBottom;
-	vertexDataSphere[count * 4 + 3].texcoord = coordLeftBottom;
-	vertexDataSphere[count * 4 + 3].normal.x = vertexDataSphere[count * 4 + 3].position.x;
-	vertexDataSphere[count * 4 + 3].normal.y = vertexDataSphere[count * 4 + 3].position.y;
-	vertexDataSphere[count * 4 + 3].normal.z = vertexDataSphere[count * 4 + 3].position.z;
+	vertexData[count * 4 + 3].position = LeftBottom;
+	vertexData[count * 4 + 3].texcoord = coordLeftBottom;
+	vertexData[count * 4 + 3].normal.x = vertexData[count * 4 + 3].position.x;
+	vertexData[count * 4 + 3].normal.y = vertexData[count * 4 + 3].position.y;
+	vertexData[count * 4 + 3].normal.z = vertexData[count * 4 + 3].position.z;
 
 	indexDataSphere[count * 6 + 0] = count * 4 + 0;
 	indexDataSphere[count * 6 + 1] = count * 4 + 1;
@@ -429,38 +494,75 @@ void Particle::InputDataSphere(
 }
 
 
-//void Particle::DrawTriangle(
-//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-//    Vector2 coordLeft, bool useWorldMap) {
-//	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-//	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
-//	DX12Common::GetInstance()->GetCommandList().Get()->
-//		IASetIndexBuffer(&indexBufferViewSphere);
-//	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
-//	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-//	    0, materialResource->GetGPUVirtualAddress());
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-//	    1, transformationMatrixResource->GetGPUVirtualAddress());
-//
-//	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-//	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
-//	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-//	    2, useWorldMap ? GetTextureSrvHandleGPU2()
-//	                   : GetTextureSrvHandleGPU());
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-//		3, directionalLightResource->GetGPUVirtualAddress());
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
-//}
+void Particle::DrawTriangle(
+    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+    Vector2 coordLeft, bool useWorldMap) {
+	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
+	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
+	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewTriangle);
+	DX12Common::GetInstance()->GetCommandList().Get()->
+		IASetIndexBuffer(&indexBufferViewSphere);
+	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	    0, materialResourceTriangle->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	    1, transformationMatrixResourceTriangle->GetGPUVirtualAddress());
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+
+	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+	    2, useWorldMap ? GetTextureSrvHandleGPU2()
+	                   : GetTextureSrvHandleGPU());
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		3, directionalLightResource->GetGPUVirtualAddress());
+
+	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
+}
+
+void Particle::DrawPlane(
+	Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
+	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft, bool useWorldMap)
+{
+	InputDataPlane
+	(TopLeft, TopRight, BottomRight, BottomLeft, color,
+		coordTopLeft, coordTopRight, coordBottomRight, coordBottomLeft);
+	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
+	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
+	DX12Common::GetInstance()->GetCommandList().Get()->
+		IASetIndexBuffer(&indexBufferViewSphere);
+	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		0, materialResourcePlane->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		1, transformationMatrixResourcePlane->GetGPUVirtualAddress());
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+		DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+
+	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+		2, useWorldMap ? GetTextureSrvHandleGPU2()
+		: GetTextureSrvHandleGPU());
+
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		3, directionalLightResource->GetGPUVirtualAddress());
+
+	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(6, 1, 0, 0);
+
+}
 
 void Particle::DrawSphere(
 	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
@@ -600,6 +702,28 @@ void Particle::MakeShaderResourceView(const DirectX::TexMetadata& metadata, cons
 
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+}
+
+void Particle::MakeShaderResourceView(const DirectX::TexMetadata& metadata)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->
+		GetDevice().Get()->GetDescriptorHandleIncrementSize(
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	textureSrvHandleCPU = DX12Common::GetInstance()->
+		GetCPUDescriptorHandle(DX12Common::GetInstance()->
+			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+	textureSrvHandleGPU = DX12Common::GetInstance()->
+		GetGPUDescriptorHandle(DX12Common::GetInstance()->
+			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+
+	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 }
 
 DirectX::ScratchImage Particle::LoadTexture(const std::string& filePath)

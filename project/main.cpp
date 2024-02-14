@@ -8,6 +8,7 @@
 #include"Managers/ModelManager.h"
 #include"Objects/model.h"
 #include"Managers/TextureManager.h"
+#include"Objects/Particle.h"
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
@@ -29,6 +30,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	object3dCommon = new Object3dCommon;
 	ModelCommon* modelCommon = new ModelCommon;
 	Camera* camera = new Camera();
+	Particle* particle = new Particle;
 	std::vector<Object3d*> objects3d;
 	std::vector<Model*> models;
 	std::vector<Sprite*> sprites;
@@ -96,6 +98,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->SetPositoin(posSprite);
 		sprites.push_back(sprite);
 	}
+	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_);
 
 	while (NewMSG.message != WM_QUIT)
 	{
@@ -104,6 +107,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		camera->Update();
 		//imgui->Update();
 		//ImGui::Begin("sphereEdit");
+		particle->Update();
 		for (Object3d* object3d : objects3d)
 		{
 			if (input->PushKey(DIK_D)) {
@@ -123,7 +127,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			sprite->Update(kWindowWidth, kWindowHeight);
 		}
 
-
 		if (winAPP->ProcessMessage())
 		{
 			//ImGui::Render();
@@ -139,6 +142,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//{
 		//	model->Draw(modelCommon);
 		//}
+		
+		particle->Draw(WinAPP::clientWidth_, WinAPP::clientHeight_);
+
 		if (input->PushKey(DIK_SPACE)!=0) {
 			for (Sprite* sprite : sprites)
 			{
