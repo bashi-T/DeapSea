@@ -139,6 +139,8 @@ private:
 	ComPtr<ID3D12Resource> vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
 
+	ComPtr<ID3D12Resource> indexResourcePlane = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewPlane{};
 
 	ComPtr<ID3D12Resource> indexResourceSphere = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
@@ -155,27 +157,32 @@ private:
 	ComPtr<ID3D12Resource> directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
-	struct Material {
+	struct Material
+	{
 		Vector4 color;
-		int32_t enableLighting;
+		bool enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
-	struct TransformationMatrix {
+	struct TransformationMatrix
+	{
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 	};
-	TransformMatrix uvTransformTriangle{
+	TransformMatrix uvTransformTriangle
+	{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	TransformMatrix uvTransformPlane{
+	TransformMatrix uvTransformPlane
+	{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	TransformMatrix uvTransformSphere{
+	TransformMatrix uvTransformSphere
+	{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
@@ -205,6 +212,12 @@ private:
 	ComPtr<ID3D12Resource> textureResource;
 	ComPtr<ID3D12Resource> textureResource2;
 
+	uint32_t textureIndex;
+
+	VertexData* vertexDataPlane = nullptr;
+	Material* materialDataPlane = nullptr;
+	TransformationMatrix* transformationMatrixDataPlane = nullptr;
+
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
@@ -224,4 +237,14 @@ private:
 	Vector2 texcoordTop[1];
 	Vector2 texcoordLeft[1];
 	Vector2 texcoordRight[1];
+
+	Vector4 LeftTop[1];
+	Vector4 RightTop[1];
+	Vector4 RightBottom[1];
+	Vector4 LeftBottom[1];
+	Vector4 ColorPlane[1];
+	Vector2 texcoordLeftTop[1];
+	Vector2 texcoordLeftBottom[1];
+	Vector2 texcoordRightTop[1];
+	Vector2 texcoordRightBottom[1];
 };

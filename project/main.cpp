@@ -107,25 +107,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		camera->Update();
 		//imgui->Update();
 		//ImGui::Begin("sphereEdit");
-		particle->Update();
-		for (Object3d* object3d : objects3d)
-		{
-			if (input->PushKey(DIK_D)) {
-				object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
-			}
-			if (input->PushKey(DIK_A)) {
-				object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
-			}
-			object3d->Update();
-			//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
-			//ImGui::Checkbox("useWorldMap", &useWorldMap);
-		}
+
+		//for (Object3d* object3d : objects3d)
+		//{
+		//	if (input->PushKey(DIK_D)) {
+		//		object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+		//	}
+		//	if (input->PushKey(DIK_A)) {
+		//		object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+		//	}
+		//	object3d->Update();
+		//	//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
+		//	//ImGui::Checkbox("useWorldMap", &useWorldMap);
+		//}
 		//ImGui::End();
 
 		for (Sprite* sprite : sprites)
 		{
 			sprite->Update(kWindowWidth, kWindowHeight);
 		}
+
+		//particle->Update();
 
 		if (winAPP->ProcessMessage())
 		{
@@ -134,10 +136,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		dx12Common->PreDraw();
 
-		for (Object3d* object3d : objects3d)
-		{
-			object3d->Draw(object3dCommon, true, ModelManager::GetInstance()->GetModelCommon());
-		}
+		//for (Object3d* object3d : objects3d)
+		//{
+		//	object3d->Draw(object3dCommon, true, ModelManager::GetInstance()->GetModelCommon());
+		//}
 		//for(Model*model:models)
 		//{
 		//	model->Draw(modelCommon);
@@ -151,7 +153,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				sprite->Draw(SPCommon);
 			}
 		}
-		//imgui->Endframe(dx12Common->GetCommandList().Get());
+		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
 
