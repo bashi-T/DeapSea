@@ -78,6 +78,23 @@ public:
 		MaterialData material;
 	};
 	ModelData modelData;
+	struct Material
+	{
+		Vector4 color;
+		bool enableLighting;
+		float padding[3];
+		Matrix4x4 uvTransform;
+	};
+	struct TransformationMatrix
+	{
+		Matrix4x4 WVP;
+		Matrix4x4 World;
+	};
+	struct DirectionalLight {
+		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		Vector3 direction = { 0.0f, -1.0f, 0.0f };
+		float intensity = 1.0f;
+	};
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(
@@ -98,11 +115,6 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 
-	struct DirectionalLight {
-		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Vector3 direction = { 0.0f, -1.0f, 0.0f };
-		float intensity = 1.0f;
-	};
 	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 private:
@@ -110,6 +122,7 @@ private:
 	WinAPP* sWinApp;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
+	Camera* camera_;
 	HRESULT hr = NULL;
 	TransformMatrix transformMatrixTriangle;
 	TransformMatrix transformMatrixPlane;
@@ -157,18 +170,6 @@ private:
 	ComPtr<ID3D12Resource> directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
-	struct Material
-	{
-		Vector4 color;
-		bool enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-	};
-	struct TransformationMatrix
-	{
-		Matrix4x4 WVP;
-		Matrix4x4 World;
-	};
 	TransformMatrix uvTransformTriangle
 	{
 		{1.0f,1.0f,1.0f},

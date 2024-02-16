@@ -46,11 +46,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 		{0.0f, 0.0f, 0.0f},
 		{0.0f, 0.0f, 0.0f}
 	};
-	cameraTransform = {
-	    {1.0f, 1.0f, 1.0f},
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, -15.0f}
-    };
+
 	projectionMatrixTriangle = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
@@ -92,7 +88,6 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	//MakeShaderResourceView(metadata);
 
 	vertexResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlane));
-	std::memcpy(vertexDataPlane, modelData.vertices.data(), sizeof(VertexData) * 6);
 	materialResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&materialDataPlane));
 	transformationMatrixResourcePlane->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataPlane));
@@ -406,18 +401,16 @@ void Particle::InputDataPlane(
 	//transformMatrixPlane.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix =
 		MakeAffineMatrix(transformMatrixPlane.scale, transformMatrixPlane.rotate, transformMatrixPlane.translate);
-	worldViewProjectionMatrixPlane = Multiply(worldMatrix, Multiply(viewMatrixPlane, projectionMatrixPlane));
+	worldViewProjectionMatrixPlane = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
 	transformationMatrixDataPlane->WVP = worldViewProjectionMatrixPlane;
 	transformationMatrixDataPlane->World = worldMatrix;
 
 	vertexDataPlane[0].position = TopLeft;
 	vertexDataPlane[1].position = TopRight;
 	vertexDataPlane[2].position = BottomRight;
-	vertexDataPlane[3].position = BottomLeft;
 	vertexDataPlane[0].texcoord = coordTopLeft;
 	vertexDataPlane[1].texcoord = coordTopRight;
 	vertexDataPlane[2].texcoord = coordBottomRight;
-	vertexDataPlane[3].texcoord = coordBottomLeft;
 	vertexDataPlane[0].normal.x = vertexDataPlane[0].position.x;
 	vertexDataPlane[0].normal.y = vertexDataPlane[0].position.y;
 	vertexDataPlane[0].normal.z = vertexDataPlane[0].position.z;
@@ -427,9 +420,22 @@ void Particle::InputDataPlane(
 	vertexDataPlane[2].normal.x = vertexDataPlane[2].position.x;
 	vertexDataPlane[2].normal.y = vertexDataPlane[2].position.y;
 	vertexDataPlane[2].normal.z = vertexDataPlane[2].position.z;
-	vertexDataPlane[3].normal.x = vertexDataPlane[3].position.x;
+
+	vertexDataPlane[3].position = TopLeft;
+	vertexDataPlane[4].position = BottomRight;
+	vertexDataPlane[5].position = BottomLeft;
+	vertexDataPlane[3].texcoord = coordTopLeft;
+	vertexDataPlane[4].texcoord = coordBottomRight;
+	vertexDataPlane[5].texcoord = coordBottomLeft;
+    vertexDataPlane[3].normal.x = vertexDataPlane[3].position.x;
 	vertexDataPlane[3].normal.y = vertexDataPlane[3].position.y;
 	vertexDataPlane[3].normal.z = vertexDataPlane[3].position.z;
+	vertexDataPlane[4].normal.x = vertexDataPlane[4].position.x;
+	vertexDataPlane[4].normal.y = vertexDataPlane[4].position.y;
+	vertexDataPlane[4].normal.z = vertexDataPlane[4].position.z;
+	vertexDataPlane[5].normal.x = vertexDataPlane[5].position.x;
+	vertexDataPlane[5].normal.y = vertexDataPlane[5].position.y;
+	vertexDataPlane[5].normal.z = vertexDataPlane[5].position.z;
 
 }
 

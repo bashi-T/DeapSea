@@ -153,7 +153,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				sprite->Draw(SPCommon);
 			}
 		}
-		imgui->Endframe(dx12Common->GetCommandList().Get());
+		//imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
 
