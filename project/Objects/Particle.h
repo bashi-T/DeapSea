@@ -124,6 +124,9 @@ private:
 	Object3dCommon* object3dCommon_;
 	Camera* camera_;
 	HRESULT hr = NULL;
+
+	uint32_t instanceCount;
+
 	TransformMatrix transformMatrixTriangle;
 	TransformMatrix transformMatrixPlane;
 	TransformMatrix transformMatrixSphere;

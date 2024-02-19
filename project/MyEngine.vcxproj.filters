@@ -165,6 +165,8 @@
   <ItemGroup>
     <FxCompile Include="HLSL\Object3d.VS.hlsl" />
     <FxCompile Include="HLSL\Object3d.PS.hlsl" />
+    <FxCompile Include="HLSL\Particle.VS.hlsl" />
+    <FxCompile Include="HLSL\Particle.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -172,5 +174,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="HLSL\Object3d.hlsli" />
+    <None Include="HLSL\Particle.hlsli" />
   </ItemGroup>
 </Project>

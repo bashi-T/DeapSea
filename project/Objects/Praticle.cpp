@@ -7,7 +7,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 {
 	this->object3dCommon_ = object3dCommon;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
-
+	instanceCount = 10;
 	kSubdivision = 16;
 	
 	ResetDXC();
@@ -236,11 +236,11 @@ void Particle::MakePSO()
 	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	vertexShaderBlob =
-		CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Particle.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-		CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Particle.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -591,7 +591,7 @@ void Particle::DrawPlane()
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
 
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, instanceCount, 0, 0, 0);
 
 }
 
