@@ -98,7 +98,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->SetPositoin(posSprite);
 		sprites.push_back(sprite);
 	}
-	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_);
+	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
 
 	while (NewMSG.message != WM_QUIT)
 	{
@@ -122,12 +122,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//}
 		//ImGui::End();
 
+		particle->Update();
+
 		for (Sprite* sprite : sprites)
 		{
 			sprite->Update(kWindowWidth, kWindowHeight);
 		}
-
-		//particle->Update();
 
 		if (winAPP->ProcessMessage())
 		{

@@ -3,8 +3,11 @@
 Particle::~Particle() {
 }
 
-void Particle::Initialize(const std::string& filename, int32_t width, int32_t height)
+void Particle::Initialize(const std::string& filename, int32_t width, int32_t height, Object3dCommon* object3dCommon)
 {
+	this->object3dCommon_ = object3dCommon;
+	this->camera_ = object3dCommon_->GetDefaultCamera();
+
 	kSubdivision = 16;
 	
 	ResetDXC();
@@ -25,11 +28,11 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	RightTop[0] = { 0.5f, 0.5f, 0.0f, 1.0f };
 	RightBottom[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
 	LeftBottom[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	ColorPlane[0] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	ColorPlane[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	texcoordLeftTop[0] = { 0.0f,0.0f };
-	texcoordRightTop[0] = { 1.0f,0.0f };
+	texcoordRightTop[0] = { 0.0f,1.0f };
 	texcoordRightBottom[0] = { 1.0f,1.0f };
-	texcoordLeftBottom[0] = { 0.0f,1.0f };
+	texcoordLeftBottom[0] = { 1.0f,0.0f };
 
 	transformMatrixTriangle = {
 			{1.0f, 1.0f, 1.0f},
@@ -149,15 +152,8 @@ ComPtr<IDxcBlob> Particle::CompileShader(
 
 void Particle::MakePSO()
 {
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[0].Descriptor.ShaderRegister = 0;
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].Descriptor.ShaderRegister = 0;
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
@@ -165,11 +161,20 @@ void Particle::MakePSO()
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
+
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-	
+
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 1;
@@ -190,16 +195,20 @@ void Particle::MakePSO()
 	descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers);
 
 	hr = D3D12SerializeRootSignature(
-	    &descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+		&descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(hr)) {
+	if (FAILED(hr))
+	{
 		debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
 	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateRootSignature(
-	    0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-	    IID_PPV_ARGS(&rootSignature));
+		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&rootSignature));
+
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
@@ -217,29 +226,35 @@ void Particle::MakePSO()
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
+	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
+	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	vertexShaderBlob =
-	    CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-	    CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 	graphicsPipelineStateDesc.VS = {
-	    vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()};
+		vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };
 	graphicsPipelineStateDesc.PS = {
-	    pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize()};
+		pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };
 	graphicsPipelineStateDesc.BlendState = blendDesc;
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 
@@ -254,12 +269,14 @@ void Particle::MakePSO()
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateGraphicsPipelineState(
-	    &graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 }
 
 void Particle::Update()
 {
+	InputDataPlane(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], ColorPlane[0],
+		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
 	//cameraTransform.translate.x += 0.02f;
 	//DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
 	//ImGui::Begin("Light");
@@ -280,17 +297,7 @@ void Particle::Draw(int32_t width, int32_t height)
 {
 	//DrawTriangle(Top[0],Right[0], Left[0],Color[0],texcoordTop[0],texcoordRight[0],texcoordLeft[0],true);
 
-	DrawPlane(
-		LeftTop[0],
-		RightTop[0],
-		RightBottom[0],
-		LeftBottom[0],
-		ColorPlane[0],
-		texcoordLeftTop[0],
-		texcoordRightTop[0],
-		texcoordRightBottom[0],
-		texcoordLeftBottom[0],
-		true);
+	DrawPlane();
 
 	//DrawSphere(sphere, ColorSphere[0], true, width, height);
 
@@ -361,7 +368,11 @@ void Particle::InputDataTriangle(
 
 	materialData[0].color = color;
 	materialData[0].enableLighting = true;
-
+	materialData[0].uvTransform= MakeIdentity4x4();
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformTriangle.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformTriangle.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformTriangle.translate));
+	materialData[0].uvTransform = uvTransformMatrix;
 	transformationMatrixData->WVP = MakeIdentity4x4();
 	
 	transformMatrixTriangle.rotate.y += 0.02f;
@@ -386,56 +397,67 @@ void Particle::InputDataTriangle(
 	vertexData[2].normal.x = vertexData[2].position.x;
 	vertexData[2].normal.y = vertexData[2].position.y;
 	vertexData[2].normal.z = vertexData[2].position.z;
+
 }
 
 void Particle::InputDataPlane(
 	Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
 	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft)
 {
+	uint32_t* indexDataPlane = nullptr;
+	indexResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&indexDataPlane));
 
 	materialDataPlane[0].color = color;
-	materialDataPlane[0].enableLighting = true;
+	materialDataPlane[0].enableLighting = false;
+	materialDataPlane[0].uvTransform = MakeIdentity4x4();
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformPlane.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformPlane.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformPlane.translate));
+	materialDataPlane[0].uvTransform = uvTransformMatrix;
 
 	transformationMatrixDataPlane->WVP = MakeIdentity4x4();
-
 	//transformMatrixPlane.rotate.y += 0.02f;
 	Matrix4x4 worldMatrix =
 		MakeAffineMatrix(transformMatrixPlane.scale, transformMatrixPlane.rotate, transformMatrixPlane.translate);
-	worldViewProjectionMatrixPlane = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
+	if (camera_)
+	{
+		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrixPlane = Multiply(worldMatrix, viewProjectionMatrix);
+	}
 	transformationMatrixDataPlane->WVP = worldViewProjectionMatrixPlane;
 	transformationMatrixDataPlane->World = worldMatrix;
 
 	vertexDataPlane[0].position = TopLeft;
-	vertexDataPlane[1].position = TopRight;
-	vertexDataPlane[2].position = BottomRight;
 	vertexDataPlane[0].texcoord = coordTopLeft;
-	vertexDataPlane[1].texcoord = coordTopRight;
-	vertexDataPlane[2].texcoord = coordBottomRight;
 	vertexDataPlane[0].normal.x = vertexDataPlane[0].position.x;
 	vertexDataPlane[0].normal.y = vertexDataPlane[0].position.y;
 	vertexDataPlane[0].normal.z = vertexDataPlane[0].position.z;
+
+	vertexDataPlane[1].position = TopRight;
+	vertexDataPlane[1].texcoord = coordTopRight;
 	vertexDataPlane[1].normal.x = vertexDataPlane[1].position.x;
 	vertexDataPlane[1].normal.y = vertexDataPlane[1].position.y;
 	vertexDataPlane[1].normal.z = vertexDataPlane[1].position.z;
+
+	vertexDataPlane[2].position = BottomRight;
+	vertexDataPlane[2].texcoord = coordBottomRight;
 	vertexDataPlane[2].normal.x = vertexDataPlane[2].position.x;
 	vertexDataPlane[2].normal.y = vertexDataPlane[2].position.y;
 	vertexDataPlane[2].normal.z = vertexDataPlane[2].position.z;
 
-	vertexDataPlane[3].position = TopLeft;
-	vertexDataPlane[4].position = BottomRight;
-	vertexDataPlane[5].position = BottomLeft;
-	vertexDataPlane[3].texcoord = coordTopLeft;
-	vertexDataPlane[4].texcoord = coordBottomRight;
-	vertexDataPlane[5].texcoord = coordBottomLeft;
-    vertexDataPlane[3].normal.x = vertexDataPlane[3].position.x;
+	vertexDataPlane[3].position = BottomLeft;
+	vertexDataPlane[3].texcoord = coordBottomLeft;
+	vertexDataPlane[3].normal.x = vertexDataPlane[3].position.x;
 	vertexDataPlane[3].normal.y = vertexDataPlane[3].position.y;
 	vertexDataPlane[3].normal.z = vertexDataPlane[3].position.z;
-	vertexDataPlane[4].normal.x = vertexDataPlane[4].position.x;
-	vertexDataPlane[4].normal.y = vertexDataPlane[4].position.y;
-	vertexDataPlane[4].normal.z = vertexDataPlane[4].position.z;
-	vertexDataPlane[5].normal.x = vertexDataPlane[5].position.x;
-	vertexDataPlane[5].normal.y = vertexDataPlane[5].position.y;
-	vertexDataPlane[5].normal.z = vertexDataPlane[5].position.z;
+
+	indexDataPlane[0] = 0;
+	indexDataPlane[1] = 1;
+	indexDataPlane[2] = 2;
+
+	indexDataPlane[3] = 0;
+	indexDataPlane[4] = 2;
+	indexDataPlane[5] = 3;
 
 }
 
@@ -542,13 +564,8 @@ void Particle::DrawTriangle(
 	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
 }
 
-void Particle::DrawPlane(
-	Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
-	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft, bool useWorldMap)
+void Particle::DrawPlane()
 {
-	InputDataPlane
-	(TopLeft, TopRight, BottomRight, BottomLeft, color,
-		coordTopLeft, coordTopRight, coordBottomRight, coordBottomLeft);
 	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
@@ -574,7 +591,7 @@ void Particle::DrawPlane(
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
 
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(6, 1, 0, 0);
+	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 }
 
@@ -651,8 +668,7 @@ void Particle::DrawSphere(
 
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				SetGraphicsRootDescriptorTable(
-				2, useWorldMap ? GetTextureSrvHandleGPU2()
-				: GetTextureSrvHandleGPU());
+				2, TextureManager::GetInstance()->GetSRVHandleGPU(textureIndex));
 
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(

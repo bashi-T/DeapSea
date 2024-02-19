@@ -7,7 +7,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t
 
 	transformationMatrixResource = CreateBufferResource(object3dCommon_,sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(object3dCommon_, sizeof(DirectionalLight));
-	this->camera = object3dCommon->GetDefaultCamera();
+	this->camera = object3dCommon_->GetDefaultCamera();
 	transformMatrix =
 	{
 	{1.0f, 1.0f, 1.0f},

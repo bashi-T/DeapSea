@@ -14,6 +14,7 @@
 #include"Commons/SpriteCommon.h"
 #include"Camera/Camera.h"
 #include"Managers/TextureManager.h"
+#include "Commons/Object3dCommon.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -24,7 +25,7 @@ class Particle
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
-	void Initialize(const std::string& filename, int32_t width, int32_t height);
+	void Initialize(const std::string& filename, int32_t width, int32_t height, Object3dCommon* object3dCommon);
 	void Update();
 	void Draw(int32_t width, int32_t height);
 	ComPtr<IDxcBlob> CompileShader(
@@ -37,9 +38,7 @@ public:
 	void DrawTriangle(
 		Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 		Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
-	void DrawPlane(
-		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
-		Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft, bool useWorldMap);
+	void DrawPlane();
 	void DrawSphere(
 		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
 	void ResetDXC();
@@ -122,6 +121,7 @@ private:
 	WinAPP* sWinApp;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
+	Object3dCommon* object3dCommon_;
 	Camera* camera_;
 	HRESULT hr = NULL;
 	TransformMatrix transformMatrixTriangle;
