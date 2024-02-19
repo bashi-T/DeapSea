@@ -58,7 +58,7 @@ public:
 
 	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
 
-	void MakeShaderResourceView(const DirectX::TexMetadata& metadata);
+	void MakeShaderResourceViewInstance(ID3D12Resource* instancingResource);
 
 	struct VertexData
 	{
@@ -107,7 +107,6 @@ public:
 	//void ParticleRelease();
 
 	//ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
-	TransformMatrix GetCameraTransform() { return cameraTransform; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
@@ -125,15 +124,17 @@ private:
 	Camera* camera_;
 	HRESULT hr = NULL;
 
-	uint32_t instanceCount;
+	uint32_t kNumInstance = 10;
 
 	TransformMatrix transformMatrixTriangle;
-	TransformMatrix transformMatrixPlane;
+	TransformMatrix transformMatrixPlane[10];
 	TransformMatrix transformMatrixSphere;
 
 	ComPtr<ID3D12Resource> transformationMatrixResourceTriangle;
 	ComPtr<ID3D12Resource> transformationMatrixResourcePlane;
 	ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
+
+	ComPtr<ID3D12Resource> instancingResourcePlane;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
 	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
@@ -192,7 +193,6 @@ private:
 		{0.0f,0.0f,0.0f},
 	};
 
-	TransformMatrix cameraTransform;
 	DirectionalLight* DirectionalLightData = nullptr;
 
 	Matrix4x4 cameraMatrix;
@@ -221,6 +221,7 @@ private:
 	VertexData* vertexDataPlane = nullptr;
 	Material* materialDataPlane = nullptr;
 	TransformationMatrix* transformationMatrixDataPlane = nullptr;
+	TransformationMatrix* instancingDataPlane = nullptr;
 
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;
@@ -228,6 +229,9 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU;
+	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;
 
 	const int32_t kNumTriangle = 1;
 	Vector4 ColorSphere[1];
