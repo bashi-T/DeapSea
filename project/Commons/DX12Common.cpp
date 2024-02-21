@@ -288,7 +288,7 @@ void DX12Common::PostDraw()
 		commandList.Get()
 	};
 	commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
-	swapChain->Present(1, 0);
+ 	swapChain->Present(1, 0);
 	fenceValue++;
 	commandQueue->Signal(fence.Get(), fenceValue);
 

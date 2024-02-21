@@ -54,7 +54,7 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\Praticle.cpp">
+    <ClCompile Include="Objects\Mesh.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Systems\MyImGui.cpp">
@@ -87,6 +87,9 @@
     <ClCompile Include="Managers\ModelManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\Praticle.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Systems\WindowApp.h">
@@ -98,7 +101,7 @@
     <ClInclude Include="Commons\DX12Common.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\Particle.h">
+    <ClInclude Include="Objects\Mesh.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -161,12 +164,15 @@
     <ClInclude Include="Managers\ModelManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Particle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\Object3d.VS.hlsl" />
     <FxCompile Include="HLSL\Object3d.PS.hlsl" />
-    <FxCompile Include="HLSL\Particle.VS.hlsl" />
     <FxCompile Include="HLSL\Particle.PS.hlsl" />
+    <FxCompile Include="HLSL\Particle.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

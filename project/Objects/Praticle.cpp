@@ -39,6 +39,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 0.0f, 0.0f}
 	};
+
 	for (uint32_t index = 0; index < kNumInstance; ++index)
 	{
 		transformMatrixPlane[index] = {
@@ -54,15 +55,13 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	};
 
 	projectionMatrixTriangle = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
-	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
-
 	vertexResourceTriangle = CreateBufferResource(sizeof(VertexData) * 3);
 	materialResourceTriangle = CreateBufferResource(sizeof(Material));
 	transformationMatrixResourceTriangle = CreateBufferResource(sizeof(TransformationMatrix));
 
+	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 	vertexResourcePlane = CreateBufferResource(sizeof(VertexData) * 6);
 	materialResourcePlane = CreateBufferResource(sizeof(Material));
-	transformationMatrixResourcePlane = CreateBufferResource(sizeof(TransformationMatrix));
 	indexResourcePlane = CreateBufferResource(sizeof(uint32_t) * 6);
 	instancingResourcePlane = CreateBufferResource(sizeof(TransformationMatrix) *kNumInstance);
 
@@ -71,19 +70,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
 	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
 	
-	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	
-	
-	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
-	DirectionalLightData->intensity = 1.0f;
-
 	MakeBufferView();
-
-	TextureManager::GetInstance()->LoadTexture(DX12Common::GetInstance(), filename);
-	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(filename);
-	MakeShaderResourceViewInstance(instancingResourcePlane.Get());
 
 	//mipImages = LoadTexture(modelData.material.textureFilePath);
 	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -95,13 +82,22 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	//UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
 	//MakeShaderResourceView(metadata);
 
+
 	vertexResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlane));
 	materialResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&materialDataPlane));
-	transformationMatrixResourcePlane->Map(
-		0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataPlane));
 	instancingResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&instancingDataPlane));
 	InputDataPlane(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], ColorPlane[0],
 		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
+
+	for (uint32_t index = 0; index < kNumInstance; ++index)
+	{
+		instancingDataPlane[index].WVP = MakeIdentity4x4();
+		instancingDataPlane[index].World = MakeIdentity4x4();
+
+	}
+	MakeShaderResourceViewInstance(instancingResourcePlane.Get());
+	TextureManager::GetInstance()->LoadTexture(DX12Common::GetInstance(), filename);
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(filename);
 }
 
 void Particle::ResetDXC()
@@ -172,7 +168,8 @@ void Particle::MakePSO()
 	descriptorRangeForInstancing[0].BaseShaderRegister = 0;
 	descriptorRangeForInstancing[0].NumDescriptors = 1;
 	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart =
+		D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -181,6 +178,7 @@ void Particle::MakePSO()
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
 	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);
 
@@ -188,10 +186,6 @@ void Particle::MakePSO()
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[3].Descriptor.ShaderRegister = 1;
 
 	descriptionRootSignature_.pParameters = rootParameters;
 	descriptionRootSignature_.NumParameters = _countof(rootParameters);
@@ -422,15 +416,12 @@ void Particle::InputDataPlane(
 	indexResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&indexDataPlane));
 
 	materialDataPlane[0].color = color;
-	materialDataPlane[0].enableLighting = false;
 	materialDataPlane[0].uvTransform = MakeIdentity4x4();
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformPlane.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformPlane.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformPlane.translate));
 	materialDataPlane[0].uvTransform = uvTransformMatrix;
 
-	transformationMatrixDataPlane->WVP = MakeIdentity4x4();
-	//transformMatrixPlane.rotate.y += 0.02f;
 	for (uint32_t index = 0; index <kNumInstance; ++index)
 	{
 		Matrix4x4 worldMatrix =
@@ -443,8 +434,6 @@ void Particle::InputDataPlane(
 			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 			worldViewProjectionMatrixPlane = Multiply(worldMatrix, viewProjectionMatrix);
 		}
-		transformationMatrixDataPlane->WVP = worldViewProjectionMatrixPlane;
-		transformationMatrixDataPlane->World = worldMatrix;
 		instancingDataPlane[index].WVP = worldViewProjectionMatrixPlane;
 		instancingDataPlane[index].World = worldMatrix;
 
@@ -590,31 +579,26 @@ void Particle::DrawPlane()
 {
 	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
-	DX12Common::GetInstance()->GetCommandList().Get()->
-		IASetIndexBuffer(&indexBufferViewPlane);
 	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
+	DX12Common::GetInstance()->GetCommandList().Get()->
+		IASetIndexBuffer(&indexBufferViewPlane);
+
 	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		0, materialResourcePlane->GetGPUVirtualAddress());
-	//DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-	//	1, transformationMatrixResourcePlane->GetGPUVirtualAddress());
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+		1, instancingSrvHandleGPU);
+	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+		2, TextureManager::GetInstance()->GetSRVHandleGPU(textureIndex));
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 		DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-
 	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-		1, instancingSrvHandleGPU);
-
-	//DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-	//	3, directionalLightResource->GetGPUVirtualAddress());
-
 	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
-
 }
 
 void Particle::DrawSphere(
@@ -752,8 +736,10 @@ void Particle::MakeShaderResourceView(const DirectX::TexMetadata& metadata, cons
 		GetGPUDescriptorHandle(DX12Common::GetInstance()->
 			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
 
-	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+	DX12Common::GetInstance()->GetDevice().Get()->
+		CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+	DX12Common::GetInstance()->GetDevice().Get()->
+		CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 }
 
 void Particle::MakeShaderResourceViewInstance(ID3D12Resource* instancingResource)
@@ -773,11 +759,10 @@ void Particle::MakeShaderResourceViewInstance(ID3D12Resource* instancingResource
 
 	instancingSrvHandleCPU = DX12Common::GetInstance()->
 		GetCPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 11);
 	instancingSrvHandleGPU = DX12Common::GetInstance()->
 		GetGPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
-
+			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 11);
 
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(
 		instancingResource, &instancingSrvDesc, instancingSrvHandleCPU);

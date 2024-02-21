@@ -76,6 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->SetRotate({ 0.0f,0.0f,0.0f });
 	camera->SetTranslate({ 0.0f,0.0f,-20.0f });
+
 	object3dCommon->SetDefaultCamera(camera);
 	for (uint32_t i = 0; i < 10; i++)
 	{
@@ -88,6 +89,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		object3d->SetTranslate({0.2f * i, 0.2f * i, 0.2f * i});
 		objects3d.push_back(object3d);
 	};
+
 	SPCommon->Initialize(dx12Common);
 	for (uint32_t i = 0; i < 10; i++)
 	{
@@ -98,6 +100,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->SetPositoin(posSprite);
 		sprites.push_back(sprite);
 	}
+	
 	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
 
 	while (NewMSG.message != WM_QUIT)
@@ -107,7 +110,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		camera->Update();
 		//imgui->Update();
 		//ImGui::Begin("sphereEdit");
-
+		//
 		//for (Object3d* object3d : objects3d)
 		//{
 		//	if (input->PushKey(DIK_D)) {

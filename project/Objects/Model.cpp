@@ -31,17 +31,15 @@ void Model::Draw(ModelCommon* modelCommon)
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 	materialData[0].uvTransform = uvTransformMatrix;
 
-	modelCommon_->GetDx12Common()->GetCommandList().Get()->
-		SetGraphicsRootDescriptorTable(
-			2, TextureManager::GetInstance()->GetSRVHandleGPU(modelData.material.textureIndex));
-
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		0, materialResource->GetGPUVirtualAddress());
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->IASetVertexBuffers(
 		0, 1, &vertexBufferView);
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+		2, TextureManager::GetInstance()->GetSRVHandleGPU(modelData.material.textureIndex));
+
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawInstanced(
 		UINT(modelData.vertices.size()), 1, 0, 0);
-
 }
 
 ComPtr<ID3D12Resource> Model::CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes)

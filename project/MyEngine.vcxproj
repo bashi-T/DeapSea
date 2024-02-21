@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Math\CGVector.cpp" />
+    <ClCompile Include="Objects\Praticle.cpp" />
     <ClCompile Include="Systems\Debug.cpp" />
     <ClCompile Include="Commons\DX12Common.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -28,7 +29,7 @@
     <ClCompile Include="Managers\ModelManager.cpp" />
     <ClCompile Include="Systems\MyImGui.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Objects\Praticle.cpp" />
+    <ClCompile Include="Objects\Mesh.cpp" />
     <ClCompile Include="Objects\Object3d.cpp" />
     <ClCompile Include="Commons\Object3dCommon.cpp" />
     <ClCompile Include="Sprites\Sprite.cpp" />
@@ -38,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="Objects\Particle.h" />
     <ClInclude Include="Systems\Debug.h" />
     <ClInclude Include="Commons\DX12Common.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
@@ -53,7 +55,7 @@
     <ClInclude Include="Commons\ModelCommon.h" />
     <ClInclude Include="Managers\ModelManager.h" />
     <ClInclude Include="Systems\MyImGui.h" />
-    <ClInclude Include="Objects\Particle.h" />
+    <ClInclude Include="Objects\Mesh.h" />
     <ClInclude Include="Math\CGVector.h" />
     <ClInclude Include="Objects\Object3d.h" />
     <ClInclude Include="Commons\Object3dCommon.h" />
@@ -76,14 +78,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HLSL\Particle.PS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HLSL\Particle.VS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -98,11 +96,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Object3d.hlsli" />
+    <None Include="HLSL\Particle.hlsli" />
     <None Include="packages.config" />
-    <None Include="HLSL\Particle.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -155,8 +150,8 @@
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Commons\;$(ProjectDir)Camera\;$(ProjectDir)Math\;$(ProjectDir)Managers\;$(ProjectDir)Systems\;$(ProjectDir)Sprites\;$(ProjectDir)Objects\;$(ProjectDir)Input\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -182,8 +177,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Commons\;$(ProjectDir)Camera\;$(ProjectDir)Math\;$(ProjectDir)Managers\;$(ProjectDir)Systems\;$(ProjectDir)Sprites\;$(ProjectDir)Objects\;$(ProjectDir)Input\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

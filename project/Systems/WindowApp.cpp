@@ -7,7 +7,7 @@ void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 {
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 	wc_.lpfnWndProc = WindowProc;
-	wc_.lpszClassName = L"CG2WindowClass";
+	wc_.lpszClassName = L"LE2B_12_ツヅキバシ_マサミ";
 	wc_.hInstance = GetModuleHandle(nullptr);
 	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	RegisterClass(&wc_);
