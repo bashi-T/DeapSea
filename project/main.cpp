@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->SetRotate({ 0.0f,0.0f,0.0f });
-	camera->SetTranslate({ 0.0f,0.0f,-20.0f });
+	camera->SetTranslate({ 0.0f,0.0f,-50.0f });
 
 	object3dCommon->SetDefaultCamera(camera);
 	for (uint32_t i = 0; i < 1; i++)
@@ -122,6 +122,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
 			}
 			object3d->Update();
+			ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
 			ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
 			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
 			ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);

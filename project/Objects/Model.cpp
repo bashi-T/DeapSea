@@ -20,7 +20,7 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData[0].enableLighting = true;
 	materialData[0].uvTransform = MakeIdentity4x4();
-	materialData[0].shininess = 10.0f;
+	materialData[0].shininess = 50.0f;
 }
 
 void Model::Draw(ModelCommon* modelCommon)
