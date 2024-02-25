@@ -13,6 +13,7 @@ private:
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
+		Vector3 worldPosition;
 	};
 	VertexData* vertexData = nullptr;
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
@@ -23,6 +24,7 @@ private:
 		int32_t enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
+		float shininess;
 	};
 	Material* materialData = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;

@@ -14,16 +14,16 @@ Camera::Camera()
 
 void Camera::Initialize(int32_t width, int32_t height)
 {
-	transformMatrix={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	fovY=0.45f;
-	aspectRetio = (float(width) / float(height));
-	nearClip = 0.1f;
-	farClip = 100.0f;
-	worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
-	viewMatrix = Inverse(worldMatrix);
-	projectionMatrix =
-		MakePerspectiveFovMatrix(fovY, aspectRetio, nearClip, farClip);
-	viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
+	//transformMatrix={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	//fovY=0.45f;
+	//aspectRetio = (float(width) / float(height));
+	//nearClip = 0.1f;
+	//farClip = 100.0f;
+	//worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+	//viewMatrix = Inverse(worldMatrix);
+	//projectionMatrix =
+	//	MakePerspectiveFovMatrix(fovY, aspectRetio, nearClip, farClip);
+	//viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 }
 
 void Camera::Update()

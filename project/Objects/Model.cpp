@@ -18,8 +18,9 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 	TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData.material.textureFilePath);
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = false;
+	materialData[0].enableLighting = true;
 	materialData[0].uvTransform = MakeIdentity4x4();
+	materialData[0].shininess = 10.0f;
 }
 
 void Model::Draw(ModelCommon* modelCommon)
@@ -31,7 +32,8 @@ void Model::Draw(ModelCommon* modelCommon)
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 	materialData[0].uvTransform = uvTransformMatrix;
 
-	modelCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootConstantBufferView(
 		0, materialResource->GetGPUVirtualAddress());
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->IASetVertexBuffers(
 		0, 1, &vertexBufferView);

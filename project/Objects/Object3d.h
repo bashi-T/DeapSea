@@ -32,6 +32,7 @@ private:
 	DirectionalLight* DirectionalLightData = nullptr;
 
 	ComPtr<ID3D12Resource> transformationMatrixResource;
+	ComPtr<ID3D12Resource> cameraResource;
 
 	struct TransformationMatrix
 	{
@@ -39,7 +40,12 @@ private:
 		Matrix4x4 World;
 	};
 
+	struct CameraTransform {
+		Vector3 worldPosition;
+	};
+
 	TransformationMatrix* transformationMatrixData = nullptr;
+	CameraTransform* cameraData = nullptr;
 
 	TransformMatrix transformMatrix;
 	Matrix4x4 worldViewProjectionMatrix;

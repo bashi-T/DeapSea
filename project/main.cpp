@@ -47,7 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		"Resource/uvChecker.png",
 		"Resource/monsterBall.png",
 		"Resource/worldMap.png",
-		"Resource/uvChecker.png",
+		"Resource/world.png",
 		"Resource/uvChecker.png",
 		"Resource/uvChecker.png",
 		"Resource/uvChecker.png",
@@ -59,17 +59,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		"plane.obj",
 		"axis.obj",
+		"world.obj",
 	};
 
 	winAPP->Initialize(WinAPP::clientWidth_,WinAPP::clientHeight_, L"GE3");
 	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
 	input->Initialize(winAPP);
-	//imgui->Initialize(
-	//	winAPP->GetHWND(),
-	//	dx12Common->GetDevice().Get(),
-	//	dx12Common->GetSwapChainDesc(),
-	//	dx12Common->GetRtvDesc(),
-	//	dx12Common->GetSrvDescriptorHeap().Get());
+	imgui->Initialize(
+		winAPP->GetHWND(),
+		dx12Common->GetDevice().Get(),
+		dx12Common->GetSwapChainDesc(),
+		dx12Common->GetRtvDesc(),
+		dx12Common->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize();
 
 	object3dCommon->Initialize(dx12Common);
@@ -78,29 +79,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	camera->SetTranslate({ 0.0f,0.0f,-20.0f });
 
 	object3dCommon->SetDefaultCamera(camera);
-	for (uint32_t i = 0; i < 10; i++)
+	for (uint32_t i = 0; i < 1; i++)
 	{
 		Model* model = new Model;
 		Object3d* object3d = new Object3d;
 		object3d->Initialize(object3dCommon, WinAPP::clientWidth_, WinAPP::clientHeight_);
-		ModelManager::GetInstance()->LoadModel(objFilePath[0]);
+		ModelManager::GetInstance()->LoadModel(objFilePath[2]);
 		object3d->SetModel(model);
-		object3d->SetModel(objFilePath[0]);
-		object3d->SetTranslate({0.2f * i, 0.2f * i, 0.2f * i});
+		object3d->SetModel(objFilePath[2]);
+		object3d->SetTranslate({ 0.2f * i, 0.2f * i, 0.2f * i });
+		object3d->SetScale({ 0.02f, 0.02f, 0.02f  });
 		objects3d.push_back(object3d);
 	};
 
-	SPCommon->Initialize(dx12Common);
-	for (uint32_t i = 0; i < 10; i++)
-	{
-		Sprite* sprite = new Sprite();
-		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
-		posSprite.x = 100.0f * i;
-		posSprite.y = 50.0f * i;
-		sprite->SetPositoin(posSprite);
-		sprites.push_back(sprite);
-	}
-	
+	//SPCommon->Initialize(dx12Common);
+	//for (uint32_t i = 0; i < 10; i++)
+	//{
+	//	Sprite* sprite = new Sprite();
+	//	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
+	//	posSprite.x = 100.0f * i;
+	//	posSprite.y = 50.0f * i;
+	//	sprite->SetPositoin(posSprite);
+	//	sprites.push_back(sprite);
+	//}
+	//
 	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
 
 	while (NewMSG.message != WM_QUIT)
@@ -108,61 +110,66 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dx12Common->update();
 		input->Update();
 		camera->Update();
-		//imgui->Update();
-		//ImGui::Begin("sphereEdit");
-		//
-		//for (Object3d* object3d : objects3d)
-		//{
-		//	if (input->PushKey(DIK_D)) {
-		//		object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
-		//	}
-		//	if (input->PushKey(DIK_A)) {
-		//		object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
-		//	}
-		//	object3d->Update();
-		//	//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
-		//	//ImGui::Checkbox("useWorldMap", &useWorldMap);
-		//}
-		//ImGui::End();
+		imgui->Update();
+		ImGui::Begin("sphereEdit");
+		
+		for (Object3d* object3d : objects3d)
+		{
+			if (input->PushKey(DIK_D)) {
+				object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+			}
+			if (input->PushKey(DIK_A)) {
+				object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+			}
+			object3d->Update();
+			ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
+			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
+			ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
+			ImGui::DragFloat4("light.color", (float*)&object3d->DrawDirectionalLightData()->color, 0.01f);
+			ImGui::DragFloat("light.intensity", (float*)&object3d->DrawDirectionalLightData()->intensity, 0.01f);
+			ImGui::DragFloat3("light.direction", (float*)&object3d->DrawDirectionalLightData()->direction, 0.01f);
+		}
+		ImGui::End();
 
 		particle->Update();
 
 		for (Sprite* sprite : sprites)
 		{
-			sprite->Update(kWindowWidth, kWindowHeight);
+			//sprite->Update(kWindowWidth, kWindowHeight);
 		}
 
 		if (winAPP->ProcessMessage())
 		{
-			//ImGui::Render();
+			ImGui::Render();
 			break;
 		}
 		dx12Common->PreDraw();
 
-		//for (Object3d* object3d : objects3d)
-		//{
-		//	object3d->Draw(object3dCommon, true, ModelManager::GetInstance()->GetModelCommon());
-		//}
+		for (Object3d* object3d : objects3d)
+		{
+			object3d->Draw(object3dCommon, true, ModelManager::GetInstance()->GetModelCommon());
+		}
 		//for(Model*model:models)
 		//{
 		//	model->Draw(modelCommon);
 		//}
 		
-		particle->Draw(WinAPP::clientWidth_, WinAPP::clientHeight_);
+		//particle->Draw(WinAPP::clientWidth_, WinAPP::clientHeight_);
 
 		if (input->PushKey(DIK_SPACE)!=0) {
 			for (Sprite* sprite : sprites)
 			{
-				sprite->Draw(SPCommon);
+				//sprite->Draw(SPCommon);
 			}
 		}
-		//imgui->Endframe(dx12Common->GetCommandList().Get());
+		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		dx12Common->PostDraw();
 
 	}
 
 	CloseHandle(dx12Common->GetFenceEvent());
+	delete particle;
 	for (Sprite* sprite : sprites)
 	{
 		delete sprite;
@@ -178,7 +185,7 @@ for (Object3d* object3d : objects3d)
 	}
 	delete object3dCommon;
 	TextureManager::GetInstance()->Finalize();
-	//imgui->Finalize();
+	imgui->Finalize();
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();
 	CoUninitialize();
