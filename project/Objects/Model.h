@@ -3,11 +3,7 @@
 
 class Model
 {
-private:
-	ModelCommon* modelCommon_;
-	HRESULT hr = NULL;
-
-
+public:
 	struct VertexData
 	{
 		Vector4 position;
@@ -15,10 +11,6 @@ private:
 		Vector3 normal;
 		Vector3 worldPosition;
 	};
-	VertexData* vertexData = nullptr;
-	ComPtr<ID3D12Resource> vertexResource = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-
 	struct Material {
 		Vector4 color;
 		int32_t enableLighting;
@@ -26,21 +18,39 @@ private:
 		Matrix4x4 uvTransform;
 		float shininess;
 	};
-	Material* materialData = nullptr;
-	ComPtr<ID3D12Resource> materialResource = nullptr;
-
 	struct MaterialData
 	{
 		std::string textureFilePath;
 		uint32_t textureIndex = 0;
 	};
-
 	struct ModelData
 	{
 		std::vector<VertexData> vertices;
 		MaterialData material;
 	};
+	void Initialize(ModelCommon* modelCommon, std::string objFilePath);
+	void Draw(ModelCommon* modelCommon);
+	void Memcpy();
+	ComPtr<ID3D12Resource> CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes);
+	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
+	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	void MakeBufferView();
+	ModelData* GetModelData() { return &modelData; }
+
+private:
 	ModelData modelData;
+	ModelCommon* modelCommon_;
+	HRESULT hr = NULL;
+
+
+	VertexData* vertexData = nullptr;
+	ComPtr<ID3D12Resource> vertexResource = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+
+	Material* materialData = nullptr;
+	ComPtr<ID3D12Resource> materialResource = nullptr;
+
+
 
 	TransformMatrix uvTransform
 	{
@@ -48,14 +58,6 @@ private:
 			{0.0f,0.0f,0.0f},
 			{0.0f,0.0f,0.0f},
 	};
-
-public:
-	void Initialize(ModelCommon* modelCommon, std::string objFilePath);
-	void Draw(ModelCommon* modelCommon);
-	ComPtr<ID3D12Resource> CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes);
-	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
-	void MakeBufferView();
 
 
 };

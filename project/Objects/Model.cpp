@@ -21,12 +21,13 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 	materialData[0].enableLighting = true;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	materialData[0].shininess = 50.0f;
+
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 }
 
 void Model::Draw(ModelCommon* modelCommon)
 {
 	this->modelCommon_ = modelCommon;
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
@@ -42,6 +43,11 @@ void Model::Draw(ModelCommon* modelCommon)
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawInstanced(
 		UINT(modelData.vertices.size()), 1, 0, 0);
+}
+
+void Model::Memcpy()
+{
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 }
 
 ComPtr<ID3D12Resource> Model::CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes)

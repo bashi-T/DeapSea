@@ -81,12 +81,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	object3dCommon->SetDefaultCamera(camera);
 	for (uint32_t i = 0; i < 1; i++)
 	{
-		Model* model = new Model;
 		Object3d* object3d = new Object3d;
 		object3d->Initialize(object3dCommon, WinAPP::clientWidth_, WinAPP::clientHeight_);
 		ModelManager::GetInstance()->LoadModel(objFilePath[2]);
-		object3d->SetModel(model);
 		object3d->SetModel(objFilePath[2]);
+		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[2]);
+		Model::ModelData* modelData = model->GetModelData();
+		for (Model::VertexData& vertex : modelData->vertices)
+		{
+			vertex.normal.x = vertex.position.x;
+			vertex.normal.y = vertex.position.y;
+			vertex.normal.z = vertex.position.z;
+		}
+		model->Memcpy();
 		object3d->SetTranslate({ 0.2f * i, 0.2f * i, 0.2f * i });
 		object3d->SetScale({ 0.02f, 0.02f, 0.02f  });
 		objects3d.push_back(object3d);
@@ -104,6 +111,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//}
 	//
 	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
+	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 
 	while (NewMSG.message != WM_QUIT)
 	{
@@ -126,9 +134,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
 			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
 			ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
-			ImGui::DragFloat4("light.color", (float*)&object3d->DrawDirectionalLightData()->color, 0.01f);
-			ImGui::DragFloat("light.intensity", (float*)&object3d->DrawDirectionalLightData()->intensity, 0.01f);
-			ImGui::DragFloat3("light.direction", (float*)&object3d->DrawDirectionalLightData()->direction, 0.01f);
+			ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
+			ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
+			ImGui::DragFloat3("light.direction", (float*)&directionlLight, 0.01f,-1.0f,1.0f);
+			object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
 		}
 		ImGui::End();
 

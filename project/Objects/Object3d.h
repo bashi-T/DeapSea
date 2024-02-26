@@ -58,7 +58,7 @@ public:
 	
 	ComPtr<ID3D12Resource> CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes);
 
-	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
+	DirectionalLight* GetDirectionalLightData() { return DirectionalLightData; }
 
 	void SetModel(const std::string& filePath);
 	void SetModel(Model* model) { this->model_ = model; }
