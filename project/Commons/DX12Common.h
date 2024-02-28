@@ -4,7 +4,6 @@
 #include"Systems/Debug.h"
 #include<d3d12.h>
 #include<dxgi1_6.h>
-#include<DirectXTex.h>
 #include<WRL.h>
 #include<array>
 #include<chrono>

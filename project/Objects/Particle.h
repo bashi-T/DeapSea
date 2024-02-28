@@ -15,6 +15,7 @@
 #include"Camera/Camera.h"
 #include"Managers/TextureManager.h"
 #include "Commons/Object3dCommon.h"
+#include <random>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -27,7 +28,7 @@ public:
 	~Particle();
 	void Initialize(const std::string& filename, int32_t width, int32_t height, Object3dCommon* object3dCommon);
 	void Update();
-	void Draw(int32_t width, int32_t height);
+	void Draw();
 	ComPtr<IDxcBlob> CompileShader(
 	    const std::wstring& filePath,
 		const wchar_t* profile,
@@ -40,7 +41,7 @@ public:
 		Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawPlane();
 	void DrawSphere(
-		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
+		const Sphere& sphere_, Vector4 color, int32_t width, int32_t height);
 	void ResetDXC();
 	void MakePSO();
 	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -90,11 +91,22 @@ public:
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 	};
-	struct DirectionalLight {
-		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Vector3 direction = { 0.0f, -1.0f, 0.0f };
-		float intensity = 1.0f;
+	struct Particles
+	{
+		TransformMatrix transform;
+		Vector3 velocity;
+		Vector4 color;
+		float lifeTime;
+		float currentTime;
 	};
+	struct ParticleForGPU
+	{
+		Matrix4x4 WVP;
+		Matrix4x4 World;
+		Vector4 color;
+	};
+
+	Particles MakeNewParticle(std::mt19937& randomEngine);
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(
@@ -114,7 +126,6 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 
-	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 private:
 	Debug* debug_;
@@ -126,9 +137,10 @@ private:
 	HRESULT hr = NULL;
 
 	uint32_t kNumInstance = 10;
+	uint32_t kNumMaxInstance = 10;
 
 	TransformMatrix transformMatrixTriangle;
-	TransformMatrix transformMatrixPlane[10];
+	Particles particlesPlane[10];
 	TransformMatrix transformMatrixSphere;
 
 	ComPtr<ID3D12Resource> transformationMatrixResourceTriangle;
@@ -194,8 +206,6 @@ private:
 		{0.0f,0.0f,0.0f},
 	};
 
-	DirectionalLight* DirectionalLightData = nullptr;
-
 	Matrix4x4 cameraMatrix;
 
 	Matrix4x4 viewMatrixTriangle;
@@ -222,7 +232,7 @@ private:
 	VertexData* vertexDataPlane = nullptr;
 	Material* materialDataPlane = nullptr;
 	TransformationMatrix* transformationMatrixDataPlane = nullptr;
-	TransformationMatrix* instancingDataPlane = nullptr;
+	ParticleForGPU* instancingDataPlane = nullptr;
 
 	DirectX::ScratchImage mipImages;
 	DirectX::ScratchImage mipImages2;
@@ -256,4 +266,7 @@ private:
 	Vector2 texcoordLeftBottom[1];
 	Vector2 texcoordRightTop[1];
 	Vector2 texcoordRightBottom[1];
+
+	const float kDeltaTime = 1.0f / 60.0f;
+
 };

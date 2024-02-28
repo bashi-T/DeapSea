@@ -269,7 +269,7 @@ void Mesh::Draw(int32_t width, int32_t height)
 	//	width,
 	//	height);
 
-	//DrawSphere(sphere, ColorSphere[0], true, width, height);
+	DrawSphere(sphere, ColorSphere[0], true, width, height);
 	//	
 	//DrawOBJ(ColorSphere[0], true, width, height);
 

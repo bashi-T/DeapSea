@@ -12,7 +12,7 @@ Camera::Camera()
 , viewProjectionMatrix(Multiply(viewMatrix, projectionMatrix))
 {}
 
-void Camera::Initialize(int32_t width, int32_t height)
+void Camera::Initialize()
 {
 	//transformMatrix={ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	//fovY=0.45f;

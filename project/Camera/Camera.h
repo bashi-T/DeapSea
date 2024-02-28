@@ -17,7 +17,7 @@ private:
 
 public:
 	Camera();
-	void Initialize(int32_t width, int32_t height);
+	void Initialize();
 	void Update();
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }

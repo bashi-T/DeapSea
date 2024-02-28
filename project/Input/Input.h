@@ -2,7 +2,6 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include<dinput.h>
 #include<WRL.h>
-#include<DirectXTex.h>
 #include"Systems/WindowApp.h"
 
 #pragma comment(lib,"dinput8.lib")

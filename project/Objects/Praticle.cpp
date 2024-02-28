@@ -7,9 +7,12 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 {
 	this->object3dCommon_ = object3dCommon;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
-	kNumInstance = 10;
+	kNumMaxInstance = 10;
 	kSubdivision = 16;
-	
+	std::random_device seedGenerator;
+	std::mt19937 randomEngine(seedGenerator());
+	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+
 	ResetDXC();
 
 	MakePSO();
@@ -40,13 +43,9 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 			{0.0f, 0.0f, 0.0f}
 	};
 
-	for (uint32_t index = 0; index < kNumInstance; ++index)
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
-		transformMatrixPlane[index] = {
-				{1.0f, 1.0f, 1.0f},
-				{0.0f, 0.0f, 0.0f},
-				{index*0.1f, index * 0.1f, index * 0.1f}
-		};
+		particlesPlane[index] = MakeNewParticle(randomEngine);
 	}
 	transformMatrixSphere = {
 		{1.0f, 1.0f, 1.0f},
@@ -63,13 +62,13 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	vertexResourcePlane = CreateBufferResource(sizeof(VertexData) * 6);
 	materialResourcePlane = CreateBufferResource(sizeof(Material));
 	indexResourcePlane = CreateBufferResource(sizeof(uint32_t) * 6);
-	instancingResourcePlane = CreateBufferResource(sizeof(TransformationMatrix) *kNumInstance);
+	instancingResourcePlane = CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
 	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
 	materialResourceSphere = CreateBufferResource(sizeof(Material));
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
 	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
-	
+
 	MakeBufferView();
 
 	//mipImages = LoadTexture(modelData.material.textureFilePath);
@@ -89,7 +88,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	InputDataPlane(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], ColorPlane[0],
 		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
 
-	for (uint32_t index = 0; index < kNumInstance; ++index)
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
 		instancingDataPlane[index].WVP = MakeIdentity4x4();
 		instancingDataPlane[index].World = MakeIdentity4x4();
@@ -283,6 +282,9 @@ void Particle::MakePSO()
 
 void Particle::Update()
 {
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+	{
+	};
 	InputDataPlane(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], ColorPlane[0],
 		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
 	//cameraTransform.translate.x += 0.02f;
@@ -301,7 +303,7 @@ void Particle::Update()
 	//ImGui::End();
 }
 
-void Particle::Draw(int32_t width, int32_t height)
+void Particle::Draw()
 {
 	//DrawTriangle(Top[0],Right[0], Left[0],Color[0],texcoordTop[0],texcoordRight[0],texcoordLeft[0],true);
 
@@ -422,21 +424,33 @@ void Particle::InputDataPlane(
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformPlane.translate));
 	materialDataPlane[0].uvTransform = uvTransformMatrix;
 
-	for (uint32_t index = 0; index <kNumInstance; ++index)
+	kNumInstance = 0;
+	for (uint32_t index = 0; index <kNumMaxInstance; ++index)
 	{
+		float alpha = 1.0f - (particlesPlane[index].currentTime / particlesPlane[index].lifeTime);
 		Matrix4x4 worldMatrix =
 			MakeAffineMatrix(
-				transformMatrixPlane[index].scale,
-				transformMatrixPlane[index].rotate,
-				transformMatrixPlane[index].translate);
+				particlesPlane[index].transform.scale,
+				particlesPlane[index].transform.rotate,
+				particlesPlane[index].transform.translate);
+		if (particlesPlane[index].lifeTime <= particlesPlane[index].currentTime)
+		{
+			continue;
+		}
+		particlesPlane[index].transform.translate.x += particlesPlane[index].velocity.x * kDeltaTime;
+		particlesPlane[index].transform.translate.y += particlesPlane[index].velocity.y * kDeltaTime;
+		particlesPlane[index].transform.translate.z += particlesPlane[index].velocity.z * kDeltaTime;
+		particlesPlane[index].currentTime += kDeltaTime;
 		if (camera_)
 		{
 			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 			worldViewProjectionMatrixPlane = Multiply(worldMatrix, viewProjectionMatrix);
 		}
-		instancingDataPlane[index].WVP = worldViewProjectionMatrixPlane;
-		instancingDataPlane[index].World = worldMatrix;
-
+		instancingDataPlane[kNumInstance].WVP = worldViewProjectionMatrixPlane;
+		instancingDataPlane[kNumInstance].World = worldMatrix;
+		instancingDataPlane[kNumInstance].color = particlesPlane[index].color;
+		instancingDataPlane[kNumInstance].color.w = alpha;
+		++kNumInstance;
 	}
 	vertexDataPlane[0].position = TopLeft;
 	vertexDataPlane[0].texcoord = coordTopLeft;
@@ -602,7 +616,7 @@ void Particle::DrawPlane()
 }
 
 void Particle::DrawSphere(
-	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
+	const Sphere& sphere_, Vector4 color, int32_t width, int32_t height)
 {
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
@@ -750,8 +764,8 @@ void Particle::MakeShaderResourceViewInstance(ID3D12Resource* instancingResource
 	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	instancingSrvDesc.Buffer.FirstElement = 0;
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements =kNumInstance;
-	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+	instancingSrvDesc.Buffer.NumElements =kNumMaxInstance;
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 
 	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->
 		GetDevice().Get()->GetDescriptorHandleIncrementSize(
@@ -766,6 +780,22 @@ void Particle::MakeShaderResourceViewInstance(ID3D12Resource* instancingResource
 
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(
 		instancingResource, &instancingSrvDesc, instancingSrvHandleCPU);
+}
+
+Particle::Particles Particle::MakeNewParticle(std::mt19937& randomEngine)
+{
+	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
+	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
+	Particles particle;
+	particle.transform.scale = { 1.0f,1.0f,1.0f };
+	particle.transform.rotate = { 0.0f,0.0f,0.0f };
+	particle.transform.translate = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
+	particle.velocity = { distribution(randomEngine) ,distribution(randomEngine) ,distribution(randomEngine) };
+	particle.color = { distColor(randomEngine) ,distColor(randomEngine) ,distColor(randomEngine) ,1.0f };
+	particle.lifeTime = distTime(randomEngine);
+	particle.currentTime = 0;
+	return particle;
 }
 
 DirectX::ScratchImage Particle::LoadTexture(const std::string& filePath)

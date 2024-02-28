@@ -1,7 +1,7 @@
 #include "Object3d.h"
 #include "Commons/Object3dCommon.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t height)
+void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
 	this->object3dCommon_ = object3dCommon;
 
@@ -27,7 +27,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, int32_t width, int32_t
 
 void Object3d::Update()
 {
-	transformMatrix.rotate.y += 0.02f;
+	transformMatrix.rotate.y -= 0.02f;
 		Matrix4x4 worldMatrix = MakeAffineMatrix(
 		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 
@@ -45,10 +45,9 @@ void Object3d::Update()
 	};
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
-
 }
 
-void Object3d::Draw(Object3dCommon* object3dCommon,bool useWorldMap, ModelCommon* modelCommon)
+void Object3d::Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon)
 {
 	this->object3dCommon_ = object3dCommon;
 	this->modelCommon_ = modelCommon;
@@ -81,12 +80,10 @@ void Object3d::Draw(Object3dCommon* object3dCommon,bool useWorldMap, ModelCommon
 		SetGraphicsRootConstantBufferView(
 		4, cameraResource->GetGPUVirtualAddress());
 
-
 	if (model_)
 	{
 		model_->Draw(modelCommon_);
 	}
-
 }
 
 ComPtr<ID3D12Resource> Object3d::CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes)

@@ -42,7 +42,6 @@ private:
 	ModelCommon* modelCommon_;
 	HRESULT hr = NULL;
 
-
 	VertexData* vertexData = nullptr;
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -50,15 +49,11 @@ private:
 	Material* materialData = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;
 
-
-
 	TransformMatrix uvTransform
 	{
 			{1.0f,1.0f,1.0f},
 			{0.0f,0.0f,0.0f},
 			{0.0f,0.0f,0.0f},
 	};
-
-
 };
 

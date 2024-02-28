@@ -6,7 +6,6 @@ void ModelCommon::Initialize(DX12Common* dxCommon)
 	ResetDXC();
 
 	MakePSO(dxCommon_);
-
 }
 
 void ModelCommon::ResetDXC()

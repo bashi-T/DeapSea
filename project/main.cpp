@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	for (uint32_t i = 0; i < 1; i++)
 	{
 		Object3d* object3d = new Object3d;
-		object3d->Initialize(object3dCommon, WinAPP::clientWidth_, WinAPP::clientHeight_);
+		object3d->Initialize(object3dCommon);
 		ModelManager::GetInstance()->LoadModel(objFilePath[2]);
 		object3d->SetModel(objFilePath[2]);
 		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[2]);
@@ -143,10 +143,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		particle->Update();
 
-		for (Sprite* sprite : sprites)
-		{
-			//sprite->Update(kWindowWidth, kWindowHeight);
-		}
+		//for (Sprite* sprite : sprites)
+		//{
+		//	//sprite->Update(kWindowWidth, kWindowHeight);
+		//}
 
 		if (winAPP->ProcessMessage())
 		{
@@ -155,21 +155,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		dx12Common->PreDraw();
 
-		for (Object3d* object3d : objects3d)
-		{
-			object3d->Draw(object3dCommon, true, ModelManager::GetInstance()->GetModelCommon());
-		}
-		//for(Model*model:models)
+		//for (Object3d* object3d : objects3d)
 		//{
-		//	model->Draw(modelCommon);
+		//	object3d->Draw(object3dCommon, ModelManager::GetInstance()->GetModelCommon());
 		//}
 		
-		//particle->Draw(WinAPP::clientWidth_, WinAPP::clientHeight_);
+		particle->Draw();
 
 		if (input->PushKey(DIK_SPACE)!=0) {
 			for (Sprite* sprite : sprites)
 			{
-				//sprite->Draw(SPCommon);
+				sprite->Draw(SPCommon);
 			}
 		}
 		imgui->Endframe(dx12Common->GetCommandList().Get());
