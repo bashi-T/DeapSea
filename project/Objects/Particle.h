@@ -125,8 +125,8 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
-
-
+	ParticleForGPU* GetInstancingDataPlane() { return instancingDataPlane; }
+	Particles* GetParticlesPlane() { return particlesPlane; }
 private:
 	Debug* debug_;
 	WinAPP* sWinApp;
@@ -268,5 +268,9 @@ private:
 	Vector2 texcoordRightBottom[1];
 
 	const float kDeltaTime = 1.0f / 60.0f;
+	Vector2 anchorPoint = { 0.0f,0.0f };
+	Vector2 textureSize = { 100.0f,100.0f };
+	bool isFlipX_ = false;
+	bool isFlipY_ = false;
 
 };

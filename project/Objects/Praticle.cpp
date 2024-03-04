@@ -92,7 +92,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	{
 		instancingDataPlane[index].WVP = MakeIdentity4x4();
 		instancingDataPlane[index].World = MakeIdentity4x4();
-
+		instancingDataPlane[index].color = particlesPlane[index].color;
 	}
 	MakeShaderResourceViewInstance(instancingResourcePlane.Get());
 	TextureManager::GetInstance()->LoadTexture(DX12Common::GetInstance(), filename);
@@ -235,13 +235,19 @@ void Particle::MakePSO()
 
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
-	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	vertexShaderBlob =
 		CompileShader(L"HLSL/Particle.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
@@ -252,7 +258,7 @@ void Particle::MakePSO()
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
@@ -282,25 +288,8 @@ void Particle::MakePSO()
 
 void Particle::Update()
 {
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
-	{
-	};
 	InputDataPlane(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], ColorPlane[0],
 		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
-	//cameraTransform.translate.x += 0.02f;
-	//DirectionalLightData->direction = Normalize(DirectionalLightData->direction);
-	//ImGui::Begin("Light");
-	//ImGui::ColorEdit3("LightColor", (float*)&DirectionalLightData->color, 0.01f);
-	//ImGui::DragFloat3("LightDirection", (float*)&DirectionalLightData->direction, 0.01f);
-	//ImGui::DragFloat3("CameraRotate", (float*)&cameraTransform.rotate.x, 0.01f);
-	//ImGui::DragFloat3("CameraTranslate", (float*)&cameraTransform.translate.x, 0.01f);
-	//ImGui::DragFloat("Intensity", (float*)&DirectionalLightData->intensity, 0.01f);
-	////ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-	////ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-	////ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
-	//ImGui::DragFloat3("Sphere.rotate", (float*)&transformMatrixSphere.rotate, 0.01f);
-	//ImGui::DragFloat3("Sphere.translate", (float*)&transformMatrixSphere.translate, 0.01f);
-	//ImGui::End();
 }
 
 void Particle::Draw()
@@ -310,7 +299,6 @@ void Particle::Draw()
 	DrawPlane();
 
 	//DrawSphere(sphere, ColorSphere[0], true, width, height);
-
 };
 
 ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
@@ -449,9 +437,48 @@ void Particle::InputDataPlane(
 		instancingDataPlane[kNumInstance].WVP = worldViewProjectionMatrixPlane;
 		instancingDataPlane[kNumInstance].World = worldMatrix;
 		instancingDataPlane[kNumInstance].color = particlesPlane[index].color;
-		instancingDataPlane[kNumInstance].color.w = alpha;
+		particlesPlane[index].color.a = alpha;
+		instancingDataPlane[kNumInstance].color.a = alpha;
+
 		++kNumInstance;
 	}
+
+	//float left = 0.0f - anchorPoint.x;
+	//float right = 1.0f - anchorPoint.x;
+	//float top = 0.0f - anchorPoint.y;
+	//float bottom = 1.0f - anchorPoint.y;
+	//
+	//if (isFlipX_)
+	//{
+	//	left = -left;
+	//	right = -right;
+	//}
+	//if (isFlipY_)
+	//{
+	//	top = -top;
+	//	bottom = -bottom;
+	//}
+	//const DirectX::TexMetadata& metadata =
+	//	TextureManager::GetInstance()->GetMetaData(textureIndex);
+	//float tex_left = TopLeft.x / metadata.width;
+	//float tex_right = (TopLeft.x + textureSize.x) / metadata.width;
+	//float tex_top = TopLeft.y / metadata.width;
+	//float tex_bottom = (TopLeft.y + textureSize.y) / metadata.width;
+	//
+	//vertexDataPlane[0].position = TopLeft;
+	//vertexDataPlane[1].position = TopRight;
+	//vertexDataPlane[2].position = BottomRight;
+	//vertexDataPlane[3].position = BottomLeft;
+	//vertexDataPlane[0].texcoord = { tex_left,tex_top };
+	//vertexDataPlane[1].texcoord = { tex_right,tex_top };
+	//vertexDataPlane[2].texcoord = { tex_right,tex_bottom };
+	//vertexDataPlane[3].texcoord = { tex_left,tex_bottom };
+	//
+	//vertexDataPlane[0].normal = { vertexDataPlane[0].position.x, vertexDataPlane[0].position.y, -vertexDataPlane[0].position.z };
+	//vertexDataPlane[1].normal = { 0.0f, 0.0f, -1.0f };
+	//vertexDataPlane[2].normal = { 0.0f, 0.0f, -1.0f };
+	//vertexDataPlane[3].normal = { 0.0f, 0.0f, -1.0f };
+
 	vertexDataPlane[0].position = TopLeft;
 	vertexDataPlane[0].texcoord = coordTopLeft;
 	vertexDataPlane[0].normal.x = vertexDataPlane[0].position.x;

@@ -102,9 +102,9 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
 		if (identifier == "v")
 		{
 			Vector4 position;
-			position.w = 1.0f;
+			position.a = 1.0f;
 			s >> position.x >> position.y >> position.z;
-			position.w = 1.0f;
+			position.a = 1.0f;
 			positions.push_back(position);
 		}
 		else if (identifier == "vt")

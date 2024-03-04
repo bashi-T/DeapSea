@@ -48,7 +48,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		"Resource/monsterBall.png",
 		"Resource/worldMap.png",
 		"Resource/world.png",
-		"Resource/uvChecker.png",
+		"Resource/circle.png",
 		"Resource/uvChecker.png",
 		"Resource/uvChecker.png",
 		"Resource/uvChecker.png",
@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->SetRotate({ 0.0f,0.0f,0.0f });
-	camera->SetTranslate({ 0.0f,0.0f,-50.0f });
+	camera->SetTranslate({ 0.0f,0.0f,-10.0f });
 
 	object3dCommon->SetDefaultCamera(camera);
 	for (uint32_t i = 0; i < 1; i++)
@@ -99,17 +99,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		objects3d.push_back(object3d);
 	};
 
-	//SPCommon->Initialize(dx12Common);
-	//for (uint32_t i = 0; i < 10; i++)
-	//{
-	//	Sprite* sprite = new Sprite();
-	//	sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
-	//	posSprite.x = 100.0f * i;
-	//	posSprite.y = 50.0f * i;
-	//	sprite->SetPositoin(posSprite);
-	//	sprites.push_back(sprite);
-	//}
-	//
+	SPCommon->Initialize(dx12Common);
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
+		posSprite.x = 100.0f * i;
+		posSprite.y = 50.0f * i;
+		sprite->SetPositoin(posSprite);
+		sprites.push_back(sprite);
+	}
+	
 	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
 	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 
@@ -123,10 +123,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		
 		for (Object3d* object3d : objects3d)
 		{
-			if (input->PushKey(DIK_D)) {
+			if (input->PushKey(DIK_D))
+			{
 				object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
 			}
-			if (input->PushKey(DIK_A)) {
+			if (input->PushKey(DIK_A))
+			{
 				object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
 			}
 			object3d->Update();
@@ -139,14 +141,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::DragFloat3("light.direction", (float*)&directionlLight, 0.01f,-1.0f,1.0f);
 			object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
 		}
-		ImGui::End();
+		ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
+		ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
 
 		particle->Update();
 
-		//for (Sprite* sprite : sprites)
-		//{
-		//	//sprite->Update(kWindowWidth, kWindowHeight);
-		//}
+		for (Sprite* sprite : sprites)
+		{
+			sprite->Update(kWindowWidth, kWindowHeight);
+		}
+		ImGui::End();
 
 		if (winAPP->ProcessMessage())
 		{
