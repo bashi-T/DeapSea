@@ -15,7 +15,7 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	
 	TextureManager::GetInstance()->LoadTexture(modelCommon_->GetDx12Common(), modelData.material.textureFilePath);
-	TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData.material.textureFilePath);
+	//TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData.material.textureFilePath);
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData[0].enableLighting = true;
@@ -25,9 +25,10 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 }
 
-void Model::Draw(ModelCommon* modelCommon)
+void Model::Draw(ModelCommon* modelCommon,SRVManager*srvManager)
 {
 	this->modelCommon_ = modelCommon;
+	this->srvManager_ = srvManager;
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
@@ -38,8 +39,8 @@ void Model::Draw(ModelCommon* modelCommon)
 		0, materialResource->GetGPUVirtualAddress());
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->IASetVertexBuffers(
 		0, 1, &vertexBufferView);
-	modelCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-		2, TextureManager::GetInstance()->GetSRVHandleGPU(modelData.material.textureIndex));
+	srvManager_->SetGraphicsRootDescriptorTable(
+		2, modelData.material.textureIndex);
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawInstanced(
 		UINT(modelData.vertices.size()), 1, 0, 0);

@@ -9,6 +9,7 @@
 #include"Objects/model.h"
 #include"Managers/TextureManager.h"
 #include"Objects/Particle.h"
+#include"Managers/SRVManager.h"
 
 const int32_t kWindowWidth = 1280;
 const int32_t kWindowHeight = 720;
@@ -22,12 +23,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	WinAPP* winAPP = WinAPP::GetInstance();
 	DX12Common* dx12Common = DX12Common::GetInstance();
+	SRVManager* srvManager = new SRVManager;
 	Input* input = new Input;
 	MSG NewMSG = winAPP->GetMSG();
 	MyImGui* imgui = new MyImGui;
 	SpriteCommon* SPCommon = new SpriteCommon;
-	Object3dCommon* object3dCommon = nullptr;
-	object3dCommon = new Object3dCommon;
+	Object3dCommon* object3dCommon = new Object3dCommon;
 	ModelCommon* modelCommon = new ModelCommon;
 	Camera* camera = new Camera();
 	Particle* particle = new Particle;
@@ -64,14 +65,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	winAPP->Initialize(WinAPP::clientWidth_,WinAPP::clientHeight_, L"GE3");
 	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
+	srvManager->Initialize(dx12Common);
 	input->Initialize(winAPP);
 	imgui->Initialize(
 		winAPP->GetHWND(),
 		dx12Common->GetDevice().Get(),
 		dx12Common->GetSwapChainDesc(),
 		dx12Common->GetRtvDesc(),
-		dx12Common->GetSrvDescriptorHeap().Get());
-	TextureManager::GetInstance()->Initialize();
+		srvManager->GetSrvDescriptorHeap().Get());
+	TextureManager::GetInstance()->Initialize(srvManager);
 
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
@@ -82,7 +84,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	for (uint32_t i = 0; i < 1; i++)
 	{
 		Object3d* object3d = new Object3d;
-		object3d->Initialize(object3dCommon);
+		object3d->Initialize(object3dCommon, srvManager);
 		ModelManager::GetInstance()->LoadModel(objFilePath[2]);
 		object3d->SetModel(objFilePath[2]);
 		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[2]);
@@ -103,14 +105,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, textureFilePath[i]);
+		sprite->Initialize(kWindowWidth, kWindowHeight, SPCommon, srvManager, textureFilePath[i]);
 		posSprite.x = 100.0f * i;
 		posSprite.y = 50.0f * i;
 		sprite->SetPositoin(posSprite);
 		sprites.push_back(sprite);
 	}
 	
-	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
+	//particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
 	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 
 	while (NewMSG.message != WM_QUIT)
@@ -141,10 +143,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::DragFloat3("light.direction", (float*)&directionlLight, 0.01f,-1.0f,1.0f);
 			object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
 		}
-		ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
-		ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
+		//ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
+		//ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
 
-		particle->Update();
+		//particle->Update();
 
 		for (Sprite* sprite : sprites)
 		{
@@ -157,28 +159,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Render();
 			break;
 		}
-		dx12Common->PreDraw();
+		srvManager->PreDraw();
 
-		//for (Object3d* object3d : objects3d)
-		//{
-		//	object3d->Draw(object3dCommon, ModelManager::GetInstance()->GetModelCommon());
-		//}
+		for (Object3d* object3d : objects3d)
+		{
+			object3d->Draw(object3dCommon, ModelManager::GetInstance()->GetModelCommon());
+		}
 		
-		particle->Draw();
+		//particle->Draw();
 
-		if (input->PushKey(DIK_SPACE)!=0) {
+		//if (input->PushKey(DIK_SPACE)!=0) {
 			for (Sprite* sprite : sprites)
 			{
 				sprite->Draw(SPCommon);
 			}
-		}
+		//}
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
-		dx12Common->PostDraw();
+		srvManager->PostDraw();
 
 	}
 
-	CloseHandle(dx12Common->GetFenceEvent());
+	CloseHandle(srvManager->GetFenceEvent());
 	delete particle;
 	for (Sprite* sprite : sprites)
 	{
@@ -196,6 +198,7 @@ for (Object3d* object3d : objects3d)
 	delete object3dCommon;
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
+	delete srvManager;
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();
 	CoUninitialize();

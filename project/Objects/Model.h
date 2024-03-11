@@ -1,5 +1,6 @@
 #pragma once
 #include"Commons/ModelCommon.h"
+#include"Managers/SRVManager.h"
 
 class Model
 {
@@ -29,7 +30,7 @@ public:
 		MaterialData material;
 	};
 	void Initialize(ModelCommon* modelCommon, std::string objFilePath);
-	void Draw(ModelCommon* modelCommon);
+	void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void Memcpy();
 	ComPtr<ID3D12Resource> CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes);
 	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
@@ -40,6 +41,7 @@ public:
 private:
 	ModelData modelData;
 	ModelCommon* modelCommon_;
+	SRVManager* srvManager_ = nullptr;
 	HRESULT hr = NULL;
 
 	VertexData* vertexData = nullptr;

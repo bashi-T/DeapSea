@@ -1,6 +1,5 @@
 #include "DX12Common.h"
 
-const uint32_t DX12Common::kMaxSRVCount = 512;
 DX12Common* DX12Common::GetInstance()
 {
 	if (instance == NULL)
@@ -48,21 +47,9 @@ void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
 	DebugLayer();
 #endif
 	InitializefixFPS();
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-	viewport.Width = float(width);
-	viewport.Height = float(height);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	scissorRect.left = LONG(0.0f);
-	scissorRect.right = LONG(width);
-	scissorRect.top = LONG(0.0f);
-	scissorRect.bottom = LONG(height);
-
-	DX12Common::MakeDXGIFactory();
-	DX12Common::ChoseUseAdapter();
-	DX12Common::MakeD3D12Device();
+	MakeDXGIFactory();
+	ChoseUseAdapter();
+	MakeD3D12Device();
 	depthStencilResource = CreatedepthstencilTextureResource(
 		width,
 		height);
@@ -70,8 +57,7 @@ void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
 #ifdef _DEBUG
 	InfoQueue(device.Get());
 #endif
-	DX12Common::MakeScreen(winApp_);
-	DX12Common::MakeFence();
+	MakeScreen(winApp_);
 }
 
 void DX12Common::update()
@@ -176,6 +162,7 @@ void DX12Common::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
 
 void DX12Common::MakeDescriptorHeap()
 {
+	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	rtvDescriptorHeapDesc.NumDescriptors = 2;
 	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
@@ -195,7 +182,8 @@ void DX12Common::MakeRTV()
 {
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const uint32_t descriptorSizeRTV = device->
+		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
 		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, 0);
 
@@ -224,10 +212,6 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
 		2,
 		false);
-	srvDescriptorHeap = CreateDescriptorHeap(
-		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-		kMaxSRVCount,
-		true);
 	dsvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
 		1,
@@ -236,81 +220,6 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 	BringResources();
 	MakeRTV();
 	MakeDSV();
-}
-
-void DX12Common::PreDraw()
-{
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList->ResourceBarrier(1, &barrier);
-
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex],
-		false, nullptr);
-
-	commandList->ClearRenderTargetView(
-		rtvHandles[backBufferIndex],
-		clearColor, 0, nullptr);
-	commandList->ClearDepthStencilView(
-		dsvHandle,
-		D3D12_CLEAR_FLAG_DEPTH,
-		1.0f,
-		0,
-		0,
-		nullptr);
-
-	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
-	{
-		srvDescriptorHeap
-	};
-	commandList->
-		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-	commandList->RSSetViewports(1, &viewport);
-	commandList->RSSetScissorRects(1, &scissorRect);
-}
-
-void DX12Common::PostDraw()
-{
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	commandList->ResourceBarrier(1, &barrier);
-	
-	hr = commandList->Close();
-	assert(SUCCEEDED(hr));
-
-	ComPtr<ID3D12CommandList> commandLists[] =
-	{
-		commandList.Get()
-	};
-	commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
- 	swapChain->Present(1, 0);
-	fenceValue++;
-	commandQueue->Signal(fence.Get(), fenceValue);
-
-	if (fence->GetCompletedValue() < fenceValue)
-	{
-		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-	}
-
-	hr = commandAllocator->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator.Get(), nullptr);
-	assert(SUCCEEDED(hr));
-}
-
-void DX12Common::MakeFence()
-{
-	hr = device->CreateFence(fenceValue,
-		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	assert(SUCCEEDED(hr));
-	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	assert(fenceEvent != nullptr);
 }
 
 void DX12Common::DX12Release()

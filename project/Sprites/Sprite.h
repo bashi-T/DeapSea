@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include"Managers/TextureManager.h"
+#include"Managers/SRVManager.h"
 
 #pragma comment(lib, "dxcompiler.lib")
 
@@ -20,6 +21,7 @@ public:
 		int32_t width,
 		int32_t height,
 		SpriteCommon* spriteCommon,
+		SRVManager* srvManager,
 		std::string texturefilePath);
 	void Update(int32_t width, int32_t height);
 	void Draw(SpriteCommon* spriteCommon);
@@ -37,6 +39,7 @@ public:
 	struct MaterialData
 	{
 		std::string textureFilePath;
+		uint32_t textureIndex = 0;
 	};
 	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
@@ -88,6 +91,7 @@ private:
 	MyImGui* imgui_;
 	HRESULT hr = NULL;
 	uint32_t textureIndex = 0;
+	SRVManager* srvManager = nullptr;
 
 	TransformMatrix transformMatrix;
 	Vector2 position = { 0.0f,0.0f };
@@ -109,6 +113,7 @@ private:
 		int32_t enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
+		MaterialData material;
 	};
 	Material* materialData = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;

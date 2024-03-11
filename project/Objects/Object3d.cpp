@@ -1,9 +1,10 @@
 #include "Object3d.h"
 #include "Commons/Object3dCommon.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon)
+void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager)
 {
 	this->object3dCommon_ = object3dCommon;
+	this->srvManager = srvManager;
 
 	transformationMatrixResource = CreateBufferResource(object3dCommon_,sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(object3dCommon_, sizeof(DirectionalLight));
@@ -62,7 +63,7 @@ void Object3d::Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon)
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
-		object3dCommon_->GetDx12Common()->GetBackBufferIndex());
+		srvManager->GetBackBufferIndex());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -82,7 +83,7 @@ void Object3d::Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon)
 
 	if (model_)
 	{
-		model_->Draw(modelCommon_);
+		model_->Draw(modelCommon_,srvManager);
 	}
 }
 

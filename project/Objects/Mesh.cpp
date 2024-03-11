@@ -527,11 +527,11 @@ void Mesh::DrawSphere(
 				IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
-				DX12Common::GetInstance()->GetBackBufferIndex());
-			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-			DX12Common::GetInstance()->GetCommandList().Get()->
-				OMSetRenderTargets(1, &rtv, false, &dsv);
+			//D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
+			//	DX12Common::GetInstance()->GetBackBufferIndex());
+			//D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+			//DX12Common::GetInstance()->GetCommandList().Get()->
+			//	OMSetRenderTargets(1, &rtv, false, &dsv);
 
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				SetGraphicsRootDescriptorTable(
@@ -584,19 +584,19 @@ void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const Di
 		GetDevice().Get()->GetDescriptorHandleIncrementSize(
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	textureSrvHandleCPU = DX12Common::GetInstance()->
-		GetCPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
-	textureSrvHandleGPU = DX12Common::GetInstance()->
-		GetGPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+	//textureSrvHandleCPU = DX12Common::GetInstance()->
+	//	GetCPUDescriptorHandle(DX12Common::GetInstance()->
+	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+	//textureSrvHandleGPU = DX12Common::GetInstance()->
+	//	GetGPUDescriptorHandle(DX12Common::GetInstance()->
+	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
 
-	textureSrvHandleCPU2 = DX12Common::GetInstance()->
-		GetCPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
-	textureSrvHandleGPU2 = DX12Common::GetInstance()->
-		GetGPUDescriptorHandle(DX12Common::GetInstance()->
-			GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+	//textureSrvHandleCPU2 = DX12Common::GetInstance()->
+	//	GetCPUDescriptorHandle(DX12Common::GetInstance()->
+	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+	//textureSrvHandleGPU2 = DX12Common::GetInstance()->
+	//	GetGPUDescriptorHandle(DX12Common::GetInstance()->
+	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
 
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);

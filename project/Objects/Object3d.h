@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include"Managers/TextureManager.h"
+#include"Managers/SRVManager.h"
 #include"Model.h"
 #include"Managers/ModelManager.h"
 #include"Camera/Camera.h"
@@ -21,6 +22,7 @@ private:
 	HRESULT hr = NULL;
 	Model* model_ = nullptr;
 	ModelCommon* modelCommon_ = nullptr;
+	SRVManager* srvManager = nullptr;
 	Camera* camera = nullptr;
 
 	struct DirectionalLight
@@ -52,7 +54,7 @@ private:
 
 	ComPtr<ID3D12Resource> directionalLightResource;
 public:
-	void Initialize(Object3dCommon* object3dCommon);
+	void Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager);
 	void Update();
 	void Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon);
 	

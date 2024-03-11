@@ -57,8 +57,6 @@ public:
 		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
-	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
-
 	void MakeShaderResourceViewInstance(ID3D12Resource* instancingResource);
 
 	struct VertexData
@@ -108,7 +106,6 @@ public:
 
 	Particles MakeNewParticle(std::mt19937& randomEngine);
 
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
 		const DirectX::TexMetadata& metadata);
@@ -130,6 +127,7 @@ public:
 private:
 	Debug* debug_;
 	WinAPP* sWinApp;
+	SRVManager* srvManager = nullptr;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
 	Object3dCommon* object3dCommon_;

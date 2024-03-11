@@ -6,10 +6,10 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon, std::string textureFilePath)
+void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommon,SRVManager* srvManager, std::string textureFilePath)
 {
 	this->spriteCommon_ = spriteCommon;
-
+	this->srvManager = srvManager;
 	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 6);
 	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
@@ -54,9 +54,9 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	coordLeftBottom = { 0.0f, 1.0f };
 	
 	InputData(Color);
-
+	materialData->material.textureFilePath = textureFilePath;
 	TextureManager::GetInstance()->LoadTexture(spriteCommon_->GetDx12Common(),textureFilePath);
-	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+	materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 	//AdjestTextureSize();
 }
 
@@ -116,7 +116,7 @@ void Sprite::InputData(Vector4 color)
 	}
 
 	const DirectX::TexMetadata& metadata =
-		TextureManager::GetInstance()->GetMetaData(textureIndex);
+		TextureManager::GetInstance()->GetMetaData(materialData->material.textureFilePath);
 	float tex_left = textureLeftTop.x / metadata.width;
 	float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
 	float tex_top = textureLeftTop.y / metadata.width;
@@ -182,15 +182,15 @@ void Sprite::Draw(SpriteCommon* spriteCommon)
 		SetGraphicsRootConstantBufferView(
 		1, transformationMatrixResource->GetGPUVirtualAddress());
 
-	//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-	//	spriteCommon_->GetDx12Common()->
-	//	GetRtvHandles(spriteCommon_->GetDx12Common()->GetBackBufferIndex());
-	//D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	OMSetRenderTargets(1, &rtv, false, &dsv);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+		spriteCommon_->GetDx12Common()->
+		GetRtvHandles(srvManager->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-		SetGraphicsRootDescriptorTable(
-		2, TextureManager::GetInstance()->GetSRVHandleGPU(textureIndex));
+		OMSetRenderTargets(1, &rtv, false, &dsv);
+
+	srvManager->SetGraphicsRootDescriptorTable(
+		2, materialData->material.textureIndex);
 
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -260,7 +260,8 @@ ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const
 
 void Sprite::AdjestTextureSize()
 {
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->
+		GetMetaData(materialData->material.textureFilePath);
 	textureSize.x = static_cast<float>(metadata.width);
 	textureSize.y = static_cast<float>(metadata.height);
 	size = textureSize;
