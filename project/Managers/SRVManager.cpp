@@ -1,6 +1,8 @@
 #include "SRVManager.h"
 
 const uint32_t SRVManager::kMaxSRVCount = 512;
+const uint32_t SRVManager::kSRVIndexTop = 1;
+
 void SRVManager::Initialize(DX12Common* dxCommon)
 {
 	this->dxCommon_ = dxCommon;
@@ -27,6 +29,7 @@ void SRVManager::Initialize(DX12Common* dxCommon)
 
 uint32_t SRVManager::Allocate()
 {
+	CheckNumTexture(useIndex);
 	int index = useIndex;
 	useIndex++;
 	return index;
@@ -46,7 +49,11 @@ D3D12_GPU_DESCRIPTOR_HANDLE SRVManager::GetGPUDescriptorHandle(uint32_t index)
 	return handleGPU;
 }
 
-void SRVManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels)
+void SRVManager::CreateSRVforTexture2D(
+	uint32_t srvIndex,
+	ID3D12Resource* pResource,
+	DXGI_FORMAT Format,
+	UINT MipLevels)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = Format;
@@ -56,10 +63,13 @@ void SRVManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResou
 
 	dxCommon_->GetDevice().Get()->CreateShaderResourceView(
 		pResource, &srvDesc, GetCPUDescriptorHandle(srvIndex));
-
 }
 
-void SRVManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByStride)
+void SRVManager::CreateSRVforStructuredBuffer(
+	uint32_t srvIndex,
+	ID3D12Resource* pResource,
+	UINT numElements,
+	UINT structureByStride)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -69,10 +79,6 @@ void SRVManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource*
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	instancingSrvDesc.Buffer.NumElements = numElements;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(structureByStride);
-
-	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->
-		GetDevice().Get()->GetDescriptorHandleIncrementSize(
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	dxCommon_->GetDevice().Get()->CreateShaderResourceView(
 		pResource, &instancingSrvDesc, GetCPUDescriptorHandle(srvIndex));
@@ -85,7 +91,7 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT RootParamaterIndex, uint32_
 
 bool SRVManager::CheckNumTexture(uint32_t textureIndex)
 {
-	if (textureIndex < SRVManager::kMaxSRVCount)
+	if (textureIndex + SRVManager::kSRVIndexTop < SRVManager::kMaxSRVCount)
 	{
 		return true;
 	}

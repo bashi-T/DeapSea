@@ -19,6 +19,7 @@ private:
 
 public:
 	static const uint32_t kMaxSRVCount;
+	static const uint32_t kSRVIndexTop;
 	void Initialize(DX12Common* dxCommon);
 	uint32_t Allocate();
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);

@@ -112,7 +112,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprites.push_back(sprite);
 	}
 	
-	//particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
+	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
 	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 
 	while (NewMSG.message != WM_QUIT)
@@ -123,30 +123,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		imgui->Update();
 		ImGui::Begin("sphereEdit");
 		
-		for (Object3d* object3d : objects3d)
-		{
-			if (input->PushKey(DIK_D))
-			{
-				object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
-			}
-			if (input->PushKey(DIK_A))
-			{
-				object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
-			}
-			object3d->Update();
-			ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
-			ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
-			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
-			ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
-			ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
-			ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
-			ImGui::DragFloat3("light.direction", (float*)&directionlLight, 0.01f,-1.0f,1.0f);
-			object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
-		}
+		//for (Object3d* object3d : objects3d)
+		//{
+		//	if (input->PushKey(DIK_D))
+		//	{
+		//		object3d->SetTranslate({ object3d->GetTranslate().x + 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+		//	}
+		//	if (input->PushKey(DIK_A))
+		//	{
+		//		object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
+		//	}
+		//	object3d->Update();
+		//	ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
+		//	ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
+		//	ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
+		//	ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
+		//	ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
+		//	ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
+		//	ImGui::DragFloat3("light.direction", (float*)&directionlLight, 0.01f,-1.0f,1.0f);
+		//	object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
+		//}
 		//ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
 		//ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
 
-		//particle->Update();
+		particle->Update();
 
 		for (Sprite* sprite : sprites)
 		{
@@ -161,10 +161,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		srvManager->PreDraw();
 
-		for (Object3d* object3d : objects3d)
-		{
-			object3d->Draw(object3dCommon, ModelManager::GetInstance()->GetModelCommon());
-		}
+		//for (Object3d* object3d : objects3d)
+		//{
+		//	object3d->Draw(object3dCommon, ModelManager::GetInstance()->GetModelCommon());
+		//}
 		
 		//particle->Draw();
 

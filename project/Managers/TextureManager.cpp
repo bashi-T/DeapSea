@@ -1,6 +1,5 @@
 #include "TextureManager.h"
 TextureManager* TextureManager::instance = nullptr;
-uint32_t TextureManager::kSRVIndexTop = 1;
 
 TextureManager* TextureManager::GetInstance()
 {
@@ -25,16 +24,15 @@ void TextureManager::Initialize(SRVManager* srvManager_)
 
 void TextureManager::LoadTexture(DX12Common* dxcommon,const std::string& filePath)
 {
-	TextureData& textureData = textureDatas[filePath];
 	dx12Common_ = dxcommon;
 	if (textureDatas.contains(filePath))
 	{
 		return;
 	}
 
-	assert(srvManager->CheckNumTexture(textureData.srvIndex));
+	assert(srvManager->CheckNumTexture(textureDatas.size()));
 
-	DirectX::ScratchImage image{};
+	DirectX::ScratchImage image{};//テクスチャファイルをプログラムで扱えるように
 	std::wstring filePathW = debug_->ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(
 		filePathW.c_str(),
@@ -43,7 +41,7 @@ void TextureManager::LoadTexture(DX12Common* dxcommon,const std::string& filePat
 		image);
 	assert(SUCCEEDED(hr));
 
-	DirectX::ScratchImage mipImages{};
+	DirectX::ScratchImage mipImages{};//MipMapの作成
 	hr = DirectX::GenerateMipMaps(
 		image.GetImages(),
 		image.GetImageCount(),
@@ -53,28 +51,25 @@ void TextureManager::LoadTexture(DX12Common* dxcommon,const std::string& filePat
 		mipImages);
 	assert(SUCCEEDED(hr));
 
-	//textureData.filePath = filePath;
+	TextureData& textureData = textureDatas[filePath];
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = CreateTextureResource(textureData.metadata);
 	UploadTextureData(textureData.resource.Get(), mipImages, textureData.metadata);
 
-	uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1 + kSRVIndexTop);
-
-	const uint32_t descriptorSizeSRV = dx12Common_->GetDevice().Get()->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
 	textureData.srvIndex = srvManager->Allocate();
 	textureData.srvHandleCPU = srvManager->
-		GetCPUDescriptorHandle(srvIndex);
+		GetCPUDescriptorHandle(textureData.srvIndex);
 
 	textureData.srvHandleGPU = srvManager->
-		GetGPUDescriptorHandle(srvIndex);
+		GetGPUDescriptorHandle(textureData.srvIndex);
 
 	srvManager->CreateSRVforTexture2D(
-		srvIndex,
+		textureData.srvIndex,
 		textureData.resource.Get(),
 		textureData.metadata.format,
 		textureData.metadata.mipLevels);
+
+	textureDatas[filePath] = textureData;
 }
 
 ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexMetadata& metadata)
