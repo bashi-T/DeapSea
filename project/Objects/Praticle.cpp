@@ -3,16 +3,16 @@
 Particle::~Particle() {
 }
 
-void Particle::Initialize(const std::string& filename, int32_t width, int32_t height, Object3dCommon* object3dCommon)
+void Particle::Initialize(const std::string& filename, int32_t width, int32_t height, SRVManager* srvManager, Object3dCommon* object3dCommon)
 {
 	this->object3dCommon_ = object3dCommon;
+	this->srvManager = srvManager;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
 	kNumMaxInstance = 10;
 	kSubdivision = 16;
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-
 	ResetDXC();
 
 	MakePSO();
@@ -37,26 +37,26 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	texcoordRightBottom[0] = { 1.0f,1.0f };
 	texcoordLeftBottom[0] = { 1.0f,0.0f };
 
-	transformMatrixTriangle = {
-			{1.0f, 1.0f, 1.0f},
-			{0.0f, 0.0f, 0.0f},
-			{0.0f, 0.0f, 0.0f}
-	};
+	//transformMatrixTriangle = {
+	//		{1.0f, 1.0f, 1.0f},
+	//		{0.0f, 0.0f, 0.0f},
+	//		{0.0f, 0.0f, 0.0f}
+	//};
 
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
 		particlesPlane[index] = MakeNewParticle(randomEngine);
 	}
-	transformMatrixSphere = {
-		{1.0f, 1.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f}
-	};
-
-	projectionMatrixTriangle = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
-	vertexResourceTriangle = CreateBufferResource(sizeof(VertexData) * 3);
-	materialResourceTriangle = CreateBufferResource(sizeof(Material));
-	transformationMatrixResourceTriangle = CreateBufferResource(sizeof(TransformationMatrix));
+	//transformMatrixSphere = {
+	//	{1.0f, 1.0f, 1.0f},
+	//	{0.0f, 0.0f, 0.0f},
+	//	{0.0f, 0.0f, 0.0f}
+	//};
+	//
+	//projectionMatrixTriangle = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
+	//vertexResourceTriangle = CreateBufferResource(sizeof(VertexData) * 3);
+	//materialResourceTriangle = CreateBufferResource(sizeof(Material));
+	//transformationMatrixResourceTriangle = CreateBufferResource(sizeof(TransformationMatrix));
 
 	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 	vertexResourcePlane = CreateBufferResource(sizeof(VertexData) * 6);
@@ -64,10 +64,10 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	indexResourcePlane = CreateBufferResource(sizeof(uint32_t) * 6);
 	instancingResourcePlane = CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
-	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
-	materialResourceSphere = CreateBufferResource(sizeof(Material));
-	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
-	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
+	//vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
+	//materialResourceSphere = CreateBufferResource(sizeof(Material));
+	//transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
+	//indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
 
 	MakeBufferView();
 
@@ -84,8 +84,9 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 		instancingDataPlane[index].color = particlesPlane[index].color;
 	}
 	MakeShaderResourceViewInstance(instancingResourcePlane.Get());
-	TextureManager::GetInstance()->LoadTexture(DX12Common::GetInstance(), filename);
-	//textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(filename);
+	materialDataPlane->material.textureFilePath = filename;
+	TextureManager::GetInstance()->LoadTexture(filename);
+	textureIndex = TextureManager::GetInstance()->GetSrvIndex(filename);
 }
 
 void Particle::ResetDXC()
@@ -106,7 +107,7 @@ ComPtr<IDxcBlob> Particle::CompileShader(
 	IDxcIncludeHandler* includeHandler_)
 {
 	debug_->Log(
-	    debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
+		debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
 	ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
 	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	assert(SUCCEEDED(hr));
@@ -117,12 +118,12 @@ ComPtr<IDxcBlob> Particle::CompileShader(
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
 	LPCWSTR arguments[]{
-	    filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
+		filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
 	};
 	ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler_->Compile(
-	    &shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
-	    IID_PPV_ARGS(&shaderResult));
+		&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
+		IID_PPV_ARGS(&shaderResult));
 	assert(SUCCEEDED(hr));
 
 	ComPtr<IDxcBlobUtf8> shaderError = nullptr;
@@ -131,14 +132,7 @@ ComPtr<IDxcBlob> Particle::CompileShader(
 		debug_->Log(shaderError->GetStringPointer());
 		assert(SUCCEEDED(hr));
 	}
-	ComPtr<IDxcBlob> shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
-	debug_->Log(
-	    debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
-	shaderSource->Release();
-	shaderResult->Release();
-	return shaderBlob;
+	return shaderError;
 }
 
 void Particle::MakePSO()
@@ -280,7 +274,7 @@ void Particle::Draw()
 	DrawPlane();
 
 	//DrawSphere(sphere, ColorSphere[0], true, width, height);
-};
+}
 
 ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
 {
@@ -311,9 +305,9 @@ ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
 
 void Particle::MakeBufferView()
 {
-	vertexBufferViewTriangle.BufferLocation = vertexResourceTriangle->GetGPUVirtualAddress();
-	vertexBufferViewTriangle.SizeInBytes = UINT(sizeof(VertexData)) * 3;
-	vertexBufferViewTriangle.StrideInBytes = sizeof(VertexData);
+	//vertexBufferViewTriangle.BufferLocation = vertexResourceTriangle->GetGPUVirtualAddress();
+	//vertexBufferViewTriangle.SizeInBytes = UINT(sizeof(VertexData)) * 3;
+	//vertexBufferViewTriangle.StrideInBytes = sizeof(VertexData);
 
 	vertexBufferViewPlane.BufferLocation = vertexResourcePlane->GetGPUVirtualAddress();
 	vertexBufferViewPlane.SizeInBytes = UINT(sizeof(VertexData)) * 6;
@@ -323,13 +317,13 @@ void Particle::MakeBufferView()
 	indexBufferViewPlane.SizeInBytes = sizeof(uint32_t) * 6;
 	indexBufferViewPlane.Format = DXGI_FORMAT_R32_UINT;
 
-	vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
-	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
-	vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
+	//vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
+	//vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
+	//vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 
-	indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
-	indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * kSubdivision;
-	indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
+	//indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
+	//indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * kSubdivision;
+	//indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
 
 }
 
@@ -612,14 +606,12 @@ void Particle::DrawPlane()
 	DX12Common::GetInstance()->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(
 		1, instancingSrvHandleGPU);
-	//DX12Common::GetInstance()->GetCommandList().Get()->
-	//	SetGraphicsRootDescriptorTable(
-	//	2, TextureManager::GetInstance()->GetSRVHandleGPU(textureIndex));
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 		DX12Common::GetInstance()->GetRtvHandles(srvManager->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+	srvManager->SetGraphicsRootDescriptorTable(2, textureIndex);
 
 	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 }
@@ -729,10 +721,10 @@ void Particle::DrawSphere(
 
 void Particle::MakeShaderResourceViewInstance(ID3D12Resource* instancingResource)
 {
-	//instancingSrvHandleCPU = srvManager->GetCPUDescriptorHandle(descriptorSizeSRV);
-	//instancingSrvHandleGPU = srvManager->GetGPUDescriptorHandle(descriptorSizeSRV);
+	instancingSrvHandleCPU = srvManager->GetCPUDescriptorHandle(textureIndex);
+	instancingSrvHandleGPU = srvManager->GetGPUDescriptorHandle(textureIndex);
 
-	//srvManager->CreateSRVforStructuredBuffer(textureIndex,indexResourcePlane.Get(), kNumInstance,);
+	srvManager->CreateSRVforStructuredBuffer(textureIndex, indexResourcePlane.Get(), kNumInstance, sizeof(particlesPlane));
 }
 
 Particle::Particles Particle::MakeNewParticle(std::mt19937& randomEngine)

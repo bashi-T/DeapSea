@@ -7,7 +7,6 @@
 #include <fstream>
 #include <sstream>
 #include"Managers/TextureManager.h"
-#include"Managers/SRVManager.h"
 
 #pragma comment(lib, "dxcompiler.lib")
 

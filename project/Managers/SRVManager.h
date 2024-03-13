@@ -33,7 +33,7 @@ public:
 		uint32_t srvIndex,
 		ID3D12Resource* pResource,
 		UINT numElements,
-		UINT structureByStride);
+		UINT structureByteStride);
 	void SetGraphicsRootDescriptorTable(UINT RootParamaterIndex, uint32_t srvIndex);
 	void MakeFence();
 	uint64_t fenceValue = 0;

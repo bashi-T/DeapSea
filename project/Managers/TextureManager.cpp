@@ -16,15 +16,15 @@ void TextureManager::Finalize()
 	instance = nullptr;
 }
 
-void TextureManager::Initialize(SRVManager* srvManager_)
+void TextureManager::Initialize(DX12Common* dxcommon, SRVManager* srvManager_)
 {
 	textureDatas.reserve(SRVManager::kMaxSRVCount);
+	this->dx12Common_ = dxcommon;
 	this->srvManager = srvManager_;
 }
 
-void TextureManager::LoadTexture(DX12Common* dxcommon,const std::string& filePath)
+void TextureManager::LoadTexture(const std::string& filePath)
 {
-	dx12Common_ = dxcommon;
 	if (textureDatas.contains(filePath))
 	{
 		return;

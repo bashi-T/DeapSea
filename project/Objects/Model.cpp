@@ -1,6 +1,6 @@
 #include "Model.h"
 
-void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
+void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath, std::string TextureFilePath)
 {
 	this->modelCommon_ = modelCommon;
 
@@ -13,8 +13,9 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	
-	TextureManager::GetInstance()->LoadTexture(modelCommon_->GetDx12Common(), modelData.material.textureFilePath);
+
+	modelData.material.textureFilePath = TextureFilePath;
+	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
 	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(modelData.material.textureFilePath);
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData[0].enableLighting = true;
@@ -24,7 +25,7 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath)
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 }
 
-void Model::Draw(ModelCommon* modelCommon,SRVManager*srvManager)
+void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 {
 	this->modelCommon_ = modelCommon;
 	this->srvManager_ = srvManager;
@@ -35,7 +36,7 @@ void Model::Draw(ModelCommon* modelCommon,SRVManager*srvManager)
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
-		0, materialResource->GetGPUVirtualAddress());
+			0, materialResource->GetGPUVirtualAddress());
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->IASetVertexBuffers(
 		0, 1, &vertexBufferView);
 	srvManager_->SetGraphicsRootDescriptorTable(

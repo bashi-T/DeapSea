@@ -26,7 +26,7 @@ class Particle
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
-	void Initialize(const std::string& filename, int32_t width, int32_t height, Object3dCommon* object3dCommon);
+	void Initialize(const std::string& filename, int32_t width, int32_t height, SRVManager* srvManager, Object3dCommon* object3dCommon);
 	void Update();
 	void Draw();
 	ComPtr<IDxcBlob> CompileShader(
@@ -70,7 +70,6 @@ public:
 		std::string textureFilePath;
 		uint32_t textureIndex = 0;
 	};
-	
 	struct ModelData
 	{
 		std::vector<VertexData> vertices;
@@ -83,6 +82,7 @@ public:
 		bool enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
+		MaterialData material;
 	};
 	struct TransformationMatrix
 	{
@@ -161,17 +161,23 @@ private:
 	ComPtr<ID3D12Resource> vertexResourceTriangle = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewTriangle{};
 
-	ComPtr<ID3D12Resource> vertexResourcePlane = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewPlane{};
-
 	ComPtr<ID3D12Resource> vertexResourceSphere = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
-
-	ComPtr<ID3D12Resource> indexResourcePlane = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewPlane{};
-
 	ComPtr<ID3D12Resource> indexResourceSphere = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
+	ComPtr<ID3D12Resource> materialResourceSphere;
+
+	ComPtr<ID3D12Resource> vertexResourcePlane = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewPlane{};
+	ComPtr<ID3D12Resource> indexResourcePlane = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewPlane{};
+	ComPtr<ID3D12Resource> materialResourcePlane;
+	TransformMatrix uvTransformPlane
+	{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
@@ -179,19 +185,11 @@ private:
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ComPtr<ID3D12Resource> materialResourceTriangle;
-	ComPtr<ID3D12Resource> materialResourcePlane;
-	ComPtr<ID3D12Resource> materialResourceSphere;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
 	TransformMatrix uvTransformTriangle
-	{
-		{1.0f,1.0f,1.0f},
-		{0.0f,0.0f,0.0f},
-		{0.0f,0.0f,0.0f},
-	};
-	TransformMatrix uvTransformPlane
 	{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
@@ -207,17 +205,17 @@ private:
 	Matrix4x4 cameraMatrix;
 
 	Matrix4x4 viewMatrixTriangle;
-	Matrix4x4 viewMatrixPlane;
 	Matrix4x4 viewMatrixSphere;
 
 	Matrix4x4 projectionMatrixTriangle;
-	Matrix4x4 projectionMatrixPlane;
 	Matrix4x4 projectionMatrixSphere;
 
+	Matrix4x4 viewMatrixPlane;
+	Matrix4x4 projectionMatrixPlane;
 	Matrix4x4 ViewProjectionMatrix;
+	Matrix4x4 worldViewProjectionMatrixPlane;
 
 	Matrix4x4 worldViewProjectionMatrixTriangle;
-	Matrix4x4 worldViewProjectionMatrixPlane;
 	Matrix4x4 worldViewProjectionMatrixSphere;
 
 	uint32_t kSubdivision = 16;

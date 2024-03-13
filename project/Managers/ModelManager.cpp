@@ -23,7 +23,7 @@ void ModelManager::Initialize(DX12Common* dxCommon)
 	modelCommon_->Initialize(dxCommon);
 }
 
-void ModelManager::LoadModel(const std::string& filePath)
+void ModelManager::LoadModel(const std::string& filePath, const std::string& TextureFilePath)
 {
 	if (models.contains(filePath))
 	{
@@ -31,7 +31,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->Initialize(modelCommon_,filePath);
+	model->Initialize(modelCommon_,filePath, TextureFilePath);
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 

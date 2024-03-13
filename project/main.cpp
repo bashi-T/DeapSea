@@ -73,7 +73,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dx12Common->GetSwapChainDesc(),
 		dx12Common->GetRtvDesc(),
 		srvManager->GetSrvDescriptorHeap().Get());
-	TextureManager::GetInstance()->Initialize(srvManager);
+	TextureManager::GetInstance()->Initialize(dx12Common,srvManager);
 
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
@@ -85,7 +85,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		Object3d* object3d = new Object3d;
 		object3d->Initialize(object3dCommon, srvManager);
-		ModelManager::GetInstance()->LoadModel(objFilePath[2]);
+		ModelManager::GetInstance()->LoadModel(objFilePath[2], textureFilePath[4]);
 		object3d->SetModel(objFilePath[2]);
 		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[2]);
 		Model::ModelData* modelData = model->GetModelData();
@@ -112,7 +112,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprites.push_back(sprite);
 	}
 	
-	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, object3dCommon);
+	particle->Initialize(textureFilePath[1], WinAPP::clientWidth_, WinAPP::clientHeight_, srvManager, object3dCommon);
 	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 
 	while (NewMSG.message != WM_QUIT)
@@ -166,7 +166,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//	object3d->Draw(object3dCommon, ModelManager::GetInstance()->GetModelCommon());
 		//}
 		
-		//particle->Draw();
+		particle->Draw();
 
 		//if (input->PushKey(DIK_SPACE)!=0) {
 			for (Sprite* sprite : sprites)

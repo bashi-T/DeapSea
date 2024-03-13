@@ -55,7 +55,7 @@ void Sprite::Initialize(int32_t width, int32_t height, SpriteCommon* spriteCommo
 	
 	InputData(Color);
 	materialData->material.textureFilePath = textureFilePath;
-	TextureManager::GetInstance()->LoadTexture(spriteCommon_->GetDx12Common(),textureFilePath);
+	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 	//AdjestTextureSize();
 }
