@@ -41,7 +41,7 @@ void TitleScene::Init()
 		}
 		model->Memcpy();
 		object3d->SetTranslate({ 0.2f * i, 0.2f * i, 0.2f * i });
-		object3d->SetScale({ 0.02f, 0.02f, 0.02f });
+		object3d->SetScale({ 0.01f, 0.01f, 0.01f });
 		objects3d.push_back(object3d);
 	};
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
@@ -61,7 +61,7 @@ void TitleScene::Update()
 		}
 		object3d->Update(Camera::GetInstance());
 	}
-	if (Input::GetInstance()->PushKey(DIK_SPACE))
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		sceneNo = INGAME;
 	}

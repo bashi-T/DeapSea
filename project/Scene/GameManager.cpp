@@ -63,7 +63,7 @@ int GameManager::Run()
 	while (NewMSG.message != WM_QUIT)
 	{
 		dx12Common->update();
-		input->Update();
+		Input::GetInstance()->Update();
 		camera->GetInstance()->Update();
 		imgui->Update();
 		prevSceneNo_ = currentSceneNo_;

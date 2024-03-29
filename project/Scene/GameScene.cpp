@@ -38,7 +38,7 @@ void GameScene::Update()
 	{
 		sprite->Update(WinAPP::clientWidth_, WinAPP::clientHeight_);
 	}
-	if (Input::GetInstance()->PushKey(DIK_Z))
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		sceneNo = TITLE;
 	}
