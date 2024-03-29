@@ -26,7 +26,7 @@ class Particle
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
-	void Initialize(const std::string& filename, int32_t width, int32_t height, SRVManager* srvManager, Object3dCommon* object3dCommon);
+	void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon, DX12Common* dxCommon);
 	void Update();
 	void Draw();
 	ComPtr<IDxcBlob> CompileShader(
@@ -132,6 +132,7 @@ private:
 	SpriteCommon* spriteCom_;
 	Object3dCommon* object3dCommon_;
 	Camera* camera_;
+	DX12Common* dxCommon;
 	HRESULT hr = NULL;
 
 	uint32_t kNumInstance = 10;

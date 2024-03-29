@@ -23,7 +23,7 @@ public:
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
-
+	static Object3dCommon* GetInstance();
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 	ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
@@ -39,6 +39,7 @@ private:
 	TransformMatrix transformMatrix;
 	Camera* defaultCamera = nullptr;
 	ComPtr<ID3D12Resource> transformationMatrixResource;
+	static inline Object3dCommon* instance;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
 	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;

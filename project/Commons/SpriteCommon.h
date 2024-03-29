@@ -24,6 +24,7 @@ public:
 		IDxcIncludeHandler* includeHandler);
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
+	static SpriteCommon* GetInstance();
 
 	//void InputDataTriangle(
 	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
@@ -52,6 +53,7 @@ private:
 	DX12Common* dx12Common_;
 	TransformMatrix transformMatrix;
 	ComPtr<ID3D12Resource> transformationMatrixResource;
+	static inline SpriteCommon* instance;
 
 	ComPtr<IDxcUtils> dxcUtils = nullptr;
 	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;

@@ -24,23 +24,6 @@
 //class ParticleManager
 //{
 //public:
-//	void Initialize(DX12Common* dxCommon, SRVManager* srvManager);
-//	void Update();
-//	void Draw();
-//	void ResetDXC();
-//	void MakePSO(DX12Common* dxCommon);
-//	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
-//	ComPtr<IDxcBlob> CompileShader(
-//		const std::wstring& filePath,
-//		const wchar_t* profile,
-//		IDxcUtils* dxcUtils,
-//		IDxcCompiler3* dxcCompiler,
-//		IDxcIncludeHandler* includeHandler);
-//	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
-//	void InputData(
-//		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
-//		Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft);
-//
 //	struct VertexData
 //	{
 //		Vector4 position;
@@ -80,14 +63,31 @@
 //	};
 //	struct ParticleGroup {
 //		MaterialData materialData;
-//		std::forward_list<Particles>particle[10];
+//		std::list<Particles>particle[10];
 //		uint32_t srvIndex;
 //		ComPtr<ID3D12Resource> instancingResource;
 //		uint32_t kNumInstance;
 //		ParticleForGPU* instancingData;
 //	};
 //	std::unordered_map<std::string, ParticleGroup>particleGroups;
-//	Particles MakeNewParticle(std::mt19937& randomEngine);
+//	std::list<Particles> MakeNewParticle(std::mt19937& randomEngine);
+//	void Initialize(DX12Common* dxCommon, SRVManager* srvManager, const std::string& particlename, const std::string& filename);
+//	void Update(const std::string& particlename);
+//	void Draw(ParticleGroup* particle);
+//	void ResetDXC();
+//	void MakePSO(DX12Common* dxCommon);
+//	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
+//	ComPtr<IDxcBlob> CompileShader(
+//		const std::wstring& filePath,
+//		const wchar_t* profile,
+//		IDxcUtils* dxcUtils,
+//		IDxcCompiler3* dxcCompiler,
+//		IDxcIncludeHandler* includeHandler);
+//	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+//	void InputData(
+//		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
+//		Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft, const std::string& particlename);
+//
 //	void MakeBufferView();
 //
 //private:
@@ -143,6 +143,9 @@
 //	Vector2 textureSize = { 100.0f,100.0f };
 //	bool isFlipX_ = false;
 //	bool isFlipY_ = false;
+//
+//	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU;
+//	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;
 //
 //};
 //

@@ -166,6 +166,14 @@ void SRVManager::PostDraw()
 	hr = dxCommon_->GetCommandList()->Reset(dxCommon_->GetCommandAllocator().Get(), nullptr);
 	assert(SUCCEEDED(hr));
 }
+SRVManager* SRVManager::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = new SRVManager;
+	}
+	return instance;
+}
 void SRVManager::MakeFence()
 {
 	HRESULT hr = dxCommon_->GetDevice()->CreateFence(fenceValue,

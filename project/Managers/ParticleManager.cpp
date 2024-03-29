@@ -1,6 +1,6 @@
 //#include "ParticleManager.h"
 //
-//void ParticleManager::Initialize(DX12Common* dxCommon, SRVManager* srvManager)
+//void ParticleManager::Initialize(DX12Common* dxCommon, SRVManager* srvManager, const std::string& particlename, const std::string& filename)
 //{
 //	this->dx12Common_ = dxCommon;
 //	this->srvManager_ = srvManager;
@@ -25,31 +25,35 @@
 //	texcoordRightBottom[0] = { 1.0f,1.0f };
 //	texcoordLeftBottom[0] = { 1.0f,0.0f };
 //
-//	for (uint32_t name = 0; name < kNumMaxInstance; ++name)
+//	for (uint32_t i = 0; i < kNumMaxInstance; ++i)
 //	{
-//		for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+//		for (uint32_t j = 0; j < particleGroups.size(); ++j)
 //		{
-//
-//			particleGroups.particle = MakeNewParticle(randomEngine);
-//			particleGroups.instancingData.WVP = MakeIdentity4x4();
-//			instancingData.World = MakeIdentity4x4();
-//			instancingData.color = particles.color;
+//			ParticleGroup& particleGroup = particleGroups[particlename];
+//			particleGroup.particle[i] = MakeNewParticle(randomEngine);
+//			particleGroup.instancingData->WVP = MakeIdentity4x4();
+//			particleGroup.instancingData->World = MakeIdentity4x4();
+//			particleGroup.instancingData->color = particleGroup.particle[i]->color;
 //		}
 //	}
 //	MakeBufferView();
 //	vertexResource = CreateBufferResource(sizeof(VertexData) * 6);
 //	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-//
+//	CreateParticleGroup(particlename, filename);
 //}
 //
-//void ParticleManager::Update()
+//void ParticleManager::Update(const std::string& particlename)
 //{
+//	viewMatrix = camera_->GetViewMatrix();
+//	projectionMatrix = camera_->GetProjectionMatrix();
+//	ViewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
+//
 //
 //	InputData(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], Color[0],
-//		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
+//		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0], particlename);
 //}
 //
-//void ParticleManager::Draw()
+//void ParticleManager::Draw(ParticleGroup* particle)
 //{
 //	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
 //	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
@@ -67,7 +71,7 @@
 //			1, instancingSrvHandleGPU);
 //
 //	srvManager_->SetGraphicsRootDescriptorTable(
-//		2, particleGroups);
+//		2, particle->srvIndex);
 //
 //	//DX12Common::GetInstance()->GetCommandList().Get()->
 //	//	SetGraphicsRootDescriptorTable(
@@ -78,7 +82,7 @@
 //	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 //	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 //
-//	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
+//	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, particle->kNumInstance, 0, 0, 0);
 //
 //}
 //
@@ -330,24 +334,24 @@
 //	return Resource;
 //}
 //
-//ParticleManager::Particles ParticleManager::MakeNewParticle(std::mt19937& randomEngine)
+//std::list<ParticleManager::Particles> ParticleManager::MakeNewParticle(std::mt19937& randomEngine)
 //{
 //	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
 //	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
 //	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
-//	Particles particle;
-//	particle.transform.scale = { 1.0f,1.0f,1.0f };
-//	particle.transform.rotate = { 0.0f,0.0f,0.0f };
-//	particle.transform.translate = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
-//	particle.velocity = { distribution(randomEngine) ,distribution(randomEngine) ,distribution(randomEngine) };
-//	particle.color = { distColor(randomEngine) ,distColor(randomEngine) ,distColor(randomEngine) ,1.0f };
-//	particle.lifeTime = distTime(randomEngine);
-//	particle.currentTime = 0;
+//	std::list<Particles> particle;
+//	particle->transform.scale = { 1.0f,1.0f,1.0f };
+//	particle->transform.rotate = { 0.0f,0.0f,0.0f };
+//	particle->transform.translate = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
+//	particle->velocity = { distribution(randomEngine) ,distribution(randomEngine) ,distribution(randomEngine) };
+//	particle->color = { distColor(randomEngine) ,distColor(randomEngine) ,distColor(randomEngine) ,1.0f };
+//	particle->lifeTime = distTime(randomEngine);
+//	particle->currentTime = 0;
 //	return particle;
 //}
 //void ParticleManager::InputData(
 //	Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
-//	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft)
+//	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft,const std::string& particlename)
 //{
 //	uint32_t* indexData = nullptr;
 //	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
@@ -359,34 +363,40 @@
 //	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 //	materialData[0].uvTransform = uvTransformMatrix;
 //
-//	particleGroups;
-//	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+//
+//	ParticleGroup& particleGroup = particleGroups[particlename];
+//	particleGroup.kNumInstance = 0;
+//	for (uint32_t i = 0; i < kNumMaxInstance; ++i)
 //	{
-//		float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
-//		Matrix4x4 worldMatrix =
-//			MakeAffineMatrix(
-//				particles[index].transform.scale,
-//				particles[index].transform.rotate,
-//				particles[index].transform.translate);
-//		if (particles[index].lifeTime <= particles[index].currentTime)
+//		for (uint32_t j = 0; j < particleGroups.size(); ++j)
 //		{
-//			continue;
+//			float alpha = 1.0f - (particleGroup.particle[i]->currentTime / particleGroup.particle[i]->lifeTime);
+//			Matrix4x4 worldMatrix =
+//				MakeAffineMatrix(
+//					particles[i].transform.scale,
+//					particles[i].transform.rotate,
+//					particles[i].transform.translate);
+//			float x = particleGroup.particle[i]->lifeTime;
+//			if (particleGroup.particle[i]->lifeTime <= particleGroup.particle[i]->currentTime)
+//			{
+//				continue;
+//			}
+//			particles[i].transform.translate.x += particles[i].velocity.x * kDeltaTime;
+//			particles[i].transform.translate.y += particles[i].velocity.y * kDeltaTime;
+//			particles[i].transform.translate.z += particles[i].velocity.z * kDeltaTime;
+//			particles[i].currentTime += kDeltaTime;
+//			if (camera_)
+//			{
+//				//const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+//				worldViewProjectionMatrix = Multiply(worldMatrix, ViewProjectionMatrix);
+//			}
+//			particleGroup.instancingData[particleGroup.kNumInstance].WVP = worldViewProjectionMatrix;
+//			particleGroup.instancingData[particleGroup.kNumInstance].World = worldMatrix;
+//			particleGroup.instancingData[particleGroup.kNumInstance].color = particles[i].color;
+//			particleGroup.particle[i]->color.a = alpha;
+//			particleGroup.instancingData[particleGroup.kNumInstance].color.a = alpha;
+//			++particleGroup.kNumInstance;
 //		}
-//		particles[index].transform.translate.x += particles[index].velocity.x * kDeltaTime;
-//		particles[index].transform.translate.y += particles[index].velocity.y * kDeltaTime;
-//		particles[index].transform.translate.z += particles[index].velocity.z * kDeltaTime;
-//		particles[index].currentTime += kDeltaTime;
-//		if (camera_)
-//		{
-//			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-//			worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-//		}
-//		instancingData[kNumInstance].WVP = worldViewProjectionMatrix;
-//		instancingData[kNumInstance].World = worldMatrix;
-//		instancingData[kNumInstance].color = particles[index].color;
-//		particles[index].color.a = alpha;
-//		instancingData[kNumInstance].color.a = alpha;
-//		++kNumInstance;
 //	}
 //
 //	//float left = 0.0f - anchorPoint.x;

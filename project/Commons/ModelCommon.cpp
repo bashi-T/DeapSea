@@ -190,6 +190,6 @@ void ModelCommon::MakePSO(DX12Common* dxcommon)
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	hr = dxcommon->GetDevice().Get()->CreateGraphicsPipelineState(
-		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));//D3D12 ERROR: ID3D12Device::CreateInputLayout: Encoded Signature size doesn't match specified size. [ STATE_CREATION ERROR #63: CREATEINPUTLAYOUT_UNPARSEABLEINPUTSIGNATURE]
+		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 }

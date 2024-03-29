@@ -3,8 +3,9 @@
 Particle::~Particle() {
 }
 
-void Particle::Initialize(const std::string& filename, int32_t width, int32_t height, SRVManager* srvManager, Object3dCommon* object3dCommon)
+void Particle::Initialize(const std::string& filename,SRVManager* srvManager, Object3dCommon* object3dCommon, DX12Common* dxCommon)
 {
+	this->dxCommon = dxCommon;
 	this->object3dCommon_ = object3dCommon;
 	this->srvManager = srvManager;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
@@ -58,7 +59,7 @@ void Particle::Initialize(const std::string& filename, int32_t width, int32_t he
 	//materialResourceTriangle = CreateBufferResource(sizeof(Material));
 	//transformationMatrixResourceTriangle = CreateBufferResource(sizeof(TransformationMatrix));
 
-	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
+	projectionMatrixPlane = MakePerspectiveFovMatrix(0.65f, float(WinAPP::clientWidth_) / float(WinAPP::clientHeight_), 0.1f, 100.0f);
 	vertexResourcePlane = CreateBufferResource(sizeof(VertexData) * 6);
 	materialResourcePlane = CreateBufferResource(sizeof(Material));
 	indexResourcePlane = CreateBufferResource(sizeof(uint32_t) * 6);
@@ -185,7 +186,7 @@ void Particle::MakePSO()
 		assert(false);
 	}
 
-	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateRootSignature(
+	hr = dxCommon->GetDevice().Get()->CreateRootSignature(
 		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 
@@ -210,9 +211,10 @@ void Particle::MakePSO()
 
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -231,10 +233,10 @@ void Particle::MakePSO()
 		CompileShader(L"HLSL/Particle.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	//D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//depthStencilDesc.DepthEnable = true;
+	//depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
@@ -256,8 +258,8 @@ void Particle::MakePSO()
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateGraphicsPipelineState(
-		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	hr = dxCommon->GetDevice()->CreateGraphicsPipelineState(
+		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));//D3D12 ERROR: ID3D12Device::CreateInputLayout: Encoded Signature size doesn't match specified size. [ STATE_CREATION ERROR #63: CREATEINPUTLAYOUT_UNPARSEABLEINPUTSIGNATURE]
 	assert(SUCCEEDED(hr));
 }
 
@@ -296,7 +298,7 @@ ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
 
 	ComPtr<ID3D12Resource> Resource = nullptr;
 
-	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateCommittedResource(
+	hr = dxCommon->GetDevice().Get()->CreateCommittedResource(
 		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
@@ -308,6 +310,14 @@ void Particle::MakeBufferView()
 	//vertexBufferViewTriangle.BufferLocation = vertexResourceTriangle->GetGPUVirtualAddress();
 	//vertexBufferViewTriangle.SizeInBytes = UINT(sizeof(VertexData)) * 3;
 	//vertexBufferViewTriangle.StrideInBytes = sizeof(VertexData);
+	//
+	//vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
+	//vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
+	//vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
+	//
+	//indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
+	//indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * kSubdivision;
+	//indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
 
 	vertexBufferViewPlane.BufferLocation = vertexResourcePlane->GetGPUVirtualAddress();
 	vertexBufferViewPlane.SizeInBytes = UINT(sizeof(VertexData)) * 6;
@@ -316,14 +326,6 @@ void Particle::MakeBufferView()
 	indexBufferViewPlane.BufferLocation = indexResourcePlane->GetGPUVirtualAddress();
 	indexBufferViewPlane.SizeInBytes = sizeof(uint32_t) * 6;
 	indexBufferViewPlane.Format = DXGI_FORMAT_R32_UINT;
-
-	//vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
-	//vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
-	//vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
-
-	//indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
-	//indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * kSubdivision;
-	//indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
 
 }
 
@@ -561,59 +563,59 @@ void Particle::DrawTriangle(
     Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
     Vector2 coordLeft, bool useWorldMap) {
 	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
-	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewTriangle);
-	DX12Common::GetInstance()->GetCommandList().Get()->
+	dxCommon->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
+	dxCommon->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
+	dxCommon->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewTriangle);
+	dxCommon->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferViewSphere);
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+	dxCommon->GetCommandList().Get()->IASetPrimitiveTopology(
 	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	dxCommon->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 	    0, materialResourceTriangle->GetGPUVirtualAddress());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	dxCommon->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 	    1, transformationMatrixResourceTriangle->GetGPUVirtualAddress());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-	    DX12Common::GetInstance()->GetRtvHandles(srvManager->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+	    dxCommon->GetRtvHandles(srvManager->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon->GetDsvHandle();
 
-	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+	dxCommon->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+	dxCommon->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
 	    2, useWorldMap ? GetTextureSrvHandleGPU2()
 	                   : GetTextureSrvHandleGPU());
 
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	dxCommon->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, directionalLightResource->GetGPUVirtualAddress());
 
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
+	dxCommon->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
 }
 
 void Particle::DrawPlane()
 {
-	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+	dxCommon->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
+	dxCommon->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
+	dxCommon->GetCommandList().Get()->IASetPrimitiveTopology(
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
-	DX12Common::GetInstance()->GetCommandList().Get()->
+	dxCommon->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
+	dxCommon->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferViewPlane);
 
-	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+	dxCommon->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		0, materialResourcePlane->GetGPUVirtualAddress());
-	DX12Common::GetInstance()->GetCommandList().Get()->
+	dxCommon->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(
 		1, instancingSrvHandleGPU);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		DX12Common::GetInstance()->GetRtvHandles(srvManager->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+		dxCommon->GetRtvHandles(srvManager->GetBackBufferIndex());
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon->GetDsvHandle();
+	dxCommon->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 	srvManager->SetGraphicsRootDescriptorTable(2, textureIndex);
 
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
+	dxCommon->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 }
 
 void Particle::DrawSphere(
@@ -671,51 +673,51 @@ void Particle::DrawSphere(
 				1.0f - float(latIndex + 1) / float(kSubdivision)
 			};
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				SetPipelineState(graphicsPipelineState.Get());
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				SetGraphicsRootSignature(rootSignature.Get());
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
+			D3D12_CPU_DESCRIPTOR_HANDLE rtv = dxCommon->GetRtvHandles(
 				srvManager->GetBackBufferIndex());
-			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon->GetDsvHandle();
+			dxCommon->GetCommandList().Get()->
 				OMSetRenderTargets(1, &rtv, false, &dsv);
 
-			//DX12Common::GetInstance()->GetCommandList().Get()->
+			//dxCommon->GetCommandList().Get()->
 			//	SetGraphicsRootDescriptorTable(
 			//	2, TextureManager::GetInstance()->GetSRVHandleGPU(textureIndex));
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
 
 			InputDataSphere(
 				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(
 				0, materialResourceSphere->GetGPUVirtualAddress());
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(
 				1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
 
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				IASetVertexBuffers(
 				0, 1, &vertexBufferViewSphere);
-			DX12Common::GetInstance()->GetCommandList().Get()->
+			dxCommon->GetCommandList().Get()->
 				IASetIndexBuffer(&indexBufferViewSphere);
 
 			sphereCount++;
 		}
 	}
-	DX12Common::GetInstance()->GetCommandList().Get()->DrawIndexedInstanced(
+	dxCommon->GetCommandList().Get()->DrawIndexedInstanced(
 		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
 

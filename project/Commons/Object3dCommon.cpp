@@ -194,3 +194,12 @@ void Object3dCommon::MakePSO(DX12Common* dxcommon)
 		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 }
+
+Object3dCommon* Object3dCommon::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = new Object3dCommon;
+	}
+	return instance;
+}

@@ -15,6 +15,7 @@ public:
 	void Update();
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
+	static Input* GetInstance();
 
 private:
 	WinAPP* winApp_ = nullptr;
@@ -23,6 +24,6 @@ private:
 	ComPtr<IDirectInputDevice8> keyboard;
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
-
+	static inline Input* instance;
 };
 

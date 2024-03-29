@@ -14,6 +14,7 @@ private:
 	float aspectRetio;
 	float nearClip;
 	float farClip;
+	static inline Camera* instance;
 
 public:
 	Camera();
@@ -31,6 +32,6 @@ public:
 	const Matrix4x4& GetViewMatrix() { return viewMatrix; }
 	const Matrix4x4& GetProjectionMatrix() { return projectionMatrix; }
 	const Matrix4x4& GetViewProjectionMatrix() { return viewProjectionMatrix; }
-
+	static Camera* GetInstance();
 };
 

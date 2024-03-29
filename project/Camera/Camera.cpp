@@ -34,3 +34,12 @@ void Camera::Update()
 		MakePerspectiveFovMatrix(fovY, aspectRetio, nearClip, farClip);
 	viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 }
+
+Camera* Camera::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = new Camera;
+	}
+	return instance;
+}

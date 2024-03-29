@@ -15,6 +15,7 @@ private:
 	D3D12_RECT scissorRect{};
 	ComPtr<ID3D12Fence> fence = nullptr;
 	HANDLE fenceEvent;
+	static inline SRVManager* instance;
 
 
 public:
@@ -44,5 +45,7 @@ public:
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
+	static SRVManager* GetInstance();
+
 };
 

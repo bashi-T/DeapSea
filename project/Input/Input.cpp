@@ -51,3 +51,12 @@ bool Input::TriggerKey(BYTE keyNumber)
 		return false;
 	}
 }
+
+Input* Input::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = new Input;
+	}
+	return instance;
+}
