@@ -12,7 +12,6 @@
 #include"Managers/ModelManager.h"
 #include"Objects/model.h"
 #include"Managers/TextureManager.h"
-#include"Objects/Particle.h"
 #include"Managers/SRVManager.h"
 
 class GameManager

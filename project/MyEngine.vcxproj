@@ -17,7 +17,6 @@
     <ClCompile Include="Math\CGVector.cpp" />
     <ClCompile Include="Objects\Praticle.cpp" />
     <ClCompile Include="Managers\SRVManager.cpp" />
-    <ClCompile Include="Managers\ParticleManager.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="Systems\Debug.cpp" />
     <ClCompile Include="Commons\DX12Common.cpp" />
@@ -49,7 +48,6 @@
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Objects\Particle.h" />
     <ClInclude Include="Managers\SRVManager.h" />
-    <ClInclude Include="Managers\ParticleManager.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Systems\Debug.h" />
     <ClInclude Include="Commons\DX12Common.h" />

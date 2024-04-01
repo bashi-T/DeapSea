@@ -14,16 +14,16 @@ void GameScene::Init()
 		"Resource/worldMap.png",
 		"Resource/world.png",
 		"Resource/circle.png",
-		"Resource/uvChecker.png",
+		"Resource/ganban.png",
 		"Resource/uvChecker.png",
 		"Resource/uvChecker.png",
 		"Resource/cursor.png"
 	};
 
-	for (uint32_t i = 0; i < 10; i++)
+	for (uint32_t i = 0; i < 9; i++)
 	{
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, SpriteCommon::GetInstance(), SRVManager::GetInstance(), textureFilePath[i]);
+		sprite->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, SpriteCommon::GetInstance(), SRVManager::GetInstance(), textureFilePath[i+1]);
 		posSprite.x = 100.0f * i;
 		posSprite.y = 50.0f * i;
 		sprite->SetPositoin(posSprite);

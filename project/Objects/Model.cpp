@@ -16,7 +16,8 @@ void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath, std::st
 
 	modelData.material.textureFilePath = TextureFilePath;
 	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(modelData.material.textureFilePath);
+	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData[0].enableLighting = true;
 	materialData[0].uvTransform = MakeIdentity4x4();

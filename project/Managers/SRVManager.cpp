@@ -1,7 +1,7 @@
 #include "SRVManager.h"
 
 const uint32_t SRVManager::kMaxSRVCount = 512;
-const uint32_t SRVManager::kSRVIndexTop = 1;
+const uint32_t SRVManager::kSRVIndexTop = 0;
 
 void SRVManager::Initialize(DX12Common* dxCommon)
 {
@@ -29,7 +29,7 @@ void SRVManager::Initialize(DX12Common* dxCommon)
 
 uint32_t SRVManager::Allocate()
 {
-	CheckNumTexture(useIndex);
+	assert(CheckNumTexture(useIndex));
 	int index = useIndex;
 	useIndex++;
 	return index;
@@ -91,7 +91,7 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT RootParamaterIndex, uint32_
 
 bool SRVManager::CheckNumTexture(uint32_t textureIndex)
 {
-	if (textureIndex + SRVManager::kSRVIndexTop < SRVManager::kMaxSRVCount)
+	if (kMaxSRVCount > textureIndex)
 	{
 		return true;
 	}

@@ -8,30 +8,32 @@ void TitleScene::Init()
 	//camera = new Camera();
 	std::string textureFilePath[10] =
 	{
-		"Resource/civ6.png",
-		"Resource/uvChecker.png",
+		"Resource/civ6.png",//一番最初のテクスチャがうまく読み込まれない
 		"Resource/monsterBall.png",
+		"Resource/uvChecker.png",
 		"Resource/worldMap.png",
 		"Resource/world.png",
+		"Resource/ganban.png",
+		"Resource/uvChecker.png",
+		"Resource/uvChecker.png",
 		"Resource/circle.png",
-		"Resource/uvChecker.png",
-		"Resource/uvChecker.png",
-		"Resource/uvChecker.png",
 		"Resource/cursor.png"
 	};
+	TextureManager::GetInstance()->LoadTexture(textureFilePath[0]);
 	std::string objFilePath[10] =
 	{
-		"plane.obj",
-		"axis.obj",
 		"world.obj",
+		"axis.obj",
+		"plane.obj",
 	};
-	for (uint32_t i = 0; i < 1; i++)
+	for (uint32_t i = 0; i < 2; i++)
 	{
 		Object3d* object3d = new Object3d;
+		Particle* particle = new Particle;
 		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-		ModelManager::GetInstance()->LoadModel(objFilePath[2], textureFilePath[4]);
-		object3d->SetModel(objFilePath[2]);
-		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[2]);
+		ModelManager::GetInstance()->LoadModel(objFilePath[i], textureFilePath[i+1]);
+		object3d->SetModel(objFilePath[i]);
+		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[i]);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
@@ -40,10 +42,13 @@ void TitleScene::Init()
 			vertex.normal.z = vertex.position.z;
 		}
 		model->Memcpy();
-		object3d->SetTranslate({ 0.2f * i, 0.2f * i, 0.2f * i });
-		object3d->SetScale({ 0.01f, 0.01f, 0.01f });
+		object3d->SetTranslate({ 1.0f -(2.0f* i), 0.0f, 0.0f });
+		object3d->SetScale({ i + 0.005f, i + 0.005f , i + 0.005f  });
 		objects3d.push_back(object3d);
+		particle->Initialize(textureFilePath[i+1], SRVManager::GetInstance(), Object3dCommon::GetInstance(), DX12Common::GetInstance());
+		particles.push_back(particle);
 	};
+
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
 }
 
@@ -61,6 +66,10 @@ void TitleScene::Update()
 		}
 		object3d->Update(Camera::GetInstance());
 	}
+	for (Particle* particle : particles)
+	{
+		particle->Update();
+	}
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		sceneNo = INGAME;
@@ -72,6 +81,10 @@ void TitleScene::Draw()
 	for (Object3d* object3d : objects3d)
 	{
 		object3d->Draw(Object3dCommon::GetInstance(), ModelManager::GetInstance()->GetModelCommon());
+	}
+	for (Particle* particle : particles)
+	{
+		particle->Draw();
 	}
 }
 

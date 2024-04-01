@@ -28,10 +28,6 @@ int GameManager::Run()
 	camera = new Camera();
 	particle = new Particle;
 	std::vector<Model*> models;
-	//for (int i = 0; i < kNumTriangle; i++)
-	//{
-	//	mesh[i] = new Mesh;
-	//}
 	//bool useWorldMap = true;
 
 
@@ -56,25 +52,32 @@ int GameManager::Run()
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	SPCommon->Initialize(dx12Common);
 
-	sceneArr_[currentSceneNo_]->Init();
+	sceneArr_[TITLE]->Init();
+	sceneArr_[INGAME]->Init();
 
-	//particle->Initialize(textureFilePath[1], srvManager, object3dCommon, dx12Common);
 	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 	while (NewMSG.message != WM_QUIT)
 	{
 		dx12Common->update();
 		Input::GetInstance()->Update();
+		if (Input::GetInstance()->PushKey(DIK_RIGHT))
+		{
+			camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x + 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z });
+		}
+		if (Input::GetInstance()->PushKey(DIK_LEFT))
+		{
+			camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x - 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z});
+		}
 		camera->GetInstance()->Update();
-		imgui->Update();
 		prevSceneNo_ = currentSceneNo_;
 		currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();
-		if (prevSceneNo_ != currentSceneNo_) {
-			sceneArr_[currentSceneNo_]->Init();
-		}
+		//if (prevSceneNo_ != currentSceneNo_) {
+		//	sceneArr_[currentSceneNo_]->Init();
+		//}
 		sceneArr_[currentSceneNo_]->Update();
+		imgui->Update();
 
-		ImGui::Begin("sphereEdit");
-
+		//ImGui::Begin("sphereEdit");
 		//	ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
 		//	ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
 		//	ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
@@ -86,10 +89,7 @@ int GameManager::Run()
 		//
 		//ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
 		//ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
-
-		//particle->Update();
-
-		ImGui::End();
+		//ImGui::End();
 
 		if (winAPP->ProcessMessage())
 		{
@@ -99,9 +99,6 @@ int GameManager::Run()
 		srvManager->PreDraw();
 		sceneArr_[currentSceneNo_]->Draw();
 
-		//particle->Draw();
-		//if (input->PushKey(DIK_SPACE)!=0) {
-		//}
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		srvManager->PostDraw();
