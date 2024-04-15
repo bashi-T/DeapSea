@@ -115,70 +115,25 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
 				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 				VertexData vertex;
 				vertex.position = { position.x,position.y,position.z,1.0f };
+				vertex.normal = { normal.x,normal.y,normal.z };
+				vertex.texcoord = { texcoord.x,texcoord.y };
+				vertex.position.x *= -1.0f;
+				vertex.normal.x *= -1.0f;
+				modelData.vertices.push_back(vertex);
 			}
 		}
 	}
-	//while (std::getline(file, line))
-	//{
-	//	std::string identifier;
-	//	std::istringstream s(line);
-	//	s >> identifier;
 
-	//	if (identifier == "v")
-	//	{
-	//		Vector4 position;
-	//		position.a = 1.0f;
-	//		s >> position.x >> position.y >> position.z;
-	//		position.a = 1.0f;
-	//		positions.push_back(position);
-	//	}
-	//	else if (identifier == "vt")
-	//	{
-	//		Vector2 texcoord;
-	//		s >> texcoord.x >> texcoord.y;
-	//		texcoord.y = 1.0f - texcoord.y;
-	//		texcoords.push_back(texcoord);
-	//	}
-	//	else if (identifier == "vn")
-	//	{
-	//		Vector3 normal;
-	//		s >> normal.x >> normal.y >> normal.z;
-	//		normals.push_back(normal);
-	//	}
-	//	else if (identifier == "mtllib")
-	//	{
-	//		std::string materialFilemane;
-	//		s >> materialFilemane;
-	//		modelData.material = LoadMaterialTemplateFile(directryPath, materialFilemane);
-	//	}
-	//	else if (identifier == "f")
-	//	{
-	//		VertexData triangle[3];
-
-	//		for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-	//			std::string vertexDefinition;
-	//			s >> vertexDefinition;
-
-	//			std::istringstream v(vertexDefinition);
-	//			uint32_t elementIndices[3];
-	//			for (int32_t element = 0; element < 3; ++element) {
-	//				std::string index;
-	//				std::getline(v, index, '/');
-	//				elementIndices[element] = std::stoi(index);
-	//			}
-
-	//			Vector4 position = positions[elementIndices[0] - 1];
-	//			Vector2 texcoord = texcoords[elementIndices[1] - 1];
-	//			Vector3 normal = normals[elementIndices[2] - 1];
-	//			VertexData vertex = { position, texcoord, normal };
-	//			modelData.vertices.push_back(vertex);
-	//			triangle[faceVertex] = { position, texcoord, normal };
-	//		}
-	//		modelData.vertices.push_back(triangle[0]);
-	//		modelData.vertices.push_back(triangle[1]);
-	//		modelData.vertices.push_back(triangle[2]);
-	//	}
-	//}
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex)
+	{
+		aiMaterial* material = scene->mMaterials[materialIndex];
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
+		{
+			aiString textureFilePath;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+			modelData.material.textureFilePath = directryPath + "/" + textureFilePath.C_Str();
+		}
+	}
 	return modelData;
 }
 
