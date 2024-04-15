@@ -92,70 +92,93 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
 	std::vector<Vector2> texcoords;
 	std::string line;
 
-	std::ifstream file(directryPath + "/" + filename);
-	assert(file.is_open());
+	Assimp::Importer importer;
+	std::string file(directryPath + "/" + filename);
+	const aiScene* scene = importer.ReadFile(file.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	assert(scene->HasMeshes());
 
-	while (std::getline(file, line))
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
 	{
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		assert(mesh->HasNormals());
+		assert(mesh->HasTextureCoords(0));
 
-		if (identifier == "v")
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex)
 		{
-			Vector4 position;
-			position.a = 1.0f;
-			s >> position.x >> position.y >> position.z;
-			position.a = 1.0f;
-			positions.push_back(position);
-		}
-		else if (identifier == "vt")
-		{
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			texcoord.y = 1.0f - texcoord.y;
-			texcoords.push_back(texcoord);
-		}
-		else if (identifier == "vn")
-		{
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			normals.push_back(normal);
-		}
-		else if (identifier == "mtllib")
-		{
-			std::string materialFilemane;
-			s >> materialFilemane;
-			modelData.material = LoadMaterialTemplateFile(directryPath, materialFilemane);
-		}
-		else if (identifier == "f")
-		{
-			VertexData triangle[3];
-
-			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-
-				std::istringstream v(vertexDefinition);
-				uint32_t elementIndices[3];
-				for (int32_t element = 0; element < 3; ++element) {
-					std::string index;
-					std::getline(v, index, '/');
-					elementIndices[element] = std::stoi(index);
-				}
-
-				Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
-				Vector3 normal = normals[elementIndices[2] - 1];
-				VertexData vertex = { position, texcoord, normal };
-				modelData.vertices.push_back(vertex);
-				triangle[faceVertex] = { position, texcoord, normal };
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3);
+			for (uint32_t element = 0; element < face.mNumIndices; ++element)
+			{
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+				VertexData vertex;
+				vertex.position = { position.x,position.y,position.z,1.0f };
 			}
-			modelData.vertices.push_back(triangle[0]);
-			modelData.vertices.push_back(triangle[1]);
-			modelData.vertices.push_back(triangle[2]);
 		}
 	}
+	//while (std::getline(file, line))
+	//{
+	//	std::string identifier;
+	//	std::istringstream s(line);
+	//	s >> identifier;
+
+	//	if (identifier == "v")
+	//	{
+	//		Vector4 position;
+	//		position.a = 1.0f;
+	//		s >> position.x >> position.y >> position.z;
+	//		position.a = 1.0f;
+	//		positions.push_back(position);
+	//	}
+	//	else if (identifier == "vt")
+	//	{
+	//		Vector2 texcoord;
+	//		s >> texcoord.x >> texcoord.y;
+	//		texcoord.y = 1.0f - texcoord.y;
+	//		texcoords.push_back(texcoord);
+	//	}
+	//	else if (identifier == "vn")
+	//	{
+	//		Vector3 normal;
+	//		s >> normal.x >> normal.y >> normal.z;
+	//		normals.push_back(normal);
+	//	}
+	//	else if (identifier == "mtllib")
+	//	{
+	//		std::string materialFilemane;
+	//		s >> materialFilemane;
+	//		modelData.material = LoadMaterialTemplateFile(directryPath, materialFilemane);
+	//	}
+	//	else if (identifier == "f")
+	//	{
+	//		VertexData triangle[3];
+
+	//		for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+	//			std::string vertexDefinition;
+	//			s >> vertexDefinition;
+
+	//			std::istringstream v(vertexDefinition);
+	//			uint32_t elementIndices[3];
+	//			for (int32_t element = 0; element < 3; ++element) {
+	//				std::string index;
+	//				std::getline(v, index, '/');
+	//				elementIndices[element] = std::stoi(index);
+	//			}
+
+	//			Vector4 position = positions[elementIndices[0] - 1];
+	//			Vector2 texcoord = texcoords[elementIndices[1] - 1];
+	//			Vector3 normal = normals[elementIndices[2] - 1];
+	//			VertexData vertex = { position, texcoord, normal };
+	//			modelData.vertices.push_back(vertex);
+	//			triangle[faceVertex] = { position, texcoord, normal };
+	//		}
+	//		modelData.vertices.push_back(triangle[0]);
+	//		modelData.vertices.push_back(triangle[1]);
+	//		modelData.vertices.push_back(triangle[2]);
+	//	}
+	//}
 	return modelData;
 }
 

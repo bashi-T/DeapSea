@@ -2,6 +2,10 @@
 #include"Commons/ModelCommon.h"
 #include"Managers/SRVManager.h"
 
+#include<assimp/Importer.hpp>
+#include<assimp/scene.h>
+#include<assimp/postprocess.h>
+
 class Model
 {
 public:
