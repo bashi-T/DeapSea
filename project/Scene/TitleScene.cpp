@@ -6,7 +6,7 @@ void TitleScene::Init()
 	//input = new Input;
 	//srvManager = new SRVManager;
 	//camera = new Camera();
-	std::string textureFilePath[10] =
+	std::string textureFilePath[10] =//textureの左右が反転してる
 	{
 		"Resource/uvChecker.png",//一番最初のテクスチャがうまく読み込まれない
 		"Resource/monsterBall.png",

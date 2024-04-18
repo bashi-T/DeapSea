@@ -36,9 +36,55 @@ struct TransformMatrix {
 	Vector3 translate;
 };
 
+struct Line//直線
+{
+	Vector3 origin;//始点
+	Vector3 diff;//終点
+};
+
+struct Ray//半直線
+{
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Segment//線分
+{
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Plane {//平面
+	Vector3 normal;//法線
+	float distance;//距離
+};
+
+struct Triangle
+{
+	Vector3 vertices[3];
+};
+
 struct Sphere {
 	Vector3 center;
 	float radius;
+};
+
+struct Quaternion
+{
+	float x;
+	float y;
+	float z;
+	float w;
+};
+struct AABB {
+	Vector3 min;
+	Vector3 max;
+};
+
+struct OBB {
+	Vector3 center;//中心点
+	Vector3 orientations[3];//座標軸　正規化・直交必須 0=x 1=y 2=z
+	Vector3 size;//中心から面までの距離　座標軸方向の長さの半分
 };
 
 //Matrix2x2 Add(Matrix2x2 a, Matrix2x2 b) {
@@ -343,3 +389,25 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2);
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
+
+Matrix4x4 DirectionTodirection(const Vector3& from, const Vector3& to);
+
+Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);
+
+Quaternion identityQuaternion();
+
+Quaternion Conjugate(const Quaternion& quaternion);
+
+float Norm(const Quaternion& quaternion);
+
+Quaternion Normalize(const Quaternion& quaternion);//正規化・単位Quaternion
+
+Quaternion Inverse(const Quaternion& quaternion);
+
+Quaternion MakerotateAxisQuaternion(const Vector3& axis, float angle);
+
+Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion);
+
+Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
+
+Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
