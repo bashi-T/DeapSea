@@ -102,21 +102,6 @@ ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexM
 	return resource;
 }
 
-uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
-{
-//	auto it = std::find_if(
-//		textureDatas.begin(),
-//		textureDatas.end(),
-//		[&](TextureData& textureData) {return filePath; });
-//	if (it != textureDatas.end())
-//	{
-//		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
-//		return textureIndex;
-//	}
-//	assert(0);
-	return 0;
-}
-
 uint32_t TextureManager::GetSrvIndex(const std::string& filePath)
 {
 	TextureData& textureData = textureDatas[filePath];
@@ -156,5 +141,3 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 	assert(srvManager->CheckNumTexture(textureData.srvIndex));
 	return textureData.metadata;
 }
-
-

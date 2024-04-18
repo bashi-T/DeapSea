@@ -28,18 +28,27 @@ public:
 		std::string textureFilePath;
 		uint32_t textureIndex = 0;
 	};
+	struct Node
+	{
+		Matrix4x4 localMatrix;
+		std::string name;
+		std::vector<Node> children;
+	};
 	struct ModelData
 	{
 		std::vector<VertexData> vertices;
 		MaterialData material;
+		Node rootNode;
 	};
 	void Initialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath);
 	void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void Memcpy();
 	ComPtr<ID3D12Resource> CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes);
-	ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	ModelData LoadModelFile(const std::string& directryPath, const std::string& filename);
+	//MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	void MakeBufferView();
+	Node ReadNode(aiNode* node);
+	
 	ModelData* GetModelData() { return &modelData; }
 
 private:

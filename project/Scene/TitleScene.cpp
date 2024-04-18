@@ -8,9 +8,9 @@ void TitleScene::Init()
 	//camera = new Camera();
 	std::string textureFilePath[10] =
 	{
-		"Resource/civ6.png",//一番最初のテクスチャがうまく読み込まれない
+		"Resource/uvChecker.png",//一番最初のテクスチャがうまく読み込まれない
 		"Resource/monsterBall.png",
-		"Resource/uvChecker.png",
+		"Resource/civ6.png",
 		"Resource/worldMap.png",
 		"Resource/world.png",
 		"Resource/ganban.png",
@@ -23,6 +23,7 @@ void TitleScene::Init()
 	std::string objFilePath[10] =
 	{
 		"world.obj",
+		"plane.gltf",
 		"axis.obj",
 		"plane.obj",
 	};
