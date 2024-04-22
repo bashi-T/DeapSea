@@ -322,21 +322,11 @@ struct OBB {
 //	return result;
 //};
 //
-//Vector2 Lerp(const Vector2& a, const Vector2& b, float t) {
-//	Vector2 f;
-//	f.x = t * a.x + (1.0f - t) * b.x;
-//	f.y = t * a.y + (1.0f - t) * b.y;
-//	return f;
-//
-//}
-//
-//Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float t) {
-//	Vector2 p0p1 = Lerp(p0, p1, t);
-//	Vector2 p1p2 = Lerp(p1, p2, t);
-//	Vector2 p = Lerp(p0p1, p1p2, t);
-//	return p;
-//}
+Vector2 Lerp(const Vector2& a, const Vector2& b, float t);
 
+Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float t);
+
+Vector3 Lerp(const Vector3& a, const Vector3& b, float t);
 
 Vector3 Add(const Vector3& v1, const Vector3& v2);
 

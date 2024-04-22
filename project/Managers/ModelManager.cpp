@@ -31,7 +31,19 @@ void ModelManager::LoadModel(const std::string& filePath, const std::string& Tex
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->Initialize(modelCommon_,filePath, TextureFilePath);
+	model->ModelInitialize(modelCommon_, filePath, TextureFilePath);
+	models.insert(std::make_pair(filePath, std::move(model)));
+}
+
+void ModelManager::LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath)
+{
+	if (models.contains(filePath))
+	{
+		return;
+	}
+
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	model->AnimationInitialize(modelCommon_, filePath, TextureFilePath);
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 

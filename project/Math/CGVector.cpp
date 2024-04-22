@@ -1,6 +1,31 @@
 #include "CGVector.h"
 
-Vector3 Add(const Vector3& v1, const Vector3& v2) 
+Vector2 Lerp(const Vector2& a, const Vector2& b, float t)
+{
+	Vector2 f;
+	f.x = t * a.x + (1.0f - t) * b.x;
+	f.y = t * a.y + (1.0f - t) * b.y;
+	return f;
+}
+
+Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float t)
+{
+	Vector2 p0p1 = Lerp(p0, p1, t);
+	Vector2 p1p2 = Lerp(p1, p2, t);
+	Vector2 p = Lerp(p0p1, p1p2, t);
+	return p;
+}
+
+Vector3 Lerp(const Vector3& a, const Vector3& b, float t)
+{
+	Vector3 f;
+	f.x = t * a.x + (1.0f - t) * b.x;
+	f.y = t * a.y + (1.0f - t) * b.y;
+	f.z = t * a.z + (1.0f - t) * b.z;
+	return f;
+}
+
+Vector3 Add(const Vector3& v1, const Vector3& v2)
 {
 	Vector3 v3 = {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
 	return v3;

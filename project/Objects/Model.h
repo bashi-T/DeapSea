@@ -83,7 +83,8 @@ public:
 
 	};
 
-	void Initialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath);
+	void ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath);
+	void AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath);
 	void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void Memcpy();
 	ComPtr<ID3D12Resource> CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes);
@@ -91,7 +92,7 @@ public:
 	//MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	void MakeBufferView();
 	Node ReadNode(aiNode* node);
-	Animation loadAnimationFile(const std::string& directoryPath, const std::string& filename);
+	Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
 
 	ModelData* GetModelData() { return &modelData; }
 

@@ -29,7 +29,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager
 void Object3d::Update(Camera* camera)
 {
 	//transformMatrix.rotate.y -= 0.02f;
-		Matrix4x4 worldMatrix = MakeAffineMatrix(
+	Matrix4x4 worldMatrix = MakeAffineMatrix(
 		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 
 	if (camera)
@@ -41,11 +41,41 @@ void Object3d::Update(Camera* camera)
 	cameraData->worldPosition =
 	{
 		camera->GetWorldMatrix().m[3][0],
-	    camera->GetWorldMatrix().m[3][1],
-	    camera->GetWorldMatrix().m[3][2]
+		camera->GetWorldMatrix().m[3][1],
+		camera->GetWorldMatrix().m[3][2]
 	};
 	transformationMatrixData->WVP = Multiply(model_->GetModelData()->rootNode.localMatrix, worldViewProjectionMatrix);
 	transformationMatrixData->World = Multiply(model_->GetModelData()->rootNode.localMatrix, worldMatrix);
+}
+
+void Object3d::AnimationUpdate(Camera* camera)
+{
+	Matrix4x4 worldMatrix = MakeAffineMatrix(
+		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+
+	if (camera)
+	{
+		const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+	}
+
+	cameraData->worldPosition =
+	{
+		camera->GetWorldMatrix().m[3][0],
+		camera->GetWorldMatrix().m[3][1],
+		camera->GetWorldMatrix().m[3][2]
+	};
+
+	animationTime += 1.0f / 60.0f;
+	animationTime = std::fmod(animationTime, animation.duration);
+	Model::NodeAnimation& rootNodeAnimation = animation.nodeAnimations[model_->GetModelData()->rootNode.name];
+	Vector3 translate = Calculatevalue(rootNodeAnimation.translate, animationTime);
+	Quaternion rotate = Calculatevalue(rootNodeAnimation.rotate, animationTime);
+	Vector3 scale = Calculatevalue(rootNodeAnimation.scale, animationTime);
+	Matrix4x4 localMatrix = MakeAffineMatrix(scale, { rotate.x,rotate.y,rotate.z }, translate);
+
+	transformationMatrixData->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
+	transformationMatrixData->World = Multiply(localMatrix, worldMatrix);
 }
 
 void Object3d::Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon)
@@ -117,6 +147,45 @@ ComPtr<ID3D12Resource> Object3d::CreateBufferResource(Object3dCommon* object3dCo
 		IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
 	return Resource;
+}
+
+Vector3 Object3d::Calculatevalue(const std::vector<Model::KeyFrameVector3>& keyframes, float time)
+{
+	assert(!keyframes.empty());
+	if (keyframes.size() == 1 || time <= keyframes[0].time)
+	{
+		return keyframes[0].value;
+	}
+	for (size_t index = 0; index < keyframes.size() - 1; ++index)
+	{
+		size_t nextIndex = index + 1;
+		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time)
+		{
+			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
+			return Lerp(keyframes[index].value, keyframes[nextIndex].value, t);
+		}
+		return (*keyframes.rbegin()).value;
+	}
+}
+
+Quaternion Calculatevalue(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time)
+{
+	assert(!keyframes.empty());
+	if (keyframes.size() == 1 || time <= keyframes[0].time)
+	{
+		return keyframes[0].value;
+	}
+	for (size_t index = 0; index < keyframes.size() - 1; ++index)
+	{
+		size_t nextIndex = index + 1;
+		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time)
+		{
+			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
+			return Slerp(keyframes[index].value, keyframes[nextIndex].value, t);
+		}
+		return (*keyframes.rbegin()).value;
+	}
+
 }
 
 void Object3d::SetModel(const std::string& filePath)

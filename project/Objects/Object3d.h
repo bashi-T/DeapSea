@@ -23,6 +23,9 @@ private:
 	ModelCommon* modelCommon_ = nullptr;
 	SRVManager* srvManager = nullptr;
 	Camera* camera = nullptr;
+	
+	Model::Animation animation;
+	float animationTime = 0.0f;
 
 	struct DirectionalLight
 	{
@@ -55,10 +58,12 @@ private:
 public:
 	void Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager);
 	void Update(Camera* camera);
+	void AnimationUpdate(Camera* camera);
 	void Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon);
 	
 	ComPtr<ID3D12Resource> CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes);
-
+	Vector3 Calculatevalue(const std::vector<Model::KeyFrameVector3>& keyframes, float time);
+	Quaternion Calculatevalue(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time);
 	DirectionalLight* GetDirectionalLightData() { return DirectionalLightData; }
 
 	void SetModel(const std::string& filePath);
@@ -70,6 +75,7 @@ public:
 	const Vector3& GetScale()const { return transformMatrix.scale; }
 	const Vector3& GetRotate()const { return transformMatrix.rotate; }
 	const Vector3& GetTranslate()const { return transformMatrix.translate; }
+
 
 };
 

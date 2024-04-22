@@ -1,11 +1,36 @@
 #include "Model.h"
 
-void Model::Initialize(ModelCommon* modelCommon,std::string objFilePath, std::string TextureFilePath)
+void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
 {
 	this->modelCommon_ = modelCommon;
 
 	modelData = LoadModelFile("Resource", objFilePath);
+	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
+	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
 
+	MakeBufferView();
+
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+	modelData.material.textureFilePath = TextureFilePath;
+	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
+	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+
+	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	materialData[0].enableLighting = true;
+	materialData[0].uvTransform = MakeIdentity4x4();
+	materialData[0].shininess = 50.0f;
+
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+}
+
+void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
+{
+	this->modelCommon_ = modelCommon;
+
+	modelData = LoadModelFile("Resource", objFilePath);
+	animation = LoadAnimationFile("Resource", objFilePath);
 	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
 	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
 
@@ -193,7 +218,7 @@ Model::Node Model::ReadNode(aiNode* node)
 	return result;
 }
 
-Model::Animation Model::loadAnimationFile(const std::string& directoryPath, const std::string& filename)
+Model::Animation Model::LoadAnimationFile(const std::string& directoryPath, const std::string& filename)
 {
 	Animation animation;
 	Assimp::Importer importer;
