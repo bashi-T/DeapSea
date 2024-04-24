@@ -30,7 +30,7 @@ void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePat
 	this->modelCommon_ = modelCommon;
 
 	modelData = LoadModelFile("Resource", objFilePath);
-	animation = LoadAnimationFile("Resource", objFilePath);
+	animation = LoadAnimationFile("Resource", objFilePath);//animationの活かし方？
 	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
 	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
 
@@ -223,8 +223,8 @@ Model::Animation Model::LoadAnimationFile(const std::string& directoryPath, cons
 	Animation animation;
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename;
-	const aiScene* scene = importer.ReadFile(filename.c_str(), 0);
-	assert(scene->mNumAnimations != 0);
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
+	assert(scene->mNumAnimations != 0);//animationがないと止まる
 	aiAnimation* animationAssimp = scene->mAnimations[0];
 	animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
 

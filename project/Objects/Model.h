@@ -95,7 +95,7 @@ public:
 	Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
 
 	ModelData* GetModelData() { return &modelData; }
-
+	Animation* GetAnimation() { return &animation; }
 private:
 	ModelData modelData;
 	ModelCommon* modelCommon_;
@@ -108,6 +108,8 @@ private:
 
 	Material* materialData = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;
+
+	Animation animation;
 
 	TransformMatrix uvTransform
 	{

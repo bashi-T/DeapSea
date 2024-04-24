@@ -67,11 +67,11 @@ void Object3d::AnimationUpdate(Camera* camera)
 	};
 
 	animationTime += 1.0f / 60.0f;
-	animationTime = std::fmod(animationTime, animation.duration);
-	Model::NodeAnimation& rootNodeAnimation = animation.nodeAnimations[model_->GetModelData()->rootNode.name];
-	Vector3 translate = Calculatevalue(rootNodeAnimation.translate, animationTime);
-	Quaternion rotate = Calculatevalue(rootNodeAnimation.rotate, animationTime);
-	Vector3 scale = Calculatevalue(rootNodeAnimation.scale, animationTime);
+	animationTime = std::fmod(animationTime, model_->GetAnimation()->duration);
+	Model::NodeAnimation& rootNodeAnimation = model_->GetAnimation()->nodeAnimations[model_->GetModelData()->rootNode.name];
+	Vector3 translate = CalculatevalueV(rootNodeAnimation.translate.keyframes, animationTime);
+	Quaternion rotate = CalculatevalueQ(rootNodeAnimation.rotate.keyframes, animationTime);
+	Vector3 scale = CalculatevalueV(rootNodeAnimation.scale.keyframes, animationTime);
 	Matrix4x4 localMatrix = MakeAffineMatrix(scale, { rotate.x,rotate.y,rotate.z }, translate);
 
 	transformationMatrixData->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
@@ -149,9 +149,9 @@ ComPtr<ID3D12Resource> Object3d::CreateBufferResource(Object3dCommon* object3dCo
 	return Resource;
 }
 
-Vector3 Object3d::Calculatevalue(const std::vector<Model::KeyFrameVector3>& keyframes, float time)
+Vector3 Object3d::CalculatevalueV(const std::vector<Model::KeyFrameVector3>& keyframes, float time)
 {
-	assert(!keyframes.empty());
+	assert(!keyframes.empty());//キーがないと止まる
 	if (keyframes.size() == 1 || time <= keyframes[0].time)
 	{
 		return keyframes[0].value;
@@ -168,9 +168,9 @@ Vector3 Object3d::Calculatevalue(const std::vector<Model::KeyFrameVector3>& keyf
 	}
 }
 
-Quaternion Calculatevalue(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time)
+Quaternion Object3d::CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time)
 {
-	assert(!keyframes.empty());
+	assert(!keyframes.empty());//キーがないと止まる
 	if (keyframes.size() == 1 || time <= keyframes[0].time)
 	{
 		return keyframes[0].value;

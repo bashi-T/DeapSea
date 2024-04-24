@@ -10,7 +10,7 @@ void TitleScene::Init()
 	{
 		"Resource/uvChecker.png",//一番最初のテクスチャがうまく読み込まれない
 		"Resource/monsterBall.png",
-		"Resource/civ6.png",
+		"Resource/AnimatedCube_BaseColor.png",
 		"Resource/worldMap.png",
 		"Resource/world.png",
 		"Resource/ganban.png",
@@ -23,7 +23,7 @@ void TitleScene::Init()
 	std::string objFilePath[10] =
 	{
 		"world.obj",
-		"plane.gltf",
+		"AnimatedCube.gltf",
 		"axis.obj",
 		"plane.obj",
 	};
@@ -31,9 +31,17 @@ void TitleScene::Init()
 	{
 		Object3d* object3d = new Object3d;
 		Particle* particle = new Particle;
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-		ModelManager::GetInstance()->LoadModel(objFilePath[i], textureFilePath[i+1]);
-		object3d->SetModel(objFilePath[i]);
+		if(i==0)
+		{
+			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+			ModelManager::GetInstance()->LoadModel(objFilePath[i], textureFilePath[i + 1]);
+			object3d->SetModel(objFilePath[i]);
+		}else if(i==1)
+		{
+			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+			ModelManager::GetInstance()->LoadAnimationModel(objFilePath[i], textureFilePath[i + 1]);
+			object3d->SetModel(objFilePath[i]);
+		}
 		Model* model = ModelManager::GetInstance()->FindModel(objFilePath[i]);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
@@ -65,8 +73,9 @@ void TitleScene::Update()
 		{
 			object3d->SetTranslate({ object3d->GetTranslate().x - 0.01f ,object3d->GetTranslate().y ,object3d->GetTranslate().z });
 		}
-		object3d->Update(Camera::GetInstance());
 	}
+		objects3d[0]->Update(Camera::GetInstance());
+		objects3d[1]->AnimationUpdate(Camera::GetInstance());
 	for (Particle* particle : particles)
 	{
 		particle->Update();
