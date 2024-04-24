@@ -87,6 +87,20 @@ struct OBB {
 	Vector3 size;//中心から面までの距離　座標軸方向の長さの半分
 };
 
+struct EulerTransform
+{
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
+};
+
+struct QuaternionTransform
+{
+	Vector3 scale;
+	Quaternion rotate;
+	Vector3 translate;
+};
+
 //Matrix2x2 Add(Matrix2x2 a, Matrix2x2 b) {
 //	Matrix2x2 add;
 //	for (int x = 0; x < 2; x++) {

@@ -10,7 +10,7 @@ void TitleScene::Init()
 	{
 		"Resource/uvChecker.png",//一番最初のテクスチャがうまく読み込まれない
 		"Resource/monsterBall.png",
-		"Resource/AnimatedCube_BaseColor.png",
+		"Resource/AnimatedCube/AnimatedCube_BaseColor.png",
 		"Resource/worldMap.png",
 		"Resource/world.png",
 		"Resource/ganban.png",
@@ -22,10 +22,10 @@ void TitleScene::Init()
 	TextureManager::GetInstance()->LoadTexture(textureFilePath[0]);
 	std::string objFilePath[10] =
 	{
-		"world.obj",
-		"AnimatedCube.gltf",
-		"axis.obj",
-		"plane.obj",
+		"world/world.obj",
+		"AnimatedCube/AnimatedCube.gltf",
+		"axis/axis.obj",
+		"plane/plane.gltf",
 	};
 	for (uint32_t i = 0; i < 2; i++)
 	{
