@@ -33,7 +33,7 @@ int GameManager::Run()
 
 
 	winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"GE3");
-	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
+	dx12Common->Initialize(winAPP);
 	srvManager->Initialize(dx12Common);
 	input->Initialize(winAPP);
 	imgui->Initialize(
@@ -58,6 +58,7 @@ int GameManager::Run()
 	Vector3 directionlLight = { 0.0f,-1.0f,0.0f };
 	while (NewMSG.message != WM_QUIT)
 	{
+		imgui->Update();
 		dx12Common->update();
 		Input::GetInstance()->Update();
 		if (Input::GetInstance()->PushKey(DIK_RIGHT))
@@ -75,7 +76,6 @@ int GameManager::Run()
 		//	sceneArr_[currentSceneNo_]->Init();
 		//}
 		sceneArr_[currentSceneNo_]->Update();
-		imgui->Update();
 
 		//ImGui::Begin("sphereEdit");
 		//	ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);

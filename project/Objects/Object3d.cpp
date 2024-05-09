@@ -92,13 +92,6 @@ void Object3d::Draw(Object3dCommon* object3dCommon, ModelCommon* modelCommon)
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
-		srvManager->GetBackBufferIndex());
-
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
-	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
-		OMSetRenderTargets(1, &rtv, false, &dsv);
-
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
 		1, transformationMatrixResource->GetGPUVirtualAddress());

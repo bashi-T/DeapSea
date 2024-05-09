@@ -39,7 +39,7 @@ void DX12Common::UpdateFixFPS()
 	reference_ = std::chrono::steady_clock::now();
 }
 
-void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
+void DX12Common::Initialize(WinAPP* winApp)
 {
 	this->winApp_ = winApp;
 	assert(winApp_);
@@ -50,9 +50,7 @@ void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
 	MakeDXGIFactory();
 	ChoseUseAdapter();
 	MakeD3D12Device();
-	depthStencilResource = CreatedepthstencilTextureResource(
-		width,
-		height);
+	depthStencilResource = CreatedepthstencilTextureResource();
 
 #ifdef _DEBUG
 	InfoQueue(device.Get());
@@ -139,10 +137,10 @@ void DX12Common::MakeCommandList()
 	assert(SUCCEEDED(hr));
 }
 
-void DX12Common::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
+void DX12Common::MakeSwapchain(HWND hwnd_)
 {
-	swapChainDesc.Width = width;
-	swapChainDesc.Height = height;
+	swapChainDesc.Width = WinAPP::clientWidth_;
+	swapChainDesc.Height = WinAPP::clientHeight_;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -201,11 +199,7 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 {
 	MakeCommandQueue();
 	MakeCommandList();
-	MakeSwapchain(
-		winApp->GetClientWidth(),
-		winApp->GetClientHeight(),
-		winApp->GetHWND()
-	);
+	MakeSwapchain(winApp->GetHWND());
 	MakeDescriptorHeap();
 
 	rtvDescriptorHeap = CreateDescriptorHeap(
@@ -260,11 +254,11 @@ void DX12Common::MakeDSV()
 }
 
 
-ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(int32_t width, int32_t height)
+ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource()
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = width;
-	resourceDesc.Height = height;
+	resourceDesc.Width = WinAPP::clientWidth_;
+	resourceDesc.Height = WinAPP::clientHeight_;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.DepthOrArraySize = 1;
 	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

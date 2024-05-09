@@ -110,14 +110,37 @@ void SRVManager::PreDraw()
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-	
-	//dxCommon_->GetCommandList()->OMSetRenderTargets(1,
-	//	&dxCommon_->GetRtvHandles(backBufferIndex), false, nullptr);
 
+	const Vector4 kRenderTergetClearValue{ 1.0f,0.0f,0.0f,1.0f };
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon_->GetRtvDesc();
+	auto renderTextureResource = CreateRenderTextureResource(
+		rtvDesc.Format, kRenderTergetClearValue);
+	dxCommon_->GetDevice()->CreateRenderTargetView(
+		renderTextureResource.Get(),
+		&rtvDesc,
+		dxCommon_->GetRtvHandles(backBufferIndex));
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
+	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	renderTextureSrvDesc.Texture2D.MipLevels = 1;
+
+	dxCommon_->GetDevice()->CreateShaderResourceView(
+		renderTextureResource.Get(), &renderTextureSrvDesc, GetCPUDescriptorHandle(backBufferIndex));
+	
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+		dxCommon_->GetRtvHandles(backBufferIndex);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon_->GetDsvHandle();
+	dxCommon_->GetCommandList().Get()->
+		OMSetRenderTargets(1, &rtv, false, &dsv);
+	clearColor[0] = kRenderTergetClearValue.x;
+	clearColor[1] = kRenderTergetClearValue.y;
+	clearColor[2] = kRenderTergetClearValue.z;
+	clearColor[3] = kRenderTergetClearValue.a;
 	dxCommon_->GetCommandList()->ClearRenderTargetView(
 		dxCommon_->GetRtvHandles(backBufferIndex),
 		clearColor, 0, nullptr);
-
 	dxCommon_->GetCommandList()->ClearDepthStencilView(
 		dxCommon_->GetDsvHandle(),
 		D3D12_CLEAR_FLAG_DEPTH,
@@ -173,6 +196,43 @@ SRVManager* SRVManager::GetInstance()
 		instance = new SRVManager;
 	}
 	return instance;
+}
+ComPtr<ID3D12Resource> SRVManager::CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = WinAPP::clientWidth_;
+	resourceDesc.Height = WinAPP::clientHeight_;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = format;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+	//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = format;
+	clearValue.Color[0] = color.x;
+	clearValue.Color[1] = color.y;
+	clearValue.Color[2] = color.z;
+	clearValue.Color[3] = color.a;
+
+	ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		&clearValue,
+		IID_PPV_ARGS(&resource));
+
+	assert(SUCCEEDED(hr));
+
+	return resource;
 }
 void SRVManager::MakeFence()
 {

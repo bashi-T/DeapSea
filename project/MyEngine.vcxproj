@@ -33,7 +33,6 @@
     <ClCompile Include="Managers\ModelManager.cpp" />
     <ClCompile Include="Systems\MyImGui.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Objects\Mesh.cpp" />
     <ClCompile Include="Objects\Object3d.cpp" />
     <ClCompile Include="Commons\Object3dCommon.cpp" />
     <ClCompile Include="Sprites\Sprite.cpp" />
@@ -64,7 +63,6 @@
     <ClInclude Include="Commons\ModelCommon.h" />
     <ClInclude Include="Managers\ModelManager.h" />
     <ClInclude Include="Systems\MyImGui.h" />
-    <ClInclude Include="Objects\Mesh.h" />
     <ClInclude Include="Math\CGVector.h" />
     <ClInclude Include="Objects\Object3d.h" />
     <ClInclude Include="Commons\Object3dCommon.h" />
@@ -75,6 +73,18 @@
     <ClInclude Include="Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\CopyImage.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="HLSL\CopyImage.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="HLSL\Object3d.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
@@ -105,6 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="HLSL\CopyImage.hlsli" />
     <None Include="HLSL\Object3d.hlsli" />
     <None Include="HLSL\Particle.hlsli" />
   </ItemGroup>

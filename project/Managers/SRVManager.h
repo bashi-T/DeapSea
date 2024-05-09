@@ -35,12 +35,18 @@ public:
 		ID3D12Resource* pResource,
 		UINT numElements,
 		UINT structureByteStride);
+	void CreateSRVforRenderTexture(
+		uint32_t srvIndex,
+		ID3D12Resource* pResource,
+		UINT numElements,
+		UINT structureByteStride);
 	void SetGraphicsRootDescriptorTable(UINT RootParamaterIndex, uint32_t srvIndex);
 	void MakeFence();
 	uint64_t fenceValue = 0;
 	bool CheckNumTexture(uint32_t textureIndex);
 	void PreDraw();
 	void PostDraw();
+	ComPtr<ID3D12Resource> CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color);
 
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }

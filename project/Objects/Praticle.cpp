@@ -291,11 +291,6 @@ void Particle::Draw()
 	dxCommon->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, cameraResource->GetGPUVirtualAddress());
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		dxCommon->GetRtvHandles(srvManager->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon->GetDsvHandle();
-	dxCommon->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-
 	dxCommon->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 }
 

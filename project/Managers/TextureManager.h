@@ -5,6 +5,7 @@
 #include "Commons/DX12Common.h"
 #include"SRVManager.h"
 #include<unordered_map>
+#include"Math/CGVector.h"
 
 class TextureManager
 {
@@ -22,6 +23,7 @@ public:
 	void Finalize();
 	void Initialize(DX12Common* dxcommon, SRVManager* srvManager_);
 	void LoadTexture(const std::string& filePath);
+	void LoadRenderTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 	const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
 	uint32_t GetSrvIndex(const std::string& filePath);

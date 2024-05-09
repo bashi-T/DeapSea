@@ -10,12 +10,13 @@
 #include<thread>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
+#include"Math/CGVector.h"
 
 class DX12Common final
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	void Initialize(int32_t width, int32_t height, WinAPP* winApp);
+	void Initialize(WinAPP* winApp);
 	void update();
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
@@ -24,7 +25,7 @@ public:
 	void MakeCommandQueue();
 	void MakeCommandList();
 
-	void MakeSwapchain(int32_t width, int32_t height, HWND hwnd_);
+	void MakeSwapchain(HWND hwnd_);
 	void MakeDescriptorHeap();
 	void BringResources();
 	void MakeRTV();
@@ -36,9 +37,7 @@ public:
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 		UINT numDescriptors,
 	    bool shaderVisible);
-	ComPtr<ID3D12Resource> CreatedepthstencilTextureResource(
-		int32_t width,
-		int32_t height);
+	ComPtr<ID3D12Resource> CreatedepthstencilTextureResource();
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
 		ID3D12DescriptorHeap* descriptorHeap,
 		uint32_t descriptorSize,
@@ -91,7 +90,7 @@ private:
 	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 
 	ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
@@ -115,6 +114,5 @@ private:
 	void UpdateFixFPS();
 
 	std::chrono::steady_clock::time_point reference_;
-
 };
 
