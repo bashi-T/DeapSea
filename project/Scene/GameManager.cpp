@@ -91,14 +91,15 @@ int GameManager::Run()
 		//ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
 		//ImGui::End();
 
-		srvManager->PreDraw();
 		if (winAPP->ProcessMessage())
 		{
 			ImGui::Render();
 			break;
 		}
+		srvManager->PreDraw();
 		sceneArr_[currentSceneNo_]->Draw();
 
+		srvManager->PreDrawImGui();
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
 		srvManager->PostDraw();

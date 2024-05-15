@@ -36,7 +36,7 @@ void MyImGui::Update()
 
 void MyImGui::Endframe(ID3D12GraphicsCommandList* commandList)
 {
-	ImGui::Render();
+	//ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(),commandList);
 }
 

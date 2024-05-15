@@ -118,7 +118,7 @@ void SRVManager::PreDraw()
 	dxCommon_->GetDevice()->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
-		dxCommon_->GetRtvHandles(backBufferIndex));
+		GetCPUDescriptorHandle(backBufferIndex));
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
 	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -134,6 +134,7 @@ void SRVManager::PreDraw()
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon_->GetDsvHandle();
 	dxCommon_->GetCommandList().Get()->
 		OMSetRenderTargets(1, &rtv, false, &dsv);
+
 	clearColor[0] = kRenderTergetClearValue.x;
 	clearColor[1] = kRenderTergetClearValue.y;
 	clearColor[2] = kRenderTergetClearValue.z;
@@ -141,6 +142,7 @@ void SRVManager::PreDraw()
 	dxCommon_->GetCommandList()->ClearRenderTargetView(
 		dxCommon_->GetRtvHandles(backBufferIndex),
 		clearColor, 0, nullptr);
+
 	dxCommon_->GetCommandList()->ClearDepthStencilView(
 		dxCommon_->GetDsvHandle(),
 		D3D12_CLEAR_FLAG_DEPTH,
@@ -148,30 +150,40 @@ void SRVManager::PreDraw()
 		0,
 		0,
 		nullptr);
+
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
+	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
+	{
+		descriptorHeap
+	};
+	dxCommon_->GetCommandList()->
+		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 }
 
 void SRVManager::PreDrawImGui()
 {
+	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
+
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 		dxCommon_->GetRtvHandles(backBufferIndex);
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon_->GetDsvHandle();
 	dxCommon_->GetCommandList().Get()->
 		OMSetRenderTargets(1, &rtv, false, &dsv);
+	
 	dxCommon_->GetCommandList()->ClearRenderTargetView(
 		dxCommon_->GetRtvHandles(backBufferIndex),
 		clearColor, 0, nullptr);
+
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
-	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
-	{
-		descriptorHeap.Get()
-	};
-	dxCommon_->GetCommandList()->
-		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());//ImGui用DescriptorHeap
-
 }
 
 void SRVManager::PostDraw()
@@ -204,6 +216,7 @@ void SRVManager::PostDraw()
 	hr = dxCommon_->GetCommandList()->Reset(dxCommon_->GetCommandAllocator().Get(), nullptr);
 	assert(SUCCEEDED(hr));
 }
+
 SRVManager* SRVManager::GetInstance()
 {
 	if (instance == NULL)
