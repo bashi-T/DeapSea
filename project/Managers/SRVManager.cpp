@@ -148,15 +148,30 @@ void SRVManager::PreDraw()
 		0,
 		0,
 		nullptr);
+	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
+	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
+}
+
+void SRVManager::PreDrawImGui()
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+		dxCommon_->GetRtvHandles(backBufferIndex);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon_->GetDsvHandle();
+	dxCommon_->GetCommandList().Get()->
+		OMSetRenderTargets(1, &rtv, false, &dsv);
+	dxCommon_->GetCommandList()->ClearRenderTargetView(
+		dxCommon_->GetRtvHandles(backBufferIndex),
+		clearColor, 0, nullptr);
+	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
+	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
 	{
 		descriptorHeap.Get()
 	};
 	dxCommon_->GetCommandList()->
-		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
-	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
+		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());//ImGui用DescriptorHeap
+
 }
 
 void SRVManager::PostDraw()
@@ -197,6 +212,7 @@ SRVManager* SRVManager::GetInstance()
 	}
 	return instance;
 }
+
 ComPtr<ID3D12Resource> SRVManager::CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};

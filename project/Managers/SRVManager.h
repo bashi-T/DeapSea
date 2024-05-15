@@ -45,6 +45,7 @@ public:
 	uint64_t fenceValue = 0;
 	bool CheckNumTexture(uint32_t textureIndex);
 	void PreDraw();
+	void PreDrawImGui();
 	void PostDraw();
 	ComPtr<ID3D12Resource> CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color);
 

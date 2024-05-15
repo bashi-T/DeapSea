@@ -27,7 +27,7 @@ void TitleScene::Init()
 		"axis/axis.obj",
 		"plane/plane.gltf",
 	};
-	for (uint32_t i = 0; i < 2; i++)
+	for (uint32_t i = 0; i < 1; i++)
 	{
 		Object3d* object3d = new Object3d;
 		Particle* particle = new Particle;
@@ -75,7 +75,7 @@ void TitleScene::Update()
 		}
 	}
 		objects3d[0]->Update(Camera::GetInstance());
-		objects3d[1]->AnimationUpdate(Camera::GetInstance());
+		//objects3d[1]->AnimationUpdate(Camera::GetInstance());
 	for (Particle* particle : particles)
 	{
 		particle->Update();
