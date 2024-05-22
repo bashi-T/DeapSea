@@ -103,22 +103,30 @@ bool SRVManager::CheckNumTexture(uint32_t textureIndex)
 void SRVManager::PreDraw()
 {
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
+	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	////barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
+	{
+		descriptorHeap
+	};
+	dxCommon_->GetCommandList()->
+		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
-	const Vector4 kRenderTergetClearValue{ 1.0f,0.0f,0.0f,1.0f };
+	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon_->GetRtvDesc();
 	auto renderTextureResource = CreateRenderTextureResource(
-		rtvDesc.Format, kRenderTergetClearValue);
+		rtvDesc.Format, kRenderTargetClearValue);
+	const uint32_t descriptorSizeRTV = dxCommon_->GetDevice()->
+		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	dxCommon_->GetDevice()->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
-		GetCPUDescriptorHandle(backBufferIndex));
+		dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetRtvDescriptorHeap().Get(), descriptorSizeRTV,0));
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
 	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -127,7 +135,8 @@ void SRVManager::PreDraw()
 	renderTextureSrvDesc.Texture2D.MipLevels = 1;
 
 	dxCommon_->GetDevice()->CreateShaderResourceView(
-		renderTextureResource.Get(), &renderTextureSrvDesc, GetCPUDescriptorHandle(backBufferIndex));
+		renderTextureResource.Get(), &renderTextureSrvDesc,
+		GetCPUDescriptorHandle(backBufferIndex));
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 		dxCommon_->GetRtvHandles(backBufferIndex);
@@ -135,10 +144,10 @@ void SRVManager::PreDraw()
 	dxCommon_->GetCommandList().Get()->
 		OMSetRenderTargets(1, &rtv, false, &dsv);
 
-	clearColor[0] = kRenderTergetClearValue.x;
-	clearColor[1] = kRenderTergetClearValue.y;
-	clearColor[2] = kRenderTergetClearValue.z;
-	clearColor[3] = kRenderTergetClearValue.a;
+	clearColor[0] = kRenderTargetClearValue.x;
+	clearColor[1] = kRenderTargetClearValue.y;
+	clearColor[2] = kRenderTargetClearValue.z;
+	clearColor[3] = kRenderTargetClearValue.a;
 	dxCommon_->GetCommandList()->ClearRenderTargetView(
 		dxCommon_->GetRtvHandles(backBufferIndex),
 		clearColor, 0, nullptr);
@@ -153,12 +162,6 @@ void SRVManager::PreDraw()
 
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
-	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
-	{
-		descriptorHeap
-	};
-	dxCommon_->GetCommandList()->
-		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 }
 
