@@ -179,8 +179,8 @@ void SRVManager::PreDrawImGui()
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 
-	dxCommon_->GetCommandList()->OMSetRenderTargets(1,
-		&dxCommon_->GetRtvHandles(backBufferIndex), false, nullptr);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv = dxCommon_->GetRtvHandles(backBufferIndex);
+	dxCommon_->GetCommandList()->OMSetRenderTargets(1, &rtv, false, nullptr);
 
 	dxCommon_->GetCommandList()->ClearRenderTargetView(
 		dxCommon_->GetRtvHandles(backBufferIndex),
@@ -241,17 +241,15 @@ ComPtr<ID3D12Resource> SRVManager::CreateRenderTextureResource(DXGI_FORMAT forma
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = WinAPP::clientWidth_;
 	resourceDesc.Height = WinAPP::clientHeight_;
+	resourceDesc.Format = format;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.DepthOrArraySize = 1;
-	resourceDesc.Format = format;
 	resourceDesc.SampleDesc.Count = 1;
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
 	D3D12_CLEAR_VALUE clearValue;
 	clearValue.Format = format;
@@ -273,6 +271,7 @@ ComPtr<ID3D12Resource> SRVManager::CreateRenderTextureResource(DXGI_FORMAT forma
 
 	return resource;
 }
+
 void SRVManager::MakeFence()
 {
 	HRESULT hr = dxCommon_->GetDevice()->CreateFence(fenceValue,
