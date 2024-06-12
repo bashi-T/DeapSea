@@ -204,7 +204,7 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 
 	rtvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-		2,
+		3,
 		false);
 	dsvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,

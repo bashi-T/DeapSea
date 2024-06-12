@@ -35,11 +35,11 @@ public:
 		ID3D12Resource* pResource,
 		UINT numElements,
 		UINT structureByteStride);
-	void CreateSRVforRenderTexture(
-		uint32_t srvIndex,
-		ID3D12Resource* pResource,
-		UINT numElements,
-		UINT structureByteStride);
+	//void CreateSRVforRenderTexture(
+	//	uint32_t srvIndex,
+	//	ID3D12Resource* pResource,
+	//	UINT numElements,
+	//	UINT structureByteStride);
 	void SetGraphicsRootDescriptorTable(UINT RootParamaterIndex, uint32_t srvIndex);
 	void MakeFence();
 	uint64_t fenceValue = 0;
@@ -53,6 +53,8 @@ public:
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	static SRVManager* GetInstance();
+	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
 
+	//auto renderTextureResource = 0;
 };
 

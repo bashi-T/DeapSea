@@ -55,6 +55,35 @@ void SRVManager::CreateSRVforTexture2D(
 	DXGI_FORMAT Format,
 	UINT MipLevels)
 {
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	//srvDesc.Format = Format;
+	//srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDesc.Texture2D.MipLevels = UINT(MipLevels);
+	//
+	//dxCommon_->GetDevice().Get()->CreateShaderResourceView(
+	//	pResource, &srvDesc, GetCPUDescriptorHandle(srvIndex));
+	//
+	//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon_->GetRtvDesc();
+	//auto renderTextureResource = CreateRenderTextureResource(
+	//	rtvDesc.Format, kRenderTargetClearValue);
+	//const uint32_t descriptorSizeRTV = dxCommon_->GetDevice()->
+	//	GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	//dxCommon_->GetDevice()->CreateRenderTargetView(
+	//	renderTextureResource.Get(),
+	//	&rtvDesc,
+	//	dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetRtvDescriptorHeap().Get(), descriptorSizeRTV, 2));
+	//
+	//D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
+	//renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	//renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//renderTextureSrvDesc.Texture2D.MipLevels = 1;
+	//
+	//dxCommon_->GetDevice()->CreateShaderResourceView(
+	//	renderTextureResource.Get(), &renderTextureSrvDesc,
+	//	GetCPUDescriptorHandle(srvIndex));
+
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = Format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -105,13 +134,11 @@ void SRVManager::PreDraw()
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[/*backBufferIndex*/2].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+	dxCommon_->GetCommandList()->ResourceBarrier(2, &barrier);
 
-
-	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon_->GetRtvDesc();
 	auto renderTextureResource = CreateRenderTextureResource(
 		rtvDesc.Format, kRenderTargetClearValue);
@@ -120,7 +147,7 @@ void SRVManager::PreDraw()
 	dxCommon_->GetDevice()->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
-		dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetRtvDescriptorHeap().Get(), descriptorSizeRTV,0));
+		dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetRtvDescriptorHeap().Get(), descriptorSizeRTV, 2));
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
 	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -130,10 +157,10 @@ void SRVManager::PreDraw()
 
 	dxCommon_->GetDevice()->CreateShaderResourceView(
 		renderTextureResource.Get(), &renderTextureSrvDesc,
-		GetCPUDescriptorHandle(backBufferIndex));
-	
+		GetCPUDescriptorHandle(2));
+
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		dxCommon_->GetRtvHandles(backBufferIndex);
+		dxCommon_->GetRtvHandles(/*backBufferIndex*/2);
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = dxCommon_->GetDsvHandle();
 	dxCommon_->GetCommandList().Get()->
 		OMSetRenderTargets(1, &rtv, false, &dsv);
@@ -146,7 +173,7 @@ void SRVManager::PreDraw()
 		kRenderTargetClearValue.a
 	};
 		dxCommon_->GetCommandList()->ClearRenderTargetView(
-		dxCommon_->GetRtvHandles(backBufferIndex),
+		dxCommon_->GetRtvHandles(/*backBufferIndex*/2),
 			newClearColor, 0, nullptr);
 
 	dxCommon_->GetCommandList()->ClearDepthStencilView(
