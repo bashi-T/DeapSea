@@ -72,7 +72,8 @@ int GameManager::Run()
 		camera->GetInstance()->Update();
 		prevSceneNo_ = currentSceneNo_;
 		currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();
-		//if (prevSceneNo_ != currentSceneNo_) {
+		//if (prevSceneNo_ != currentSceneNo_)
+		//  {
 		//	sceneArr_[currentSceneNo_]->Init();
 		//}
 		sceneArr_[currentSceneNo_]->Update();
