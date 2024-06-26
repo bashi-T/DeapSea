@@ -13,9 +13,7 @@ class SpriteCommon
 {
 public:
 	~SpriteCommon();
-	void Initialize(DX12Common* dxcommon);
-	//void Update();
-	//void Draw(int32_t width, int32_t height);
+	void Initialize(DX12Common* dxCommon);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -25,14 +23,6 @@ public:
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
 	static SpriteCommon* GetInstance();
-
-	//void InputDataTriangle(
-	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	//	Vector2 coordRight, Vector2 coordLeft);
-
-	//void DrawTriangle(
-	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	//	Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }

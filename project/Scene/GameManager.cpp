@@ -23,6 +23,7 @@ int GameManager::Run()
 	MSG NewMSG = winAPP->GetMSG();
 	imgui = new MyImGui;
 	SPCommon = SpriteCommon::GetInstance();
+	SPCommonFullScreen = SpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
 	modelCommon = new ModelCommon;
 	camera = new Camera();

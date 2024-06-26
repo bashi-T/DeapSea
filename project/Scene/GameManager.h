@@ -26,6 +26,7 @@ private:
 	Input* input;
 	MyImGui* imgui;
 	SpriteCommon* SPCommon;
+	SpriteCommon* SPCommonFullScreen;
 	Object3dCommon* object3dCommon;
 	ModelCommon* modelCommon;
 	Camera* camera;

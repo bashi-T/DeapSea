@@ -54,7 +54,7 @@ void TitleScene::Init()
 		object3d->SetTranslate({ 1.0f -(2.0f* i), 0.0f, 0.0f });
 		object3d->SetScale({ i + 0.005f, i + 0.005f , i + 0.005f  });
 		objects3d.push_back(object3d);
-		particle->Initialize(textureFilePath[i+1], SRVManager::GetInstance(), Object3dCommon::GetInstance(), DX12Common::GetInstance());
+		particle->Initialize(textureFilePath[i + 1], SRVManager::GetInstance(), Object3dCommon::GetInstance(), DX12Common::GetInstance());
 		particles.push_back(particle);
 	};
 
@@ -94,7 +94,7 @@ void TitleScene::Draw()
 	}
 	for (Particle* particle : particles)
 	{
-		particle->Draw();
+		//particle->Draw();
 	}
 }
 
