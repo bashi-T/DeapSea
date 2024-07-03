@@ -5,6 +5,55 @@ FullScreenSprite::~FullScreenSprite()
 {
 }
 
+void FullScreenSprite::Initialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager)
+{
+	this->spriteCommon_ = spriteCommon;
+	this->srvManager = srvManager;
+	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 3);
+	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 3);
+	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
+	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
+
+	//uvTransform =
+	//{
+	//	{1.0f,1.0f,1.0f},
+	//	{0.0f,0.0f,0.0f},
+	//	{0.0f,0.0f,0.0f},
+	//};
+	//transformMatrix =
+	//{
+	//	{1.0f,1.0f,1.0f},
+	//	{0.0f,0.0f,0.0f},
+	//	{0.0f,0.0f,0.0f},
+	//};
+	//cameraTransform = {
+	//	{1.0f, 1.0f, 1.0f},
+	//	{0.0f, 0.0f, 0.0f},
+	//	{0.0f, 0.0f, -15.0f}
+	//};
+	//cameraMatrix =
+	//	MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	//MakeBufferView();
+	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//transformationMatrixResource->Map(
+	//	0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+	//LeftTop = { 0.0f, 0.0f, 0.0f, 1.0f };
+	//RightTop = { float(WinAPP::clientWidth_) / 3, 0.0f, 0.0f, 1.0f };
+	//RightBottom = { float(WinAPP::clientWidth_) / 3, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
+	//LeftBottom = { 0.0f, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
+	//coordLeftTop = { 0.0f, 0.0f };
+	//coordRightTop = { 1.0f, 0.0f };
+	//coordRightBottom = { 1.0f, 1.0f };
+	//coordLeftBottom = { 0.0f, 1.0f };
+
+	Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//InputData(Color);
+	//TextureManager::GetInstance()->LoadTexture(materialData->material.textureFilePath);
+	//materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(materialData->material.textureFilePath);
+}
+
 void FullScreenSprite::Initialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager, std::string texturefilePath)
 {
 	this->spriteCommon_ = spriteCommon;
@@ -140,6 +189,16 @@ void FullScreenSprite::MakeBufferView()
 }
 
 void FullScreenSprite::InputData(Vector4 color)
+{
+	//	Material* materialData = nullptr;
+	//	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+	//	materialData[0].color = color;
+//	materialData[0].enableLighting = true;
+
+}
+
+void FullScreenSprite::InputDataTexture(Vector4 color)
 {
 	float left = 0.0f - anchorPoint.x;
 	float right = 1.0f - anchorPoint.x;

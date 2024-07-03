@@ -23,7 +23,7 @@ int GameManager::Run()
 	MSG NewMSG = winAPP->GetMSG();
 	imgui = new MyImGui;
 	SPCommon = SpriteCommon::GetInstance();
-	SPCommonFullScreen = SpriteCommon::GetInstance();
+	FSSPCommon = FullScreenSpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
 	modelCommon = new ModelCommon;
 	camera = new Camera();
@@ -79,11 +79,11 @@ int GameManager::Run()
 		//}
 		sceneArr_[currentSceneNo_]->Update();
 
-		//ImGui::Begin("sphereEdit");
+		ImGui::Begin("camera");
 		//	ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
 		//	ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
-		//	ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
-		//	ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
+			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
+			ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
 		//	ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
 		//	ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
 		//	ImGui::DragFloat3("light.direction", (float*)&directionlLight, 0.01f,-1.0f,1.0f);
@@ -91,7 +91,7 @@ int GameManager::Run()
 		//
 		//ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
 		//ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
-		//ImGui::End();
+		ImGui::End();
 
 		if (winAPP->ProcessMessage())
 		{
@@ -100,11 +100,12 @@ int GameManager::Run()
 		}
 		srvManager->PreDraw();
 		sceneArr_[currentSceneNo_]->Draw();
+		srvManager->PostDraw();
 
 		srvManager->PreDrawImGui();
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 
-		srvManager->PostDraw();
+		srvManager->PostDrawImGui();
 	}
 
 	CloseHandle(srvManager->GetFenceEvent());

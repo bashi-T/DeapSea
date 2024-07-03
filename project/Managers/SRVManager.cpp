@@ -133,10 +133,14 @@ void SRVManager::PreDraw()
 {
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//現在のバックバッファをバリアを張る対象にする
 	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	//現在のresourceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//遷移後のresourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//transitionBarrierを張る
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon_->GetRtvDesc();
@@ -200,11 +204,11 @@ void SRVManager::PreDrawImGui()
 {
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
 
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	//barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 
 	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
@@ -227,13 +231,52 @@ void SRVManager::PreDrawImGui()
 
 void SRVManager::PostDraw()
 {
-	/*
+	//
+	//backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
+	//barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	//dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+	//コマンドリストの内容確定
+	HRESULT hr = dxCommon_->GetCommandList()->Close();
+	assert(SUCCEEDED(hr));
+
+	ComPtr<ID3D12CommandList> commandLists[] =
+	{
+		dxCommon_->GetCommandList().Get()
+	};
+	//GPUにコマンドリストを実行させる
+	dxCommon_->GetCommandQueue()->ExecuteCommandLists(1, commandLists->GetAddressOf());
+	//GPU・OSに画面の交換命令
+	dxCommon_->GetSwapChain()->Present(1, 2);
+
+	//fenceの値を更新
+	fenceValue++;
+	//GPUがたどり着いたことを通知
+	dxCommon_->GetCommandQueue()->Signal(fence.Get(), fenceValue);
+	//fenceの値で到着を確認　getCompleteValueは初期値
+	if (fence->GetCompletedValue() < fenceValue)
+	{
+		//たどり着くまで待つ
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+	//次フレーム用コマンドリスト準備
+	hr = dxCommon_->GetCommandAllocator()->Reset();
+	assert(SUCCEEDED(hr));
+	hr = dxCommon_->GetCommandList()->Reset(dxCommon_->GetCommandAllocator().Get(), nullptr);
+	assert(SUCCEEDED(hr));
+}
+
+void SRVManager::PostDrawImGui()
+{
+	
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
 	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-	*/
+
 	HRESULT hr = dxCommon_->GetCommandList()->Close();
 	assert(SUCCEEDED(hr));
 

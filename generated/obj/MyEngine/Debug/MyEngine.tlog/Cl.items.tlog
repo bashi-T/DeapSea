@@ -1,8 +1,6 @@
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Camera\Camera.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Camera.obj
-C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\GameEntity\EnemyBullet.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\EnemyBullet.obj
-C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\GameEntity\Enemy.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Enemy.obj
-C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\GameEntity\Player.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Player.obj
-C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\GameEntity\PlayerBullet.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\PlayerBullet.obj
+C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Sprites\FullScreenSprite.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\FullScreenSprite.obj
+C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Commons\FullScreenSpriteCommon.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\FullScreenSpriteCommon.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Scene\GameManager.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\GameManager.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Scene\GameScene.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\GameScene.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Math\CGVector.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\CGVector.obj
@@ -24,7 +22,6 @@ C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Commons\ModelCo
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Managers\ModelManager.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\ModelManager.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Systems\MyImGui.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\MyImGui.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\main.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\main.obj
-C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Objects\Mesh.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Mesh.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Objects\Object3d.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Object3d.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Commons\Object3dCommon.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Object3dCommon.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Sprites\Sprite.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Debug\Sprite.obj

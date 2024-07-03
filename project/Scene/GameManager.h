@@ -8,6 +8,7 @@
 #include"Systems/Debug.h"
 #include"Input/Input.h"
 #include"Commons/SpriteCommon.h"
+#include"Commons/FullScreenSpriteCommon.h"
 #include"Commons/Object3dCommon.h"
 #include"Managers/ModelManager.h"
 #include"Objects/model.h"
@@ -26,7 +27,7 @@ private:
 	Input* input;
 	MyImGui* imgui;
 	SpriteCommon* SPCommon;
-	SpriteCommon* SPCommonFullScreen;
+	FullScreenSpriteCommon* FSSPCommon;
 	Object3dCommon* object3dCommon;
 	ModelCommon* modelCommon;
 	Camera* camera;

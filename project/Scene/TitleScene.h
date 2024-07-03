@@ -6,6 +6,8 @@
 #include"Objects/Particle.h"
 #include"Commons/SpriteCommon.h"
 #include"Sprites/Sprite.h"
+#include"Commons/FullScreenSpriteCommon.h"
+#include"Sprites/FullScreenSprite.h"
 
 class TitleScene:public SceneManager
 {
@@ -21,5 +23,6 @@ private:
 	//Camera* camera;
 	std::vector<Object3d*> objects3d;
 	std::vector <Particle*> particles;
+	FullScreenSprite* fullScreenSprite;
 };
 

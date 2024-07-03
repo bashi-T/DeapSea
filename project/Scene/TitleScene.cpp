@@ -59,6 +59,8 @@ void TitleScene::Init()
 	};
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
+	fullScreenSprite = new FullScreenSprite;
+	fullScreenSprite->Initialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
 }
 
 void TitleScene::Update()
@@ -80,6 +82,7 @@ void TitleScene::Update()
 	{
 		particle->Update();
 	}
+	fullScreenSprite->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		sceneNo = INGAME;
@@ -96,6 +99,7 @@ void TitleScene::Draw()
 	{
 		//particle->Draw();
 	}
+	//fullScreenSprite->Draw(FullScreenSpriteCommon::GetInstance());
 }
 
 void TitleScene::Finalize()

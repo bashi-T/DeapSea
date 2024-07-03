@@ -18,6 +18,9 @@ public:
 	~FullScreenSprite();
 	void Initialize(
 		FullScreenSpriteCommon* spriteCommon,
+		SRVManager* srvManager);
+	void Initialize(
+		FullScreenSpriteCommon* spriteCommon,
 		SRVManager* srvManager,
 		std::string texturefilePath);
 	void Update();
@@ -26,6 +29,7 @@ public:
 	ComPtr<ID3D12Resource> CreateBufferResource(FullScreenSpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();
 	void InputData(Vector4 color);
+	void InputDataTexture(Vector4 color);
 
 	struct VertexData
 	{

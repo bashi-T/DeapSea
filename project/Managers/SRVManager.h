@@ -47,13 +47,14 @@ public:
 	void PreDraw();
 	void PreDrawImGui();
 	void PostDraw();
+	void PostDrawImGui();
 	ComPtr<ID3D12Resource> CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color);
 
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	static SRVManager* GetInstance();
-	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
+	const Vector4 kRenderTargetClearValue{ 0.0f,0.0f,0.0f,1.0f };
 
 	//auto renderTextureResource = 0;
 };
