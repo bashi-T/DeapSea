@@ -56,6 +56,7 @@ public:
 	static SRVManager* GetInstance();
 	const Vector4 kRenderTargetClearValue{ 0.0f,0.0f,0.0f,1.0f };
 
-	//auto renderTextureResource = 0;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv;
 };
 
