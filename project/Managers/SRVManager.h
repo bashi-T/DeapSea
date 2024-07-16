@@ -54,7 +54,7 @@ public:
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	static SRVManager* GetInstance();
-	const Vector4 kRenderTargetClearValue{ 0.0f,0.0f,0.0f,1.0f };
+	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv;
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv;

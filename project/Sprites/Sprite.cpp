@@ -10,10 +10,10 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::
 {
 	this->spriteCommon_ = spriteCommon;
 	this->srvManager = srvManager;
-	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 6);
-	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
-	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
-	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
+	vertexResource = CreateBufferResource(sizeof(VertexData) * 6);
+	indexResource = CreateBufferResource(sizeof(uint32_t) * 6);
+	materialResource = CreateBufferResource(sizeof(Material));
+	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 
 	uvTransform =
 	{
@@ -190,9 +190,8 @@ void Sprite::Draw(SpriteCommon* spriteCommon)
 }
 
 
-ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes)
+ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeInBytes)
 {
-	this->spriteCommon_ = spriteCommon;
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -220,36 +219,6 @@ ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, 
 		IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
 	return Resource;
-}
-
-ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);
-	resourceDesc.Height = UINT(metadata.height);
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
-	resourceDesc.Format = metadata.format;
-	resourceDesc.SampleDesc.Count = 1;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
-
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-
-	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&resource));
-
-	assert(SUCCEEDED(hr));
-
-	return resource;
 }
 
 void Sprite::AdjestTextureSize()

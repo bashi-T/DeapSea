@@ -30,8 +30,3 @@ void FullScreen::MakeBufferView()
 void FullScreen::InputData(Vector4 color)
 {
 }
-
-ComPtr<ID3D12Resource> FullScreen::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
-	return ComPtr<ID3D12Resource>();
-}

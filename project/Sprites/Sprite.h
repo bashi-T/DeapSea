@@ -23,7 +23,7 @@ public:
 	void Update();
 	void Draw(SpriteCommon* spriteCommon);
 
-	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
+	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void MakeBufferView();
 	void InputData(Vector4 color);
 
@@ -38,9 +38,6 @@ public:
 		std::string textureFilePath;
 		uint32_t textureIndex = 0;
 	};
-	ComPtr<ID3D12Resource> CreateTextureResource(
-		ID3D12Device* device,
-		const DirectX::TexMetadata& metadata);
 	void SetPositoin(const Vector2& position) { this->position = position; }
 	void SetRotation(float rotation) { this->rotation = rotation; }
 	void SetColor(const Vector4& color) { materialData->color = color; }
