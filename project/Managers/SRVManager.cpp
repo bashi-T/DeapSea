@@ -25,18 +25,20 @@ void SRVManager::Initialize(DX12Common* dxCommon)
 	scissorRect.top = LONG(0.0f);
 	scissorRect.bottom = LONG(WinAPP::clientHeight_);
 
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon_->GetRtvDesc();
-	auto renderTextureResource = CreateRenderTextureResource(
+	rtvDesc = dxCommon_->GetRtvDesc();
+	renderTextureResource = CreateRenderTextureResource(
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
 
-	const uint32_t descriptorSizeRTV = dxCommon_->GetDevice()->
+	descriptorSizeRTV = dxCommon_->GetDevice()->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
 	dxCommon_->GetDevice()->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
 		dxCommon_->GetCPUDescriptorHandle(
 			dxCommon_->GetRtvDescriptorHeap().Get(),
 			descriptorSizeRTV, 2));
+
 	//SRV設定　formatはresourceと同じにする
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
 	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -133,6 +135,7 @@ bool SRVManager::CheckNumTexture(uint32_t textureIndex)
 
 void SRVManager::PreDraw()
 {
+	//書き込むバックバッファのインデックスを取得
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -166,7 +169,7 @@ void SRVManager::PreDraw()
 		kRenderTargetClearValue.z,
 		kRenderTargetClearValue.a
 	};
-
+	//指定した色で画面をクリア
 	dxCommon_->GetCommandList()->ClearRenderTargetView(
 		dxCommon_->GetRtvHandles(backBufferIndex),
 		newClearColor, 0, nullptr);
@@ -226,7 +229,6 @@ void SRVManager::PreDrawImGui()
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-	//D3D12_CPU_DESCRIPTOR_HANDLE rtv = dxCommon_->GetRtvHandles(backBufferIndex);
 	dxCommon_->GetCommandList()->OMSetRenderTargets(1, &rtv, false, nullptr);
 
 	dxCommon_->GetCommandList()->ClearRenderTargetView(

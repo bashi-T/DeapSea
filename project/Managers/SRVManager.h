@@ -16,7 +16,12 @@ private:
 	ComPtr<ID3D12Fence> fence = nullptr;
 	HANDLE fenceEvent;
 	static inline SRVManager* instance;
-
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv;
+	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
+	ComPtr<ID3D12Resource> renderTextureResource;
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
+	uint32_t descriptorSizeRTV;
 
 public:
 	static const uint32_t kMaxSRVCount;
@@ -54,9 +59,6 @@ public:
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	static SRVManager* GetInstance();
-	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv;
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv;
 };
 
