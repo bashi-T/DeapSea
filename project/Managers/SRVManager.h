@@ -22,7 +22,7 @@ private:
 	ComPtr<ID3D12Resource> renderTextureResource;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
 	uint32_t descriptorSizeRTV;
-
+	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
 public:
 	static const uint32_t kMaxSRVCount;
 	static const uint32_t kSRVIndexTop;
