@@ -5,12 +5,12 @@ SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput
 {
-  float 32_t4 color : SV_TARGET0;
+  float32_t4 color : SV_TARGET0;
 };
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
   PixelShaderOutput output;
-  output.color=gTexture.Sample(gSampler, input.texcoord);
+  output.color = gTexture.Sample(gSampler, input.texcoord);
   retur output;
 }

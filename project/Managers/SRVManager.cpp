@@ -25,6 +25,31 @@ void SRVManager::Initialize(DX12Common* dxCommon)
 	scissorRect.top = LONG(0.0f);
 	scissorRect.bottom = LONG(WinAPP::clientHeight_);
 
+	//↓initializeでいいかも
+	rtvDesc = dxCommon_->GetRtvDesc();
+	renderTextureResource = CreateRenderTextureResource(
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
+
+	descriptorSizeRTV = dxCommon_->GetDevice()->
+		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	dxCommon_->GetDevice()->CreateRenderTargetView(
+		renderTextureResource.Get(),
+		&rtvDesc,
+		dxCommon_->GetCPUDescriptorHandle(
+			dxCommon_->GetRtvDescriptorHeap().Get(),
+			descriptorSizeRTV, 2));
+
+	//SRV設定　formatはresourceと同じにする
+	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	renderTextureSrvDesc.Texture2D.MipLevels = 1;
+	//SRV生成
+	dxCommon_->GetDevice()->CreateShaderResourceView(
+		renderTextureResource.Get(), &renderTextureSrvDesc,
+		GetCPUDescriptorHandle(2));
+	//↑initializeでいいかも
 
 }
 
@@ -109,38 +134,13 @@ void SRVManager::PreDraw()
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//現在のバックバッファをバリアを張る対象にする
 	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
 	//現在のresourceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	//遷移後のresourceState
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//transitionBarrierを張る
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-
-	//↓initializeでいいかも
-	rtvDesc = dxCommon_->GetRtvDesc();
-	renderTextureResource = CreateRenderTextureResource(
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
-
-	descriptorSizeRTV = dxCommon_->GetDevice()->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	dxCommon_->GetDevice()->CreateRenderTargetView(
-		renderTextureResource.Get(),
-		&rtvDesc,
-		dxCommon_->GetCPUDescriptorHandle(
-			dxCommon_->GetRtvDescriptorHeap().Get(),
-			descriptorSizeRTV, 2));
-
-	//SRV設定　formatはresourceと同じにする
-	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	renderTextureSrvDesc.Texture2D.MipLevels = 1;
-	//SRV生成
-	dxCommon_->GetDevice()->CreateShaderResourceView(
-		renderTextureResource.Get(), &renderTextureSrvDesc,
-		GetCPUDescriptorHandle(2));
-	//↑initializeでいいかも
 
 	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
 	{
@@ -183,18 +183,23 @@ void SRVManager::PostDraw()
 	barrier.Transition.pResource = renderTextureResource.Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 }
 
 void SRVManager::PreDrawImGui()
 {
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
-
 	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	
 	barrier.Transition.pResource = renderTextureResource.Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	//barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
@@ -212,6 +217,7 @@ void SRVManager::PostDrawImGui()
 	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
 	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 

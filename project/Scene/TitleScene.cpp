@@ -60,7 +60,7 @@ void TitleScene::Init()
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
 	fullScreenSprite = new FullScreenSprite;
-	fullScreenSprite->Initialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
+	fullScreenSprite->MeshInitialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
 }
 
 void TitleScene::Update()
@@ -91,6 +91,7 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
+	fullScreenSprite->MeshDraw(FullScreenSpriteCommon::GetInstance());
 	for (Object3d* object3d : objects3d)
 	{
 		object3d->Draw(Object3dCommon::GetInstance(), ModelManager::GetInstance()->GetModelCommon());
@@ -99,7 +100,6 @@ void TitleScene::Draw()
 	{
 		//particle->Draw();
 	}
-	//fullScreenSprite->Draw(FullScreenSpriteCommon::GetInstance());
 }
 
 void TitleScene::Finalize()

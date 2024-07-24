@@ -5,7 +5,7 @@ FullScreenSprite::~FullScreenSprite()
 {
 }
 
-void FullScreenSprite::Initialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager)
+void FullScreenSprite::MeshInitialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager)
 {
 	this->spriteCommon_ = spriteCommon;
 	this->srvManager = srvManager;
@@ -54,7 +54,7 @@ void FullScreenSprite::Initialize(FullScreenSpriteCommon* spriteCommon, SRVManag
 	//materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(materialData->material.textureFilePath);
 }
 
-void FullScreenSprite::Initialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager, std::string texturefilePath)
+void FullScreenSprite::SpriteInitialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager, std::string texturefilePath)
 {
 	this->spriteCommon_ = spriteCommon;
 	this->srvManager = srvManager;
@@ -117,7 +117,51 @@ void FullScreenSprite::Update()
 
 }
 
-void FullScreenSprite::Draw(FullScreenSpriteCommon* spriteCommon)
+void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
+{
+	this->spriteCommon_ = spriteCommon;
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	IASetVertexBuffers(0, 1, &vertexBufferView);
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	IASetIndexBuffer(&indexBufferView);
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	SetGraphicsRootConstantBufferView(
+	//		0, materialResource->GetGPUVirtualAddress());
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	SetGraphicsRootConstantBufferView(
+	//		1, transformationMatrixResource->GetGPUVirtualAddress());
+	//
+	//srvManager->SetGraphicsRootDescriptorTable(
+	//	2, materialData->material.textureIndex);
+	//
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	DrawInstanced(3, 1, 0, 0);
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+			SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+			SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+			IASetVertexBuffers(0, 1, &vertexBufferView);
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+			IASetIndexBuffer(&indexBufferView);
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+			IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+		//spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		//    0, materialResource->GetGPUVirtualAddress());
+		//spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		//    1, transformationMatrixResource->GetGPUVirtualAddress());
+	
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);}
+
+void FullScreenSprite::SpriteDraw(FullScreenSpriteCommon* spriteCommon)
 {
 	this->spriteCommon_ = spriteCommon;
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -180,11 +224,11 @@ ComPtr<ID3D12Resource> FullScreenSprite::CreateBufferResource(FullScreenSpriteCo
 void FullScreenSprite::MakeBufferView()
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
-	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferView.SizeInBytes = sizeof(uint32_t) * 3;
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
@@ -194,8 +238,7 @@ void FullScreenSprite::InputData(Vector4 color)
 	//	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 
 	//	materialData[0].color = color;
-//	materialData[0].enableLighting = true;
-
+	//	materialData[0].enableLighting = true;
 }
 
 void FullScreenSprite::InputDataTexture(Vector4 color)

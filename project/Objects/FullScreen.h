@@ -10,20 +10,20 @@
 
 #pragma comment(lib, "dxcompiler.lib")
 
-class SpriteCommon;
+class FullScreenSpriteCommon;
 class FullScreen
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~FullScreen();
 	void Initialize(
-		SpriteCommon* spriteCommon,
+		FullScreenSpriteCommon* FSSpriteCommon,
 		SRVManager* srvManager,
 		std::string texturefilePath);
 	void Update();
-	void Draw(SpriteCommon* spriteCommon);
+	void Draw(FullScreenSpriteCommon* FSSpriteCommon);
 
-	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
+	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void MakeBufferView();
 	void InputData(Vector4 color);
 
@@ -78,7 +78,7 @@ public:
 	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 private:
-	SpriteCommon* spriteCommon_;
+	FullScreenSpriteCommon* FSSpriteCommon_;
 	Debug* debug_;
 	WinAPP* sWinApp;
 	MyImGui* imgui_;

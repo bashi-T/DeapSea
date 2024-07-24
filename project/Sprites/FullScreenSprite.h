@@ -16,15 +16,16 @@ class FullScreenSprite
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~FullScreenSprite();
-	void Initialize(
+	void MeshInitialize(
 		FullScreenSpriteCommon* spriteCommon,
 		SRVManager* srvManager);
-	void Initialize(
+	void SpriteInitialize(
 		FullScreenSpriteCommon* spriteCommon,
 		SRVManager* srvManager,
 		std::string texturefilePath);
 	void Update();
-	void Draw(FullScreenSpriteCommon* spriteCommon);
+	void MeshDraw(FullScreenSpriteCommon* spriteCommon);
+	void SpriteDraw(FullScreenSpriteCommon* spriteCommon);
 
 	ComPtr<ID3D12Resource> CreateBufferResource(FullScreenSpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();

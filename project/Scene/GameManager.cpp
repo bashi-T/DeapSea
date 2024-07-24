@@ -44,7 +44,7 @@ int GameManager::Run()
 		dx12Common->GetRtvDesc(),
 		srvManager->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize(dx12Common, srvManager);
-
+	FSSPCommon->Initialize(dx12Common);
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->GetInstance()->SetRotate({0.0f,0.0f,0.0f});
@@ -104,7 +104,6 @@ int GameManager::Run()
 
 		srvManager->PreDrawImGui();
 		imgui->Endframe(dx12Common->GetCommandList().Get());
-
 		srvManager->PostDrawImGui();
 	}
 
