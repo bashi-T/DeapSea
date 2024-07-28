@@ -6,40 +6,12 @@ const uint32_t SRVManager::kSRVIndexTop = 0;
 void SRVManager::Initialize(DX12Common* dxCommon)
 {
 	this->dxCommon_ = dxCommon;
-	MakeFence();
 	descriptorHeap = dxCommon_->CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
 		kMaxSRVCount,
 		true);
 	descriptorSize = dxCommon_->GetDevice()->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-	viewport.Width = float(WinAPP::clientWidth_);
-	viewport.Height = float(WinAPP::clientHeight_);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	scissorRect.left = LONG(0.0f);
-	scissorRect.right = LONG(WinAPP::clientWidth_);
-	scissorRect.top = LONG(0.0f);
-	scissorRect.bottom = LONG(WinAPP::clientHeight_);
-
-	//↓initializeでいいかも
-	rtvDesc = dxCommon_->GetRtvDesc();
-	renderTextureResource = CreateRenderTextureResource(
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
-
-	descriptorSizeRTV = dxCommon_->GetDevice()->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	dxCommon_->GetDevice()->CreateRenderTargetView(
-		renderTextureResource.Get(),
-		&rtvDesc,
-		dxCommon_->GetCPUDescriptorHandle(
-			dxCommon_->GetRtvDescriptorHeap().Get(),
-			descriptorSizeRTV, 2));
-
 	//SRV設定　formatはresourceと同じにする
 	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -47,10 +19,8 @@ void SRVManager::Initialize(DX12Common* dxCommon)
 	renderTextureSrvDesc.Texture2D.MipLevels = 1;
 	//SRV生成
 	dxCommon_->GetDevice()->CreateShaderResourceView(
-		renderTextureResource.Get(), &renderTextureSrvDesc,
+		dxCommon_->GetRenderTextureResource().Get(), &renderTextureSrvDesc,
 		GetCPUDescriptorHandle(2));
-	//↑initializeでいいかも
-
 }
 
 uint32_t SRVManager::Allocate()
@@ -126,125 +96,6 @@ bool SRVManager::CheckNumTexture(uint32_t textureIndex)
 	}
 }
 
-void SRVManager::PreDraw()
-{
-	//書き込むバックバッファのインデックスを取得
-	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//現在のバックバッファをバリアを張る対象にする
-	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
-	//barrier.Transition.pResource = renderTextureResource.Get();
-	//現在のresourceState
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	//遷移後のresourceState
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//transitionBarrierを張る
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-
-	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
-	{
-		descriptorHeap
-	};
-	dxCommon_->GetCommandList()->
-		SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-	rtv = dxCommon_->GetRtvHandles(backBufferIndex);
-	dsv = dxCommon_->GetDsvHandle();
-
-	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
-	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
-
-	dxCommon_->GetCommandList()->ClearDepthStencilView(
-		dxCommon_->GetDsvHandle(),
-		D3D12_CLEAR_FLAG_DEPTH,
-		1.0f,
-		0,
-		0,
-		nullptr);
-
-	dxCommon_->GetCommandList().Get()->//描画先のRTV設定
-		OMSetRenderTargets(0, &rtv, false, &dsv);
-
-	float newClearColor[4] =
-	{
-		kRenderTargetClearValue.x,
-		kRenderTargetClearValue.y,
-		kRenderTargetClearValue.z,
-		kRenderTargetClearValue.a
-	};
-	//指定した色で画面をクリア
-	dxCommon_->GetCommandList()->ClearRenderTargetView(
-		dxCommon_->GetRtvHandles(backBufferIndex),
-		newClearColor, 0, nullptr);
-}
-
-void SRVManager::PostDraw()
-{
-	barrier.Transition.pResource = renderTextureResource.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-}
-
-void SRVManager::PreDrawImGui()
-{
-	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
-	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	
-	barrier.Transition.pResource = renderTextureResource.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-	//barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
-	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-
-	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
-	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect);
-
-	dxCommon_->GetCommandList()->OMSetRenderTargets(1, &rtv, false, nullptr);
-
-	dxCommon_->GetCommandList()->ClearRenderTargetView(
-		dxCommon_->GetRtvHandles(backBufferIndex),
-		clearColor, 0, nullptr);
-}
-
-void SRVManager::PostDrawImGui()
-{
-	backBufferIndex = dxCommon_->GetSwapChain()->GetCurrentBackBufferIndex();
-	barrier.Transition.pResource = dxCommon_->GetSwapChainResources()[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-
-	HRESULT hr = dxCommon_->GetCommandList()->Close();
-	assert(SUCCEEDED(hr));
-
-	ComPtr<ID3D12CommandList> commandLists[] =
-	{
-		dxCommon_->GetCommandList().Get()
-	};
-	dxCommon_->GetCommandQueue()->ExecuteCommandLists(1, commandLists->GetAddressOf());
-	dxCommon_->GetSwapChain()->Present(1, 0);
-	fenceValue++;
-	dxCommon_->GetCommandQueue()->Signal(fence.Get(), fenceValue);
-
-	if (fence->GetCompletedValue() < fenceValue)
-	{
-		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-	}
-
-	hr = dxCommon_->GetCommandAllocator()->Reset();
-	assert(SUCCEEDED(hr));
-	hr = dxCommon_->GetCommandList()->Reset(dxCommon_->GetCommandAllocator().Get(), nullptr);
-	assert(SUCCEEDED(hr));
-}
-
 SRVManager* SRVManager::GetInstance()
 {
 	if (instance == NULL)
@@ -252,49 +103,4 @@ SRVManager* SRVManager::GetInstance()
 		instance = new SRVManager;
 	}
 	return instance;
-}
-
-ComPtr<ID3D12Resource> SRVManager::CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color)
-{
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = WinAPP::clientWidth_;
-	resourceDesc.Height = WinAPP::clientHeight_;
-	resourceDesc.Format = format;
-	resourceDesc.MipLevels = 1;
-	resourceDesc.DepthOrArraySize = 1;
-	resourceDesc.SampleDesc.Count = 1;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-	D3D12_CLEAR_VALUE clearValue;
-	clearValue.Format = format;
-	clearValue.Color[0] = color.x;
-	clearValue.Color[1] = color.y;
-	clearValue.Color[2] = color.z;
-	clearValue.Color[3] = color.a;
-
-	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		&clearValue,
-		IID_PPV_ARGS(&resource));
-
-	assert(SUCCEEDED(hr));
-
-	return resource;
-}
-
-void SRVManager::MakeFence()
-{
-	HRESULT hr = dxCommon_->GetDevice()->CreateFence(fenceValue,
-		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	assert(SUCCEEDED(hr));
-	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	assert(fenceEvent != nullptr);
 }

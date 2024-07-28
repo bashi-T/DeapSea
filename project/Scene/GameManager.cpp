@@ -98,16 +98,16 @@ int GameManager::Run()
 			ImGui::Render();
 			break;
 		}
-		srvManager->PreDraw();
+		dx12Common->PreDraw();
 		sceneArr_[currentSceneNo_]->Draw();
-		srvManager->PostDraw();
+		dx12Common->PostDraw();
 
-		srvManager->PreDrawImGui();
+		dx12Common->PreDrawImGui();
 		imgui->Endframe(dx12Common->GetCommandList().Get());
-		srvManager->PostDrawImGui();
+		dx12Common->PostDrawImGui();
 	}
 
-	CloseHandle(srvManager->GetFenceEvent());
+	CloseHandle(dx12Common->GetFenceEvent());
 	delete particle;
 	sceneArr_[TITLE]->Finalize();
 	for (Model* model : models)

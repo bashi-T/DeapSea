@@ -1,4 +1,5 @@
 #include "DX12Common.h"
+#include "Managers/SRVManager.h"
 
 DX12Common* DX12Common::GetInstance()
 {
@@ -56,6 +57,35 @@ void DX12Common::Initialize(WinAPP* winApp)
 	InfoQueue(device.Get());
 #endif
 	MakeScreen(winApp_);
+	MakeFence();
+
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	viewport.Width = float(WinAPP::clientWidth_);
+	viewport.Height = float(WinAPP::clientHeight_);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	scissorRect.left = LONG(0.0f);
+	scissorRect.right = LONG(WinAPP::clientWidth_);
+	scissorRect.top = LONG(0.0f);
+	scissorRect.bottom = LONG(WinAPP::clientHeight_);
+
+	//↓initializeでいいかも
+	renderTextureResource = CreateRenderTextureResource(
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
+
+	descriptorSizeRTV = device->
+		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	device->CreateRenderTargetView(
+		renderTextureResource.Get(),
+		&rtvDesc,
+		GetCPUDescriptorHandle(
+			GetRtvDescriptorHeap().Get(),
+			descriptorSizeRTV, 2));
+	//↑initializeでいいかも
+
 }
 
 void DX12Common::update()
@@ -344,4 +374,182 @@ void DX12Common::InfoQueue(ID3D12Device* device)
 		filter.DenyList.pSeverityList = severities;
 		InfoQueue->PushStorageFilter(&filter);
 	}
+}
+
+void DX12Common::PreDraw()
+{
+	//書き込むバックバッファのインデックスを取得
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//現在のバックバッファをバリアを張る対象にする
+	//barrier.Transition.pResource =swapChainResources[backBufferIndex].Get();
+	barrier.Transition.pResource = renderTextureResource.Get();
+	//現在のresourceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//遷移後のresourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//transitionBarrierを張る
+	commandList->ResourceBarrier(1, &barrier);
+
+	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
+	{
+		SRVManager::GetInstance()->GetSrvDescriptorHeap()
+	};
+	commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	rtv = rtvHandles[backBufferIndex];
+	dsv = dsvHandle;
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList->ClearDepthStencilView(
+		dsvHandle,
+		D3D12_CLEAR_FLAG_DEPTH,
+		1.0f,
+		0,
+		0,
+		nullptr);
+
+	commandList.Get()->//描画先のRTV設定
+		OMSetRenderTargets(0, &rtv, false, &dsv);
+
+	float newClearColor[4] =
+	{
+		kRenderTargetClearValue.x,
+		kRenderTargetClearValue.y,
+		kRenderTargetClearValue.z,
+		kRenderTargetClearValue.a
+	};
+	//指定した色で画面をクリア
+	commandList->ClearRenderTargetView(
+		rtvHandles[backBufferIndex],
+		newClearColor, 0, nullptr);
+}
+
+void DX12Common::PostDraw()
+{
+	//barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	commandList->ResourceBarrier(1, &barrier);
+	swapChainResources[backBufferIndex] = renderTextureResource.Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	//commandList->ResourceBarrier(1, &barrier);
+
+	//commandList->CopyResource(swapChainResources[backBufferIndex].Get(), renderTextureResource.Get());
+}
+
+void DX12Common::PreDrawImGui()
+{
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
+
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	commandList->ResourceBarrier(1, &barrier);
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList->OMSetRenderTargets(1, &rtv, false, nullptr);
+
+	commandList->ClearRenderTargetView(
+		rtvHandles[backBufferIndex],
+		clearColor, 0, nullptr);
+}
+
+void DX12Common::PostDrawImGui()
+{
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	commandList->ResourceBarrier(1, &barrier);
+
+	HRESULT hr = commandList->Close();
+	assert(SUCCEEDED(hr));
+
+	ComPtr<ID3D12CommandList> commandLists[] =
+	{
+		commandList
+	};
+	commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
+	swapChain->Present(1, 0);
+
+	fenceValue++;
+	commandQueue->Signal(fence.Get(), fenceValue);
+
+	if (fence->GetCompletedValue() < fenceValue)
+	{
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+}
+
+void DX12Common::MakeFence()
+{
+	HRESULT hr = device->CreateFence(fenceValue,
+		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(SUCCEEDED(hr));
+	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent != nullptr);
+}
+
+ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = WinAPP::clientWidth_;
+	resourceDesc.Height = WinAPP::clientHeight_;
+	resourceDesc.Format = format;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = format;
+	clearValue.Color[0] = color.x;
+	clearValue.Color[1] = color.y;
+	clearValue.Color[2] = color.z;
+	clearValue.Color[3] = color.a;
+
+	ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		&clearValue,
+		IID_PPV_ARGS(&resource));
+
+	assert(SUCCEEDED(hr));
+
+	return resource;
 }

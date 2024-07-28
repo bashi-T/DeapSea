@@ -50,6 +50,13 @@ public:
 	void DebugLayer();
 	void InfoQueue(ID3D12Device* device);
 
+	void PreDraw();
+	void PostDraw();
+	void PreDrawImGui();
+	void PostDrawImGui();
+	void MakeFence();
+
+	ComPtr<ID3D12Resource> CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color);
 
 	ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 	ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
@@ -70,7 +77,10 @@ public:
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
-		
+	ComPtr<ID3D12Resource> GetRenderTextureResource() { return renderTextureResource; }
+	UINT GetBackBufferIndex() { return backBufferIndex; }
+	HANDLE GetFenceEvent() { return fenceEvent; }
+
 	~DX12Common() {
 		swapChain.Reset();
 		device.Reset();
@@ -114,5 +124,20 @@ private:
 	void UpdateFixFPS();
 
 	std::chrono::steady_clock::time_point reference_;
+
+	UINT backBufferIndex;
+	ComPtr<ID3D12Resource> renderTextureResource;
+	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
+	float clearColor[4] = { 0.1f, 0.25f, 0.5f, 1.0f };
+	D3D12_RESOURCE_BARRIER barrier{};
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv;
+	D3D12_VIEWPORT viewport{};
+	D3D12_RECT scissorRect{};
+	uint32_t descriptorSizeRTV;
+	HANDLE fenceEvent;
+	ComPtr<ID3D12Fence> fence = nullptr;
+	uint64_t fenceValue = 0;
+
 };
 
