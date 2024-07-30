@@ -383,8 +383,8 @@ void DX12Common::PreDraw()
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//現在のバックバッファをバリアを張る対象にする
-	//barrier.Transition.pResource =swapChainResources[backBufferIndex].Get();
-	barrier.Transition.pResource = renderTextureResource.Get();
+	barrier.Transition.pResource =swapChainResources[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
 	//現在のresourceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	//遷移後のresourceState
@@ -430,37 +430,36 @@ void DX12Common::PreDraw()
 void DX12Common::PostDraw()
 {
 	//barrier.Transition.pResource = renderTextureResource.Get();
-	//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList->ResourceBarrier(1, &barrier);
-	swapChainResources[backBufferIndex] = renderTextureResource.Get();
+
 	//barrier.Transition.pResource = renderTextureResource.Get();
 	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
 	//commandList->ResourceBarrier(1, &barrier);
 
+	//swapChainResources[backBufferIndex] = renderTextureResource;
 	//commandList->CopyResource(swapChainResources[backBufferIndex].Get(), renderTextureResource.Get());
 }
 
 void DX12Common::PreDrawImGui()
 {
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
 	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 	//barrier.Transition.pResource = renderTextureResource.Get();
 
-	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
 	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
 	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
 	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -480,6 +479,7 @@ void DX12Common::PostDrawImGui()
 {
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList->ResourceBarrier(1, &barrier);

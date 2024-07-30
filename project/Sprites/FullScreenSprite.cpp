@@ -10,7 +10,7 @@ void FullScreenSprite::MeshInitialize(FullScreenSpriteCommon* spriteCommon, SRVM
 	this->spriteCommon_ = spriteCommon;
 	this->srvManager = srvManager;
 	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 3);
-	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 3);
+	//indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 3);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
 	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
 
@@ -34,11 +34,7 @@ void FullScreenSprite::MeshInitialize(FullScreenSpriteCommon* spriteCommon, SRVM
 	//cameraMatrix =
 	//	MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	//MakeBufferView();
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	//indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	//transformationMatrixResource->Map(
-	//	0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	//LeftTop = { 0.0f, 0.0f, 0.0f, 1.0f };
 	//RightTop = { float(WinAPP::clientWidth_) / 3, 0.0f, 0.0f, 1.0f };
 	//RightBottom = { float(WinAPP::clientWidth_) / 3, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
@@ -48,7 +44,11 @@ void FullScreenSprite::MeshInitialize(FullScreenSpriteCommon* spriteCommon, SRVM
 	//coordRightBottom = { 1.0f, 1.0f };
 	//coordLeftBottom = { 0.0f, 1.0f };
 
-	Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	transformationMatrixResource->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	//InputData(Color);
 	//TextureManager::GetInstance()->LoadTexture(materialData->material.textureFilePath);
 	//materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(materialData->material.textureFilePath);
@@ -114,7 +114,6 @@ void FullScreenSprite::Update()
 	transformMatrix.rotate = { 0.0f,0.0f,rotation };
 	transformMatrix.scale = { size.x,size.y,1.0f };
 	InputData(Color);
-
 }
 
 void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
@@ -149,17 +148,19 @@ void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
 			SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
 		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 			IASetVertexBuffers(0, 1, &vertexBufferView);
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-			IASetIndexBuffer(&indexBufferView);
+		//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		//	IASetIndexBuffer(&indexBufferView);
 		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 			IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
-		//spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		//    0, materialResource->GetGPUVirtualAddress());
-		//spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		//    1, transformationMatrixResource->GetGPUVirtualAddress());
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		    0, materialResource->GetGPUVirtualAddress());
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		    1, transformationMatrixResource->GetGPUVirtualAddress());
 	
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);}
+		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+			DrawInstanced(3, 1, 0, 0);
+}
 
 void FullScreenSprite::SpriteDraw(FullScreenSpriteCommon* spriteCommon)
 {
