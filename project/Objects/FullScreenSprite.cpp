@@ -137,29 +137,29 @@ void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
 	//	SetGraphicsRootConstantBufferView(
 	//		1, transformationMatrixResource->GetGPUVirtualAddress());
 	//
-	//srvManager->SetGraphicsRootDescriptorTable(
-	//	2, materialData->material.textureIndex);
 	//
 	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 	//	DrawInstanced(3, 1, 0, 0);
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-			SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-			SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-			IASetVertexBuffers(0, 1, &vertexBufferView);
-		//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-		//	IASetIndexBuffer(&indexBufferView);
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-			IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		    0, materialResource->GetGPUVirtualAddress());
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-		    1, transformationMatrixResource->GetGPUVirtualAddress());
-	
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-			DrawInstanced(3, 1, 0, 0);
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		IASetVertexBuffers(0, 1, &vertexBufferView);
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	IASetIndexBuffer(&indexBufferView);
+	srvManager->SetGraphicsRootDescriptorTable(
+		2, srvManager->GetRenderTextureIndex());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		0, materialResource->GetGPUVirtualAddress());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		1, transformationMatrixResource->GetGPUVirtualAddress());
+
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		DrawInstanced(3, 1, 0, 0);
 }
 
 void FullScreenSprite::SpriteDraw(FullScreenSpriteCommon* spriteCommon)

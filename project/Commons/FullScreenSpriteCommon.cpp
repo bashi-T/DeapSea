@@ -38,7 +38,7 @@ ComPtr<IDxcBlob> FullScreenSpriteCommon::CompileShader(const std::wstring& fileP
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		debug_->Log(shaderError->GetStringPointer());
-		assert(SUCCEEDED(hr));
+		assert(false);
 	}
 	ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);

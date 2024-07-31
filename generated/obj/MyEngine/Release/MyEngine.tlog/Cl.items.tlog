@@ -1,4 +1,7 @@
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Camera\Camera.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\Camera.obj
+C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Objects\FullScreen.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\FullScreen.obj
+C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Sprites\FullScreenSprite.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\FullScreenSprite.obj
+C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Commons\FullScreenSpriteCommon.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\FullScreenSpriteCommon.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Scene\GameManager.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\GameManager.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Scene\GameScene.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\GameScene.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Math\CGVector.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\CGVector.obj
@@ -20,7 +23,6 @@ C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Commons\ModelCo
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Managers\ModelManager.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\ModelManager.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Systems\MyImGui.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\MyImGui.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\main.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\main.obj
-C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Objects\Mesh.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\Mesh.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Objects\Object3d.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\Object3d.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Commons\Object3dCommon.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\Object3dCommon.obj
 C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\project\Sprites\Sprite.cpp;C:\Users\k022g\Lessons\2023A\CG2\MyEngine0628\newProject\generated\obj\MyEngine\Release\Sprite.obj

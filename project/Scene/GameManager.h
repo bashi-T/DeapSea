@@ -9,6 +9,7 @@
 #include"Input/Input.h"
 #include"Commons/SpriteCommon.h"
 #include"Commons/FullScreenSpriteCommon.h"
+#include"Objects/FullScreenSprite.h"
 #include"Commons/Object3dCommon.h"
 #include"Managers/ModelManager.h"
 #include"Objects/model.h"
@@ -32,6 +33,7 @@ private:
 	ModelCommon* modelCommon;
 	Camera* camera;
 	Particle* particle;
+	FullScreenSprite* fullScreenSprite;
 
 public: 
 	GameManager();

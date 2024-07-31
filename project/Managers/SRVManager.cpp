@@ -3,7 +3,7 @@
 const uint32_t SRVManager::kMaxSRVCount = 512;
 const uint32_t SRVManager::kSRVIndexTop = 0;
 
-void SRVManager::Initialize(DX12Common* dxCommon)
+void SRVManager::Initialize(DX12Common* dxCommon/*,uint32_t srvIndex*/)
 {
 	this->dxCommon_ = dxCommon;
 	descriptorHeap = dxCommon_->CreateDescriptorHeap(
@@ -18,9 +18,10 @@ void SRVManager::Initialize(DX12Common* dxCommon)
 	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	renderTextureSrvDesc.Texture2D.MipLevels = 1;
 	//SRV生成
+	renderTextureIndex = Allocate();
 	dxCommon_->GetDevice()->CreateShaderResourceView(
 		dxCommon_->GetRenderTextureResource().Get(), &renderTextureSrvDesc,
-		GetCPUDescriptorHandle(2));
+		GetCPUDescriptorHandle(renderTextureIndex));
 }
 
 uint32_t SRVManager::Allocate()
@@ -56,7 +57,7 @@ void SRVManager::CreateSRVforTexture2D(
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(MipLevels);
-
+	
 	dxCommon_->GetDevice().Get()->CreateShaderResourceView(
 		pResource, &srvDesc, GetCPUDescriptorHandle(srvIndex));
 }

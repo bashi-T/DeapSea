@@ -52,6 +52,8 @@ int GameManager::Run()
 
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	SPCommon->Initialize(dx12Common);
+	fullScreenSprite = new FullScreenSprite;
+	fullScreenSprite->MeshInitialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
 
 	sceneArr_[TITLE]->Init();
 	sceneArr_[INGAME]->Init();
@@ -103,6 +105,8 @@ int GameManager::Run()
 		dx12Common->PostDraw();
 
 		dx12Common->PreDrawImGui();
+			fullScreenSprite->MeshDraw(FullScreenSpriteCommon::GetInstance());
+
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 		dx12Common->PostDrawImGui();
 	}

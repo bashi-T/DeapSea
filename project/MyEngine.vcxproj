@@ -13,7 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Objects\FullScreen.cpp" />
-    <ClCompile Include="Sprites\FullScreenSprite.cpp" />
+    <ClCompile Include="Objects\FullScreenSprite.cpp" />
     <ClCompile Include="Commons\FullScreenSpriteCommon.cpp" />
     <ClCompile Include="Scene\GameManager.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
@@ -47,7 +47,7 @@
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Objects\FullScreen.h" />
-    <ClInclude Include="Sprites\FullScreenSprite.h" />
+    <ClInclude Include="Objects\FullScreenSprite.h" />
     <ClInclude Include="Commons\FullScreenSpriteCommon.h" />
     <ClInclude Include="Scene\GameManager.h" />
     <ClInclude Include="Scene\GameScene.h" />

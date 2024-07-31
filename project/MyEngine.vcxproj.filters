@@ -102,7 +102,7 @@
     <ClCompile Include="Scene\GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Sprites\FullScreenSprite.cpp">
+    <ClCompile Include="Objects\FullScreenSprite.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Commons\FullScreenSpriteCommon.cpp">
@@ -200,7 +200,7 @@
     <ClInclude Include="Scene\GameScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Sprites\FullScreenSprite.h">
+    <ClInclude Include="Objects\FullScreenSprite.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Commons\FullScreenSpriteCommon.h">

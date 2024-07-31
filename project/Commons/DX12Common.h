@@ -11,6 +11,7 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #include"Math/CGVector.h"
+//#include"Objects/FullScreenSprite.h"
 
 class DX12Common final
 {
@@ -57,6 +58,7 @@ public:
 	void MakeFence();
 
 	ComPtr<ID3D12Resource> CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color);
+	uint32_t Allocate();
 
 	ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 	ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
@@ -80,6 +82,7 @@ public:
 	ComPtr<ID3D12Resource> GetRenderTextureResource() { return renderTextureResource; }
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
+	bool CheckNumTexture(uint32_t textureIndex);
 
 	~DX12Common() {
 		swapChain.Reset();
@@ -95,6 +98,7 @@ private:
 
 	Debug* debug_ = nullptr;
 	WinAPP* winApp_ = nullptr;
+	//FullScreenSprite* fullScreenSprite;
 
 	ComPtr<ID3D12Device> device = nullptr;
 	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
@@ -111,8 +115,13 @@ private:
 	std::array<ComPtr<ID3D12Resource>, 10> swapChainResources;
 	ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	uint32_t descriptorSizeRTV;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
+	uint32_t descriptorSizeDTV;
+
+	//uint32_t descriptorSize;
+	//ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 
 	ComPtr<ID3D12Resource> depthStencilResource;
 
@@ -134,10 +143,10 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv;
 	D3D12_VIEWPORT viewport{};
 	D3D12_RECT scissorRect{};
-	uint32_t descriptorSizeRTV;
 	HANDLE fenceEvent;
 	ComPtr<ID3D12Fence> fence = nullptr;
 	uint64_t fenceValue = 0;
+	uint32_t useIndex = 0;
 
 };
 

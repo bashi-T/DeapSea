@@ -19,6 +19,17 @@ void DX12Common::DeleteInstance()
 	instance = NULL;
 }
 
+bool DX12Common::CheckNumTexture(uint32_t textureIndex)
+{
+	if (SRVManager::kMaxSRVCount > textureIndex)
+	{
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 void DX12Common::InitializefixFPS()
 {
 	reference_ = std::chrono::steady_clock::now();
@@ -75,15 +86,22 @@ void DX12Common::Initialize(WinAPP* winApp)
 	renderTextureResource = CreateRenderTextureResource(
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
 
+	rtvDescriptorHeap = CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		SRVManager::kMaxSRVCount,
+		true);
+	//descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
 	descriptorSizeRTV = device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
+	int index = Allocate();
 	device->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
+		//GetCPUDescriptorHandle(index)
 		GetCPUDescriptorHandle(
 			GetRtvDescriptorHeap().Get(),
-			descriptorSizeRTV, 2));
+			descriptorSizeRTV, index));
 	//↑initializeでいいかも
 
 }
@@ -212,8 +230,9 @@ void DX12Common::MakeRTV()
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	const uint32_t descriptorSizeRTV = device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	int index = Allocate();
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
-		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, 0);
+		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, index);
 
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(
@@ -274,13 +293,15 @@ void DX12Common::MakeDSV()
 {
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	int index = Allocate();
 	device->CreateDepthStencilView(
 		depthStencilResource.Get(),
 		&dsvDesc,
 		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
+	index = Allocate(); 
+	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, index);
 }
 
 
@@ -473,6 +494,10 @@ void DX12Common::PreDrawImGui()
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex],
 		clearColor, 0, nullptr);
+
+	//fullScreenSprite = new FullScreenSprite;
+	//fullScreenSprite->MeshInitialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
+
 }
 
 void DX12Common::PostDrawImGui()
@@ -552,4 +577,12 @@ ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT forma
 	assert(SUCCEEDED(hr));
 
 	return resource;
+}
+
+uint32_t DX12Common::Allocate()
+{
+	assert(CheckNumTexture(useIndex));
+	int index = useIndex;
+	useIndex++;
+	return index;
 }

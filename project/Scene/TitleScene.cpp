@@ -59,8 +59,6 @@ void TitleScene::Init()
 	};
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
-	fullScreenSprite = new FullScreenSprite;
-	fullScreenSprite->MeshInitialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
 }
 
 void TitleScene::Update()
@@ -82,7 +80,7 @@ void TitleScene::Update()
 	{
 		particle->Update();
 	}
-	fullScreenSprite->Update();
+	//fullScreenSprite->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		sceneNo = INGAME;
@@ -91,7 +89,6 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	fullScreenSprite->MeshDraw(FullScreenSpriteCommon::GetInstance());
 	for (Object3d* object3d : objects3d)
 	{
 		object3d->Draw(Object3dCommon::GetInstance(), ModelManager::GetInstance()->GetModelCommon());
