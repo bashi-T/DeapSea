@@ -86,22 +86,35 @@ void DX12Common::Initialize(WinAPP* winApp)
 	renderTextureResource = CreateRenderTextureResource(
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
 
-	rtvDescriptorHeap = CreateDescriptorHeap(
-		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-		SRVManager::kMaxSRVCount,
-		true);
 	//descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	
 	descriptorSizeRTV = device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
 	int index = Allocate();
 	device->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
-		//GetCPUDescriptorHandle(index)
 		GetCPUDescriptorHandle(
-			GetRtvDescriptorHeap().Get(),
+			rtvDescriptorHeap.Get(),
 			descriptorSizeRTV, index));
+
+	srvDescriptorHeap = CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		512,
+		true);
+	//SRV設定　formatはresourceと同じにする
+	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	renderTextureSrvDesc.Texture2D.MipLevels = 1;
+	//SRV生成
+	renderTextureIndex = Allocate();
+	int descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	device->CreateShaderResourceView(
+		renderTextureResource.Get(), &renderTextureSrvDesc,
+		GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSize, renderTextureIndex));
+
 	//↑initializeでいいかも
 
 }
@@ -570,8 +583,8 @@ ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT forma
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
-		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		&clearValue,
+		D3D12_RESOURCE_STATE_RENDER_TARGET,//これから描画する前提のtextureなのでrenderTargetとして使う
+		&clearValue,//clearRenderTargetをこの色でclearする
 		IID_PPV_ARGS(&resource));
 
 	assert(SUCCEEDED(hr));

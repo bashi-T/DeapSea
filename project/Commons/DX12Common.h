@@ -83,7 +83,7 @@ public:
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	bool CheckNumTexture(uint32_t textureIndex);
-
+	int GetRenderTextureIndex() { return renderTextureIndex; }
 	~DX12Common() {
 		swapChain.Reset();
 		device.Reset();
@@ -121,7 +121,7 @@ private:
 	uint32_t descriptorSizeDTV;
 
 	//uint32_t descriptorSize;
-	//ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 
 	ComPtr<ID3D12Resource> depthStencilResource;
 
@@ -147,6 +147,8 @@ private:
 	ComPtr<ID3D12Fence> fence = nullptr;
 	uint64_t fenceValue = 0;
 	uint32_t useIndex = 0;
+	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
+	int renderTextureIndex;
 
 };
 

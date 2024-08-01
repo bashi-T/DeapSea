@@ -12,16 +12,6 @@ void SRVManager::Initialize(DX12Common* dxCommon/*,uint32_t srvIndex*/)
 		true);
 	descriptorSize = dxCommon_->GetDevice()->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//SRV設定　formatはresourceと同じにする
-	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	renderTextureSrvDesc.Texture2D.MipLevels = 1;
-	//SRV生成
-	renderTextureIndex = Allocate();
-	dxCommon_->GetDevice()->CreateShaderResourceView(
-		dxCommon_->GetRenderTextureResource().Get(), &renderTextureSrvDesc,
-		GetCPUDescriptorHandle(renderTextureIndex));
 }
 
 uint32_t SRVManager::Allocate()

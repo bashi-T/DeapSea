@@ -10,8 +10,6 @@ private:
 	uint32_t useIndex = 0;
 	static inline SRVManager* instance;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
-	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
-	int renderTextureIndex;
 public:
 	static const uint32_t kMaxSRVCount;
 	static const uint32_t kSRVIndexTop;
@@ -39,7 +37,6 @@ public:
 
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	static SRVManager* GetInstance();
-	int GetRenderTextureIndex() { return renderTextureIndex; }
 
 };
 

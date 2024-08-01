@@ -149,7 +149,7 @@ void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
 	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 	//	IASetIndexBuffer(&indexBufferView);
 	srvManager->SetGraphicsRootDescriptorTable(
-		2, srvManager->GetRenderTextureIndex());
+		2, spriteCommon_->GetDx12Common()->GetRenderTextureIndex());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
