@@ -14,13 +14,13 @@ void SRVManager::Initialize(DX12Common* dxCommon/*,uint32_t srvIndex*/)
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-uint32_t SRVManager::Allocate()
-{
-	assert(CheckNumTexture(useIndex));
-	int index = useIndex;
-	useIndex++;
-	return index;
-}
+//uint32_t SRVManager::Allocate()
+//{
+//	assert(CheckNumTexture(DX12Common::GetInstance()->GetUseIndex()));
+//	int index = DX12Common::GetInstance()->GetUseIndex();
+//	DX12Common::GetInstance()->AddUseIndex();
+//	return index;
+//}
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUDescriptorHandle(uint32_t index)
 {

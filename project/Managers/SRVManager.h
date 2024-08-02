@@ -14,7 +14,7 @@ public:
 	static const uint32_t kMaxSRVCount;
 	static const uint32_t kSRVIndexTop;
 	void Initialize(DX12Common* dxCommon/*, uint32_t srvIndex*/);
-	uint32_t Allocate();
+	//uint32_t Allocate();
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 	void CreateSRVforTexture2D(
@@ -34,6 +34,7 @@ public:
 	//	UINT structureByteStride);
 	void SetGraphicsRootDescriptorTable(UINT RootParamaterIndex, uint32_t srvIndex);
 	bool CheckNumTexture(uint32_t textureIndex);
+	uint32_t GetDescriptorSize(){ return descriptorSize; }
 
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	static SRVManager* GetInstance();

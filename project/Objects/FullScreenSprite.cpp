@@ -10,48 +10,14 @@ void FullScreenSprite::MeshInitialize(FullScreenSpriteCommon* spriteCommon, SRVM
 	this->spriteCommon_ = spriteCommon;
 	this->srvManager = srvManager;
 	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 3);
-	//indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 3);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
 	transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
-
-	//uvTransform =
-	//{
-	//	{1.0f,1.0f,1.0f},
-	//	{0.0f,0.0f,0.0f},
-	//	{0.0f,0.0f,0.0f},
-	//};
-	//transformMatrix =
-	//{
-	//	{1.0f,1.0f,1.0f},
-	//	{0.0f,0.0f,0.0f},
-	//	{0.0f,0.0f,0.0f},
-	//};
-	//cameraTransform = {
-	//	{1.0f, 1.0f, 1.0f},
-	//	{0.0f, 0.0f, 0.0f},
-	//	{0.0f, 0.0f, -15.0f}
-	//};
-	//cameraMatrix =
-	//	MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	//MakeBufferView();
-	//indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	//LeftTop = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//RightTop = { float(WinAPP::clientWidth_) / 3, 0.0f, 0.0f, 1.0f };
-	//RightBottom = { float(WinAPP::clientWidth_) / 3, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
-	//LeftBottom = { 0.0f, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
-	//coordLeftTop = { 0.0f, 0.0f };
-	//coordRightTop = { 1.0f, 0.0f };
-	//coordRightBottom = { 1.0f, 1.0f };
-	//coordLeftBottom = { 0.0f, 1.0f };
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	transformationMatrixResource->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//InputData(Color);
-	//TextureManager::GetInstance()->LoadTexture(materialData->material.textureFilePath);
-	//materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(materialData->material.textureFilePath);
 }
 
 void FullScreenSprite::SpriteInitialize(FullScreenSpriteCommon* spriteCommon, SRVManager* srvManager, std::string texturefilePath)
@@ -148,8 +114,8 @@ void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
 		IASetVertexBuffers(0, 1, &vertexBufferView);
 	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 	//	IASetIndexBuffer(&indexBufferView);
-	srvManager->SetGraphicsRootDescriptorTable(
-		2, spriteCommon_->GetDx12Common()->GetRenderTextureIndex());
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootDescriptorTable(2, spriteCommon_->GetDx12Common()->GetSrvHandleGPU());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

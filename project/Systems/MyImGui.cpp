@@ -1,5 +1,5 @@
 #include "MyImGui.h"
-
+#include"DX12Common.h"
 MyImGui::~MyImGui()
 {
 	ImGui_ImplDX12_Shutdown();
@@ -14,6 +14,7 @@ void MyImGui::Initialize(
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
 	ID3D12DescriptorHeap* srvDescriptorHeap)
 {
+	uint32_t index = DX12Common::GetInstance()->Allocate();
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -23,8 +24,14 @@ void MyImGui::Initialize(
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
 		srvDescriptorHeap,
-	    srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-	    srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		DX12Common::GetInstance()->GetCPUDescriptorHandle(
+			DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(),
+			DX12Common::GetInstance()->GetDescriptorSizeSRV(),
+			index),
+		DX12Common::GetInstance()->GetGPUDescriptorHandle(
+			DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(),
+			DX12Common::GetInstance()->GetDescriptorSizeSRV(),
+			index));
 }
 
 void MyImGui::Update()

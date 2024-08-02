@@ -11,10 +11,7 @@ void TitleScene::Init()
 		"Resource/uvChecker.png",//一番最初のテクスチャがうまく読み込まれない
 		"Resource/monsterBall.png",
 		"Resource/AnimatedCube/AnimatedCube_BaseColor.png",
-		"Resource/worldMap.png",
-		"Resource/world.png",
 		"Resource/ganban.png",
-		"Resource/uvChecker.png",
 		"Resource/uvChecker.png",
 		"Resource/circle.png",
 		"Resource/cursor.png"
@@ -30,7 +27,7 @@ void TitleScene::Init()
 	for (uint32_t i = 0; i < 1; i++)
 	{
 		Object3d* object3d = new Object3d;
-		Particle* particle = new Particle;
+		//Particle* particle = new Particle;
 		if(i==0)
 		{
 			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
@@ -54,8 +51,8 @@ void TitleScene::Init()
 		object3d->SetTranslate({ 1.0f -(2.0f* i), 0.0f, 0.0f });
 		object3d->SetScale({ i + 0.005f, i + 0.005f , i + 0.005f  });
 		objects3d.push_back(object3d);
-		particle->Initialize(textureFilePath[i + 1], SRVManager::GetInstance(), Object3dCommon::GetInstance(), DX12Common::GetInstance());
-		particles.push_back(particle);
+		//particle->Initialize(textureFilePath[i + 1], SRVManager::GetInstance(), Object3dCommon::GetInstance(), DX12Common::GetInstance());
+		//particles.push_back(particle);
 	};
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
@@ -76,11 +73,10 @@ void TitleScene::Update()
 	}
 		objects3d[0]->Update(Camera::GetInstance());
 		//objects3d[1]->AnimationUpdate(Camera::GetInstance());
-	for (Particle* particle : particles)
-	{
-		particle->Update();
-	}
-	//fullScreenSprite->Update();
+	//for (Particle* particle : particles)
+	//{
+	//	particle->Update();
+	//}
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		sceneNo = INGAME;
@@ -93,10 +89,10 @@ void TitleScene::Draw()
 	{
 		object3d->Draw(Object3dCommon::GetInstance(), ModelManager::GetInstance()->GetModelCommon());
 	}
-	for (Particle* particle : particles)
-	{
-		//particle->Draw();
-	}
+	//for (Particle* particle : particles)
+	//{
+	//	//particle->Draw();
+	//}
 }
 
 void TitleScene::Finalize()

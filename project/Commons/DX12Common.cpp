@@ -1,5 +1,4 @@
 #include "DX12Common.h"
-#include "Managers/SRVManager.h"
 
 DX12Common* DX12Common::GetInstance()
 {
@@ -19,9 +18,9 @@ void DX12Common::DeleteInstance()
 	instance = NULL;
 }
 
-bool DX12Common::CheckNumTexture(uint32_t textureIndex)
+bool DX12Common::CheckNumHandle(uint32_t textureIndex)
 {
-	if (SRVManager::kMaxSRVCount > textureIndex)
+	if (100 > textureIndex)
 	{
 		return true;
 	}
@@ -91,13 +90,13 @@ void DX12Common::Initialize(WinAPP* winApp)
 	descriptorSizeRTV = device->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-	int index = Allocate();
+	rtvIndex = Allocate();
 	device->CreateRenderTargetView(
 		renderTextureResource.Get(),
 		&rtvDesc,
 		GetCPUDescriptorHandle(
 			rtvDescriptorHeap.Get(),
-			descriptorSizeRTV, index));
+			descriptorSizeRTV, rtvIndex));
 
 	srvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
@@ -110,11 +109,11 @@ void DX12Common::Initialize(WinAPP* winApp)
 	renderTextureSrvDesc.Texture2D.MipLevels = 1;
 	//SRV生成
 	renderTextureIndex = Allocate();
-	int descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	device->CreateShaderResourceView(
 		renderTextureResource.Get(), &renderTextureSrvDesc,
-		GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSize, renderTextureIndex));
-
+		GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, renderTextureIndex));
+	srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, renderTextureIndex);
 	//↑initializeでいいかも
 
 }
@@ -223,7 +222,7 @@ void DX12Common::MakeDescriptorHeap()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	rtvDescriptorHeapDesc.NumDescriptors = 2;
+	rtvDescriptorHeapDesc.NumDescriptors = 16;
 	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
 		IID_PPV_ARGS(&rtvDescriptorHeap));
 	assert(SUCCEEDED(hr));
@@ -241,8 +240,7 @@ void DX12Common::MakeRTV()
 {
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	const uint32_t descriptorSizeRTV = device->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	int index = Allocate();
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
 		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, index);
@@ -250,9 +248,8 @@ void DX12Common::MakeRTV()
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(
 		swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
-
-	rtvHandles[1].ptr = rtvHandles[0].ptr + device->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	index = Allocate();
+	rtvHandles[1] = GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, index);
 	device->CreateRenderTargetView(
 		swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 }
@@ -266,11 +263,11 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 
 	rtvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-		3,
+		16,
 		false);
 	dsvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-		1,
+		16,
 		false);
 
 	BringResources();
@@ -307,14 +304,13 @@ void DX12Common::MakeDSV()
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	int index = Allocate();
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, index);
 	device->CreateDepthStencilView(
 		depthStencilResource.Get(),
 		&dsvDesc,
-		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		dsvHandle);
 
-	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	index = Allocate(); 
-	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, index);
 }
 
 
@@ -424,18 +420,22 @@ void DX12Common::PreDraw()
 	//遷移後のresourceState
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//transitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
+	//commandList->ResourceBarrier(1, &barrier);
 
 	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
 	{
-		SRVManager::GetInstance()->GetSrvDescriptorHeap()
+		srvDescriptorHeap
 	};
 	commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-	rtv = rtvHandles[backBufferIndex];
+	rtv = GetCPUDescriptorHandle(
+		rtvDescriptorHeap.Get(),descriptorSizeRTV, rtvIndex);
 	dsv = dsvHandle;
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList.Get()->//描画先のRTV設定
+		OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	commandList->ClearDepthStencilView(
 		dsvHandle,
@@ -445,8 +445,6 @@ void DX12Common::PreDraw()
 		0,
 		nullptr);
 
-	commandList.Get()->//描画先のRTV設定
-		OMSetRenderTargets(0, &rtv, false, &dsv);
 
 	float newClearColor[4] =
 	{
@@ -457,17 +455,17 @@ void DX12Common::PreDraw()
 	};
 	//指定した色で画面をクリア
 	commandList->ClearRenderTargetView(
-		rtvHandles[backBufferIndex],
+		rtv,
 		newClearColor, 0, nullptr);
 }
 
 void DX12Common::PostDraw()
 {
-	//barrier.Transition.pResource = renderTextureResource.Get();
-	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList->ResourceBarrier(1, &barrier);
 
 	//barrier.Transition.pResource = renderTextureResource.Get();
@@ -502,14 +500,11 @@ void DX12Common::PreDrawImGui()
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 
-	commandList->OMSetRenderTargets(1, &rtv, false, nullptr);
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
 
 	commandList->ClearRenderTargetView(
 		rtvHandles[backBufferIndex],
 		clearColor, 0, nullptr);
-
-	//fullScreenSprite = new FullScreenSprite;
-	//fullScreenSprite->MeshInitialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
 
 }
 
@@ -520,6 +515,13 @@ void DX12Common::PostDrawImGui()
 	//barrier.Transition.pResource = renderTextureResource.Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	commandList->ResourceBarrier(1, &barrier);
+
+	barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
 
 	HRESULT hr = commandList->Close();
@@ -594,8 +596,23 @@ ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT forma
 
 uint32_t DX12Common::Allocate()
 {
-	assert(CheckNumTexture(useIndex));
+	assert(CheckNumHandle(useIndex));
 	int index = useIndex;
 	useIndex++;
 	return index;
+}
+void DX12Common::CreateSRVforTexture2D(
+	uint32_t srvIndex,
+	ID3D12Resource* pResource,
+	DXGI_FORMAT Format,
+	UINT MipLevels)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = Format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(MipLevels);
+
+	device->CreateShaderResourceView(
+		pResource, &srvDesc, GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, srvIndex));
 }

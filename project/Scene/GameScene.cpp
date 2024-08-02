@@ -11,8 +11,6 @@ void GameScene::Init()
 		"Resource/civ6.png",
 		"Resource/uvChecker.png",
 		"Resource/monsterBall.png",
-		"Resource/worldMap.png",
-		"Resource/world.png",
 		"Resource/circle.png",
 		"Resource/ganban.png",
 		"Resource/uvChecker.png",

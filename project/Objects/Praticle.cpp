@@ -413,7 +413,7 @@ void Particle::InputData(
 
 void Particle::MakeShaderResourceViewInstance()
 {
-	uint32_t index = srvManager->Allocate();
+	uint32_t index = DX12Common::GetInstance()->Allocate();
 	instancingSrvHandleCPU = srvManager->GetCPUDescriptorHandle(index);
 	instancingSrvHandleGPU = srvManager->GetGPUDescriptorHandle(index);
 	srvManager->CreateSRVforStructuredBuffer(index, instancingResource.Get(), kNumInstance, sizeof(ParticleForGPU));

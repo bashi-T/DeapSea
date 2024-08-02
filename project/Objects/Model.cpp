@@ -5,8 +5,8 @@ void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, s
 	this->modelCommon_ = modelCommon;
 
 	modelData = LoadModelFile("Resource", objFilePath);
-	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
-	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
+	vertexResource = CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	materialResource = CreateBufferResource(sizeof(Material));
 
 	MakeBufferView();
 
@@ -30,9 +30,9 @@ void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePat
 	this->modelCommon_ = modelCommon;
 
 	modelData = LoadModelFile("Resource", objFilePath);
-	animation = LoadAnimationFile("Resource", objFilePath);//animationの活かし方？
-	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
-	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
+	animation = LoadAnimationFile("Resource", objFilePath);
+	vertexResource = CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	materialResource = CreateBufferResource(sizeof(Material));
 
 	MakeBufferView();
 
@@ -63,10 +63,14 @@ void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
 			0, materialResource->GetGPUVirtualAddress());
-	modelCommon_->GetDx12Common()->GetCommandList().Get()->IASetVertexBuffers(
-		0, 1, &vertexBufferView);
-	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData.material.textureIndex);
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		IASetVertexBuffers(0, 1, &vertexBufferView);
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootDescriptorTable(2, modelCommon_->GetDx12Common()->
+			GetGPUDescriptorHandle(
+				modelCommon_->GetDx12Common()->GetSrvDescriptorHeap().Get(),
+				modelCommon_->GetDx12Common()->GetDescriptorSizeSRV(),
+				modelData.material.textureIndex));
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawInstanced(
 		UINT(modelData.vertices.size()), 1, 0, 0);
@@ -77,9 +81,9 @@ void Model::Memcpy()
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 }
 
-ComPtr<ID3D12Resource> Model::CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes)
+ComPtr<ID3D12Resource> Model::CreateBufferResource(size_t sizeInBytes)
 {
-	this->modelCommon_ = modelCommon;
+	
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;

@@ -75,19 +75,30 @@ public:
 	ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator.Get(); }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	ComPtr<IDXGISwapChain4> GetSwapChain() { return swapChain; }
-	std::array<ComPtr<ID3D12Resource>, 10> GetSwapChainResources() { return swapChainResources; }
+	std::array<ComPtr<ID3D12Resource>, 16> GetSwapChainResources() { return swapChainResources; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
+	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return srvDescriptorHeap; }
+	int GetDescriptorSizeSRV() { return descriptorSizeSRV; }
+
 	ComPtr<ID3D12Resource> GetRenderTextureResource() { return renderTextureResource; }
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
-	bool CheckNumTexture(uint32_t textureIndex);
+	bool CheckNumHandle(uint32_t textureIndex);
 	int GetRenderTextureIndex() { return renderTextureIndex; }
+	int GetRTVIndex() { return rtvIndex; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU() { return srvHandleGPU; }
 	~DX12Common() {
 		swapChain.Reset();
 		device.Reset();
 	}
+
+	void CreateSRVforTexture2D(
+		uint32_t srvIndex,
+		ID3D12Resource* pResource,
+		DXGI_FORMAT Format,
+		UINT MipLevels);
 
 private:
 	DX12Common() = default;
@@ -104,7 +115,7 @@ private:
 	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[4];
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 
 	ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
@@ -112,7 +123,7 @@ private:
 	ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 	ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	std::array<ComPtr<ID3D12Resource>, 10> swapChainResources;
+	std::array<ComPtr<ID3D12Resource>, 16> swapChainResources;
 	ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	uint32_t descriptorSizeRTV;
@@ -149,6 +160,8 @@ private:
 	uint32_t useIndex = 0;
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
 	int renderTextureIndex;
-
+	int rtvIndex;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+	int descriptorSizeSRV;
 };
 
