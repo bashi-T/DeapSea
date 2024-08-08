@@ -18,10 +18,9 @@ public:
 	~Sprite();
 	void Initialize(
 		SpriteCommon* spriteCommon,
-		SRVManager* srvManager,
 		std::string texturefilePath);
 	void Update();
-	void Draw();
+	void Draw(SpriteCommon* spriteCommon);
 
 	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();
@@ -41,11 +40,11 @@ public:
 	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
 		const DirectX::TexMetadata& metadata);
-	void SetPositoin(const Vector2& position) { this->position = position; }
-	void SetRotation(float rotation) { this->rotation = rotation; }
+	void SetPositoin(const Vector2& position) { this->position_ = position; }
+	void SetRotation(float rotation) { this->rotation_ = rotation; }
 	void SetColor(const Vector4& color) { materialData->color = color; }
-	void SetSize(const Vector2& size) { this->size = size; }
-	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	void SetSize(const Vector2& size) { this->size_ = size; }
+	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint_ = anchorPoint; }
 	void SetIsFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
 	void SetIsFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
 	void SetTextureLeftTop(const Vector2& texturelefttop) { this->textureLeftTop = texturelefttop; }
@@ -57,18 +56,18 @@ public:
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	Vector4 GetLeftTop() { return LeftTop; }
 	Vector4 GetRightTop() { return RightTop; }
-	Vector4 GetRightBottom(){ return RightBottom; }
-	Vector4 GetLeftBottom(){ return LeftBottom; }
-	Vector4 GetColor(){ return LeftTop; }
-	Vector2 GetTexcoordLeftTop(){ return coordLeftTop; }
-	Vector2 GetTexcoordRightTop(){ return coordRightTop; }
-	Vector2 GetTexcoordRightBottom(){ return coordRightBottom; }
+	Vector4 GetRightBottom() { return RightBottom; }
+	Vector4 GetLeftBottom() { return LeftBottom; }
+	Vector4 GetColor() { return LeftTop; }
+	Vector2 GetTexcoordLeftTop() { return coordLeftTop; }
+	Vector2 GetTexcoordRightTop() { return coordRightTop; }
+	Vector2 GetTexcoordRightBottom() { return coordRightBottom; }
 	Vector2 GetTexcoordLeftBottom() { return coordLeftBottom; }
-	const Vector2& GetPosition()const { return position; }
-	float GetRotation()const { return rotation; }
+	const Vector2& GetPosition()const { return position_; }
+	float GetRotation()const { return rotation_; }
 	const Vector4& GetColor()const { return materialData->color; }
-	const Vector2& GetSize()const { return size; }
-	const Vector2& GetAnchorPoint()const { return anchorPoint; }
+	const Vector2& GetSize()const { return size_; }
+	const Vector2& GetAnchorPoint()const { return anchorPoint_; }
 	const bool& GetIsFlipX() { return isFlipX_; }
 	const bool& GetIsFlipY() { return isFlipY_; }
 	const Vector2& GetTextureLeftTop()const { return textureLeftTop; }
@@ -84,17 +83,16 @@ public:
 private:
 	SpriteCommon* spriteCommon_;
 	Debug* debug_;
-	WinAPP* sWinApp;
 	MyImGui* imgui_;
 	HRESULT hr = NULL;
 	uint32_t textureIndex = 0;
 	SRVManager* srvManager = nullptr;
 
 	EulerTransform transformMatrix;
-	Vector2 position = { 0.0f,0.0f };
-	float rotation = 0.0f;
-	Vector2 size = { 100.0f,100.0f };
-	Vector2 anchorPoint = { 0.0f,0.0f };
+	Vector2 position_ = { 0.0f,0.0f };
+	float rotation_ = 0.0f;
+	Vector2 size_ = { 100.0f,100.0f };
+	Vector2 anchorPoint_ = { 0.0f,0.0f };
 
 	VertexData* vertexData = nullptr;
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
@@ -107,6 +105,8 @@ private:
 	struct Material
 	{
 		Vector4 color;
+		int32_t enableLighting;
+		float padding[3];
 		Matrix4x4 uvTransform;
 		MaterialData material;
 	};

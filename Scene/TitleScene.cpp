@@ -66,12 +66,12 @@ void TitleScene::Init()
 	//object3d->SetTranslate({ 3.0f - (2.0f * i), float(pow(-1.0,i)), 1.0f });
 	object3d->SetRotate({ 0.0f, 3.3f, 0.0f });
 	objects3d.push_back(object3d);
-	particle->Initialize(textureFilePath[11], SRVManager::GetInstance(), Object3dCommon::GetInstance());
+	particle->Initialize(textureFilePath[11], Object3dCommon::GetInstance());
 	particles.push_back(particle);
 };
     //objects3d[1]->SetScale({ 0.005f,0.005f ,0.005f });
 	sprite = new Sprite;
-	sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/Titleexample.png");
+	sprite->Initialize(SpriteCommon::GetInstance(), "Resource/Titleexample.png");
 	sprite->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprite->GetSize().x / 2),0.0f });
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
 }
@@ -155,7 +155,7 @@ void TitleScene::Draw()
 	{
 		particle->Draw();
 	}
-	sprite->Draw();
+	sprite->Draw(SpriteCommon::GetInstance());
 }
 
 void TitleScene::Finalize()

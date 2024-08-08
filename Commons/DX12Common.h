@@ -29,13 +29,15 @@ public:
 	void BringResources();
 	void MakeRTV();
 	void MakeDSV();
+	void ExecuteCommandList();
+	void MakeFenceEvent();
 
 	void MakeScreen(WinAPP* winApp);
 	void DX12Release();
 	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 		UINT numDescriptors,
-	    bool shaderVisible);
+		bool shaderVisible);
 	ComPtr<ID3D12Resource> CreatedepthstencilTextureResource(
 		int32_t width,
 		int32_t height);
@@ -50,7 +52,10 @@ public:
 
 	void DebugLayer();
 	void InfoQueue(ID3D12Device* device);
+	void MakeFence();
 
+	void PreDraw();
+	void PostDraw();
 
 	ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 	ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
@@ -60,8 +65,8 @@ public:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
-	
-	ComPtr<ID3D12Device> GetDevice() { return device; }
+
+	ComPtr<ID3D12Device> GetDevice() { return device_; }
 	ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList.Get(); }
 	ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue.Get(); }
 	ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator.Get(); }
@@ -71,23 +76,23 @@ public:
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
-		
+	HANDLE GetFenceEvent() { return fenceEvent; }
+
 	~DX12Common() {
 		swapChain.Reset();
-		device.Reset();
+		device_.Reset();
 	}
 
 private:
 	DX12Common() = default;
 	//~DX12Common() = default;
 	DX12Common(const DX12Common& obj) = delete;
-	DX12Common& oparator(const DX12Common&obj) = delete;
+	DX12Common& oparator(const DX12Common& obj) = delete;
 	static inline DX12Common* instance;
-
 	Debug* debug_ = nullptr;
 	WinAPP* winApp_ = nullptr;
 
-	ComPtr<ID3D12Device> device = nullptr;
+	ComPtr<ID3D12Device> device_ = nullptr;
 	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	ComPtr<IDXGIAdapter4> useAdapter = nullptr;
@@ -115,6 +120,14 @@ private:
 	void UpdateFixFPS();
 
 	std::chrono::steady_clock::time_point reference_;
+	D3D12_RESOURCE_BARRIER barrier{};
+	//ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+	float clearColor[4] = { 0.1f, 0.25f, 0.5f, 1.0f };
+	D3D12_VIEWPORT viewport{};
+	D3D12_RECT scissorRect{};
+	HANDLE fenceEvent;
+	uint64_t fenceValue = 0;
+	ComPtr<ID3D12Fence> fence = nullptr;
 
 };
 

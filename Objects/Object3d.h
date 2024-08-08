@@ -18,13 +18,14 @@ class Object3d
 {
 public:
 	void Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager);
+	void InitializeSkeleton(Object3dCommon* object3dCommon, SRVManager* srvManager);
 	void Update(Camera* camera);
 	void SkeltonUpdate(Camera* camera);
 	void AnimationUpdate(Camera* camera);
 	void Draw(ModelCommon* modelCommon);
 	void SkeltonDraw(ModelCommon* modelCommon);
 
-	ComPtr<ID3D12Resource> CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes);
+	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	Vector3 CalculatevalueV(const std::vector<Model::KeyFrameVector3>& keyframes, float time);
 	Quaternion CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time);
 	void ApplyAnimation(Model::Skelton& skelton, const Model::Animation& animation, float animationTime);
@@ -34,8 +35,8 @@ public:
 	void SetScale(const Vector3& scale) { transformMatrix.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
-	void SetCamera(Camera* camera) { this->camera = camera; }
-	bool SetIsAnimation(bool isAnimation) { return this->isAnimation = isAnimation; }
+	void SetCamera(Camera* camera) { this->camera_ = camera; }
+	bool SetIsAnimation(bool isAnimation) { return this->isAnimation_ = isAnimation; }
 	const Vector3& GetScale()const { return transformMatrix.scale; }
 	const Vector3& GetRotate()const { return transformMatrix.rotate; }
 	const Vector3& GetTranslate()const { return transformMatrix.translate; }
@@ -46,6 +47,12 @@ public:
 		Vector3 direction;
 		float intensity;
 	};
+	struct PointLight
+	{
+		Vector4 color;
+		Vector3 position;
+		float intensity;
+	};
 	DirectionalLight* GetDirectionalLightData() { return directionalLightData; }
 	DirectionalLight& GetDirectionalLight() { return directionalLight; }
 
@@ -54,11 +61,11 @@ private:
 	HRESULT hr = NULL;
 	Model* model_ = nullptr;
 	ModelCommon* modelCommon_ = nullptr;
-	SRVManager* srvManager = nullptr;
-	Camera* camera = nullptr;
-	
+	SRVManager* srvManager_ = nullptr;
+	Camera* camera_ = nullptr;
+
 	//Model::Animation& animation;
-	float animationTime = 0.0f;
+	float animationTime_ = 0.0f;
 	float skeltonAnimationTime = 0.0f;
 
 	DirectionalLight* directionalLightData = nullptr;
@@ -68,31 +75,40 @@ private:
 		{0.0f,-1.0f,0.0f},
 		1.0f
 	};
+	ComPtr<ID3D12Resource> directionalLightResource;
+
+	PointLight* pointLightData = nullptr;
+	PointLight pointLight =
+	{
+		{1.0f,1.0f,1.0f,1.0f},
+		{0.0f,-1.0f,0.0f},
+		1.0f
+	};
+	ComPtr<ID3D12Resource> pointLightResource;
+
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	ComPtr<ID3D12Resource> cameraResource;
 
 	struct TransformationMatrix
 	{
-		Matrix4x4 WVP;
-		Matrix4x4 World;
-		Matrix4x4 WorldInverseTranspose;
+		Matrix4x4 WVP = {};
+		Matrix4x4 World = {};
+		Matrix4x4 WorldInverseTranspose = {};
 	};
 
-	struct CameraTransform 
+	struct CameraTransform
 	{
-		Vector3 worldPosition;
+		Vector3 worldPosition = {};
 	};
 
 	TransformationMatrix* transformationMatrixData = nullptr;
 	CameraTransform* cameraData = nullptr;
 
-	EulerTransform transformMatrix;
-	Matrix4x4 worldViewProjectionMatrix;
+	EulerTransform transformMatrix = {};
+	Matrix4x4 worldViewProjectionMatrix = {};
 
-	Matrix4x4 skeltonSpaceMatrix;
+	Matrix4x4 skeltonSpaceMatrix = {};
 
-	ComPtr<ID3D12Resource> directionalLightResource;
-
-	bool isAnimation = false;
+	bool isAnimation_ = false;
 };
 

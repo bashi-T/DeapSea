@@ -3,7 +3,7 @@
 void GameOverScene::Init()
 {
 	sprite = new Sprite;
-	sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/GameOverExample.png");
+	sprite->Initialize(SpriteCommon::GetInstance(), "Resource/GameOverExample.png");
 	sprite->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprite->GetSize().x / 2),0.0f });
 	Camera::GetInstance()->SetTranslate({ 0.0f,7.0f,-20.0f });
 }
@@ -23,7 +23,7 @@ void GameOverScene::Update()
 
 void GameOverScene::Draw()
 {
-	sprite->Draw();
+	sprite->Draw(SpriteCommon::GetInstance());
 }
 
 void GameOverScene::Finalize()

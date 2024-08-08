@@ -6,10 +6,9 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::string textureFilePath)
+void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	this->spriteCommon_ = spriteCommon;
-	this->srvManager = srvManager;
 	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 6);
 	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
@@ -52,12 +51,12 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::
 	coordRightTop = { 1.0f, 0.0f };
 	coordRightBottom = { 1.0f, 1.0f };
 	coordLeftBottom = { 0.0f, 1.0f };
-	
+
 	InputData(Color);
 	materialData->material.textureFilePath = textureFilePath;
 	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
-	AdjestTextureSize();
+	//AdjestTextureSize();
 }
 
 void Sprite::Update()
@@ -67,9 +66,9 @@ void Sprite::Update()
 		MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	projectionMatrix =
 		MakeOrthographicMatrix(0.0f, 0.0f, float(WinAPP::clientWidth_), float(WinAPP::clientHeight_), 0.0f, 100.0f);
-	transformMatrix.translate = { position.x,position.y,0.0f };
-	transformMatrix.rotate = { 0.0f,0.0f,rotation };
-	transformMatrix.scale = { size.x,size.y,1.0f };
+	transformMatrix.translate = { position_.x,position_.y,0.0f };
+	transformMatrix.rotate = { 0.0f,0.0f,rotation_ };
+	transformMatrix.scale = { size_.x,size_.y,1.0f };
 	InputData(Color);
 
 	//ImGui::Begin("spriteEdit");
@@ -99,10 +98,10 @@ void Sprite::MakeBufferView()
 
 void Sprite::InputData(Vector4 color)
 {
-	float left = 0.0f - anchorPoint.x;
-	float right = 1.0f - anchorPoint.x;
-	float top = 0.0f - anchorPoint.y;
-	float bottom = 1.0f - anchorPoint.y;
+	float left = 0.0f - anchorPoint_.x;
+	float right = 1.0f - anchorPoint_.x;
+	float top = 0.0f - anchorPoint_.y;
+	float bottom = 1.0f - anchorPoint_.y;
 
 	if (isFlipX_)
 	{
@@ -146,6 +145,7 @@ void Sprite::InputData(Vector4 color)
 	indexData[5] = 2;
 
 	materialData[0].color = color;
+	materialData[0].enableLighting = false;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
@@ -161,8 +161,9 @@ void Sprite::InputData(Vector4 color)
 	transformationMatrixData->World = worldMatrix;
 }
 
-void Sprite::Draw()
+void Sprite::Draw(SpriteCommon* spriteCommon)
 {
+	this->spriteCommon_ = spriteCommon;
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -176,23 +177,16 @@ void Sprite::Draw()
 		IASetIndexBuffer(&indexBufferView);
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
-		0, materialResource->GetGPUVirtualAddress());
+			0, materialResource->GetGPUVirtualAddress());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
-		1, transformationMatrixResource->GetGPUVirtualAddress());
+			1, transformationMatrixResource->GetGPUVirtualAddress());
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		spriteCommon_->GetDx12Common()->
-		GetRtvHandles(srvManager->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-		OMSetRenderTargets(1, &rtv, false, &dsv);
-
-	srvManager->SetGraphicsRootDescriptorTable(
+	SRVManager::GetInstance()->SetGraphicsRootDescriptorTable(
 		2, materialData->material.textureIndex);
 
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-		DrawIndexedInstanced(6, 1, 0, 0, 0);
+		DrawIndexedInstanced(indexBufferView.SizeInBytes, 1, 0, 0, 0);
 }
 
 ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes)
@@ -244,7 +238,7 @@ ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -263,7 +257,7 @@ void Sprite::AdjestTextureSize()
 		GetMetaData(materialData->material.textureFilePath);
 	textureSize.x = static_cast<float>(metadata.width);
 	textureSize.y = static_cast<float>(metadata.height);
-	size = textureSize;
+	size_ = textureSize;
 }
 
 

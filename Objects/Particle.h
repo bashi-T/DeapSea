@@ -26,10 +26,10 @@ class Particle
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
-	void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon);
+	void Initialize(const std::string& filename, Object3dCommon* object3dCommon);
 	void Update();
 	ComPtr<IDxcBlob> CompileShader(
-	    const std::wstring& filePath,
+		const std::wstring& filePath,
 		const wchar_t* profile,
 		IDxcUtils* dxcUtils,
 		IDxcCompiler3* dxcCompiler,
@@ -107,12 +107,10 @@ public:
 private:
 	Debug* debug_;
 	WinAPP* sWinApp;
-	SRVManager* srvManager = nullptr;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
 	Object3dCommon* object3dCommon_;
 	Camera* camera_;
-	DX12Common* dxCommon;
 	HRESULT hr = NULL;
 
 	uint32_t kNumInstance = 10;
@@ -182,8 +180,6 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;
 
 	Vector4 ColorSphere[1];
-
-	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
 
 	Vector4 LeftTop[1];
 	Vector4 RightTop[1];

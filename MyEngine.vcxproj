@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Commons\SkyBoxCommon.cpp" />
+    <ClCompile Include="Objects\SkyBox.cpp" />
     <ClCompile Include="Scene\ClearScene.cpp" />
     <ClCompile Include="GameObject\EnemyBullet.cpp" />
     <ClCompile Include="GameObject\PlayerBullet.cpp" />
@@ -50,6 +52,8 @@
     <ClCompile Include="GameObject\Whale.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Commons\SkyBoxCommon.h" />
+    <ClInclude Include="Objects\SkyBox.h" />
     <ClInclude Include="Scene\ClearScene.h" />
     <ClInclude Include="GameObject\EnemyBullet.h" />
     <ClInclude Include="GameObject\PlayerBullet.h" />
@@ -139,6 +143,7 @@
   <ItemGroup>
     <None Include="HLSL\Object3d.hlsli" />
     <None Include="HLSL\Particle.hlsli" />
+    <None Include="HLSL\SkyBox.hlsli" />
     <None Include="HLSL\Sprite.hlsli" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

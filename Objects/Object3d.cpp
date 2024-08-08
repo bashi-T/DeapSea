@@ -4,12 +4,14 @@
 void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager)
 {
 	this->object3dCommon_ = object3dCommon;
-	this->srvManager = srvManager;
+	this->srvManager_ = srvManager;
 
-	transformationMatrixResource = CreateBufferResource(object3dCommon_,sizeof(TransformationMatrix));
-	directionalLightResource = CreateBufferResource(object3dCommon_, sizeof(DirectionalLight));
-	this->camera = object3dCommon_->GetDefaultCamera();
-	cameraResource = CreateBufferResource(object3dCommon_, sizeof(CameraTransform));
+	//object3dCommon_->Initialize(DX12Common::GetInstance());
+	//object3dCommon_->SetDefaultCamera(camera->GetInstance());
+	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
+	this->camera_ = object3dCommon_->GetDefaultCamera();
+	cameraResource = CreateBufferResource(sizeof(CameraTransform));
 	transformMatrix =
 	{
 	{1.0f, 1.0f, 1.0f},
@@ -19,7 +21,34 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager
 
 	transformationMatrixResource->Map(
 		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-    directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+	directionalLightData->color = directionalLight.color;
+	directionalLightData->direction = directionalLight.direction;
+	directionalLightData->intensity = directionalLight.intensity;
+}
+
+void Object3d::InitializeSkeleton(Object3dCommon* object3dCommon, SRVManager* srvManager)
+{
+	this->object3dCommon_ = object3dCommon;
+	this->srvManager_ = srvManager;
+
+	//object3dCommon_->InitializeSkeleton(DX12Common::GetInstance());
+	//object3dCommon_->SetDefaultCamera(camera->GetInstance());
+	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
+	this->camera_ = object3dCommon_->GetDefaultCamera();
+	cameraResource = CreateBufferResource(sizeof(CameraTransform));
+	transformMatrix =
+	{
+	{1.0f, 1.0f, 1.0f},
+	{0.0f, 0.0f, 0.0f},
+	{0.0f, 0.0f, 0.0f}
+	};
+
+	transformationMatrixResource->Map(
+		0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
 	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
 	directionalLightData->color = directionalLight.color;
 	directionalLightData->direction = directionalLight.direction;
@@ -70,16 +99,19 @@ void Object3d::AnimationUpdate(Camera* camera)
 		camera->GetWorldMatrix().m[3][1],
 		camera->GetWorldMatrix().m[3][2]
 	};
+	directionalLightData->color = directionalLight.color;
+	directionalLightData->direction = directionalLight.direction;
+	directionalLightData->intensity = directionalLight.intensity;
 
-	if (isAnimation == true)
+	if (isAnimation_ == true)
 	{
-		animationTime += 1.0f / 60.0f;
+		animationTime_ += 1.0f / 60.0f;
 	}
-	animationTime = std::fmod(animationTime, model_->GetAnimation().duration);
+	animationTime_ = std::fmod(animationTime_, model_->GetAnimation().duration);
 	Model::NodeAnimation& rootNodeAnimation = model_->GetAnimation().nodeAnimations[model_->GetModelData()->rootNode.name];
-	Vector3 translate = CalculatevalueV(rootNodeAnimation.translate.keyframes, animationTime);
-	Quaternion rotate = CalculatevalueQ(rootNodeAnimation.rotate.keyframes, animationTime);
-	Vector3 scale = CalculatevalueV(rootNodeAnimation.scale.keyframes, animationTime);
+	Vector3 translate = CalculatevalueV(rootNodeAnimation.translate.keyframes, animationTime_);
+	Quaternion rotate = CalculatevalueQ(rootNodeAnimation.rotate.keyframes, animationTime_);
+	Vector3 scale = CalculatevalueV(rootNodeAnimation.scale.keyframes, animationTime_);
 	Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
 
 	transformationMatrixData->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
@@ -103,7 +135,11 @@ void Object3d::SkeltonUpdate(Camera* camera)
 		camera->GetWorldMatrix().m[3][1],
 		camera->GetWorldMatrix().m[3][2]
 	};
-	if(isAnimation==true)
+	directionalLightData->color = directionalLight.color;
+	directionalLightData->direction = directionalLight.direction;
+	directionalLightData->intensity = directionalLight.intensity;
+
+	if (isAnimation_ == true)
 	{
 		skeltonAnimationTime += 1.0f / 60.0f;
 	}
@@ -135,16 +171,13 @@ void Object3d::SkeltonUpdate(Camera* camera)
 	{
 		assert(jointIndex < model_->GetSkinCluster().inverseBindPoseMatrices.size());
 
-		model_->GetSkinCluster().mappedPalette[jointIndex].skeltonSpaceMatrix = 
+		model_->GetSkinCluster().mappedPalette[jointIndex].skeltonSpaceMatrix =
 			Multiply(model_->GetSkinCluster().inverseBindPoseMatrices[jointIndex],
 				model_->GetSkelton().joints[jointIndex].skeltonSpaceMatrix);
-		
+
 		model_->GetSkinCluster().mappedPalette[jointIndex].skeltonSpaceInverseTransposeMatrix =
 			Transpose(Inverse(model_->GetSkinCluster().mappedPalette[jointIndex].skeltonSpaceMatrix));
 	}
-
-	auto&& test = model_->GetSkinCluster();
-	(void)test;
 }
 
 void Object3d::Draw(ModelCommon* modelCommon)
@@ -160,28 +193,21 @@ void Object3d::Draw(ModelCommon* modelCommon)
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
-		srvManager->GetBackBufferIndex());
-
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
-		OMSetRenderTargets(1, &rtv, false, &dsv);
+		SetGraphicsRootConstantBufferView(
+			1, transformationMatrixResource->GetGPUVirtualAddress());
 
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
-		1, transformationMatrixResource->GetGPUVirtualAddress());
-
-	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
-		SetGraphicsRootConstantBufferView(
-		3, directionalLightResource->GetGPUVirtualAddress());
+			4, directionalLightResource->GetGPUVirtualAddress());
 
 	object3dCommon_->GetDx12Common()->GetCommandList()->
 		SetGraphicsRootConstantBufferView(
-		4, cameraResource->GetGPUVirtualAddress());
+			3, cameraResource->GetGPUVirtualAddress());
 
 	if (model_)
 	{
-		model_->Draw(modelCommon_,srvManager);
+		model_->Draw(modelCommon_, srvManager_);
 	}
 }
 
@@ -198,13 +224,6 @@ void Object3d::SkeltonDraw(ModelCommon* modelCommon)
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
-		srvManager->GetBackBufferIndex());
-
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
-	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
-		OMSetRenderTargets(1, &rtv, false, &dsv);
-
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
 			1, transformationMatrixResource->GetGPUVirtualAddress());
@@ -219,13 +238,12 @@ void Object3d::SkeltonDraw(ModelCommon* modelCommon)
 
 	if (model_)
 	{
-		model_->SkeltonDraw(modelCommon_, srvManager);
+		model_->SkeltonDraw(modelCommon_, srvManager_);
 	}
 }
 
-ComPtr<ID3D12Resource> Object3d::CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes)
+ComPtr<ID3D12Resource> Object3d::CreateBufferResource(size_t sizeInBytes)
 {
-	this->object3dCommon_ = object3dCommon;
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -270,8 +288,8 @@ Vector3 Object3d::CalculatevalueV(const std::vector<Model::KeyFrameVector3>& key
 			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
 			return Lerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
-		return (*keyframes.rbegin()).value;
 	}
+	return (*keyframes.rbegin()).value;
 }
 
 Quaternion Object3d::CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time)
@@ -291,7 +309,6 @@ Quaternion Object3d::CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion
 		}
 	}
 	return (*keyframes.rbegin()).value;
-
 }
 
 void Object3d::ApplyAnimation(Model::Skelton& skelton, const Model::Animation& animation, float animationTime)
