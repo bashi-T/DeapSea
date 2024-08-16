@@ -41,10 +41,10 @@ void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height
 	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
 
 	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
-	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
 	materialResource = CreateBufferResource(sizeof(Material));
-	materialResourceSphere = CreateBufferResource(sizeof(Material));
 	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
+	materialResourceSphere = CreateBufferResource(sizeof(Material));
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));

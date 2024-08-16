@@ -5,7 +5,7 @@ void Whale::Initialize()
 	object3d = new Object3d; 
 	player = new Player;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	ModelManager::GetInstance()->LoadSkeltonAnimation(whaleModel, whaleSkin, SRVManager::GetInstance());
+	ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin);
 	object3d->SetModel(whaleModel);
 	Model* model = ModelManager::GetInstance()->FindModel(whaleModel);
 	Model::ModelData* modelData = model->GetModelData();
@@ -155,8 +155,7 @@ void Whale::Update()
 
 	nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
 	object3d->SetTranslate(Add(object3d->GetTranslate(), nowWhaleSpeed));
-	object3d->SetIsAnimation(true);
-	object3d->SkeltonUpdate(Camera::GetInstance());
+	object3d->Update(Camera::GetInstance());
 #ifdef _DEBUG
 
 	ImGui::Begin("whale");
@@ -168,7 +167,7 @@ void Whale::Update()
 
 void Whale::Draw()
 {
-	object3d->SkeltonDraw(ModelManager::GetInstance()->GetModelCommon());
+	object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
 }
 
 void Whale::OnCollision()

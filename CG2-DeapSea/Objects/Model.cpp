@@ -4,69 +4,80 @@ void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, s
 {
 	this->modelCommon_ = modelCommon;
 
-	modelData = LoadModelFile("Resource", objFilePath);
-	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
-	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
-	indexResource = CreateBufferResource(modelCommon_, sizeof(uint32_t) * modelData.indices.size());
+	modelData_ = LoadModelFile("Resource", objFilePath);
+	vertexResource = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	materialResource = CreateBufferResource(sizeof(Material));
+	indexResource = CreateBufferResource(sizeof(uint32_t) * modelData_.indices.size());
 
 	MakeBufferView();
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	modelData.material.textureFilePath = TextureFilePath;
+	modelData_.material.textureFilePath = TextureFilePath;
 	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
-	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = true;
-	materialData[0].uvTransform = MakeIdentity4x4();
-	materialData[0].shininess = 50.0f; 
-
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-	std::memcpy(indexData, modelData.indices.data(), sizeof(uint32_t) * modelData.indices.size());
-}
-
-void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
-{
-	this->modelCommon_ = modelCommon;
-
-	modelData = LoadModelFile("Resource", objFilePath);
-	animation = LoadAnimationFile("Resource", objFilePath);
-	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
-	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
-	indexResource = CreateBufferResource(modelCommon_, sizeof(uint32_t) * modelData.indices.size());
-
-	MakeBufferView();
-
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-
-	modelData.material.textureFilePath = TextureFilePath;
-	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+	//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";
+	//TextureManager::GetInstance()->LoadTexture("Resource/rostock_laage_airport_4k.dds");
+	//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
+	//modelData_.isEnvironment = false;
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData[0].enableLighting = true;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	materialData[0].shininess = 50.0f;
 
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-	std::memcpy(indexData, modelData.indices.data(), sizeof(uint32_t) * modelData.indices.size());
+	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
+}
+
+void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
+{
+	this->modelCommon_ = modelCommon;
+	//modelCommon_->MakePSO(DX12Common::GetInstance());
+
+	modelData_ = LoadModelFile("Resource", objFilePath);
+	animation_ = LoadAnimationFile("Resource", objFilePath);
+	vertexResource = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	materialResource = CreateBufferResource(sizeof(Material));
+	indexResource = CreateBufferResource(sizeof(uint32_t) * modelData_.indices.size());
+
+	MakeBufferView();
+
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+
+	modelData_.material.textureFilePath = TextureFilePath;
+	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
+	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+
+	//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";
+	//TextureManager::GetInstance()->LoadTexture("Resource/rostock_laage_airport_4k.dds");
+	//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
+
+	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	materialData[0].enableLighting = true;
+	materialData[0].uvTransform = MakeIdentity4x4();
+	materialData[0].shininess = 50.0f;
+
+	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 }
 
 void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager)
 {
 	this->modelCommon_ = modelCommon;
 	this->srvManager_ = srvManager;
+	//modelCommon_->MakeSkeltonPSO(DX12Common::GetInstance());
 
-	modelData = LoadModelFile("Resource", objFilePath);
-	animation = LoadAnimationFile("Resource", objFilePath);
-	skelton = CreateSkelton(modelData.rootNode);
-	vertexResource = CreateBufferResource(modelCommon_, sizeof(VertexData) * modelData.vertices.size());
-	materialResource = CreateBufferResource(modelCommon_, sizeof(Material));
-	indexResource = CreateBufferResource(modelCommon_, sizeof(uint32_t) * modelData.indices.size());
+	modelData_ = LoadModelFile("Resource", objFilePath);
+	animation_ = LoadAnimationFile("Resource", objFilePath);
+	skelton_ = CreateSkelton(modelData_.rootNode);
+	vertexResource = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	materialResource = CreateBufferResource(sizeof(Material));
+	indexResource = CreateBufferResource(sizeof(uint32_t) * modelData_.indices.size());
 
 	MakeBufferView();
 
@@ -74,19 +85,19 @@ void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath,
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
-	modelData.material.textureFilePath = TextureFilePath;
+	modelData_.material.textureFilePath = TextureFilePath;
 	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData[0].enableLighting = true;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	materialData[0].shininess = 50.0f;
 
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-	std::memcpy(indexData, modelData.indices.data(), sizeof(uint32_t) * modelData.indices.size());
+	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 
-	CreateSkinCluster(skelton, modelData, srvManager_->GetSrvDescriptorHeap(),
+	CreateSkinCluster(skelton_, modelData_, srvManager_->GetSrvDescriptorHeap(),
 		modelCommon_->GetDx12Common()->GetDevice()->
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 }
@@ -108,10 +119,16 @@ void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferView);
 	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData.material.textureIndex);
+		2, modelData_.material.textureIndex);
+
+	//if (modelData_.isEnvironment == true)
+	//{
+	//	srvManager_->SetGraphicsRootDescriptorTable(
+	//		5, modelData_.eMaterial.textureIndex);
+	//}
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
-		UINT(modelData.indices.size()), 1, 0, 0, 0);
+		UINT(modelData_.indices.size()), 1, 0, 0, 0);
 }
 
 void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
@@ -139,20 +156,19 @@ void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 		SetGraphicsRootDescriptorTable(
 			5, skinCluster.paletteSrvHandle.second);
 	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData.material.textureIndex); 
+		2, modelData_.material.textureIndex);
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
-		UINT(modelData.indices.size()), 1, 0, 0, 0);
+		UINT(modelData_.indices.size()), 1, 0, 0, 0);
 }
 
 void Model::Memcpy()
 {
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 }
 
-ComPtr<ID3D12Resource> Model::CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes)
+ComPtr<ID3D12Resource> Model::CreateBufferResource(size_t sizeInBytes)
 {
-	this->modelCommon_ = modelCommon;
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -202,7 +218,7 @@ Model::ModelData Model::LoadModelFile(const std::string& directryPath, const std
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
 			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 
-			modelData.vertices[vertexIndex].position = {-position.x,position.y,position.z,1.0f};
+			modelData.vertices[vertexIndex].position = { -position.x,position.y,position.z,1.0f };
 			modelData.vertices[vertexIndex].normal = { -normal.x,normal.y,normal.z };
 			modelData.vertices[vertexIndex].texcoord = { texcoord.x,texcoord.y };
 		}
@@ -258,36 +274,14 @@ Model::ModelData Model::LoadModelFile(const std::string& directryPath, const std
 	return modelData;
 }
 
-//Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-//{
-//	MaterialData materialData;
-//	std::string line;
-//
-//	std::ifstream file(directoryPath + "/" + filename);
-//	assert(file.is_open());
-//
-//	while (std::getline(file, line)) {
-//		std::string identifier;
-//		std::stringstream s(line);
-//		s >> identifier;
-//
-//		if (identifier == "map_Kd") {
-//			std::string textureFilename;
-//			s >> textureFilename;
-//			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-//		}
-//	}
-//	return materialData;
-//}
-
 void Model::MakeBufferView()
 {
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
+	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
-	indexBufferView.SizeInBytes = sizeof(uint32_t) * modelData.indices.size();
+	indexBufferView.SizeInBytes = sizeof(uint32_t) * UINT(modelData_.indices.size());
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
@@ -300,7 +294,7 @@ Model::Node Model::ReadNode(aiNode* node)
 	result.qTransform.scale = { scale.x,scale.y,scale.z };
 	result.qTransform.rotate = { rotate.x,-rotate.y,-rotate.z,rotate.w };
 	result.qTransform.translate = { -translate.x,translate.y,translate.z };
-	result.localMatrix = 
+	result.localMatrix =
 		MakeAffineMatrix(result.qTransform.scale, result.qTransform.rotate, result.qTransform.translate);
 
 	result.name = node->mName.C_Str();
@@ -326,7 +320,7 @@ Model::Animation Model::LoadAnimationFile(const std::string& directoryPath, cons
 	{
 		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
 		NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
-	
+
 		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex)
 		{
 			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
@@ -370,19 +364,20 @@ Model::Skelton Model::CreateSkelton(const Node& rootNode)
 
 int32_t Model::CreateJoint(const Node& node, const std::optional<int32_t>parent, std::vector<Joint>& joints)
 {
-	 Joint joint;
-	 joint.name = node.name;
-	 joint.localMatrix = node.localMatrix;
-	 joint.skeltonSpaceMatrix = MakeIdentity4x4();
-	 joint.transform = node.qTransform;
-	 joint.index = int32_t(joints.size());
-	 joint.parent = parent;
-	 joints.push_back(joint);
-	 for (const Node& child : node.children)
-	 {
-		 int32_t childIndex = CreateJoint(child, joint.index, joints);
-	 }
-	 return joint.index;
+	Joint joint;
+	joint.name = node.name;
+	joint.localMatrix = node.localMatrix;
+	joint.skeltonSpaceMatrix = MakeIdentity4x4();
+	joint.transform = node.qTransform;
+	joint.index = int32_t(joints.size());
+	joint.parent = parent;
+	joints.push_back(joint);
+	for (const Node& child : node.children)
+	{
+		int32_t childIndex = CreateJoint(child, joint.index, joints);
+		joints[joint.index].children.push_back(childIndex);
+	}
+	return joint.index;
 }
 
 Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelData& modelData,
@@ -390,13 +385,13 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 {
 	WellForGPU* mappedParette = nullptr;
 	//parette用resource作成
-	skinCluster.paletteResource = CreateBufferResource(modelCommon_, sizeof(WellForGPU) * skelton.joints.size());
+	skinCluster.paletteResource = CreateBufferResource(sizeof(WellForGPU) * skelton.joints.size());
 	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedParette));
 	skinCluster.mappedPalette = { mappedParette,skelton.joints.size() };
 	uint32_t index = srvManager_->Allocate();
 
-	//skinCluster.paletteSrvHandle.first = modelCommon_->GetDx12Common()->GetCPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
-	//skinCluster.paletteSrvHandle.second = modelCommon_->GetDx12Common()->GetGPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
+	skinCluster.paletteSrvHandle.first = modelCommon_->GetDx12Common()->GetCPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
+	skinCluster.paletteSrvHandle.second = modelCommon_->GetDx12Common()->GetGPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
 	skinCluster.paletteSrvHandle.first = srvManager_->GetCPUDescriptorHandle(index);
 	skinCluster.paletteSrvHandle.second = srvManager_->GetGPUDescriptorHandle(index);
 
@@ -414,7 +409,7 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 		skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
 
 	VertexInfluence* mappedInfluence = nullptr;
-	skinCluster.influenceResource = CreateBufferResource(modelCommon_, sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.influenceResource = CreateBufferResource(sizeof(VertexInfluence) * modelData.vertices.size());
 	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
 	skinCluster.mappedInfluence = { mappedInfluence,modelData.vertices.size() };
@@ -440,12 +435,12 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 		for (const auto& vertexWeight : jointWeight.second.vertexWeights)
 		{
 			auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
-			for (uint32_t index = 0; index < kNumMaxInfluence; ++index)
+			for (uint32_t index_ = 0; index_ < kNumMaxInfluence; ++index_)
 			{
-				if (currentInfluence.weights[index] == 0.0f)
+				if (currentInfluence.weights[index_] == 0.0f)
 				{
-					currentInfluence.weights[index] = vertexWeight.weight;
-					currentInfluence.jointIndices[index] = (*it).second;
+					currentInfluence.weights[index_] = vertexWeight.weight;
+					currentInfluence.jointIndices[index_] = (*it).second;
 					break;
 				}
 			}

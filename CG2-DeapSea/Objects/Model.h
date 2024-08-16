@@ -54,6 +54,8 @@ public:
 		std::vector<uint32_t> indices;
 		MaterialData material;
 		Node rootNode;
+		//MaterialData eMaterial;
+		//bool isEnvironment = true;
 	};
 	struct Joint
 	{
@@ -63,12 +65,12 @@ public:
 		Matrix4x4 worldMatrix;
 		std::string name;
 		std::vector<int32_t>children;
-		int32_t index;
+		int32_t index = 0;
 		std::optional<int32_t>parent;
 	};
 	struct Skelton
 	{
-		int32_t root;
+		int32_t root = 0;
 		std::map<std::string, int32_t>jointMap;
 		std::vector<Joint>joints;
 	};
@@ -99,7 +101,7 @@ public:
 	};
 	struct Animation
 	{
-		float duration;//アニメーション全体の尺
+		float duration = 0.0f;//アニメーション全体の尺
 		std::map<std::string, NodeAnimation>nodeAnimations;
 	};
 	const uint32_t kNumMaxInfluence = 4;
@@ -118,11 +120,11 @@ public:
 	{
 		std::vector<Matrix4x4>inverseBindPoseMatrices;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource>influenceResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>influenceResource = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
 		std::span<VertexInfluence>mappedInfluence;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource>paletteResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>paletteResource = nullptr;
 		std::span<WellForGPU>mappedPalette;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>paletteSrvHandle;
 	};
@@ -133,9 +135,8 @@ public:
 	void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void Memcpy();
-	ComPtr<ID3D12Resource> CreateBufferResource(ModelCommon* modelCommon, size_t sizeInBytes);
+	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	ModelData LoadModelFile(const std::string& directryPath, const std::string& filename);
-	//MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	void MakeBufferView();
 	Node ReadNode(aiNode* node);
 	Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
@@ -143,20 +144,20 @@ public:
 	int32_t CreateJoint(
 		const Node& node,
 		const std::optional<int32_t>parent,
-		std::vector<Joint>&joints);
+		std::vector<Joint>& joints);
 	SkinCluster CreateSkinCluster(
 		const Skelton& skelton,
 		const ModelData& modelData,
 		const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap,
 		uint32_t descriptorSize);
 
-	ModelData* GetModelData() { return &modelData; }
-	Animation& GetAnimation() { return animation; }
-	Skelton& GetSkelton() { return skelton; }
+	ModelData* GetModelData() { return &modelData_; }
+	Animation& GetAnimation() { return animation_; }
+	Skelton& GetSkelton() { return skelton_; }
 	const SkinCluster& GetSkinCluster() { return skinCluster; }
 private:
-	ModelData modelData;
-	ModelCommon* modelCommon_;
+	ModelData modelData_;
+	ModelCommon* modelCommon_ = nullptr;
 	SRVManager* srvManager_ = nullptr;
 	HRESULT hr = NULL;
 
@@ -171,12 +172,12 @@ private:
 	Material* materialData = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;
 
-	Animation animation;
+	Animation animation_;
 
-	Skelton skelton;
+	Skelton skelton_;
 
 	SkinCluster skinCluster;
-	
+
 	EulerTransform uvTransform
 	{
 			{1.0f,1.0f,1.0f},

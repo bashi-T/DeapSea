@@ -28,7 +28,7 @@ private:
 	std::list<EnemyBullet*> eBullets;
 	Player* player_;
 	Whale* whale_;
-	const std::string enemyModel = "plane/plane.gltf";
+	const std::string enemyModel = "fish/improvisedFish.obj";
 	const std::string enemySkin = "Resource/uvChecker.png";
 
 	uint32_t shotInterval = 0;

@@ -17,7 +17,7 @@ void EnemyBullet::Initialize(Vector3 firstPos)
 	model->Memcpy();
 	object3d->SetTranslate({ firstPos.x /*+ 0.01f*/, firstPos.y,firstPos.z });
 	object3d->SetScale({ 0.5f,0.5f,0.5f });
-	object3d->SetIsAnimation(true);
+	object3d->SetIsAnimation(false);
 }
 
 void EnemyBullet::Update()

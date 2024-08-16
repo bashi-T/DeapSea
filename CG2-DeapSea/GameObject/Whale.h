@@ -23,7 +23,7 @@ public:
 private:
 	Object3d* object3d;
 	Player* player;
-	const std::string whaleModel = "simpleSkin/simpleSkin.gltf";
+	const std::string whaleModel = "whale/improvisedWhale.gltf";
 	const std::string whaleSkin = "Resource/monsterBall.png";
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };
 	Vector3 nowWhaleSpeed = { 0.0f,0.0f,0.0f };

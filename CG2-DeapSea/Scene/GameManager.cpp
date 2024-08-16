@@ -31,6 +31,7 @@ int GameManager::Run()
 	modelCommon = new ModelCommon;
 	camera = new Camera();
 	particle = new Particle;
+	skyDome = new SkyDome;
 	std::vector<Model*> models;
 	//bool useWorldMap = true;
 
@@ -55,7 +56,7 @@ int GameManager::Run()
 
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	SPCommon->Initialize(dx12Common);
-
+	skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 	//sceneArr_[INGAME]->Init();
 
@@ -80,6 +81,7 @@ int GameManager::Run()
 			sceneArr_[currentSceneNo_]->Init();
 		}
 		imgui->Update();
+		skyDome->Update();
 		sceneArr_[currentSceneNo_]->Update();
 #ifdef _DEBUG
 		ImGui::Begin("camera");
@@ -119,6 +121,7 @@ int GameManager::Run()
 			break;
 		}
 		srvManager->PreDraw();
+		skyDome->Draw();
 		sceneArr_[currentSceneNo_]->Draw();
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());

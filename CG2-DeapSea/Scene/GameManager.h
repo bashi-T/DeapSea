@@ -16,6 +16,7 @@
 #include"Objects/model.h"
 #include"Managers/TextureManager.h"
 #include"Managers/SRVManager.h"
+#include"Objects/SkyDome.h"
 
 class GameManager
 {
@@ -34,7 +35,7 @@ private:
 	ModelCommon* modelCommon;
 	Camera* camera;
 	Particle* particle;
-
+	SkyDome* skyDome;
 public: 
 	GameManager();
 	~GameManager();

@@ -27,6 +27,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 {
 	if (textureDatas.contains(filePath))
 	{
+		//textureDatas.at(filePath);
 		return;
 	}
 
