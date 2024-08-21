@@ -6,6 +6,7 @@
 #include"Commons/Object3dCommon.h"
 #include"Objects/Particle.h"
 #include "GameManager.h"
+#include"Objects/SkyDome.h"
 
 class TitleScene:public SceneManager
 {
@@ -22,5 +23,6 @@ private:
 	std::vector<Object3d*> objects3d;
 	std::vector <Particle*> particles;
 	Sprite* sprite;
+	SkyDome* skyDome;
 };
 

@@ -4,17 +4,19 @@ void SkyDome::Initialize()
 {
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+	std::string model_ = "world/skyDome.obj";
+	std::string skin = "Resource/monsterBall.png";
 	ModelManager::GetInstance()->LoadModel(model_, skin);
 	object3d->SetModel(model_);
 	Model* model = ModelManager::GetInstance()->FindModel(model_);
-	for (Model::VertexData& vertex : model->GetModelData()->vertices)
+	Model::ModelData* modelData = model->GetModelData();
+	for (Model::VertexData& vertex : modelData->vertices)
 	{
 		vertex.normal.x = vertex.position.x;
 		vertex.normal.y = vertex.position.y;
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	object3d->SetTranslate({ 0.0f,0.0f,0.0f });
 	//object3d->SetScale({ -200.0f,200.0f,200.0f });
 }
 

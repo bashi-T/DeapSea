@@ -10,31 +10,34 @@
 class Enemy
 {
 public:
-	void Initialize(Player*player, Whale* whale);
-	void Update();
-	void Draw();
+	void Initialize(Player* player, Whale* whale, int sort);
+	void Update(int sort);
+	void Draw(int sort);
 	void Shot();
 	void OnCollision();
 	void SetTranslate(Vector3 translate);
 	void SetEnemyVector(Vector3 translate);
+	void SetSort(int i) { sort = i; }
 
 	bool IsDead()const { return isDead; }
 	const std::list<EnemyBullet*>& GetBullets()const { return eBullets; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
 	OBB GetCollision() { return eCollision; }
-
+	int GetSort() { return sort; }
 private:
 	Object3d* object3d;
 	std::list<EnemyBullet*> eBullets;
 	Player* player_;
 	Whale* whale_;
-	const std::string enemyModel = "fish/improvisedFish.obj";
-	const std::string enemySkin = "Resource/uvChecker.png";
 
 	uint32_t shotInterval = 0;
 	bool isShot = false;
 	bool isDead = false;
 	OBB eCollision;
 	Vector3 enemyVector;
+	int sort;
+	int moveInterval = 0;
+	//const std::string enemyModel;
+	//const std::string enemySkin;
 };
 

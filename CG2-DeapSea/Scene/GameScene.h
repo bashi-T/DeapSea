@@ -7,9 +7,12 @@
 #include"GameObject/Whale.h"
 #include"GameObject/Enemy.h"
 #include "GameManager.h"
+#include <random>
 
 class GameScene:public SceneManager
 {
+	enum EnemySort { NORMAL, STRAIGHT };
+
 public:
 	void Init() override;
 	void Update() override;

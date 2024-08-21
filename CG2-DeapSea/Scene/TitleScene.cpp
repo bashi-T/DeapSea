@@ -77,6 +77,8 @@ void TitleScene::Init()
 	sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/Titleexample.png");
 	sprite->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprite->GetSize().x / 2),0.0f });
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
+	skyDome = new SkyDome;
+	skyDome->Initialize();
 }
 
 void TitleScene::Update()
@@ -132,6 +134,7 @@ void TitleScene::Update()
 	{
 		particle->Update();
 	}
+	skyDome->Update();
 	sprite->Update();
 	if (Input::GetInstance()->GetJoystickState(0, joyState))
 	{
@@ -157,6 +160,7 @@ void TitleScene::Draw()
 	{
 		particle->Draw();
 	}
+	skyDome->Draw();
 	sprite->Draw();
 }
 
