@@ -12,6 +12,7 @@ TextureManager* TextureManager::GetInstance()
 
 void TextureManager::Finalize()
 {
+	textureDatas.clear();
 	delete instance;
 	instance = nullptr;
 }
@@ -27,7 +28,6 @@ void TextureManager::LoadTexture(const std::string& filePath)
 {
 	if (textureDatas.contains(filePath))
 	{
-		//textureDatas.at(filePath);
 		return;
 	}
 
@@ -77,6 +77,7 @@ void TextureManager::LoadTextureforSRV(const std::string& filePath)
 {
 	if (textureDatas.contains(filePath))
 	{
+		textureDatas[filePath] = textureDatas.at(filePath);
 		return;
 	}
 

@@ -27,6 +27,7 @@ public:
 	const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
 	uint32_t GetSrvIndex(const std::string& filePath);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVHandleGPU(const std::string& filePath);
+	std::unordered_map<std::string, TextureData>GetTextureData() { return textureDatas; }
 
 	void UploadTextureData(
 		ID3D12Resource* texture,

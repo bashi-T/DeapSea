@@ -5,7 +5,7 @@ void SkyDome::Initialize()
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	std::string model_ = "world/skyDome.obj";
-	std::string skin = "Resource/civ6.png";
+	std::string skin = "Resource/sea.png";
 	ModelManager::GetInstance()->LoadModel(model_, skin);
 	object3d->SetModel(model_);
 	Model* model = ModelManager::GetInstance()->FindModel(model_);
@@ -17,7 +17,7 @@ void SkyDome::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	object3d->SetScale({ -200.0f,200.0f,200.0f });
+	object3d->SetScale({ -400.0f,400.0f,400.0f });
 }
 
 void SkyDome::Update()
@@ -33,20 +33,6 @@ void SkyDome::Draw()
 void SkyDome::SphereInitialize()
 {
 
-	//Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
-	//transformMatrixSphere = {
-	//{1.0f, 1.0f, 1.0f},
-	//{0.0f, 0.0f, 0.0f},
-	//{0.0f, 0.0f, 0.0f}
-	//};
-
-	//vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
-	//materialResourceSphere = CreateBufferResource(sizeof(Material));
-	//transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
-	//directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
-	//directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-
-	//indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
 }
 
 void SkyDome::SphereUpdate()

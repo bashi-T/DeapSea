@@ -17,6 +17,7 @@
 #include"Managers/TextureManager.h"
 #include"Managers/SRVManager.h"
 #include"Objects/SkyDome.h"
+#include"Objects/Mesh.h"
 
 class GameManager
 {
@@ -36,6 +37,7 @@ private:
 	Camera* camera;
 	Particle* particle;
 	SkyDome* skyDome;
+	Mesh* mesh;
 public: 
 	GameManager();
 	~GameManager();

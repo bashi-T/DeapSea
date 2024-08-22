@@ -15,7 +15,7 @@ void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, s
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	modelData_.material.textureFilePath = TextureFilePath;
-	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
+	TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
 	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
 	//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";

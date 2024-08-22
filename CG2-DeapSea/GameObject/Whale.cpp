@@ -5,7 +5,7 @@ void Whale::Initialize()
 	object3d = new Object3d; 
 	player = new Player;
 	const std::string whaleModel = "whale/improvisedWhale2.obj";
-	const std::string whaleSkin = "Resource/sea.png";
+	const std::string whaleSkin = "Resource/whale5.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin);
 	object3d->SetModel(whaleModel);

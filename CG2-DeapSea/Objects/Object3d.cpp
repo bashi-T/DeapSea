@@ -270,8 +270,8 @@ Vector3 Object3d::CalculatevalueV(const std::vector<Model::KeyFrameVector3>& key
 			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
 			return Lerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
-		return (*keyframes.rbegin()).value;
 	}
+	return (*keyframes.rbegin()).value;
 }
 
 Quaternion Object3d::CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time)
@@ -291,7 +291,6 @@ Quaternion Object3d::CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion
 		}
 	}
 	return (*keyframes.rbegin()).value;
-
 }
 
 void Object3d::ApplyAnimation(Model::Skelton& skelton, const Model::Animation& animation, float animationTime)

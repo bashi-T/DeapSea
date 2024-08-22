@@ -32,6 +32,7 @@ int GameManager::Run()
 	camera = new Camera();
 	particle = new Particle;
 	skyDome = new SkyDome;
+	mesh = new Mesh;
 	std::vector<Model*> models;
 	//bool useWorldMap = true;
 
@@ -56,6 +57,7 @@ int GameManager::Run()
 
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	SPCommon->Initialize(dx12Common);
+	//mesh->Initialize("Resource/sea.png", srvManager->GetInstance(), object3dCommon->GetInstance());
 	skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 	//sceneArr_[INGAME]->Init();
@@ -82,6 +84,7 @@ int GameManager::Run()
 		}
 		imgui->Update();
 		skyDome->Update();
+		//mesh->Update();
 		sceneArr_[currentSceneNo_]->Update();
 #ifdef _DEBUG
 		ImGui::Begin("camera");
@@ -121,7 +124,8 @@ int GameManager::Run()
 			break;
 		}
 		srvManager->PreDraw();
-		//skyDome->Draw();
+		skyDome->Draw();
+		//mesh->Draw();
 		sceneArr_[currentSceneNo_]->Draw();
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
@@ -130,13 +134,13 @@ int GameManager::Run()
 	}
 
 	CloseHandle(srvManager->GetFenceEvent());
+	delete skyDome;
 	delete particle;
 	sceneArr_[currentSceneNo_]->Finalize();
 	for (Model* model : models)
 	{
 		delete model;
 	}
-	//sceneArr_[INGAME]->Finalize();
 	ModelManager::GetInstance()->Finalize();
 	delete object3dCommon;
 	TextureManager::GetInstance()->Finalize();

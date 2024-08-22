@@ -12,6 +12,10 @@
 #include <sstream>
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
+#include"Camera/Camera.h"
+#include"Managers/TextureManager.h"
+#include "Commons/Object3dCommon.h"
+#include <random>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -22,7 +26,7 @@ class Mesh
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Mesh();
-	void Initialize(const std::string& filename, int32_t width, int32_t height);
+	void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon);
 	void Update();
 	void Draw();
 	ComPtr<IDxcBlob> CompileShader(
@@ -32,9 +36,9 @@ public:
 		IDxcCompiler3* dxcCompiler,
 		IDxcIncludeHandler* includeHandler);
 
-	void DrawTriangle(
-	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
-	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
+	//void DrawTriangle(
+	//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
+	//    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSphere(
 		const Sphere& sphere_, Vector4 color, bool useWorldMap);
 	void ResetDXC();
@@ -49,7 +53,7 @@ public:
 		Vector2 coordLeftTop, Vector2 coordRightTop, Vector2 coordRightBottom,
 		Vector2 coordLeftBottom, uint32_t count, int32_t width, int32_t height);
 
-	void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
+	//void MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2);
 
 	struct VertexData
 	{
@@ -60,8 +64,9 @@ public:
 	struct MaterialData
 	{
 		std::string textureFilePath;
+		uint32_t textureIndex = 0;
 	};
-	
+
 	struct ModelData
 	{
 		std::vector<VertexData> vertices;
@@ -69,14 +74,14 @@ public:
 	};
 	ModelData modelData;
 
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-	ComPtr<ID3D12Resource> CreateTextureResource(
-		ID3D12Device* device,
-		const DirectX::TexMetadata& metadata);
-	void UploadTextureData(
-		ID3D12Resource* texture,
-		const DirectX::ScratchImage& mipImages,
-		const DirectX::TexMetadata& metadata);
+	//DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	//ComPtr<ID3D12Resource> CreateTextureResource(
+	//	ID3D12Device* device,
+	//	const DirectX::TexMetadata& metadata);
+	//void UploadTextureData(
+	//	ID3D12Resource* texture,
+	//	const DirectX::ScratchImage& mipImages,
+	//	const DirectX::TexMetadata& metadata);
 
 	//void MeshRelease();
 
@@ -96,12 +101,16 @@ public:
 	DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 private:
-	Mesh* mesh_;
 	Debug* debug_;
 	WinAPP* sWinApp;
+	SRVManager* srvManager = nullptr;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
+	Object3dCommon* object3dCommon_;
+	Camera* camera_;
+	DX12Common* dxCommon;
 	HRESULT hr = NULL;
+
 	EulerTransform transformMatrix;
 	EulerTransform transformMatrixSphere;
 
@@ -198,5 +207,14 @@ private:
 	Vector2 texcoordLeft[1];
 	Vector2 texcoordRight[1];
 
+	MaterialData materialData;
+	struct CameraTransform {
+		Vector3 worldPosition;
+	};
+
+	ComPtr<ID3D12Resource> cameraResource;
+	CameraTransform* cameraData = nullptr;
+	ComPtr<ID3D12Resource> colorResource;
+	Material* colorData = nullptr;
 
 };

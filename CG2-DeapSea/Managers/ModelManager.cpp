@@ -25,10 +25,10 @@ void ModelManager::Initialize(DX12Common* dxCommon)
 
 void ModelManager::LoadModel(const std::string& filePath, const std::string& TextureFilePath)
 {
-	//if (models.contains(filePath))
-	//{
-	//	return;
-	//}
+	if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
+	{
+		return;
+	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->ModelInitialize(modelCommon_, filePath, TextureFilePath);

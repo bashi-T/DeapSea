@@ -3,15 +3,16 @@
 Mesh::~Mesh() {
 }
 
-void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height) {
-	spriteCom_->Initialize(DX12Common::GetInstance());
+void Mesh::Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon) {
+	this->object3dCommon_ = object3dCommon;
+	this->srvManager = srvManager;
+	this->camera_ = object3dCommon_->GetDefaultCamera();
 	kSubdivision = 16;
 	
 	ResetDXC();
-
 	MakePSO();
 
-	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
+	Sphere sphere = { { 0.0f,0.0f,0.0f },200.0f };
 	ColorSphere[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	Top[0] = { 0.0f, 1.75f, 0.0f, 1.0f };
@@ -38,37 +39,31 @@ void Mesh::Initialize(const std::string& filename, int32_t width, int32_t height
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, -15.0f}
     };
-	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(width) / float(height), 0.1f, 100.0f);
+	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(WinAPP::clientWidth_) / float(WinAPP::clientHeight_), 0.1f, 100.0f);
 
-	vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
-	materialResource = CreateBufferResource(sizeof(Material));
-	transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+	//vertexResource = CreateBufferResource(sizeof(VertexData) * 3);
+	//materialResource = CreateBufferResource(sizeof(Material));
+	//transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 	vertexResourceSphere = CreateBufferResource(sizeof(VertexData) * 6 * kSubdivision * kSubdivision);
 	materialResourceSphere = CreateBufferResource(sizeof(Material));
 	transformationMatrixResourceSphere = CreateBufferResource(sizeof(TransformationMatrix));
+
 	directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&DirectionalLightData));
-	
+	cameraResource = CreateBufferResource(sizeof(CameraTransform));
+	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+
 	indexResourceSphere = CreateBufferResource(sizeof(uint32_t) * 6 * kSubdivision * kSubdivision);
+	MakeBufferView();
 	
 	DirectionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	DirectionalLightData->intensity = 1.0f;
 
 
-	mipImages = LoadTexture(modelData.material.textureFilePath);
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textureResource = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata);
-	UploadTextureData(textureResource.Get(), mipImages, metadata);
-	
-	mipImages2 = LoadTexture(modelData.material.textureFilePath);
-	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	textureResource2 = CreateTextureResource(DX12Common::GetInstance()->GetDevice().Get(), metadata2);
-	UploadTextureData(textureResource2.Get(), mipImages2, metadata2);
-
-	MakeShaderResourceView(metadata, metadata2);
-
-	MakeBufferView();
+	materialData.textureFilePath = filename;
+	TextureManager::GetInstance()->LoadTexture(filename);
+	materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(filename);
 
 }
 
@@ -90,7 +85,7 @@ ComPtr<IDxcBlob> Mesh::CompileShader(
 	IDxcIncludeHandler* includeHandler_)
 {
 	debug_->Log(
-	    debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
+		debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
 	ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
 	hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	assert(SUCCEEDED(hr));
@@ -101,12 +96,12 @@ ComPtr<IDxcBlob> Mesh::CompileShader(
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
 	LPCWSTR arguments[]{
-	    filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
+		filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
 	};
 	ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler_->Compile(
-	    &shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
-	    IID_PPV_ARGS(&shaderResult));
+		&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
+		IID_PPV_ARGS(&shaderResult));
 	assert(SUCCEEDED(hr));
 
 	ComPtr<IDxcBlobUtf8> shaderError = nullptr;
@@ -119,7 +114,7 @@ ComPtr<IDxcBlob> Mesh::CompileShader(
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	debug_->Log(
-	    debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
+		debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
 	shaderSource->Release();
 	shaderResult->Release();
 	return shaderBlob;
@@ -127,15 +122,8 @@ ComPtr<IDxcBlob> Mesh::CompileShader(
 
 void Mesh::MakePSO()
 {
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[0].Descriptor.ShaderRegister = 0;
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].Descriptor.ShaderRegister = 0;
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
@@ -143,14 +131,27 @@ void Mesh::MakePSO()
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
+
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-	
+
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 1;
+
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 2;
 
 	descriptionRootSignature_.pParameters = rootParameters;
 	descriptionRootSignature_.NumParameters = _countof(rootParameters);
@@ -168,25 +169,35 @@ void Mesh::MakePSO()
 	descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers);
 
 	hr = D3D12SerializeRootSignature(
-	    &descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+		&descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(hr)) {
+	if (FAILED(hr))
+	{
 		debug_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
 	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateRootSignature(
-	    0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-	    IID_PPV_ARGS(&rootSignature));
+		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&rootSignature));
 
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 	inputElementDescs[1].SemanticName = "TEXCOORD";
 	inputElementDescs[1].SemanticIndex = 0;
 	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 	inputElementDescs[2].SemanticName = "NORMAL";
 	inputElementDescs[2].SemanticIndex = 0;
 	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -195,29 +206,37 @@ void Mesh::MakePSO()
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
+	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
+	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	vertexShaderBlob =
-	    CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-	    CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 	graphicsPipelineStateDesc.VS = {
-	    vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()};
+		vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };
 	graphicsPipelineStateDesc.PS = {
-	    pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize()};
+		pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };
 	graphicsPipelineStateDesc.BlendState = blendDesc;
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 
@@ -231,11 +250,10 @@ void Mesh::MakePSO()
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	hr = DX12Common::GetInstance()->GetDevice().Get()->CreateGraphicsPipelineState(
-	    &graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	hr = DX12Common::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
+		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
-}
-
+};
 void Mesh::Update()
 {
 	//cameraTransform.translate.x += 0.02f;
@@ -256,23 +274,7 @@ void Mesh::Update()
 
 void Mesh::Draw()
 {
-	//sprite_->DrawSprite(
-	//	sprite_->GetLeftTop(0),
-	//	sprite_->GetRightTop(0),
-	//	sprite_->GetRightBottom(0),
-	//	sprite_->GetLeftBottom(0),
-	//	sprite_->GetColorSprite(0),
-	//	sprite_->GetTexcoordLeftTop(0),
-	//	sprite_->GetTexcoordRightTop(0),
-	//	sprite_->GetTexcoordRightBottom(0),
-	//	sprite_->GetTexcoordLeftBottom(0),
-	//	width,
-	//	height);
-
 	DrawSphere(sphere, ColorSphere[0], true);
-	//	
-	//DrawOBJ(ColorSphere[0], true, width, height);
-
 };
 
 ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
@@ -304,9 +306,9 @@ ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
 
 void Mesh::MakeBufferView()
 {
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData)) * 3;
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	//vertexBufferView.SizeInBytes = UINT(sizeof(VertexData)) * 3;
+	//vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
 	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6 * kSubdivision * kSubdivision;
@@ -357,6 +359,39 @@ void Mesh::MakeBufferView()
 //	vertexData[2].normal.x = vertexData[2].position.x;
 //	vertexData[2].normal.y = vertexData[2].position.y;
 //	vertexData[2].normal.z = vertexData[2].position.z;
+//}
+// 
+//void Mesh::DrawTriangle(
+//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
+//    Vector2 coordLeft, bool useWorldMap) {
+//	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
+//	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
+//	DX12Common::GetInstance()->GetCommandList().Get()->
+//		IASetIndexBuffer(&indexBufferViewSphere);
+//	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
+//	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+//	    0, materialResource->GetGPUVirtualAddress());
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+//	    1, transformationMatrixResource->GetGPUVirtualAddress());
+//
+//	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+//	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
+//	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+//	    2, useWorldMap ? GetTextureSrvHandleGPU2()
+//	                   : GetTextureSrvHandleGPU());
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+//		3, directionalLightResource->GetGPUVirtualAddress());
+//
+//	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
 //}
 
 void Mesh::InputDataSphere(
@@ -428,40 +463,6 @@ void Mesh::InputDataSphere(
 	indexDataSphere[count * 6 + 5] = count * 4 + 3;
 }
 
-
-//void Mesh::DrawTriangle(
-//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop, Vector2 coordRight,
-//    Vector2 coordLeft, bool useWorldMap) {
-//	InputDataTriangle(Top, Right, Left, color, coordTop, coordRight, coordLeft);
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetPipelineState(graphicsPipelineState.Get());
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootSignature(rootSignature.Get());
-//	DX12Common::GetInstance()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
-//	DX12Common::GetInstance()->GetCommandList().Get()->
-//		IASetIndexBuffer(&indexBufferViewSphere);
-//	DX12Common::GetInstance()->GetCommandList().Get()->IASetPrimitiveTopology(
-//	    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-//	    0, materialResource->GetGPUVirtualAddress());
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-//	    1, transformationMatrixResource->GetGPUVirtualAddress());
-//
-//	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-//	    DX12Common::GetInstance()->GetRtvHandles(DX12Common::GetInstance()->GetBackBufferIndex());
-//	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
-//	    2, useWorldMap ? GetTextureSrvHandleGPU2()
-//	                   : GetTextureSrvHandleGPU());
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
-//		3, directionalLightResource->GetGPUVirtualAddress());
-//
-//	DX12Common::GetInstance()->GetCommandList().Get()->DrawInstanced(3, 1, 0, 0);
-//}
-
 void Mesh::DrawSphere(
 	const Sphere& sphere_, Vector4 color, bool useWorldMap)
 {
@@ -527,20 +528,17 @@ void Mesh::DrawSphere(
 				IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			//D3D12_CPU_DESCRIPTOR_HANDLE rtv = DX12Common::GetInstance()->GetRtvHandles(
-			//	DX12Common::GetInstance()->GetBackBufferIndex());
-			//D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-			//DX12Common::GetInstance()->GetCommandList().Get()->
-			//	OMSetRenderTargets(1, &rtv, false, &dsv);
-
-			DX12Common::GetInstance()->GetCommandList().Get()->
-				SetGraphicsRootDescriptorTable(
-				2, useWorldMap ? GetTextureSrvHandleGPU2()
-				: GetTextureSrvHandleGPU());
-
+			srvManager->SetGraphicsRootDescriptorTable(
+				2, materialData.textureIndex);
+			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+				3, cameraResource->GetGPUVirtualAddress());
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(
-				3, directionalLightResource->GetGPUVirtualAddress());
+					4, directionalLightResource->GetGPUVirtualAddress());
+			D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+				DX12Common::GetInstance()->GetRtvHandles(srvManager->GetBackBufferIndex());
+			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+			DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 			InputDataSphere(
 				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, WinAPP::clientWidth_, WinAPP::clientHeight_);
@@ -566,109 +564,107 @@ void Mesh::DrawSphere(
 		6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
 }
 
-void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
-{
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
-	srvDesc2.Format = metadata2.format;
-	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
-
-	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->
-		GetDevice().Get()->GetDescriptorHandleIncrementSize(
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	//textureSrvHandleCPU = DX12Common::GetInstance()->
-	//	GetCPUDescriptorHandle(DX12Common::GetInstance()->
-	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
-	//textureSrvHandleGPU = DX12Common::GetInstance()->
-	//	GetGPUDescriptorHandle(DX12Common::GetInstance()->
-	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
-
-	//textureSrvHandleCPU2 = DX12Common::GetInstance()->
-	//	GetCPUDescriptorHandle(DX12Common::GetInstance()->
-	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
-	//textureSrvHandleGPU2 = DX12Common::GetInstance()->
-	//	GetGPUDescriptorHandle(DX12Common::GetInstance()->
-	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
-
-	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
-}
-
-DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
-{
-	DirectX::ScratchImage image{};
-	std::wstring filePathW = debug_->ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(
-		filePathW.c_str(),
-		DirectX::WIC_FLAGS_FORCE_SRGB,
-		nullptr,
-		image);
-	assert(SUCCEEDED(hr));
-
-	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(
-		image.GetImages(),
-		image.GetImageCount(),
-		image.GetMetadata(),
-		DirectX::TEX_FILTER_SRGB,
-		0,
-		mipImages);
-
-	return mipImages;
-}
-
-ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);
-	resourceDesc.Height = UINT(metadata.height);
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
-	resourceDesc.Format = metadata.format;
-	resourceDesc.SampleDesc.Count = 1;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
-
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-
-	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&resource));
-
-	assert(SUCCEEDED(hr));
-
-	return resource;
-}
-
-void Mesh::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
-{
-	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
-	{
-		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		HRESULT hr = texture->WriteToSubresource(
-			UINT(mipLevel),
-			nullptr,
-			img->pixels,
-			UINT(img->rowPitch),
-			UINT(img->slicePitch)
-		);
-		assert(SUCCEEDED(hr));
-	}
-}
-
-
+//void Mesh::MakeShaderResourceView(const DirectX::TexMetadata& metadata, const DirectX::TexMetadata& metadata2)
+//{
+//	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+//	srvDesc.Format = metadata.format;
+//	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+//	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+//	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+//
+//	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+//	srvDesc2.Format = metadata2.format;
+//	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+//	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+//	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+//
+//	const uint32_t descriptorSizeSRV = DX12Common::GetInstance()->
+//		GetDevice().Get()->GetDescriptorHandleIncrementSize(
+//			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+//
+//	//textureSrvHandleCPU = DX12Common::GetInstance()->
+//	//	GetCPUDescriptorHandle(DX12Common::GetInstance()->
+//	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+//	//textureSrvHandleGPU = DX12Common::GetInstance()->
+//	//	GetGPUDescriptorHandle(DX12Common::GetInstance()->
+//	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 1);
+//
+//	//textureSrvHandleCPU2 = DX12Common::GetInstance()->
+//	//	GetCPUDescriptorHandle(DX12Common::GetInstance()->
+//	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+//	//textureSrvHandleGPU2 = DX12Common::GetInstance()->
+//	//	GetGPUDescriptorHandle(DX12Common::GetInstance()->
+//	//		GetSrvDescriptorHeap().Get(), descriptorSizeSRV, 2);
+//
+//	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+//	DX12Common::GetInstance()->GetDevice().Get()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+//}
+//
+//DirectX::ScratchImage Mesh::LoadTexture(const std::string& filePath)
+//{
+//	DirectX::ScratchImage image{};
+//	std::wstring filePathW = debug_->ConvertString(filePath);
+//	HRESULT hr = DirectX::LoadFromWICFile(
+//		filePathW.c_str(),
+//		DirectX::WIC_FLAGS_FORCE_SRGB,
+//		nullptr,
+//		image);
+//	assert(SUCCEEDED(hr));
+//
+//	DirectX::ScratchImage mipImages{};
+//	hr = DirectX::GenerateMipMaps(
+//		image.GetImages(),
+//		image.GetImageCount(),
+//		image.GetMetadata(),
+//		DirectX::TEX_FILTER_SRGB,
+//		0,
+//		mipImages);
+//
+//	return mipImages;
+//}
+//
+//ComPtr<ID3D12Resource> Mesh::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+//{
+//	D3D12_RESOURCE_DESC resourceDesc{};
+//	resourceDesc.Width = UINT(metadata.width);
+//	resourceDesc.Height = UINT(metadata.height);
+//	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
+//	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+//	resourceDesc.Format = metadata.format;
+//	resourceDesc.SampleDesc.Count = 1;
+//	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+//
+//	D3D12_HEAP_PROPERTIES heapProperties{};
+//	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
+//	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+//	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+//
+//	ComPtr<ID3D12Resource> resource = nullptr;
+//	HRESULT hr = device->CreateCommittedResource(
+//		&heapProperties,
+//		D3D12_HEAP_FLAG_NONE,
+//		&resourceDesc,
+//		D3D12_RESOURCE_STATE_GENERIC_READ,
+//		nullptr,
+//		IID_PPV_ARGS(&resource));
+//
+//	assert(SUCCEEDED(hr));
+//
+//	return resource;
+//}
+//
+//void Mesh::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, const DirectX::TexMetadata& metadata)
+//{
+//	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
+//	{
+//		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+//		HRESULT hr = texture->WriteToSubresource(
+//			UINT(mipLevel),
+//			nullptr,
+//			img->pixels,
+//			UINT(img->rowPitch),
+//			UINT(img->slicePitch)
+//		);
+//		assert(SUCCEEDED(hr));
+//	}
+//}

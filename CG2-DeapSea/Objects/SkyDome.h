@@ -19,9 +19,6 @@ public:
 
 private:
 	Object3d* object3d;
-	std::string model_ = "world/world.obj";
-	std::string skin = "Resource/monsterBall.png";
-
 
 	EulerTransform transformMatrixSphere;
 	ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
