@@ -254,7 +254,7 @@ void Mesh::Update()
 	//ImGui::End();
 }
 
-void Mesh::Draw(int32_t width, int32_t height)
+void Mesh::Draw()
 {
 	//sprite_->DrawSprite(
 	//	sprite_->GetLeftTop(0),
@@ -269,7 +269,7 @@ void Mesh::Draw(int32_t width, int32_t height)
 	//	width,
 	//	height);
 
-	DrawSphere(sphere, ColorSphere[0], true, width, height);
+	DrawSphere(sphere, ColorSphere[0], true);
 	//	
 	//DrawOBJ(ColorSphere[0], true, width, height);
 
@@ -463,7 +463,7 @@ void Mesh::InputDataSphere(
 //}
 
 void Mesh::DrawSphere(
-	const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height)
+	const Sphere& sphere_, Vector4 color, bool useWorldMap)
 {
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
@@ -543,7 +543,7 @@ void Mesh::DrawSphere(
 				3, directionalLightResource->GetGPUVirtualAddress());
 
 			InputDataSphere(
-				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, width, height);
+				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, WinAPP::clientWidth_, WinAPP::clientHeight_);
 
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(

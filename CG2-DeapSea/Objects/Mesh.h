@@ -24,7 +24,7 @@ public:
 	~Mesh();
 	void Initialize(const std::string& filename, int32_t width, int32_t height);
 	void Update();
-	void Draw(int32_t width, int32_t height);
+	void Draw();
 	ComPtr<IDxcBlob> CompileShader(
 	    const std::wstring& filePath,
 		const wchar_t* profile,
@@ -36,7 +36,7 @@ public:
 	    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSphere(
-		const Sphere& sphere_, Vector4 color, bool useWorldMap, int32_t width, int32_t height);
+		const Sphere& sphere_, Vector4 color, bool useWorldMap);
 	void ResetDXC();
 	void MakePSO();
 	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);

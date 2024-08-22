@@ -5,7 +5,7 @@ void SkyDome::Initialize()
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	std::string model_ = "world/skyDome.obj";
-	std::string skin = "Resource/monsterBall.png";
+	std::string skin = "Resource/civ6.png";
 	ModelManager::GetInstance()->LoadModel(model_, skin);
 	object3d->SetModel(model_);
 	Model* model = ModelManager::GetInstance()->FindModel(model_);
@@ -17,7 +17,7 @@ void SkyDome::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	//object3d->SetScale({ -200.0f,200.0f,200.0f });
+	object3d->SetScale({ -200.0f,200.0f,200.0f });
 }
 
 void SkyDome::Update()
