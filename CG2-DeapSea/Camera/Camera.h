@@ -18,6 +18,7 @@ private:
 
 public:
 	Camera();
+	~Camera();
 	void Initialize();
 	void Update();
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }

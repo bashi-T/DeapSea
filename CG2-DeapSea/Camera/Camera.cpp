@@ -1,4 +1,8 @@
 #include "Camera.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 Camera::Camera()
 :transformMatrix({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} })
@@ -11,6 +15,10 @@ Camera::Camera()
 , projectionMatrix(MakePerspectiveFovMatrix(fovY, aspectRetio, nearClip, farClip))
 , viewProjectionMatrix(Multiply(viewMatrix, projectionMatrix))
 {}
+
+Camera::~Camera()
+{
+}
 
 void Camera::Initialize()
 {

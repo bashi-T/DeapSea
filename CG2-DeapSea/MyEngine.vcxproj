@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameObject\ground.cpp" />
+    <ClCompile Include="Commons\ParticleCommon.cpp" />
     <ClCompile Include="Scene\ClearScene.cpp" />
     <ClCompile Include="GameObject\EnemyBullet.cpp" />
     <ClCompile Include="GameObject\PlayerBullet.cpp" />
@@ -54,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObject\ground.h" />
+    <ClInclude Include="Commons\ParticleCommon.h" />
     <ClInclude Include="Scene\ClearScene.h" />
     <ClInclude Include="GameObject\EnemyBullet.h" />
     <ClInclude Include="GameObject\PlayerBullet.h" />

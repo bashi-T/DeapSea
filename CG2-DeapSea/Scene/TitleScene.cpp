@@ -1,8 +1,4 @@
 #include "titleScene.h"
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 //TitleScene::~TitleScene()
 //{
@@ -13,9 +9,11 @@
 void TitleScene::Init()
 {
 	//for(uint32_t i = 0; i < 1; i++)
-	//Particle* particle = new Particle;
-	//particle->Initialize("Resource/colorbabble.png", SRVManager::GetInstance(), Object3dCommon::GetInstance());
-	//particles.push_back(particle);
+	//{
+		//Particle* particle = new Particle;
+		//particle->Initialize("Resource/colorbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance());
+		//particles.push_back(particle);
+	//}
 
 	sprite = new Sprite;
 	sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/Titleexample.png");
@@ -53,10 +51,10 @@ void TitleScene::Draw()
 
 void TitleScene::Finalize()
 {
-	//for (Object3d* object3d : objects3d)
-	//{
-	//	delete object3d;
-	//}
+	for (Object3d* object3d : objects3d)
+	{
+		delete object3d;
+	}
 	//particles.clear();
 	delete sprite;
 	sprite = NULL;

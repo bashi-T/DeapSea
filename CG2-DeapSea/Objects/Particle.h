@@ -1,44 +1,28 @@
 #pragma once
 #include "Math/CGVector.h"
 #include "Commons/DX12Common.h"
-#include "Systems/Debug.h"
 #include "Systems/MyImGui.h"
-#include "list"
 #include <cassert>
-#include <d3d12.h>
 #include <dxcapi.h>
-#include <dxgi1_6.h>
 #include <fstream>
 #include <sstream>
-#include"Sprites/Sprite.h"
-#include"Commons/SpriteCommon.h"
-#include"Camera/Camera.h"
-#include"Managers/TextureManager.h"
 #include "Commons/Object3dCommon.h"
-#include <random>
+#include"Managers/TextureManager.h"
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
+#include <random>
 #pragma comment(lib, "dxcompiler.lib")
 
+class ParticleCommon;
 class Particle
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
-	void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon);
+	void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon);
 	void Update();
-	ComPtr<IDxcBlob> CompileShader(
-	    const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler,
-		IDxcIncludeHandler* includeHandler);
-
 	void Draw();
-	void ResetDXC();
-	void MakePSO();
-	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+	ComPtr<ID3D12Resource> CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes);
 	void MakeBufferView();
 	void InputData(
 		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
@@ -109,8 +93,9 @@ private:
 	WinAPP* sWinApp = nullptr;
 	SRVManager* srvManager = nullptr;
 	MyImGui* imgui_ = nullptr;
-	SpriteCommon* spriteCom_ = nullptr;
+	DX12Common* dx12Common_ = nullptr;
 	Object3dCommon* object3dCommon_ = nullptr;
+	ParticleCommon* particleCommon_;
 	Camera* camera_ = nullptr;
 	DX12Common* dxCommon = nullptr;
 	HRESULT hr = NULL;

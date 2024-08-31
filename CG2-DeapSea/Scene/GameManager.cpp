@@ -1,4 +1,9 @@
 #include "GameManager.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
+
 Vector4* vertexData = nullptr;
 int GameManager::stageNumber = 0;
 
@@ -27,12 +32,10 @@ int GameManager::Run()
 	imgui = new MyImGui;
 	SPCommon = SpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
-	object3d = new Object3d;
-	modelCommon = new ModelCommon;
+	//object3d = new Object3d;
 	camera = new Camera();
-	particle = new Particle;
+	particleCommon = new ParticleCommon;
 	skyDome = new SkyDome;
-	mesh = new Mesh;
 	std::vector<Model*> models;
 	//bool useWorldMap = true;
 
@@ -54,10 +57,9 @@ int GameManager::Run()
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->GetInstance()->SetRotate({0.26f,0.0f,0.0f});
 	camera->GetInstance()->SetTranslate({ 0.0f,7.0f,-20.0f });
-
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	SPCommon->Initialize(dx12Common);
-	//mesh->Initialize("Resource/sea.png", srvManager->GetInstance(), object3dCommon->GetInstance());
+	//particleCommon->Initialize(dx12Common);
 	skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 	//sceneArr_[INGAME]->Init();
@@ -84,7 +86,6 @@ int GameManager::Run()
 		}
 		imgui->Update();
 		skyDome->Update();
-		//mesh->Update();
 		sceneArr_[currentSceneNo_]->Update();
 #ifdef _DEBUG
 		ImGui::Begin("camera");
@@ -94,10 +95,8 @@ int GameManager::Run()
 		ImGui::DragFloat3("camera.translate", (float*)&camera->GetInstance()->GetTranslate(), 0.01f);
 		//ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
 			//ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
-		ImGui::DragFloat3("light.direction", (float*)&object3d->GetDirectionalLight().direction, 0.01f, -1.0f, 1.0f);
+		//ImGui::DragFloat3("light.direction", (float*)&object3d->GetDirectionalLight().direction, 0.01f, -1.0f, 1.0f);
 		//object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
-		//ImGui::DragFloat4("particles.color", (float*)&particle->GetInstancingDataPlane()->color, 0.01f);
-		//ImGui::ColorEdit4("particles.color", (float*)&particle->GetParticlesPlane()->color, 0.01f);
 		ImGui::End();
 		ImGui::Begin("scene");
 		switch (int(sceneArr_[currentSceneNo_]->GetSceneNo()))
@@ -125,7 +124,6 @@ int GameManager::Run()
 		}
 		srvManager->PreDraw();
 		skyDome->Draw();
-		//mesh->Draw();
 		sceneArr_[currentSceneNo_]->Draw();
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
@@ -135,23 +133,20 @@ int GameManager::Run()
 
 	CloseHandle(srvManager->GetFenceEvent());
 	sceneArr_[currentSceneNo_]->Finalize();
+	delete skyDome;
 	for (Model* model : models)
 	{
 		delete model;
 	}
-	ModelManager::GetInstance()->Finalize();
-	delete skyDome;
-	delete mesh;
-	delete particle;
-	delete camera;
-	delete object3d;
-	delete modelCommon;
-	delete object3dCommon;
-	srvManager->Finalize();
-	TextureManager::GetInstance()->Finalize();
 	delete SPCommon;
+	delete camera;
+	//delete object3d;
+	ModelManager::GetInstance()->Finalize();
+	delete object3dCommon;
+	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
-	//delete imgui;
+	delete input;
+	srvManager->Finalize();
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();
 	CoUninitialize();

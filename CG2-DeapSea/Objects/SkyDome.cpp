@@ -3,7 +3,6 @@
 SkyDome::~SkyDome()
 {
 	delete object3d;
-	object3d = NULL;
 }
 
 void SkyDome::Initialize()
@@ -36,23 +35,3 @@ void SkyDome::Draw()
 	object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
 }
 
-//void SkyDome::SphereInitialize()
-//{
-//
-//}
-//
-//void SkyDome::SphereUpdate()
-//{
-//}
-//
-//void SkyDome::SphereDraw()
-//{
-//}
-//
-//void SkyDome::ResetDXC()
-//{
-//}
-//
-//void SkyDome::MakePSO()
-//{
-//}

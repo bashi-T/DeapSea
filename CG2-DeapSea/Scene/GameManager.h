@@ -12,6 +12,7 @@
 #include"Input/Input.h"
 #include"Commons/SpriteCommon.h"
 #include"Commons/Object3dCommon.h"
+#include"Commons/ParticleCommon.h"
 #include"Managers/ModelManager.h"
 #include"Objects/model.h"
 #include"Managers/TextureManager.h"
@@ -32,12 +33,10 @@ private:
 	MyImGui* imgui;
 	SpriteCommon* SPCommon;
 	Object3dCommon* object3dCommon;
-	Object3d* object3d;
-	ModelCommon* modelCommon;
+	ParticleCommon* particleCommon;
+	//Object3d* object3d;
 	Camera* camera;
-	Particle* particle;
 	SkyDome* skyDome;
-	Mesh* mesh;
 public: 
 	GameManager();
 	~GameManager();
