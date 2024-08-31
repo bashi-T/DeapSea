@@ -4,9 +4,10 @@ void GameScene::Init()
 {
 	player_ = new Player;
 	whale_ = new Whale;
+	ground = new Ground;
 	player_->Initialize();
 	whale_->Initialize();
-
+	ground->Initialize();
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
 
 	for (uint32_t i = 0; i < 1; i++)
@@ -68,7 +69,7 @@ void GameScene::Update()
 	{
 		player_->SetTranslate({ 10.0f,player_->GetTranslate().y,player_->GetTranslate().z });
 	}
-
+	ground->Update();
 	player_->Update();
 	whale_->Update();
 	UpdateEnemyPopCommands(GameManager::stageNumber);
@@ -81,10 +82,7 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	//for (Sprite* sprite : sprites)
-	//{
-	//	sprite->Draw(SpriteCommon::GetInstance());
-	//}
+	ground->Draw();
 	player_->Draw();
 	whale_->Draw();
 	for (Enemy* enemy_ : enemys_)
@@ -99,12 +97,17 @@ void GameScene::Finalize()
 	{
 		delete sprite;
 	}
+	sprites.clear();
+	player_->Finalize();
 	delete player_;
+	player_ == NULL;
 	delete whale_;
+	whale_ = NULL;
 	for (Enemy* enemy_ : enemys_)
 	{
 		delete enemy_;
 	}
+	enemys_.clear();
 	enemyPopFile[0].clear();
 	enemyPopCommands[0].clear();
 }
@@ -137,8 +140,6 @@ void GameScene::CheckAllCollisions()
 #pragma region 自機と敵の当たり判定
 		for (Enemy* enemy_ : enemys_)
 		{
-			const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
-
 			posA = player_->GetTranslate();
 			posB = enemy_->GetTranslate();
 			Vector3 distance = Subtract(posA, posB);
@@ -154,15 +155,13 @@ void GameScene::CheckAllCollisions()
 #pragma region 敵と自弾の当たり判定
 	for (Enemy* enemy_ : enemys_)
 	{
-		const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
-
 		posA = enemy_->GetTranslate();
 		for (PlayerBullet* bullet : playerBullets)
 		{
 			posB = bullet->GetTranslate();
 			Vector3 distance = Subtract(posA, posB);
 			if ((distance.x * distance.x) + (distance.y * distance.y) +
-				(distance.z * distance.z) <= 4)
+				(distance.z * distance.z) <= 2)
 			{
 				enemy_->OnCollision();
 				bullet->OnCollision();
@@ -183,7 +182,7 @@ void GameScene::CheckAllCollisions()
 				posB = eBullet->GetTranslate();
 				Vector3 distance = Subtract(posA, posB);
 				if ((distance.x * distance.x) + (distance.y * distance.y) +
-					(distance.z * distance.z) <= 2)
+					(distance.z * distance.z) <= 3)
 				{
 					pBullet->OnCollision();
 					eBullet->OnCollision();

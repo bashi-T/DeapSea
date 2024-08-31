@@ -1,5 +1,9 @@
 #include "Model.h"
 
+Model::~Model()
+{
+}
+
 void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
 {
 	this->modelCommon_ = modelCommon;

@@ -10,6 +10,7 @@
 class Enemy
 {
 public:
+	~Enemy();
 	void Initialize(Player* player, Whale* whale, int sort);
 	void Update(int sort);
 	void Draw(int sort);

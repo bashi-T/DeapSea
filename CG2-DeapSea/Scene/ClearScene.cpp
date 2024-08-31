@@ -1,5 +1,10 @@
 #include "ClearScene.h"
 
+//ClearScene::~ClearScene()
+//{
+//	delete sprite;
+//}
+
 void ClearScene::Init()
 {
 	sprite = new Sprite;
@@ -28,4 +33,5 @@ void ClearScene::Draw()
 
 void ClearScene::Finalize()
 {
+	delete sprite;
 }

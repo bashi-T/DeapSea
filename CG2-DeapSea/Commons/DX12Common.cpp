@@ -225,7 +225,7 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 void DX12Common::DX12Release()
 {
 #ifdef _DEBUG
-	//debugController->Release();
+	debugController->Release();
 #endif
 }
 

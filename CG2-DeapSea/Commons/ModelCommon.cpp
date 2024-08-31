@@ -1,5 +1,9 @@
 #include "ModelCommon.h"
 
+ModelCommon::~ModelCommon()
+{
+}
+
 void ModelCommon::Initialize(DX12Common* dxCommon)
 {
 	this->dxCommon_ = dxCommon;

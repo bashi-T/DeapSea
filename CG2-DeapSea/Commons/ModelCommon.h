@@ -26,6 +26,7 @@ private:
 	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
 
 public:
+	~ModelCommon();
 	void Initialize(DX12Common* dxCommon);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,

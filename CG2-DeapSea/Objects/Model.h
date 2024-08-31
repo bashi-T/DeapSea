@@ -11,6 +11,7 @@
 class Model
 {
 public:
+	~Model();
 	struct VertexData
 	{
 		Vector4 position;

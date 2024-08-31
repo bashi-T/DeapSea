@@ -1,5 +1,12 @@
 #include "Enemy.h"
 
+Enemy::~Enemy()
+{
+	delete object3d;
+	object3d = NULL;
+	eBullets.clear();
+}
+
 void Enemy::Initialize(Player* player, Whale* whale, int sort)
 {
 	player_ = player;

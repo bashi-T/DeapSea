@@ -17,6 +17,7 @@ class Object3dCommon;
 class Object3d
 {
 public:
+	//~Object3d();
 	void Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager);
 	void Update(Camera* camera);
 	void SkeltonUpdate(Camera* camera);

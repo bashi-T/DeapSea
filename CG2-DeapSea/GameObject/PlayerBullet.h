@@ -7,6 +7,7 @@
 class PlayerBullet
 {
 public:
+	~PlayerBullet();
 	void Initialize(Vector3 firstPos);
 	void Update();
 	void Draw();

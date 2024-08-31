@@ -4,7 +4,7 @@ ModelManager* ModelManager::instance = nullptr;
 
 ModelManager* ModelManager::GetInstance()
 {
-	if (instance == nullptr)
+	if (instance == NULL)
 	{
 		instance = new ModelManager;
 	}
@@ -13,8 +13,11 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Finalize()
 {
-	delete instance;
-	instance = nullptr;
+	if (instance != NULL)
+	{
+		delete instance;
+	}
+	instance = NULL;
 }
 
 void ModelManager::Initialize(DX12Common* dxCommon)

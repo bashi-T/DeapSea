@@ -1,5 +1,10 @@
 #include "GameOverScene.h"
 
+//GameOverScene::~GameOverScene()
+//{
+//	delete sprite;
+//}
+
 void GameOverScene::Init()
 {
 	sprite = new Sprite;
@@ -28,4 +33,5 @@ void GameOverScene::Draw()
 
 void GameOverScene::Finalize()
 {
+	delete sprite;
 }

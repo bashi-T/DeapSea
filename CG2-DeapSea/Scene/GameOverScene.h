@@ -9,6 +9,7 @@
 class GameOverScene :public SceneManager
 {
 public:
+	//~GameOverScene();
 	void Init() override;
 	void Update() override;
 	void Draw() override;

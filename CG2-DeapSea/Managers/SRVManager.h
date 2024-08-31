@@ -41,7 +41,7 @@ public:
 	bool CheckNumTexture(uint32_t textureIndex);
 	void PreDraw();
 	void PostDraw();
-
+	void Finalize();
 	UINT GetBackBufferIndex() { return backBufferIndex; }
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }

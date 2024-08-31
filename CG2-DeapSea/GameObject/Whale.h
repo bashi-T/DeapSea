@@ -8,6 +8,7 @@
 class Whale
 {
 public:
+	~Whale();
 	void Initialize();
 	void Update();
 	void Draw();

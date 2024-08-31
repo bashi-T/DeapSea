@@ -9,6 +9,7 @@
 class ClearScene :public SceneManager
 {
 public:
+	//~ClearScene();
 	void Init() override;
 	void Update() override;
 	void Draw() override;

@@ -7,6 +7,7 @@
 #include"GameObject/Whale.h"
 #include"GameObject/Enemy.h"
 #include "GameManager.h"
+#include"GameObject/ground.h"
 #include <random>
 
 class GameScene:public SceneManager
@@ -14,6 +15,7 @@ class GameScene:public SceneManager
 	enum EnemySort { NORMAL, STRAIGHT };
 
 public:
+	//~GameScene();
 	void Init() override;
 	void Update() override;
 	void Draw() override;
@@ -35,5 +37,6 @@ private:
 	bool isWait = false;
 	int32_t WaitTimer = 1;
 	bool gameEnd = false;
+	Ground* ground;
 };
 

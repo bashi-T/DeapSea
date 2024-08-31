@@ -1,5 +1,10 @@
 #include "PlayerBullet.h"
 
+PlayerBullet::~PlayerBullet()
+{
+	delete object3d;
+}
+
 void PlayerBullet::Initialize(Vector3 firstPos)
 {
 	object3d = new Object3d;

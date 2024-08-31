@@ -1,5 +1,9 @@
 #include "Object3dCommon.h"
 
+Object3dCommon::~Object3dCommon()
+{
+}
+
 void Object3dCommon::Initialize(DX12Common* dxcommon)
 {
 	dx12Common_ = dxcommon;

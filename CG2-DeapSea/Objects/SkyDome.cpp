@@ -1,11 +1,17 @@
 #include "SkyDome.h"
 
+SkyDome::~SkyDome()
+{
+	delete object3d;
+	object3d = NULL;
+}
+
 void SkyDome::Initialize()
 {
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	std::string model_ = "world/skyDome.obj";
-	std::string skin = "Resource/sea.png";
+	std::string skin = "Resource/sea2.png";
 	ModelManager::GetInstance()->LoadModel(model_, skin);
 	object3d->SetModel(model_);
 	Model* model = ModelManager::GetInstance()->FindModel(model_);
@@ -30,23 +36,23 @@ void SkyDome::Draw()
 	object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
 }
 
-void SkyDome::SphereInitialize()
-{
-
-}
-
-void SkyDome::SphereUpdate()
-{
-}
-
-void SkyDome::SphereDraw()
-{
-}
-
-void SkyDome::ResetDXC()
-{
-}
-
-void SkyDome::MakePSO()
-{
-}
+//void SkyDome::SphereInitialize()
+//{
+//
+//}
+//
+//void SkyDome::SphereUpdate()
+//{
+//}
+//
+//void SkyDome::SphereDraw()
+//{
+//}
+//
+//void SkyDome::ResetDXC()
+//{
+//}
+//
+//void SkyDome::MakePSO()
+//{
+//}

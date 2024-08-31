@@ -1,5 +1,11 @@
 #include "Whale.h"
 
+Whale::~Whale()
+{
+	delete 	object3d;
+	delete player;
+}
+
 void Whale::Initialize()
 {
 	object3d = new Object3d; 
@@ -159,7 +165,6 @@ void Whale::Update()
 	object3d->SetTranslate(Add(object3d->GetTranslate(), nowWhaleSpeed));
 	object3d->Update(Camera::GetInstance());
 #ifdef _DEBUG
-
 	ImGui::Begin("whale");
 	ImGui::DragFloat3("whale.translate", (float*)&object3d->GetTranslate(), 0.01f);
 	ImGui::Text("life:%d", life);

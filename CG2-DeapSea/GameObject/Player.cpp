@@ -1,11 +1,18 @@
 #include "Player.h"
 
+Player::~Player()
+{
+	delete object3d;
+	object3d = NULL;
+	pBullets.clear();
+}
+
 void Player::Initialize()
 {
 	object3d = new Object3d; 
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	const std::string playerModel = "human/walk.gltf";
-	const std::string playerSkin = "Resource/ganban.png";
+	const std::string playerSkin = "Resource/monsterBall.png";
 	ModelManager::GetInstance()->LoadSkeltonAnimation(playerModel, playerSkin, SRVManager::GetInstance());
 	object3d->SetModel(playerModel);
 	Model* model = ModelManager::GetInstance()->FindModel(playerModel);
@@ -156,4 +163,8 @@ void Player::Shot()
 void Player::OnCollision()
 {
 	isHit = true;
+}
+
+void Player::Finalize()
+{
 }

@@ -10,6 +10,7 @@
 class TitleScene:public SceneManager
 {
 public:
+	//~TitleScene();
 	void Init() override;
 	void Update() override;
 	void Draw() override;
@@ -21,6 +22,7 @@ private:
 	//Camera* camera;
 	std::vector<Object3d*> objects3d;
 	std::vector <Particle*> particles;
-	Sprite* sprite;
+	Sprite* sprite = nullptr;
+
 };
 

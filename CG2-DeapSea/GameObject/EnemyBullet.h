@@ -7,6 +7,7 @@
 class EnemyBullet
 {
 public:
+	~EnemyBullet();
 	void Initialize(Vector3 firstPos);
 	void Update();
 	void Draw();

@@ -1,9 +1,14 @@
 #include "TextureManager.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
+
 TextureManager* TextureManager::instance = nullptr;
 
 TextureManager* TextureManager::GetInstance()
 {
-	if (instance == nullptr)
+	if (instance == NULL)
 	{
 		instance = new TextureManager;
 	}
@@ -13,8 +18,11 @@ TextureManager* TextureManager::GetInstance()
 void TextureManager::Finalize()
 {
 	textureDatas.clear();
-	delete instance;
-	instance = nullptr;
+	if (instance != NULL)
+	{
+		delete instance;
+	}
+	instance = NULL;
 }
 
 void TextureManager::Initialize(DX12Common* dxcommon, SRVManager* srvManager_)
@@ -26,10 +34,10 @@ void TextureManager::Initialize(DX12Common* dxcommon, SRVManager* srvManager_)
 
 void TextureManager::LoadTexture(const std::string& filePath)
 {
-	if (textureDatas.contains(filePath))
-	{
-		return;
-	}
+	//if (textureDatas.contains(filePath))
+	//{
+	//	return;
+	//}
 
 	assert(srvManager->CheckNumTexture(textureDatas.size()));
 
@@ -75,11 +83,11 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 void TextureManager::LoadTextureforSRV(const std::string& filePath)
 {
-	if (textureDatas.contains(filePath))
-	{
-		textureDatas[filePath] = textureDatas.at(filePath);
-		return;
-	}
+	//if (textureDatas.contains(filePath))
+	//{
+	//	textureDatas[filePath] = textureDatas.at(filePath);
+	//	return;
+	//}
 
 	assert(srvManager->CheckNumTexture(textureDatas.size()));
 

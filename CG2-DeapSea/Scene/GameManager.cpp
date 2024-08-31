@@ -134,22 +134,27 @@ int GameManager::Run()
 	}
 
 	CloseHandle(srvManager->GetFenceEvent());
-	delete skyDome;
-	delete particle;
 	sceneArr_[currentSceneNo_]->Finalize();
 	for (Model* model : models)
 	{
 		delete model;
 	}
 	ModelManager::GetInstance()->Finalize();
+	delete skyDome;
+	delete mesh;
+	delete particle;
+	delete camera;
+	delete object3d;
+	delete modelCommon;
 	delete object3dCommon;
+	srvManager->Finalize();
 	TextureManager::GetInstance()->Finalize();
+	delete SPCommon;
 	imgui->Finalize();
-	delete srvManager;
+	//delete imgui;
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();
 	CoUninitialize();
 	delete leakCheck;
 	return 0;
-
 }

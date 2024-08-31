@@ -13,6 +13,7 @@
 class Object3dCommon
 {
 public:
+	~Object3dCommon();
 	void Initialize(DX12Common* dxcommon);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,

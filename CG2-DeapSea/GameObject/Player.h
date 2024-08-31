@@ -8,11 +8,13 @@
 class Player
 {
 public:
+	~Player();
 	void Initialize();
 	void Update();
 	void Draw();
 	void Shot();
 	void OnCollision();
+	void Finalize();
 
 	const std::list<PlayerBullet*>& GetBullets()const { return pBullets; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }

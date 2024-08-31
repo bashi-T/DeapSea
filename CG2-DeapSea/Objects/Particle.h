@@ -105,14 +105,14 @@ public:
 	ParticleForGPU* GetInstancingData() { return instancingData; }
 	Particles* GetParticles() { return particles; }
 private:
-	Debug* debug_;
-	WinAPP* sWinApp;
+	Debug* debug_ = nullptr;
+	WinAPP* sWinApp = nullptr;
 	SRVManager* srvManager = nullptr;
-	MyImGui* imgui_;
-	SpriteCommon* spriteCom_;
-	Object3dCommon* object3dCommon_;
-	Camera* camera_;
-	DX12Common* dxCommon;
+	MyImGui* imgui_ = nullptr;
+	SpriteCommon* spriteCom_ = nullptr;
+	Object3dCommon* object3dCommon_ = nullptr;
+	Camera* camera_ = nullptr;
+	DX12Common* dxCommon = nullptr;
 	HRESULT hr = NULL;
 
 	uint32_t kNumInstance = 10;
@@ -148,7 +148,7 @@ private:
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-	ComPtr<ID3D12Resource> directionalLightResource;
+	ComPtr<ID3D12Resource> directionalLightResource = nullptr;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
 	Matrix4x4 cameraMatrix;
@@ -160,8 +160,8 @@ private:
 
 	uint32_t kSubdivision = 16;
 
-	ComPtr<ID3D12Resource> textureResource;
-	ComPtr<ID3D12Resource> textureResource2;
+	ComPtr<ID3D12Resource> textureResource = nullptr;
+	ComPtr<ID3D12Resource> textureResource2 = nullptr;
 
 	uint32_t textureIndex;
 

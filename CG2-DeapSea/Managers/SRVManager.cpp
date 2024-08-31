@@ -174,6 +174,16 @@ SRVManager* SRVManager::GetInstance()
 	}
 	return instance;
 }
+
+void SRVManager::Finalize()
+{
+	if (instance != NULL)
+	{
+		delete instance;
+	}
+	instance = NULL;
+}
+
 void SRVManager::MakeFence()
 {
 	HRESULT hr = dxCommon_->GetDevice()->CreateFence(fenceValue,

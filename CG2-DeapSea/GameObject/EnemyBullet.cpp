@@ -1,5 +1,10 @@
 #include "EnemyBullet.h"
 
+EnemyBullet::~EnemyBullet()
+{
+	delete object3d;
+}
+
 void EnemyBullet::Initialize(Vector3 firstPos)
 {
 	object3d = new Object3d;
