@@ -31,5 +31,10 @@ public:
 		ID3D12DescriptorHeap* srvDescriptorHeap);
 	void Update();
 	void Endframe(ID3D12GraphicsCommandList* commandList);
+	static MyImGui* GetInstance();
+
 	void Finalize();
+
+private:
+	static inline MyImGui* instance;
 };

@@ -1,4 +1,8 @@
 #include "SRVManager.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 const uint32_t SRVManager::kMaxSRVCount = 512;
 const uint32_t SRVManager::kSRVIndexTop = 0;
@@ -177,10 +181,7 @@ SRVManager* SRVManager::GetInstance()
 
 void SRVManager::Finalize()
 {
-	if (instance != NULL)
-	{
-		delete instance;
-	}
+	delete instance;
 	instance = NULL;
 }
 

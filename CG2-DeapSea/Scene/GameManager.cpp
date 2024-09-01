@@ -29,7 +29,7 @@ int GameManager::Run()
 	srvManager = SRVManager::GetInstance();
 	input = Input::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
-	imgui = new MyImGui;
+	imgui = MyImGui::GetInstance();
 	SPCommon = SpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
 	//object3d = new Object3d;
@@ -59,7 +59,7 @@ int GameManager::Run()
 	camera->GetInstance()->SetTranslate({ 0.0f,7.0f,-20.0f });
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	SPCommon->Initialize(dx12Common);
-	//particleCommon->Initialize(dx12Common);
+	particleCommon->Initialize(dx12Common);
 	skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 	//sceneArr_[INGAME]->Init();
@@ -134,18 +134,27 @@ int GameManager::Run()
 	CloseHandle(srvManager->GetFenceEvent());
 	sceneArr_[currentSceneNo_]->Finalize();
 	delete skyDome;
+	skyDome = NULL;
+	particleCommon->DeleteInstance();
+	delete particleCommon;
+	particleCommon = NULL;
 	for (Model* model : models)
 	{
 		delete model;
+		model = NULL;
 	}
-	delete SPCommon;
+	SPCommon->DeleteInstance();
+	camera->DeleteInstance();
 	delete camera;
+	camera = NULL;
 	//delete object3d;
 	ModelManager::GetInstance()->Finalize();
-	delete object3dCommon;
+	object3dCommon->DeleteInstance();
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
+	//delete imgui;
 	delete input;
+	input = NULL;
 	srvManager->Finalize();
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();

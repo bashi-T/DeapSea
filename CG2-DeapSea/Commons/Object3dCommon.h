@@ -26,6 +26,8 @@ public:
 	void MakeSkeltonPSO(DX12Common* dxcommon);
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	static Object3dCommon* GetInstance();
+	static void DeleteInstance();
+
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineStates(int t) { return graphicsPipelineStates[t]; }
 	ComPtr<ID3D12RootSignature> GetRootSignatures(int t) { return rootSignatures[t]; }

@@ -2,9 +2,14 @@
 
 MyImGui::~MyImGui()
 {
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	//if (instance != NULL)
+	//{
+	//	delete instance;
+	//}
+	//instance = NULL;
+	//ImGui_ImplDX12_Shutdown();
+	//ImGui_ImplWin32_Shutdown();
+	//ImGui::DestroyContext();
 }
 
 void MyImGui::Initialize(
@@ -40,8 +45,19 @@ void MyImGui::Endframe(ID3D12GraphicsCommandList* commandList)
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(),commandList);
 }
 
+MyImGui* MyImGui::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = new MyImGui;
+	}
+	return instance;
+}
+
 void MyImGui::Finalize()
 {
+	delete instance;
+	instance = NULL;
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();

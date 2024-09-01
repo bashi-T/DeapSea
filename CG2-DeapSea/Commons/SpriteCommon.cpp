@@ -1,4 +1,8 @@
 #include "SpriteCommon.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 SpriteCommon::~SpriteCommon()
 {
@@ -205,4 +209,10 @@ SpriteCommon* SpriteCommon::GetInstance()
 		instance = new SpriteCommon;
 	}
 	return instance;
+}
+
+void SpriteCommon::DeleteInstance()
+{
+	delete instance;
+	instance = NULL;
 }

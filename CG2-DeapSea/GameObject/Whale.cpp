@@ -3,7 +3,9 @@
 Whale::~Whale()
 {
 	delete 	object3d;
+	object3d = NULL;
 	delete player;
+	player = NULL;
 }
 
 void Whale::Initialize()

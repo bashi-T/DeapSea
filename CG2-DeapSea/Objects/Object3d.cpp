@@ -1,5 +1,9 @@
 #include "Object3d.h"
 #include "Commons/Object3dCommon.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager)
 {

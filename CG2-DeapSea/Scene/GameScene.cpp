@@ -1,10 +1,14 @@
 #include "GameScene.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 void GameScene::Init()
 {
 	player_ = new Player;
 	whale_ = new Whale;
-	ground = new Ground;
+	ground = new Ground;//未解放
 	player_->Initialize();
 	whale_->Initialize();
 	ground->Initialize();
@@ -96,16 +100,20 @@ void GameScene::Finalize()
 	for (Sprite* sprite : sprites)
 	{
 		delete sprite;
+		sprite = NULL;
 	}
 	sprites.clear();
+	delete ground;
+	ground = NULL;
+	delete whale_;
+	whale_ = NULL;
 	player_->Finalize();
 	delete player_;
 	player_ == NULL;
-	delete whale_;
-	whale_ = NULL;
 	for (Enemy* enemy_ : enemys_)
 	{
 		delete enemy_;
+		enemy_ = NULL;
 	}
 	enemys_.clear();
 	enemyPopFile[0].clear();

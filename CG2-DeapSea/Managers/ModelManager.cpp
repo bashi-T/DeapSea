@@ -13,10 +13,9 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Finalize()
 {
-	if (instance != NULL)
-	{
-		delete instance;
-	}
+	delete modelCommon_;
+	modelCommon_ = NULL;
+	delete instance;
 	instance = NULL;
 }
 

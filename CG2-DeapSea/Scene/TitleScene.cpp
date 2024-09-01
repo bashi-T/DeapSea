@@ -1,4 +1,8 @@
 #include "titleScene.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 //TitleScene::~TitleScene()
 //{
@@ -51,11 +55,18 @@ void TitleScene::Draw()
 
 void TitleScene::Finalize()
 {
-	for (Object3d* object3d : objects3d)
-	{
-		delete object3d;
-	}
+	//for (Object3d* object3d : objects3d)
+	//{
+	//	delete object3d;
+	//	object3d = NULL;
+	//}
+	//for (Particle* particle : particles)
+	//{
+	//	delete particle;
+	//  particle = NULL;
+	//}
 	//particles.clear();
+	sprite->Finalize();
 	delete sprite;
 	sprite = NULL;
 }

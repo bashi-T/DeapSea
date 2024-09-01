@@ -217,3 +217,9 @@ ParticleCommon* ParticleCommon::GetInstance()
 	}
 	return instance;
 }
+
+void ParticleCommon::DeleteInstance()
+{
+	delete instance;
+	instance = NULL;
+}

@@ -1,10 +1,18 @@
 #include "Player.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 Player::~Player()
 {
 	delete object3d;
 	object3d = NULL;
-	pBullets.clear();
+	for (PlayerBullet* bullet : pBullets)
+	{
+		delete bullet;
+		bullet = NULL;
+	}
 }
 
 void Player::Initialize()

@@ -25,6 +25,7 @@ public:
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
 	static SpriteCommon* GetInstance();
+	static void DeleteInstance();
 
 	//void InputDataTriangle(
 	//	Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,

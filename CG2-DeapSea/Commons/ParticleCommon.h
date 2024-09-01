@@ -23,6 +23,8 @@ public:
 	void ResetDXC();
 	void MakePSO(DX12Common* dxcommon);
 	static ParticleCommon* GetInstance();
+	static void DeleteInstance();
+
 	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 	ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }

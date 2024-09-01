@@ -1,9 +1,19 @@
 #include "Enemy.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
+
 
 Enemy::~Enemy()
 {
 	delete object3d;
 	object3d = NULL;
+	for (EnemyBullet* bullet : eBullets)
+	{
+		delete bullet;
+		bullet = NULL;
+	}
 	eBullets.clear();
 }
 

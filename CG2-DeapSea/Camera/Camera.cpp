@@ -51,3 +51,12 @@ Camera* Camera::GetInstance()
 	}
 	return instance;
 }
+
+void Camera::DeleteInstance()
+{
+	if (instance != NULL)
+	{
+		delete instance;
+	}
+	instance = NULL;
+}

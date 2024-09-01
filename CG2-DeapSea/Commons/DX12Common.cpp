@@ -11,10 +11,7 @@ DX12Common* DX12Common::GetInstance()
 
 void DX12Common::DeleteInstance()
 {
-	if (instance != NULL)
-	{
-		delete instance;
-	}
+	delete instance;
 	instance = NULL;
 }
 

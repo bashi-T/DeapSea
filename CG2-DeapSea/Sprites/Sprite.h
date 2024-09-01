@@ -22,6 +22,7 @@ public:
 		std::string texturefilePath);
 	void Update();
 	void Draw();
+	void Finalize();
 
 	ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
 	void MakeBufferView();
@@ -83,9 +84,6 @@ public:
 
 private:
 	SpriteCommon* spriteCommon_;
-	Debug* debug_;
-	WinAPP* sWinApp;
-	MyImGui* imgui_;
 	HRESULT hr = NULL;
 	uint32_t textureIndex = 0;
 	SRVManager* srvManager = nullptr;

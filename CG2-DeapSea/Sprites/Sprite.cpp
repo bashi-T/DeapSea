@@ -57,7 +57,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::
 	coordLeftBottom = { 0.0f, 1.0f };
 	
 	InputData(Color);
-	materialData->material.textureFilePath = textureFilePath;
+	materialData->material.textureFilePath = textureFilePath;//未解放
 	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 	AdjestTextureSize();
@@ -196,6 +196,11 @@ void Sprite::Draw()
 
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
+
+void Sprite::Finalize()
+{
+	materialData->material.textureFilePath.clear();
 }
 
 ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes)

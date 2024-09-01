@@ -3,6 +3,7 @@
 EnemyBullet::~EnemyBullet()
 {
 	delete object3d;
+	object3d = NULL;
 }
 
 void EnemyBullet::Initialize(Vector3 firstPos)
