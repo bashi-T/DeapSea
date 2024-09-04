@@ -4,8 +4,10 @@
 #include"Commons/Object3dCommon.h"
 #include"Objects/Object3d.h"
 #include"Sprites/Sprite.h"
-//#include"Objects/Particle.h"
+#include"Objects/Particle.h"
 #include "GameManager.h"
+#include"GameObject/Cursor.h"
+#include"GameObject/Whale.h"
 
 class TitleScene:public SceneManager
 {
@@ -21,8 +23,17 @@ private:
 	//SRVManager* srvManager;
 	//Camera* camera;
 	std::vector<Object3d*> objects3d;
-	//std::vector <Particle*> particles;
-	Sprite* sprite = nullptr;
+	std::vector <Particle*> particles;
+	std::vector <Sprite*> sprites;
+	Cursor* cursor;
+	Whale* whale;
 
+	bool isSceneTransition;
+	bool isStageSelect;
+	int numStage;
+	int sceneTransitionTime = 0;
+	int nowStage;
+	int cooltime = 0;
+	int floatTime = 0;
 };
 

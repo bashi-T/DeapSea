@@ -9,7 +9,7 @@ Ground::~Ground()
 void Ground::Initialize()
 {
 	object3d = new Object3d;
-	const std::string groundModel = "ground/ground.obj";
+	const std::string groundModel = "ground/newground.obj";
 	const std::string groundSkin = "Resource/ganban.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(groundModel, groundSkin);
@@ -23,11 +23,13 @@ void Ground::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	object3d->SetTranslate({ 0.0f,-1.0f,50.0f });
+	object3d->SetTranslate({ 0.0f,-15.0f,50.0f });
 }
 
 void Ground::Update()
 {
+	object3d->SetTranslate({ object3d->GetTranslate().x, object3d->GetTranslate().y, object3d->GetTranslate().z - 0.1f });
+	object3d->Update(Camera::GetInstance());
 #ifdef _DEBUG
 	ImGui::Begin("ground");
 	ImGui::DragFloat3("ground.translate", (float*)&object3d->GetTranslate(), 0.01f);

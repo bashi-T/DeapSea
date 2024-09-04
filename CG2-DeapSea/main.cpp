@@ -1,14 +1,17 @@
 #include"Scene/GameManager.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	GameManager* gameManager = new GameManager;
-	_CrtSetBreakAlloc(127378);//enemyPopCommands
-	_CrtSetBreakAlloc(127353);//enemyPopFile[0]
-	//_CrtSetBreakAlloc(107732);//ground/ new Object3d;
-	//_CrtSetBreakAlloc(14359);//sprite/ materialData->material.textureFilePath
-	//_CrtSetBreakAlloc(139);
+#ifdef _DEBUG
+	//_CrtSetBreakAlloc(num);//
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 	gameManager->Run();
-	//_CrtDumpMemoryLeaks();
+	delete gameManager;
 	return 0;
 }

@@ -19,14 +19,12 @@ public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
 	void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon);
-	void Update();
+	void Update(bool isRevive);
 	void Draw();
 
 	ComPtr<ID3D12Resource> CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes);
 	void MakeBufferView();
-	void InputData(
-		Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
-		Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft);
+	void InputData(bool isRevive);
 
 	void MakeShaderResourceViewInstance();
 
@@ -89,10 +87,7 @@ public:
 	ParticleForGPU* GetInstancingData() { return instancingData; }
 	Particles* GetParticles() { return particles; }
 private:
-	Debug* debug_ = nullptr;
-	WinAPP* sWinApp = nullptr;
 	SRVManager* srvManager = nullptr;
-	MyImGui* imgui_ = nullptr;
 	DX12Common* dx12Common_ = nullptr;
 	Object3dCommon* object3dCommon_ = nullptr;
 	ParticleCommon* particleCommon_;
@@ -170,15 +165,15 @@ private:
 
 	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
 
-	Vector4 LeftTop[1];
-	Vector4 RightTop[1];
-	Vector4 RightBottom[1];
-	Vector4 LeftBottom[1];
-	Vector4 Color[1];
-	Vector2 texcoordLeftTop[1];
-	Vector2 texcoordLeftBottom[1];
-	Vector2 texcoordRightTop[1];
-	Vector2 texcoordRightBottom[1];
+	Vector4 LeftTop;
+	Vector4 RightTop;
+	Vector4 RightBottom;
+	Vector4 LeftBottom;
+	Vector4 Color;
+	Vector2 texcoordLeftTop;
+	Vector2 texcoordLeftBottom;
+	Vector2 texcoordRightTop;
+	Vector2 texcoordRightBottom;
 
 	const float kDeltaTime = 1.0f / 60.0f;
 	Vector2 anchorPoint = { 0.0f,0.0f };

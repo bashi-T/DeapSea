@@ -14,16 +14,16 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 
-	LeftTop[0] = { -0.5f, 0.5f, 0.0f, 1.0f };
-	RightTop[0] = { 0.5f, 0.5f, 0.0f, 1.0f };
-	RightBottom[0] = { 0.5f, -0.5f, 0.0f, 1.0f };
-	LeftBottom[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	Color[0] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	LeftTop = { -0.5f, 0.5f, 0.0f, 1.0f };
+	RightTop = { 0.5f, 0.5f, 0.0f, 1.0f };
+	RightBottom = { 0.5f, -0.5f, 0.0f, 1.0f };
+	LeftBottom = { -0.5f, -0.5f, 0.0f, 1.0f };
+	Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	texcoordLeftTop[0] = { 0.0f,0.0f };
-	texcoordRightTop[0] = { 0.0f,1.0f };
-	texcoordRightBottom[0] = { 1.0f,1.0f };
-	texcoordLeftBottom[0] = { 1.0f,0.0f };
+	texcoordLeftTop = { 0.0f,0.0f };
+	texcoordRightTop = { 0.0f,1.0f };
+	texcoordRightBottom = { 1.0f,1.0f };
+	texcoordLeftBottom = { 1.0f,0.0f };
 
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
@@ -44,8 +44,7 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
 
-	InputData(LeftTop[0], RightTop[0], RightBottom[0], LeftBottom[0], Color[0],
-		texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0], texcoordLeftBottom[0]);
+	InputData(true);
 
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
@@ -61,10 +60,9 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 }
 
 
-void Particle::Update()
+void Particle::Update(bool isRevive)
 {
-	InputData(RightTop[0], LeftTop[0], LeftBottom[0], RightBottom[0], Color[0],
-		texcoordLeftBottom[0], texcoordLeftTop[0], texcoordRightTop[0], texcoordRightBottom[0]);
+	InputData(isRevive);
 }
 
 void Particle::Draw()
@@ -98,6 +96,7 @@ void Particle::Draw()
 
 ComPtr<ID3D12Resource> Particle::CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes)
 {
+	this->particleCommon_ = particleCommon;
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -134,9 +133,7 @@ void Particle::MakeBufferView()
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
-void Particle::InputData(
-	Vector4 TopLeft, Vector4 TopRight, Vector4 BottomRight, Vector4 BottomLeft, Vector4 color,
-	Vector2 coordTopLeft, Vector2 coordTopRight, Vector2 coordBottomRight, Vector2 coordBottomLeft)
+void Particle::InputData(bool isRevive)
 {
 	uint32_t* indexData = nullptr;
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
@@ -152,7 +149,7 @@ void Particle::InputData(
 				particles[index].transform.scale,
 				particles[index].transform.rotate,
 				particles[index].transform.translate);
-		if (particles[index].lifeTime <= particles[index].currentTime)
+		if (particles[index].lifeTime <= particles[index].currentTime && isRevive == true)
 		{
 			std::random_device seedGenerator;
 			std::mt19937 randomEngine(seedGenerator());
@@ -181,26 +178,26 @@ void Particle::InputData(
 	};
 
 
-	vertexData[0].position = TopLeft;
-	vertexData[0].texcoord = coordTopLeft;
+	vertexData[0].position = LeftTop;
+	vertexData[0].texcoord = texcoordLeftTop;
 	vertexData[0].normal.x = vertexData[0].position.x;
 	vertexData[0].normal.y = vertexData[0].position.y;
 	vertexData[0].normal.z = vertexData[0].position.z;
 
-	vertexData[1].position = TopRight;
-	vertexData[1].texcoord = coordTopRight;
+	vertexData[1].position = RightTop;
+	vertexData[1].texcoord = texcoordRightTop;
 	vertexData[1].normal.x = vertexData[1].position.x;
 	vertexData[1].normal.y = vertexData[1].position.y;
 	vertexData[1].normal.z = vertexData[1].position.z;
 
-	vertexData[2].position = BottomRight;
-	vertexData[2].texcoord = coordBottomRight;
+	vertexData[2].position = RightBottom;
+	vertexData[2].texcoord = texcoordRightBottom;
 	vertexData[2].normal.x = vertexData[2].position.x;
 	vertexData[2].normal.y = vertexData[2].position.y;
 	vertexData[2].normal.z = vertexData[2].position.z;
 
-	vertexData[3].position = BottomLeft;
-	vertexData[3].texcoord = coordBottomLeft;
+	vertexData[3].position = LeftBottom;
+	vertexData[3].texcoord = texcoordLeftBottom;
 	vertexData[3].normal.x = vertexData[3].position.x;
 	vertexData[3].normal.y = vertexData[3].position.y;
 	vertexData[3].normal.z = vertexData[3].position.z;

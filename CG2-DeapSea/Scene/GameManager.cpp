@@ -32,7 +32,7 @@ int GameManager::Run()
 	imgui = MyImGui::GetInstance();
 	SPCommon = SpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
-	//object3d = new Object3d;
+	object3d = new Object3d;
 	camera = new Camera();
 	particleCommon = new ParticleCommon;
 	skyDome = new SkyDome;
@@ -55,9 +55,10 @@ int GameManager::Run()
 
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
-	camera->GetInstance()->SetRotate({0.26f,0.0f,0.0f});
-	camera->GetInstance()->SetTranslate({ 0.0f,7.0f,-20.0f });
+	camera->GetInstance()->SetRotate({0.1f,0.0f,0.0f});
+	camera->GetInstance()->SetTranslate({ 0.0f,2.0f,-20.0f });
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
+	object3d->Initialize(object3dCommon, srvManager);
 	SPCommon->Initialize(dx12Common);
 	particleCommon->Initialize(dx12Common);
 	skyDome->Initialize();
@@ -93,10 +94,10 @@ int GameManager::Run()
 			//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
 		ImGui::DragFloat3("camera.rotate", (float*)&camera->GetInstance()->GetRotate(), 0.01f);
 		ImGui::DragFloat3("camera.translate", (float*)&camera->GetInstance()->GetTranslate(), 0.01f);
-		//ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
-			//ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
-		//ImGui::DragFloat3("light.direction", (float*)&object3d->GetDirectionalLight().direction, 0.01f, -1.0f, 1.0f);
-		//object3d->GetDirectionalLightData()->direction = Normalize(directionlLight);
+		ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
+		ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
+		ImGui::DragFloat3("light.direction", (float*)&object3d->GetDirectionalLight().direction, 0.01f, -1.0f, 1.0f);
+		object3d->GetDirectionalLightData()->direction = Normalize(object3d->GetDirectionalLightData()->direction);
 		ImGui::End();
 		ImGui::Begin("scene");
 		switch (int(sceneArr_[currentSceneNo_]->GetSceneNo()))
@@ -147,7 +148,7 @@ int GameManager::Run()
 	camera->DeleteInstance();
 	delete camera;
 	camera = NULL;
-	//delete object3d;
+	delete object3d;
 	ModelManager::GetInstance()->Finalize();
 	object3dCommon->DeleteInstance();
 	TextureManager::GetInstance()->Finalize();

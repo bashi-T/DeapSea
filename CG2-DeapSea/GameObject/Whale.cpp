@@ -153,7 +153,7 @@ void Whale::Update()
 
 	if (isHit == true)
 	{
-		object3d->SetRotate({ object3d->GetRotate().x,object3d->GetRotate().y + 1.0f,object3d->GetRotate().z });
+		object3d->SetRotate({ object3d->GetRotate().x,object3d->GetRotate().y + 0.3f,object3d->GetRotate().z });
 		coolTimer++;
 		if (coolTimer == 120)
 		{

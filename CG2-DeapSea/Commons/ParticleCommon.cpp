@@ -204,7 +204,7 @@ void ParticleCommon::MakePSO(DX12Common* dxcommon)
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	hr = dxcommon->GetDevice()->CreateGraphicsPipelineState(
+	hr = dxcommon->GetDevice().Get()->CreateGraphicsPipelineState(
 		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 }

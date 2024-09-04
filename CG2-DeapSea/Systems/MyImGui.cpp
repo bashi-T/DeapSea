@@ -1,4 +1,5 @@
 #include "MyImGui.h"
+#include"Managers/SRVManager.h"
 
 MyImGui::~MyImGui()
 {
@@ -19,6 +20,7 @@ void MyImGui::Initialize(
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
 	ID3D12DescriptorHeap* srvDescriptorHeap)
 {
+	uint32_t index = SRVManager::GetInstance()->Allocate();
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -28,8 +30,10 @@ void MyImGui::Initialize(
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
 		srvDescriptorHeap,
-	    srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-	    srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		SRVManager::GetInstance()->
+		GetCPUDescriptorHandle(index),
+		SRVManager::GetInstance()->
+		GetGPUDescriptorHandle(index));
 }
 
 void MyImGui::Update()

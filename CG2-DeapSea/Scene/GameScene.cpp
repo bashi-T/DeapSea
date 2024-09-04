@@ -8,7 +8,7 @@ void GameScene::Init()
 {
 	player_ = new Player;
 	whale_ = new Whale;
-	ground = new Ground;//未解放
+	ground = new Ground;
 	player_->Initialize();
 	whale_->Initialize();
 	ground->Initialize();
@@ -117,7 +117,9 @@ void GameScene::Finalize()
 	}
 	enemys_.clear();
 	enemyPopFile[0].clear();
-	enemyPopCommands[0].clear();
+	enemyPopFile[0].shrink_to_fit();
+	enemyPopCommands[0].str("");
+	enemyPopCommands[0].clear(std::stringstream::goodbit);
 }
 
 void GameScene::CheckAllCollisions()
@@ -155,7 +157,6 @@ void GameScene::CheckAllCollisions()
 				(distance.z * distance.z) <= 4)
 			{
 				player_->OnCollision();
-				//enemy_->OnCollision();
 			}
 		}
 #pragma endregion

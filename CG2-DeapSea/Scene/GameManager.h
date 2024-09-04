@@ -34,7 +34,7 @@ private:
 	SpriteCommon* SPCommon;
 	Object3dCommon* object3dCommon;
 	ParticleCommon* particleCommon;
-	//Object3d* object3d;
+	Object3d* object3d;
 	Camera* camera;
 	SkyDome* skyDome;
 public: 

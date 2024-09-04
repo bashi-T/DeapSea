@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameObject\Cursor.cpp" />
     <ClCompile Include="GameObject\ground.cpp" />
     <ClCompile Include="Commons\ParticleCommon.cpp" />
     <ClCompile Include="Scene\ClearScene.cpp" />
@@ -54,6 +55,7 @@
     <ClCompile Include="GameObject\Tide.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameObject\Cursor.h" />
     <ClInclude Include="GameObject\ground.h" />
     <ClInclude Include="Commons\ParticleCommon.h" />
     <ClInclude Include="Scene\ClearScene.h" />

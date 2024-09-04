@@ -1,9 +1,5 @@
 #include "Sprite.h"
 #include"Commons/SpriteCommon.h"
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 Sprite::~Sprite()
 {
@@ -57,7 +53,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::
 	coordLeftBottom = { 0.0f, 1.0f };
 	
 	InputData(Color);
-	materialData->material.textureFilePath = textureFilePath;//未解放
+	materialData->material.textureFilePath = textureFilePath;
 	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 	AdjestTextureSize();
@@ -201,6 +197,7 @@ void Sprite::Draw()
 void Sprite::Finalize()
 {
 	materialData->material.textureFilePath.clear();
+	materialData->material.textureFilePath.shrink_to_fit();
 }
 
 ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes)
