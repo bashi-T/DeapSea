@@ -47,6 +47,9 @@ void TitleScene::Init()
 	numStage = 1;
 	nowStage = 1;
 	cooltime = 0;
+
+	soundData = AudioManager::GetInstance()->SoundLoadWave("Resource/titlebgm.wav");
+	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), soundData);
 }
 
 void TitleScene::Update()
@@ -185,5 +188,6 @@ void TitleScene::Finalize()
 	cursor = NULL;
 	delete whale;
 	whale = NULL;
+	AudioManager::GetInstance()->SoundUnload(&soundData);
 
 };

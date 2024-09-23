@@ -8,6 +8,7 @@
 #include "GameManager.h"
 #include"GameObject/Cursor.h"
 #include"GameObject/Whale.h"
+#include"Managers/AudioManager.h"
 
 class TitleScene:public SceneManager
 {
@@ -28,6 +29,7 @@ private:
 	Cursor* cursor;
 	Whale* whale;
 
+
 	bool isSceneTransition;
 	bool isStageSelect;
 	int numStage;
@@ -35,5 +37,7 @@ private:
 	int nowStage;
 	int cooltime = 0;
 	int floatTime = 0;
+
+	AudioManager::SoundData soundData;
 };
 

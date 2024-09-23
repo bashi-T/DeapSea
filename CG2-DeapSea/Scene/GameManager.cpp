@@ -27,6 +27,7 @@ int GameManager::Run()
 	winAPP = WinAPP::GetInstance();
 	dx12Common = DX12Common::GetInstance();
 	srvManager = SRVManager::GetInstance();
+	audioManager = AudioManager::GetInstance();
 	input = Input::GetInstance();
 	MSG NewMSG = winAPP->GetMSG();
 	imgui = MyImGui::GetInstance();
@@ -44,6 +45,7 @@ int GameManager::Run()
 	winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"GE3");
 	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
 	srvManager->Initialize(dx12Common);
+	audioManager->Initialize();
 	input->Initialize(winAPP);
 	imgui->Initialize(
 		winAPP->GetHWND(),
@@ -156,6 +158,7 @@ int GameManager::Run()
 	//delete imgui;
 	delete input;
 	input = NULL;
+	audioManager->Finalize();
 	srvManager->Finalize();
 	dx12Common->DeleteInstance();
 	winAPP->Finalize();

@@ -14,9 +14,10 @@
 #include"Commons/Object3dCommon.h"
 #include"Commons/ParticleCommon.h"
 #include"Managers/ModelManager.h"
-#include"Objects/model.h"
+#include"Managers/AudioManager.h"
 #include"Managers/TextureManager.h"
 #include"Managers/SRVManager.h"
+#include"Objects/model.h"
 #include"Objects/SkyDome.h"
 #include"Objects/Mesh.h"
 
@@ -37,6 +38,7 @@ private:
 	Object3d* object3d;
 	Camera* camera;
 	SkyDome* skyDome;
+	AudioManager* audioManager;
 public: 
 	GameManager();
 	~GameManager();
