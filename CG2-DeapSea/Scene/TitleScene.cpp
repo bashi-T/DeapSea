@@ -189,5 +189,4 @@ void TitleScene::Finalize()
 	delete whale;
 	whale = NULL;
 	AudioManager::GetInstance()->SoundUnload(&soundData);
-
 };
