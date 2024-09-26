@@ -23,10 +23,10 @@ public:
 	void Update();
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
-	void SetFovY(const float& fovY) { this->fovY = fovY; }
-	void SetAspectretio(const float& aspectRetio) { this->aspectRetio = aspectRetio; }
-	void SetNearClip(const float& nearClip) { this->nearClip = nearClip; }
-	void SetFarClip(const float& farClip) { this->farClip = farClip; }
+	void SetFovY(const float& FovY) { fovY = FovY; }
+	void SetAspectretio(const float& AspectRetio) { aspectRetio = AspectRetio; }
+	void SetNearClip(const float& NearClip) { nearClip = NearClip; }
+	void SetFarClip(const float& FarClip) { farClip = FarClip; }
 	const Vector3& GetRotate()const { return transformMatrix.rotate; }
 	const Vector3& GetTranslate()const { return transformMatrix.translate; }
 	const Matrix4x4& GetWorldMatrix() { return worldMatrix; }

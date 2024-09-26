@@ -153,7 +153,7 @@ void Player::Shot()
 		if (shotInterval == 1)
 		{
 			PlayerBullet* newBullet = new PlayerBullet;
-			newBullet->Initialize(object3d->GetTranslate());
+			newBullet->Initialize(object3d->GetTranslate(), object3d->GetRotate());
 			pBullets.push_back(newBullet);
 		}
 		if (shotInterval == 15)

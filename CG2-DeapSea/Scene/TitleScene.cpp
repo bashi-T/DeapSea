@@ -137,7 +137,7 @@ void TitleScene::Update()
 		if(sceneTransitionTime==90)
 		{
 			sceneNo = INGAME;
-			GameManager::stageNumber = 0;
+			GameManager::stageNumber = nowStage - 1;
 		}
 	}
 #ifdef _DEBUG

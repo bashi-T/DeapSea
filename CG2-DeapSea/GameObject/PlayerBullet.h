@@ -8,7 +8,7 @@ class PlayerBullet
 {
 public:
 	~PlayerBullet();
-	void Initialize(Vector3 firstPos);
+	void Initialize(Vector3 firstPos, Vector3 angle);
 	void Update();
 	void Draw();
 	void OnCollision();

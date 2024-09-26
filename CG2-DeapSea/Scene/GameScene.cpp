@@ -12,7 +12,10 @@ void GameScene::Init()
 	player_->Initialize();
 	whale_->Initialize();
 	ground->Initialize();
-	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
+	enemyPopFile[0] = "Resource/CSV/practiceFile.csv"; 
+	enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
+	enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
+	enemyPopFile[3] = "Resource/CSV/STAGE3File.csv";
 
 	for (uint32_t i = 0; i < 1; i++)
 	{
@@ -81,6 +84,7 @@ void GameScene::Update()
 	{
 		enemy_->Update(enemy_->GetSort());
 	}
+
 	CheckAllCollisions();
 }
 
@@ -109,7 +113,7 @@ void GameScene::Finalize()
 	whale_ = NULL;
 	player_->Finalize();
 	delete player_;
-	player_ == NULL;
+	player_ = NULL;
 	for (Enemy* enemy_ : enemys_)
 	{
 		delete enemy_;
@@ -120,6 +124,8 @@ void GameScene::Finalize()
 	enemyPopFile[0].shrink_to_fit();
 	enemyPopCommands[0].str("");
 	enemyPopCommands[0].clear(std::stringstream::goodbit);
+
+	GameManager::stageNumber = 0;
 }
 
 void GameScene::CheckAllCollisions()
@@ -200,6 +206,7 @@ void GameScene::CheckAllCollisions()
 		}
 	}
 #pragma endregion
+
 	if (whale_->GetIsHit() == false)
 	{
 #pragma region 敵とクジラの当たり判定

@@ -42,11 +42,11 @@ public:
 	ComPtr<ID3D12Resource> CreateTextureResource(
 		ID3D12Device* device,
 		const DirectX::TexMetadata& metadata);
-	void SetPositoin(const Vector2& position) { this->position = position; }
-	void SetRotation(float rotation) { this->rotation = rotation; }
+	void SetPositoin(const Vector2& Position) { position = Position; }
+	void SetRotation(float Rotation) { rotation = Rotation; }
 	void SetColor(const Vector4& color) { materialData->color = color; }
-	void SetSize(const Vector2& size) { this->size = size; }
-	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	void SetSize(const Vector2& Size) { size = Size; }
+	void SetAnchorPoint(const Vector2& AnchorPoint) {anchorPoint = AnchorPoint; }
 	void SetIsFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
 	void SetIsFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
 	void SetTextureLeftTop(const Vector2& texturelefttop) { this->textureLeftTop = texturelefttop; }
