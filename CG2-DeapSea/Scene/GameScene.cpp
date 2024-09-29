@@ -17,10 +17,10 @@ void GameScene::Init()
 	enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
 	enemyPopFile[3] = "Resource/CSV/STAGE3File.csv";
 
-	for (uint32_t i = 0; i < 1; i++)
-	{
-		LoadEnemyPopData(enemyPopFile[i], i);
-	}
+	//for (uint32_t i = 0; i < 1; i++)
+	//{
+	//}
+	LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
 	gameEnd = false;
 }
 
@@ -120,10 +120,13 @@ void GameScene::Finalize()
 		enemy_ = NULL;
 	}
 	enemys_.clear();
-	enemyPopFile[0].clear();
-	enemyPopFile[0].shrink_to_fit();
-	enemyPopCommands[0].str("");
-	enemyPopCommands[0].clear(std::stringstream::goodbit);
+	for (uint32_t i = 0; i < 4; i++)
+	{
+		enemyPopFile[i].clear();
+		enemyPopFile[i].shrink_to_fit();
+		enemyPopCommands[i].str("");
+		enemyPopCommands[i].clear(std::stringstream::goodbit);
+	}
 
 	GameManager::stageNumber = 0;
 }

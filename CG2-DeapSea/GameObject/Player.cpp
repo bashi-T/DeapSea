@@ -37,6 +37,7 @@ void Player::Initialize()
 	pCollision.orientations[1] = { 0.0f,1.0f,0.0f };
 	pCollision.orientations[2] = { 0.0f,0.0f,1.0f };
 	pCollision.size = { 0.5f,1.0f,0.5f };
+	angle_ = 0.0f;
 }
 
 void Player::Update()
@@ -51,6 +52,7 @@ void Player::Update()
 			return false;
 		});
 	XINPUT_STATE joyState;
+	Vector3 move = { 0.0f,0.0f,0.0f };
 	if (isHit == false)
 	{
 		if (Input::GetInstance()->GetJoystickState(0, joyState))
@@ -60,11 +62,30 @@ void Player::Update()
 			}
 			else
 			{
-				object3d->SetTranslate(
-					{ object3d->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f),
-					0.0f, object3d->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f) });
+				move =
+				{ 
+					(float)joyState.Gamepad.sThumbLX / (SHRT_MAX),
+					0.0f,
+					(float)joyState.Gamepad.sThumbLY / (SHRT_MAX)
+				};
+				float inputMagnitude = Length(move);
+				// スティックの入力に応じて速度を調整する
+				float adjustedSpeed = 1.0f * inputMagnitude;
+
+				// 最大速度を超えないようにする
+				if (adjustedSpeed > 1.0f)
+				{
+					adjustedSpeed = 1.0f;
+				}
+
+				// 実際の移動量を計算
+				move.x *= adjustedSpeed;
+				move.z *= adjustedSpeed;
+
+
 			}
 		}
+
 		if ((float)joyState.Gamepad.sThumbLX != 0.0f || (float)joyState.Gamepad.sThumbLY != 0.0f)
 		{
 			object3d->SetIsAnimation(true);
@@ -74,31 +95,35 @@ void Player::Update()
 			object3d->SetIsAnimation(false);
 		}
 
-		if ((float)joyState.Gamepad.sThumbLY > 0)
-		{
-			object3d->SetRotate({ 0.0f,0.0f,0.0f });
-		}
-		if ((float)joyState.Gamepad.sThumbLY < 0)
-		{
-			object3d->SetRotate({ 0.0f,3.0f,0.0f });
-		}
-		if ((float)joyState.Gamepad.sThumbLX > 0)
-		{
-			object3d->SetRotate({ 0.0f,1.5f,0.0f });
-		}
-		if ((float)joyState.Gamepad.sThumbLX < 0)
-		{
-			object3d->SetRotate({ 0.0f,4.5f,0.0f });
-		}
+		//if ((float)joyState.Gamepad.sThumbLY > 0)
+		//{
+		//	object3d->SetRotate({ 0.0f,0.0f,0.0f });
+		//}
+		//if ((float)joyState.Gamepad.sThumbLY < 0)
+		//{
+		//	object3d->SetRotate({ 0.0f,3.0f,0.0f });
+		//}
+		//if ((float)joyState.Gamepad.sThumbLX > 0)
+		//{
+		//	object3d->SetRotate({ 0.0f,1.5f,0.0f });
+		//}
+		//if ((float)joyState.Gamepad.sThumbLX < 0)
+		//{
+		//	object3d->SetRotate({ 0.0f,4.5f,0.0f });
+		//}
 
-		if (Input::GetInstance()->PushKey(DIK_D))
-		{
-			object3d->SetTranslate({ object3d->GetTranslate().x + 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
-		}
-		if (Input::GetInstance()->PushKey(DIK_A))
-		{
-			object3d->SetTranslate({ object3d->GetTranslate().x - 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
-		}
+		angle_ = std::atan2(object3d->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f), object3d->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f));
+		object3d->SetRotate({ 0.0f,/*object3d->GetRotate().y+*/LerpShortAngle(object3d->GetRotate().y, angle_,0.1f),0.0f});
+
+
+		//if (Input::GetInstance()->PushKey(DIK_D))
+		//{
+		//	object3d->SetTranslate({ object3d->GetTranslate().x + 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
+		//}
+		//if (Input::GetInstance()->PushKey(DIK_A))
+		//{
+		//	object3d->SetTranslate({ object3d->GetTranslate().x - 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
+		//}
 
 		if (joyState.Gamepad.bRightTrigger || Input::GetInstance()->PushKey(DIK_C))
 		{

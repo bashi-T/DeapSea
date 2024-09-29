@@ -31,5 +31,6 @@ private:
 	bool isShot = false;
 	bool isHit = false;
 	uint32_t hitTimer = 0;
+	float angle_;
 };
 

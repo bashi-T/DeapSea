@@ -25,6 +25,15 @@ Vector3 Lerp(const Vector3& a, const Vector3& b, float t)
 	return f;
 }
 
+float Lerp(const float& a, const float& b, float t)
+{
+	float result{};
+
+	result = a + b * t;
+
+	return result;
+}
+
 Vector3 Add(const Vector3& v1, const Vector3& v2)
 {
 	Vector3 v3 = {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
@@ -837,4 +846,32 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Quaternion rotate, Vector3 translate)
 		result.m[3][3] = 1.0f
 	};
 	return result;
+}
+
+float LerpShortAngle(float a, float b, float t)
+{
+	// 角度差分を求める
+	float diff = b - a;
+
+	diff = std::fmod(diff, 2 * (float)std::numbers::pi);
+	if (diff < 2 * (float)-std::numbers::pi)
+	{
+		diff += 2 * (float)std::numbers::pi;
+	}
+	else if (diff >= 2 * std::numbers::pi)
+	{
+		diff -= 2 * (float)std::numbers::pi;
+	}
+
+	diff = std::fmod(diff, 2 * (float)std::numbers::pi);
+	if (diff < (float)-std::numbers::pi)
+	{
+		diff += 2 * (float)std::numbers::pi;
+	}
+	else if (diff >= (float)std::numbers::pi)
+	{
+		diff -= 2 * (float)std::numbers::pi;
+	}
+
+	return Lerp(a, diff, t);
 }

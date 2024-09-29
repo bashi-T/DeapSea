@@ -1,9 +1,10 @@
 #pragma once
 #include <assert.h>
-#include<cmath>
+#include <cmath>
+#include <math.h>
 #include<stdio.h>
 #include<limits>
-
+#include<numbers>
 
 typedef struct Matrix4x4 {
 	float m[4][4];
@@ -420,3 +421,7 @@ Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
 Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
 
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Quaternion rotate, Vector3 translate);
+
+float Lerp(const float& a, const float& b, float t);
+
+float LerpShortAngle(float a, float b, float t);
