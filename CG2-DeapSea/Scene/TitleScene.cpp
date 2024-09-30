@@ -48,8 +48,12 @@ void TitleScene::Init()
 	nowStage = 1;
 	cooltime = 0;
 
-	soundData = AudioManager::GetInstance()->SoundLoadWave("Resource/titlebgm.wav");
-	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), soundData);
+	//bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/titlebgm.wav");
+	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
+	//enterSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei.wav");
+	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
+	//moveSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei2.wav");
+	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
 }
 
 void TitleScene::Update()
@@ -188,5 +192,7 @@ void TitleScene::Finalize()
 	cursor = NULL;
 	delete whale;
 	whale = NULL;
-	AudioManager::GetInstance()->SoundUnload(&soundData);
+	AudioManager::GetInstance()->SoundUnload(&bgm);
+	AudioManager::GetInstance()->SoundUnload(&enterSound);
+	AudioManager::GetInstance()->SoundUnload(&moveSound);
 };

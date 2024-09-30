@@ -38,6 +38,8 @@ private:
 	int cooltime = 0;
 	int floatTime = 0;
 
-	AudioManager::SoundData soundData;
+	AudioManager::SoundData bgm;
+	AudioManager::SoundData enterSound;
+	AudioManager::SoundData moveSound;
 };
 
