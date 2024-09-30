@@ -48,12 +48,10 @@ void TitleScene::Init()
 	nowStage = 1;
 	cooltime = 0;
 
-	//bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/titlebgm.wav");
-	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
-	//enterSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei.wav");
-	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
-	//moveSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei2.wav");
-	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
+	bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/titlebgm.wav");
+	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
+	enterSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei.wav");
+	moveSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei2.wav");
 }
 
 void TitleScene::Update()
@@ -89,6 +87,7 @@ void TitleScene::Update()
 	{
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isStageSelect == false)
 		{
+			AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
 			isStageSelect = true;
 		}
 	}
@@ -102,6 +101,7 @@ void TitleScene::Update()
 		{
 			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
 			{
+				AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
 				/*sprites[5]->SetPositoin({ sprites[nowStage]->GetPosition().x - sprites[5]->GetSize().x,sprites[nowStage]->GetPosition().y });*/
 				cursor->SetTranslate({ cursor->GetTranslate().x,cursor->GetTranslate().y - 1.1f,cursor->GetTranslate().z });
 				cooltime = 0;
@@ -114,6 +114,7 @@ void TitleScene::Update()
 			}
 			else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
 			{
+				AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
 				cursor->SetTranslate({ cursor->GetTranslate().x,cursor->GetTranslate().y + 1.1f,cursor->GetTranslate().z });
 				cooltime = 0;
 				nowStage--;
@@ -125,6 +126,7 @@ void TitleScene::Update()
 			}
 			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isSceneTransition == false)
 			{
+				AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
 				isSceneTransition = true;
 				cooltime = 0;
 			}
