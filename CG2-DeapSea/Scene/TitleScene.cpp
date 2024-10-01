@@ -36,6 +36,7 @@ void TitleScene::Init()
 	cursor = new Cursor;
 	cursor->Initialize();
 	cursor->SetTranslate({ -2.7f,1.7f,0.0f });
+	Camera::GetInstance()->SetTranslate({0.0f,2.0f,-20.0f});
 
 	//whale = new Whale;
 	//whale->Initialize();
@@ -47,9 +48,10 @@ void TitleScene::Init()
 	numStage = 1;
 	nowStage = 1;
 	cooltime = 0;
+	sceneTransitionTime = 0;
 
 	bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/titlebgm.wav");
-	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
+	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
 	enterSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei.wav");
 	moveSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei2.wav");
 }
@@ -82,10 +84,7 @@ void TitleScene::Update()
 	//	floatTime = 0;
 	//}
 	//whale->Update();
-
-	if (Input::GetInstance()->GetJoystickState(0, joyState))
-	{
-	}
+	Input::GetInstance()->GetJoystickState(0, joyState);
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isStageSelect == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isStageSelect == false)
 	{
 		AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);

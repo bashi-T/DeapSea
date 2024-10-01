@@ -4,7 +4,7 @@
 #include <crtdbg.h>
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
-const uint32_t SRVManager::kMaxSRVCount = 512;
+const uint32_t SRVManager::kMaxSRVCount = 5120;
 const uint32_t SRVManager::kSRVIndexTop = 0;
 
 void SRVManager::Initialize(DX12Common* dxCommon)

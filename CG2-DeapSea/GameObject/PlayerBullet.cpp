@@ -26,13 +26,13 @@ void PlayerBullet::Initialize(Vector3 firstPos,Vector3 angle)
 	}
 	model->Memcpy();
 	object3d->SetTranslate({ firstPos.x + 0.01f, firstPos.y,firstPos.z });
-	Vector3 direction = { firstPos.x + 0.01f, firstPos.y,firstPos.z + 1.0f };
-	bulletSpeed = Normalize(
-		Vector3{
-			(direction.x - firstPos.x) * std::cos(angle.y) + (direction.z - firstPos.z) * std::sin(angle.y) + firstPos.x,
-			direction.y + firstPos.y,
-			-(direction.x - firstPos.x) * std::sin(angle.y) + (direction.z - firstPos.z) * std::cos(angle.y) + firstPos.z,
-		});
+	//Vector3 direction = { firstPos.x + 0.01f, firstPos.y,firstPos.z + 1.0f };
+	//bulletSpeed = Normalize(
+	//	Vector3{
+	//		(direction.x - firstPos.x) * std::cos(angle.y) + (direction.z - firstPos.z) * std::sin(angle.y) + firstPos.x,
+	//		direction.y + firstPos.y,
+	//		-(direction.x - firstPos.x) * std::sin(angle.y) + (direction.z - firstPos.z) * std::cos(angle.y) + firstPos.z,
+	//	});
 
 	object3d->SetScale({ 0.5f,0.5f,0.5f });
 	object3d->SetIsAnimation(false);
