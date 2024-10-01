@@ -38,12 +38,12 @@ void GameScene::Update()
 			}
 			return false;
 		});
-	if (whale_->GetLife() == 0)
+/*	if (whale__->GetLife() == 0)
 	{
 		enemys_.resize(0);
 		sceneNo = GAMEOVER;
 	}
-	else if (enemys_.size() == 0 && gameEnd||Input::GetInstance()->TriggerKey(DIK_RETURN))
+	else*/ if (enemys_.size() == 0 && gameEnd||Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
 		enemys_.resize(0);
 		sceneNo = CLEAR;
@@ -53,23 +53,23 @@ void GameScene::Update()
 	//	sceneNo = TITLE;
 	//}
 
-	if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ player_->GetTranslate().x + whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
-	}
-	if (whale_->GetTranslate().x < player_->GetTranslate().x - whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ player_->GetTranslate().x - whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
-	}
+	//if (whale__->GetTranslate().x > player_->GetTranslate().x + whale__->GetMaxDistance())
+	//{
+	//	whale__->SetTranslate({ player_->GetTranslate().x + whale__->GetMaxDistance(),whale__->GetTranslate().y,whale__->GetTranslate().z });
+	//}
+	//if (whale__->GetTranslate().x < player_->GetTranslate().x - whale__->GetMaxDistance())
+	//{
+	//	whale__->SetTranslate({ player_->GetTranslate().x - whale__->GetMaxDistance(),whale__->GetTranslate().y,whale__->GetTranslate().z });
+	//}
 
-	if (whale_->GetTranslate().z > player_->GetTranslate().z + whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y,player_->GetTranslate().z + whale_->GetMaxDistance() });
-	}
-	if (whale_->GetTranslate().z < player_->GetTranslate().z - whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y,player_->GetTranslate().z - whale_->GetMaxDistance() });
-	}
+	//if (whale__->GetTranslate().z > player_->GetTranslate().z + whale__->GetMaxDistance())
+	//{
+	//	whale__->SetTranslate({ whale__->GetTranslate().x,whale__->GetTranslate().y,player_->GetTranslate().z + whale__->GetMaxDistance() });
+	//}
+	//if (whale__->GetTranslate().z < player_->GetTranslate().z - whale__->GetMaxDistance())
+	//{
+	//	whale__->SetTranslate({ whale__->GetTranslate().x,whale__->GetTranslate().y,player_->GetTranslate().z - whale__->GetMaxDistance() });
+	//}
 
 	if (player_->GetTranslate().x <= -10.0f)
 	{
@@ -95,7 +95,7 @@ void GameScene::Update()
 void GameScene::Draw()
 {
 	//ground->Draw();
-	player_->Draw();
+	//player_->Draw();
 	whale_->Draw();
 	for (Enemy* enemy_ : enemys_)
 	{
@@ -214,44 +214,44 @@ void GameScene::CheckAllCollisions()
 	}
 #pragma endregion
 
-	if (whale_->GetIsHit() == false)
-	{
-#pragma region 敵とクジラの当たり判定
-		for (Enemy* enemy_ : enemys_)
-		{
-			posA = whale_->GetTranslate();
-			posB = enemy_->GetTranslate();
-			Vector3 distance = Subtract(posA, posB);
-			if ((distance.x * distance.x) + (distance.y * distance.y) +
-				(distance.z * distance.z) <= 4)
-			{
-				whale_->OnCollision();
-				enemy_->OnCollision();
-				return;
-			}
-		}
-#pragma endregion
-#pragma region 敵弾とクジラの当たり判定
-		for (Enemy* enemy_ : enemys_)
-		{
-			const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
-
-			posA = whale_->GetTranslate();
-			for (EnemyBullet* bullet : enemyBullets)
-			{
-				posB = bullet->GetTranslate();
-				Vector3 distance = Subtract(posA, posB);
-				if ((distance.x * distance.x) + (distance.y * distance.y) +
-					(distance.z * distance.z) <= 4)
-				{
-					whale_->OnCollision();
-					bullet->OnCollision();
-					return;
-				}
-			}
-		}
-#pragma endregion
-	}
+//	if (whale__->GetIsHit() == false)
+//	{
+//#pragma region 敵とクジラの当たり判定
+//		for (Enemy* enemy_ : enemys_)
+//		{
+//			posA = whale__->GetTranslate();
+//			posB = enemy_->GetTranslate();
+//			Vector3 distance = Subtract(posA, posB);
+//			if ((distance.x * distance.x) + (distance.y * distance.y) +
+//				(distance.z * distance.z) <= 4)
+//			{
+//				whale__->OnCollision();
+//				enemy_->OnCollision();
+//				return;
+//			}
+//		}
+//#pragma endregion
+//#pragma region 敵弾とクジラの当たり判定
+//		for (Enemy* enemy_ : enemys_)
+//		{
+//			const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+//
+//			posA = whale__->GetTranslate();
+//			for (EnemyBullet* bullet : enemyBullets)
+//			{
+//				posB = bullet->GetTranslate();
+//				Vector3 distance = Subtract(posA, posB);
+//				if ((distance.x * distance.x) + (distance.y * distance.y) +
+//					(distance.z * distance.z) <= 4)
+//				{
+//					whale__->OnCollision();
+//					bullet->OnCollision();
+//					return;
+//				}
+//			}
+//		}
+//#pragma endregion
+//	}
 }
 
 void GameScene::LoadEnemyPopData(std::string filePath,int fileNum)
@@ -307,10 +307,10 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 			//Enemy* enemy_ = new Enemy;
 			//enemy_ = new Enemy;
 			//enemy_->SetSort(1);
-			//enemy_->Initialize(player_, whale_, enemy_->GetSort());
+			//enemy_->Initialize(player_, whale__, enemy_->GetSort());
 			//enemys_.push_back(enemy_);
 			//enemy_->SetTranslate({ x,y,z });
-			//enemy_->SetEnemyVector(whale_->GetTranslate());
+			//enemy_->SetEnemyVector(whale__->GetTranslate());
 		}
 		else if (word.find("WAIT") == 0)
 		{
