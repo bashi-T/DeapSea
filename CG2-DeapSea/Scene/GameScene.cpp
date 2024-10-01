@@ -8,10 +8,10 @@ void GameScene::Init()
 {
 	player_ = new Player;
 	whale_ = new Whale;
-	ground = new Ground;
+	//ground = new Ground;
 	player_->Initialize();
 	whale_->Initialize(player_);
-	ground->Initialize();
+	//ground->Initialize();
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv"; 
 	enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
 	enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
@@ -43,7 +43,7 @@ void GameScene::Update()
 		enemys_.resize(0);
 		sceneNo = GAMEOVER;
 	}
-	else if (enemys_.size() == 0 && gameEnd)
+	else if (enemys_.size() == 0 && gameEnd||Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
 		enemys_.resize(0);
 		sceneNo = CLEAR;
@@ -80,7 +80,7 @@ void GameScene::Update()
 	{
 		player_->SetTranslate({ 10.0f,player_->GetTranslate().y,player_->GetTranslate().z });
 	}
-	ground->Update();
+	//ground->Update();
 	player_->Update();
 	whale_->Update();
 	UpdateEnemyPopCommands(GameManager::stageNumber);
@@ -94,7 +94,7 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	ground->Draw();
+	//ground->Draw();
 	player_->Draw();
 	whale_->Draw();
 	for (Enemy* enemy_ : enemys_)
@@ -111,8 +111,8 @@ void GameScene::Finalize()
 		sprite = NULL;
 	}
 	sprites.clear();
-	delete ground;
-	ground = NULL;
+	//delete ground;
+	//ground = NULL;
 	delete whale_;
 	whale_ = NULL;
 	player_->Finalize();
@@ -306,7 +306,7 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 			//std::uniform_real_distribution<float> enemySort(0, 2);
 			//Enemy* enemy_ = new Enemy;
 			//enemy_ = new Enemy;
-			//enemy_->SetSort(int(enemySort(randomEngine)));
+			//enemy_->SetSort(1);
 			//enemy_->Initialize(player_, whale_, enemy_->GetSort());
 			//enemys_.push_back(enemy_);
 			//enemy_->SetTranslate({ x,y,z });
