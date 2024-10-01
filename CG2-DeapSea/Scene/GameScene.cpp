@@ -22,6 +22,9 @@ void GameScene::Init()
 	//}
 	LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
 	gameEnd = false;
+	bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
+	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
+
 }
 
 void GameScene::Update()
@@ -93,10 +96,10 @@ void GameScene::Draw()
 	ground->Draw();
 	player_->Draw();
 	whale_->Draw();
-	for (Enemy* enemy_ : enemys_)
-	{
-		enemy_->Draw(enemy_->GetSort());
-	}
+	//for (Enemy* enemy_ : enemys_)
+	//{
+	//	enemy_->Draw(enemy_->GetSort());
+	//}
 }
 
 void GameScene::Finalize()
@@ -127,7 +130,7 @@ void GameScene::Finalize()
 		enemyPopCommands[i].str("");
 		enemyPopCommands[i].clear(std::stringstream::goodbit);
 	}
-
+	AudioManager::GetInstance()->SoundUnload(&bgm);
 	GameManager::stageNumber = 0;
 }
 

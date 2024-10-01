@@ -8,6 +8,7 @@
 #include"GameObject/Enemy.h"
 #include "GameManager.h"
 #include"GameObject/ground.h"
+#include"Managers/AudioManager.h"
 #include <random>
 
 class GameScene:public SceneManager
@@ -38,5 +39,7 @@ private:
 	int32_t WaitTimer = 1;
 	bool gameEnd = false;
 	Ground* ground;
+	AudioManager::SoundData bgm;
+
 };
 

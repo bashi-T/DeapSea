@@ -13,7 +13,6 @@ GameManager::GameManager()
 	sceneArr_[INGAME] = std::make_unique<GameScene>();
 	sceneArr_[GAMEOVER] = std::make_unique<GameOverScene>();
 	sceneArr_[CLEAR] = std::make_unique<ClearScene>();
-	currentSceneNo_ = TITLE;
 }
 
 GameManager::~GameManager() {}
@@ -85,6 +84,7 @@ int GameManager::Run()
 		if (prevSceneNo_ != currentSceneNo_)
 		{
 			sceneArr_[prevSceneNo_]->Finalize();
+			audioManager->Initialize();
 			sceneArr_[currentSceneNo_]->Init();
 		}
 		imgui->Update();

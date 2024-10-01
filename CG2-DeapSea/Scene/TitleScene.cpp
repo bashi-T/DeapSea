@@ -85,11 +85,11 @@ void TitleScene::Update()
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState))
 	{
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isStageSelect == false)
-		{
-			AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
-			isStageSelect = true;
-		}
+	}
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isStageSelect == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isStageSelect == false)
+	{
+		AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
+		isStageSelect = true;
 	}
 	if (isStageSelect == true && isSceneTransition == false)
 	{
@@ -99,7 +99,7 @@ void TitleScene::Update()
 		}
 		else
 		{
-			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN || Input::GetInstance()->TriggerKey(DIK_DOWN))
 			{
 				AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
 				/*sprites[5]->SetPositoin({ sprites[nowStage]->GetPosition().x - sprites[5]->GetSize().x,sprites[nowStage]->GetPosition().y });*/
@@ -112,7 +112,7 @@ void TitleScene::Update()
 					nowStage = 1;
 				}
 			}
-			else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
+			else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP || Input::GetInstance()->TriggerKey(DIK_UP))
 			{
 				AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
 				cursor->SetTranslate({ cursor->GetTranslate().x,cursor->GetTranslate().y + 1.1f,cursor->GetTranslate().z });
@@ -124,7 +124,7 @@ void TitleScene::Update()
 					nowStage = 4;
 				}
 			}
-			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isSceneTransition == false)
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isSceneTransition == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isSceneTransition == false)
 			{
 				AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
 				isSceneTransition = true;
