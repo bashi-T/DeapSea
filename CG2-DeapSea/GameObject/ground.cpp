@@ -23,7 +23,7 @@ void Ground::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	object3d->SetTranslate({ 0.0f,-15.0f,50.0f });
+	object3d->SetTranslate({ 0.0f,-15.0f,100.0f });
 }
 
 void Ground::Update()
