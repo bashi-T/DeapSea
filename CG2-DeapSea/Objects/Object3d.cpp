@@ -57,7 +57,7 @@ void Object3d::Update(Camera* camera)
 	transformationMatrixData->WorldInverseTranspose = Transpose(Inverse(transformationMatrixData->World));
 }
 
-void Object3d::AnimationUpdate(Camera* camera)
+void Object3d::AnimationUpdate(Camera* camera)//処理に問題の可能性あり
 {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(
 		transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
@@ -80,6 +80,7 @@ void Object3d::AnimationUpdate(Camera* camera)
 		animationTime += 1.0f / 60.0f;
 	}
 	animationTime = std::fmod(animationTime, model_->GetAnimation().duration);
+	ApplyAnimation(model_->GetSkelton(), model_->GetAnimation(), animationTime);
 	Model::NodeAnimation& rootNodeAnimation = model_->GetAnimation().nodeAnimations[model_->GetModelData()->rootNode.name];
 	Vector3 translate = CalculatevalueV(rootNodeAnimation.translate.keyframes, animationTime);
 	Quaternion rotate = CalculatevalueQ(rootNodeAnimation.rotate.keyframes, animationTime);
@@ -151,7 +152,7 @@ void Object3d::SkeltonUpdate(Camera* camera)
 	(void)test;
 }
 
-void Object3d::Draw(ModelCommon* modelCommon)
+void Object3d::Draw(ModelCommon* modelCommon)//処理に問題の可能性あり
 {
 	this->modelCommon_ = modelCommon;
 

@@ -19,10 +19,10 @@ void GameOverScene::Update()
 	sprite->Update();
 	if (Input::GetInstance()->GetJoystickState(0, joyState))
 	{
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-		{
-			sceneNo = TITLE;
-		}
+	}
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || Input::GetInstance()->TriggerKey(DIK_SPACE))
+	{
+		sceneNo = TITLE;
 	}
 }
 

@@ -10,7 +10,7 @@ void GameScene::Init()
 	whale_ = new Whale;
 	ground = new Ground;
 	player_->Initialize();
-	whale_->Initialize();
+	whale_->Initialize(player_);
 	ground->Initialize();
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv"; 
 	enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
@@ -23,7 +23,7 @@ void GameScene::Init()
 	LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
 	gameEnd = false;
 	bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
-	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
+	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
 
 }
 
@@ -45,12 +45,13 @@ void GameScene::Update()
 	}
 	else if (enemys_.size() == 0 && gameEnd)
 	{
+		enemys_.resize(0);
 		sceneNo = CLEAR;
 	}else
-	if (Input::GetInstance()->TriggerKey(DIK_S))
-	{
-		sceneNo = TITLE;
-	}
+	//if (Input::GetInstance()->TriggerKey(DIK_S))
+	//{
+	//	sceneNo = TITLE;
+	//}
 
 	if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
 	{
@@ -96,10 +97,10 @@ void GameScene::Draw()
 	ground->Draw();
 	player_->Draw();
 	whale_->Draw();
-	//for (Enemy* enemy_ : enemys_)
-	//{
-	//	enemy_->Draw(enemy_->GetSort());
-	//}
+	for (Enemy* enemy_ : enemys_)
+	{
+		enemy_->Draw(enemy_->GetSort());
+	}
 }
 
 void GameScene::Finalize()

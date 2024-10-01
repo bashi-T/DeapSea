@@ -37,7 +37,7 @@ void ModelManager::LoadModel(const std::string& filePath, const std::string& Tex
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 
-void ModelManager::LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath)
+void ModelManager::LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath)//処理に問題の可能性あり
 {
 	//if (models.contains(filePath))
 	//{

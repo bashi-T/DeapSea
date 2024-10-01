@@ -9,7 +9,7 @@ class Whale
 {
 public:
 	~Whale();
-	void Initialize();
+	void Initialize(Player* players);
 	void Update();
 	void Draw();
 

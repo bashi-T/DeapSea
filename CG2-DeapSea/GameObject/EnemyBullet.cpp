@@ -10,7 +10,7 @@ void EnemyBullet::Initialize(Vector3 firstPos)
 {
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	ModelManager::GetInstance()->LoadAnimationModel(bulletModel, bulletSkin);
+	ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin);
 	object3d->SetModel(bulletModel);
 	Model* model = ModelManager::GetInstance()->FindModel(bulletModel);
 	Model::ModelData* modelData = model->GetModelData();
@@ -33,7 +33,7 @@ void EnemyBullet::Update()
 		isDead = true;
 	}
 	object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.1f, enemyBulletVector)));
-	object3d->AnimationUpdate(Camera::GetInstance());
+	object3d->Update(Camera::GetInstance());
 }
 
 void EnemyBullet::Draw()

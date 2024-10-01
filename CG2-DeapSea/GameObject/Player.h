@@ -21,11 +21,15 @@ public:
 	OBB GetCollision() { return pCollision; }
 	bool GetIsHit() { return isHit; }
 	uint32_t GetIsHitTimer() { return hitTimer; }
+	Vector3 GetMoveVector() { return moveVector; }
+
 	void SetTranslate(Vector3 translate) { object3d->SetTranslate(translate); }
 private:
 	Object3d* object3d;
 	std::list<PlayerBullet*> pBullets;
 	OBB pCollision;
+	Vector3 moveVector;
+	//Vector3 preVector;
 
 	uint32_t shotInterval = 0;
 	bool isShot = false;

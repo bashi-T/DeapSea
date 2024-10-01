@@ -4,14 +4,14 @@ Whale::~Whale()
 {
 	delete 	object3d;
 	object3d = NULL;
-	delete player;
-	player = NULL;
+	//delete player;
+	//player = NULL;
 }
 
-void Whale::Initialize()
+void Whale::Initialize(Player* players)
 {
 	object3d = new Object3d; 
-	player = new Player;
+	player = players;
 	const std::string whaleModel = "whale/improvisedWhale2.obj";
 	const std::string whaleSkin = "Resource/whale5.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
@@ -27,6 +27,7 @@ void Whale::Initialize()
 	}
 	model->Memcpy();
 	life = 4;
+	coolTimer = 0;
 }
 
 void Whale::Update()
@@ -36,119 +37,114 @@ void Whale::Update()
 	{
 		if (Input::GetInstance()->GetJoystickState(0, joyState))
 		{
-			if ((float)joyState.Gamepad.sThumbLX > 0.0f)
+		}
+		if (player->GetMoveVector().x > 0.0f)
+		{
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-				{
-					accSpeed.x -= 0.01f;
-					if (accSpeed.x <= 0.0f)
-					{
-						accSpeed.x = 0.0f;
-					}
-				}
-				else
-				{
-					accSpeed.x += 0.01f;
-					if (accSpeed.x >= 1.0f)
-					{
-						accSpeed.x = 1.0f;
-					}
-				}
-			}
-			else if ((float)joyState.Gamepad.sThumbLX < 0.0f)
-			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-				{
-					accSpeed.x += 0.01f;
-					if (accSpeed.x >= 0.0f)
-					{
-						accSpeed.x = 0.0f;
-					}
-				}
-				else
-				{
-					accSpeed.x -= 0.01f;
-					if (accSpeed.x <= -1.0f)
-					{
-						accSpeed.x = -1.0f;
-					}
-				}
-			}
-			else
-			{
-				if (accSpeed.x > 0.0f)
-				{
-					accSpeed.x -= 0.01f;
-				}
-				else if (accSpeed.x < 0.0f)
-				{
-					accSpeed.x += 0.01f;
-				}
-				else if (accSpeed.x == 0.0f)
+				accSpeed.x -= 0.01f;
+				if (accSpeed.x <= 0.0f)
 				{
 					accSpeed.x = 0.0f;
 				}
 			}
-
-			if ((float)joyState.Gamepad.sThumbLY > 0.0f)
+			else
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+				accSpeed.x += 0.01f;
+				if (accSpeed.x >= 1.0f)
 				{
-					accSpeed.z -= 0.01f;
-					if (accSpeed.z <= 0.0f)
-					{
-						accSpeed.z = 0.0f;
-					}
-				}
-				else
-				{
-					accSpeed.z += 0.01f;
-					if (accSpeed.z >= 1.0f)
-					{
-						accSpeed.z = 1.0f;
-					}
+					accSpeed.x = 1.0f;
 				}
 			}
-			else if ((float)joyState.Gamepad.sThumbLY < 0.0f)
+		}
+		else if (player->GetMoveVector().x < 0.0f)
+		{
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+				accSpeed.x += 0.01f;
+				if (accSpeed.x >= 0.0f)
 				{
-					accSpeed.z += 0.01f;
-					if (accSpeed.z >= 0.0f)
-					{
-						accSpeed.z = 0.0f;
-					}
-				}
-				else
-				{
-					accSpeed.z -= 0.01f;
-					if (accSpeed.z <= -1.0f)
-					{
-						accSpeed.z = -1.0f;
-					}
+					accSpeed.x = 0.0f;
 				}
 			}
 			else
 			{
-				if (accSpeed.z > 0.0f)
+				accSpeed.x -= 0.01f;
+				if (accSpeed.x <= -1.0f)
 				{
-					accSpeed.z -= 0.01f;
+					accSpeed.x = -1.0f;
 				}
-				else if (accSpeed.z < 0.0f)
-				{
-					accSpeed.z += 0.01f;
-				}
-				else if (accSpeed.z == 0.0f)
+			}
+		}
+		else
+		{
+			if (accSpeed.x > 0.0f)
+			{
+				accSpeed.x -= 0.01f;
+			}
+			else if (accSpeed.x < 0.0f)
+			{
+				accSpeed.x += 0.01f;
+			}
+			else if (accSpeed.x == 0.0f)
+			{
+				accSpeed.x = 0.0f;
+			}
+		}
+
+		if (player->GetMoveVector().z > 0.0f)
+		{
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
+			{
+				accSpeed.z -= 0.01f;
+				if (accSpeed.z <= 0.0f)
 				{
 					accSpeed.z = 0.0f;
 				}
 			}
+			else
+			{
+				accSpeed.z += 0.01f;
+				if (accSpeed.z >= 1.0f)
+				{
+					accSpeed.z = 1.0f;
+				}
+			}
 		}
-	}
-    else
-    {
-		int x = 1;
-		x++;
+		else if (player->GetMoveVector().z < 0.0f)
+		{
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
+			{
+				accSpeed.z += 0.01f;
+				if (accSpeed.z >= 0.0f)
+				{
+					accSpeed.z = 0.0f;
+				}
+			}
+			else
+			{
+				accSpeed.z -= 0.01f;
+				if (accSpeed.z <= -1.0f)
+				{
+					accSpeed.z = -1.0f;
+				}
+			}
+		}
+		else
+		{
+			if (accSpeed.z > 0.0f)
+			{
+				accSpeed.z -= 0.01f;
+			}
+			else if (accSpeed.z < 0.0f)
+			{
+				accSpeed.z += 0.01f;
+			}
+			else if (accSpeed.z == 0.0f)
+			{
+				accSpeed.z = 0.0f;
+			}
+		}
 	}
 
 	if (isHit == true)

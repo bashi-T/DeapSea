@@ -52,23 +52,23 @@ void Player::Update()
 			return false;
 		});
 	XINPUT_STATE joyState;
-	Vector3 move = { 0.0f,0.0f,0.0f };
 	if (isHit == false)
 	{
-		if (Input::GetInstance()->GetJoystickState(0, joyState))
+		if (Input::GetInstance()->GetJoystickState(0, joyState))//joystick操作
 		{
+
 			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 			{
 			}
 			else
 			{
-				move =
-				{ 
+				moveVector =
+				{
 					(float)joyState.Gamepad.sThumbLX / (SHRT_MAX),
 					0.0f,
 					(float)joyState.Gamepad.sThumbLY / (SHRT_MAX)
 				};
-				float inputMagnitude = Length(move);
+				float inputMagnitude = Length(moveVector);
 				// スティックの入力に応じて速度を調整する
 				float adjustedSpeed = 1.0f * inputMagnitude;
 
@@ -79,59 +79,119 @@ void Player::Update()
 				}
 
 				// 実際の移動量を計算
-				move.x *= adjustedSpeed;
-				move.z *= adjustedSpeed;
-
+				moveVector.x *= adjustedSpeed;
+				moveVector.z *= adjustedSpeed;
 
 			}
+
+			if ((float)joyState.Gamepad.sThumbLX != 0.0f || (float)joyState.Gamepad.sThumbLY != 0.0f)
+			{
+				object3d->SetIsAnimation(true);
+			}
+			else
+			{
+				object3d->SetIsAnimation(false);
+			}
+
+			//if ((float)joyState.Gamepad.sThumbLY > 0)
+			//{
+			//	object3d->SetRotate({ 0.0f,0.0f,0.0f });
+			//}
+			//if ((float)joyState.Gamepad.sThumbLY < 0)
+			//{
+			//	object3d->SetRotate({ 0.0f,3.0f,0.0f });
+			//}
+			//if ((float)joyState.Gamepad.sThumbLX > 0)
+			//{
+			//	object3d->SetRotate({ 0.0f,1.5f,0.0f });
+			//}
+			//if ((float)joyState.Gamepad.sThumbLX < 0)
+			//{
+			//	object3d->SetRotate({ 0.0f,4.5f,0.0f });
+			//}
+
+			angle_ = std::atan2(object3d->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f), object3d->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f));
+			object3d->SetRotate({ 0.0f,/*object3d->GetRotate().y+*/LerpShortAngle(object3d->GetRotate().y, angle_,0.1f),0.0f });
+
+
+			//if (Input::GetInstance()->PushKey(DIK_D))
+			//{
+			//	object3d->SetTranslate({ object3d->GetTranslate().x + 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
+			//}
+			//if (Input::GetInstance()->PushKey(DIK_A))
+			//{
+			//	object3d->SetTranslate({ object3d->GetTranslate().x - 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
+			//}
+
+			if (joyState.Gamepad.bRightTrigger )
+			{
+				isShot = true;
+			}
+			else
+			{
+				isShot = false;
+			}
 		}
-
-		if ((float)joyState.Gamepad.sThumbLX != 0.0f || (float)joyState.Gamepad.sThumbLY != 0.0f)
+		else//keyboard操作
 		{
-			object3d->SetIsAnimation(true);
-		}
-		else
-		{
-			object3d->SetIsAnimation(false);
-		}
+			moveVector = { 0.0f,0.0f,0.0f };
+			if (Input::GetInstance()->PushKey(DIK_RIGHT))
+			{
+				moveVector = { 0.05f, 0.0f,0.0f };
+			}
+			if (Input::GetInstance()->PushKey(DIK_LEFT))
+			{
+				moveVector = { -0.05f, 0.0f,0.0f };
+			}
+			if (Input::GetInstance()->PushKey(DIK_UP))
+			{
+				moveVector = { 0.0f, 0.0f,0.05f };
+			}
+			if (Input::GetInstance()->PushKey(DIK_DOWN))
+			{
+				moveVector = { 0.0f, 0.0f,-0.05f };
+			}
 
-		//if ((float)joyState.Gamepad.sThumbLY > 0)
-		//{
-		//	object3d->SetRotate({ 0.0f,0.0f,0.0f });
-		//}
-		//if ((float)joyState.Gamepad.sThumbLY < 0)
-		//{
-		//	object3d->SetRotate({ 0.0f,3.0f,0.0f });
-		//}
-		//if ((float)joyState.Gamepad.sThumbLX > 0)
-		//{
-		//	object3d->SetRotate({ 0.0f,1.5f,0.0f });
-		//}
-		//if ((float)joyState.Gamepad.sThumbLX < 0)
-		//{
-		//	object3d->SetRotate({ 0.0f,4.5f,0.0f });
-		//}
+			if (Input::GetInstance()->PushKey(DIK_A))
+			{
+			}else
+			{
+				object3d->SetTranslate(Add(object3d->GetTranslate(), moveVector));
+			}
+			if ( moveVector.x !=0.0f|| moveVector.z != 0.0f)
+			{
+				object3d->SetIsAnimation(true);
+			}
+			else
+			{
+				object3d->SetIsAnimation(false);
+			}
+			if (moveVector.z > 0)
+			{
+				object3d->SetRotate({ 0.0f,0.0f,0.0f });
+			}
+			if (moveVector.z < 0)
+			{
+				object3d->SetRotate({ 0.0f,3.0f,0.0f });
+			}
+			if (moveVector.x > 0)
+			{
+				object3d->SetRotate({ 0.0f,1.5f,0.0f });
+			}
+			if (moveVector.x < 0)
+			{
+				object3d->SetRotate({ 0.0f,4.5f,0.0f });
+			}
 
-		angle_ = std::atan2(object3d->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f), object3d->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f));
-		object3d->SetRotate({ 0.0f,/*object3d->GetRotate().y+*/LerpShortAngle(object3d->GetRotate().y, angle_,0.1f),0.0f});
+			if (Input::GetInstance()->PushKey(DIK_SPACE))
+			{
+				isShot = true;
+			}
+			else
+			{
+				isShot = false;
+			}
 
-
-		//if (Input::GetInstance()->PushKey(DIK_D))
-		//{
-		//	object3d->SetTranslate({ object3d->GetTranslate().x + 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
-		//}
-		//if (Input::GetInstance()->PushKey(DIK_A))
-		//{
-		//	object3d->SetTranslate({ object3d->GetTranslate().x - 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
-		//}
-
-		if (joyState.Gamepad.bRightTrigger || Input::GetInstance()->PushKey(DIK_C))
-		{
-			isShot = true;
-		}
-		else
-		{
-			isShot = false;
 		}
 		Shot();
 

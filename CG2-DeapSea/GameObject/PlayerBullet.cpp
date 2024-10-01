@@ -1,4 +1,8 @@
 #include "PlayerBullet.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 PlayerBullet::~PlayerBullet()
 {
@@ -9,9 +13,10 @@ void PlayerBullet::Initialize(Vector3 firstPos,Vector3 angle)
 {
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	ModelManager::GetInstance()->LoadAnimationModel(bulletModel, bulletSkin);
+	ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin);
 	object3d->SetModel(bulletModel);
 	Model* model = ModelManager::GetInstance()->FindModel(bulletModel);
+
 	Model::ModelData* modelData = model->GetModelData();
 	for (Model::VertexData& vertex : modelData->vertices)
 	{
@@ -30,7 +35,7 @@ void PlayerBullet::Initialize(Vector3 firstPos,Vector3 angle)
 		});
 
 	object3d->SetScale({ 0.5f,0.5f,0.5f });
-	object3d->SetIsAnimation(true);
+	object3d->SetIsAnimation(false);
 }
 
 void PlayerBullet::Update()
@@ -40,7 +45,7 @@ void PlayerBullet::Update()
 		isDead = true;
 	}
 	object3d->SetTranslate(Add(object3d->GetTranslate(), bulletSpeed));
-	object3d->AnimationUpdate(Camera::GetInstance());
+	object3d->Update(Camera::GetInstance());
 }
 
 void PlayerBullet::Draw()
