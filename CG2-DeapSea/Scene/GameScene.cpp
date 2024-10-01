@@ -301,16 +301,16 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 			getline(line_stream, word, ',');
 			float z = (float)std::atof(word.c_str()) + player_->GetTranslate().z;
 
-			std::random_device seedGenerator;
-			std::mt19937 randomEngine(seedGenerator());
-			std::uniform_real_distribution<float> enemySort(0, 2);
-			Enemy* enemy_ = new Enemy;
-			enemy_ = new Enemy;
-			enemy_->SetSort(int(enemySort(randomEngine)));
-			enemy_->Initialize(player_, whale_, enemy_->GetSort());
-			enemys_.push_back(enemy_);
-			enemy_->SetTranslate({ x,y,z });
-			enemy_->SetEnemyVector(whale_->GetTranslate());
+			//std::random_device seedGenerator;
+			//std::mt19937 randomEngine(seedGenerator());
+			//std::uniform_real_distribution<float> enemySort(0, 2);
+			//Enemy* enemy_ = new Enemy;
+			//enemy_ = new Enemy;
+			//enemy_->SetSort(int(enemySort(randomEngine)));
+			//enemy_->Initialize(player_, whale_, enemy_->GetSort());
+			//enemys_.push_back(enemy_);
+			//enemy_->SetTranslate({ x,y,z });
+			//enemy_->SetEnemyVector(whale_->GetTranslate());
 		}
 		else if (word.find("WAIT") == 0)
 		{

@@ -185,12 +185,12 @@ void Player::Update()
 
 			if (Input::GetInstance()->PushKey(DIK_SPACE))
 			{
-				isShot = true;
 			}
 			else
 			{
 				isShot = false;
 			}
+			isShot = true;
 
 		}
 		Shot();
