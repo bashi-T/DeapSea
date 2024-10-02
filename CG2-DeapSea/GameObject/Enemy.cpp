@@ -24,46 +24,45 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 	object3d = new Object3d;
 	switch (sort)
 	{
-	case 0:
-	{
-		const std::string enemyModel = "fish/improvisedFish.obj";
-		const std::string enemySkin = "Resource/uvChecker.png";
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-		ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin);
-		object3d->SetModel(enemyModel);
-		Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
-		Model::ModelData* modelData = model->GetModelData();
-		for (Model::VertexData& vertex : modelData->vertices)
+	    case 0:
 		{
-			vertex.normal.x = vertex.position.x;
-			vertex.normal.y = vertex.position.y;
-			vertex.normal.z = vertex.position.z;
+			const std::string enemyModel = "fish/improvisedFish.obj";
+			const std::string enemySkin = "Resource/uvChecker.png";
+			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin);
+			object3d->SetModel(enemyModel);
+			Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
+			Model::ModelData* modelData = model->GetModelData();
+			for (Model::VertexData& vertex : modelData->vertices)
+			{
+				vertex.normal.x = vertex.position.x;
+				vertex.normal.y = vertex.position.y;
+				vertex.normal.z = vertex.position.z;
+			}
+			model->Memcpy();
+			break;
 		}
-		model->Memcpy();
-	}
-		break;
 
-	case 1:
-	{
-		moveInterval = 0;
-		const std::string enemyModel = "straight/improvisedStraight.obj";
-		const std::string enemySkin = "Resource/uvChecker.png";
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-		ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin);
-		object3d->SetModel(enemyModel);
-		Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
-		Model::ModelData* modelData = model->GetModelData();
-		for (Model::VertexData& vertex : modelData->vertices)
+	    case 1:
 		{
-			vertex.normal.x = vertex.position.x;
-			vertex.normal.y = vertex.position.y;
-			vertex.normal.z = vertex.position.z;
+			moveInterval = 0;
+			const std::string enemyModel = "straight/improvisedStraight.obj";
+			const std::string enemySkin = "Resource/uvChecker.png";
+			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin);
+			object3d->SetModel(enemyModel);
+			Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
+			Model::ModelData* modelData = model->GetModelData();
+			for (Model::VertexData& vertex : modelData->vertices)
+			{
+				vertex.normal.x = vertex.position.x;
+				vertex.normal.y = vertex.position.y;
+				vertex.normal.z = vertex.position.z;
+			}
+			model->Memcpy();
+			break;
 		}
-		model->Memcpy();
-		break;
 	}
-	};
-	//object3d->SetTranslate({ 0.0f,0.0f,10.0f });
 }
 
 void Enemy::Update(int sort)
@@ -83,7 +82,7 @@ void Enemy::Update(int sort)
 	case 0:
 		if (object3d->GetTranslate().z > player_->GetTranslate().z)
 		{
-			//Shot();
+			Shot();
 		}
 		if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
 		{

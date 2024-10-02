@@ -61,7 +61,7 @@ int GameManager::Run()
 	object3d->Initialize(object3dCommon, srvManager);
 	SPCommon->Initialize(dx12Common);
 	particleCommon->Initialize(dx12Common);
-	skyDome->Initialize();
+	//skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 
 	while (NewMSG.message != WM_QUIT)
@@ -86,7 +86,7 @@ int GameManager::Run()
 			sceneArr_[currentSceneNo_]->Init();
 		}
 		imgui->Update();
-		skyDome->Update();
+		//skyDome->Update();
 		sceneArr_[currentSceneNo_]->Update();
 #ifdef _DEBUG
 		ImGui::Begin("camera");
@@ -134,8 +134,8 @@ int GameManager::Run()
 
 	CloseHandle(srvManager->GetFenceEvent());
 	sceneArr_[currentSceneNo_]->Finalize();
-	delete skyDome;
-	skyDome = NULL;
+	//delete skyDome;
+	//skyDome = NULL;
 	particleCommon->DeleteInstance();
 	delete particleCommon;
 	particleCommon = NULL;
