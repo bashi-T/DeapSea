@@ -91,9 +91,9 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	ground->Draw();
-	//player_->Draw();
-	whale_->Draw();
+	//ground->Draw();
+	player_->Draw();
+	//whale_->Draw();
 	for (Enemy* enemy_ : enemys_)
 	{
 		enemy_->Draw(enemy_->GetSort());
@@ -136,7 +136,7 @@ void GameScene::CheckAllCollisions()
 {
 	Vector3 posA, posB;
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-	if(player_->GetIsHit()==false&&player_->GetIsHitTimer()==0)
+	if (player_->GetIsHit() == false && player_->GetIsHitTimer() == 0)
 	{
 #pragma region 自機と敵弾の当たり判定
 		for (Enemy* enemy_ : enemys_)
@@ -304,10 +304,10 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 			Enemy* enemy_ = new Enemy;
 			enemy_ = new Enemy;
 			enemy_->SetSort(/*(int)enemySort(randomEngine)*/0);
-			enemy_->Initialize(player_, whale_, enemy_->GetSort());
-			enemys_.push_back(enemy_);
-			enemy_->SetTranslate({ x,y,z });
-			enemy_->SetEnemyVector(whale_->GetTranslate());
+			//enemy_->Initialize(player_, whale_, enemy_->GetSort());
+			//enemys_.push_back(enemy_);
+			//enemy_->SetTranslate({ x,y,z });
+			//enemy_->SetEnemyVector(whale_->GetTranslate());
 		}
 		else if (word.find("WAIT") == 0)
 		{
