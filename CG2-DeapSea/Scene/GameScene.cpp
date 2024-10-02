@@ -92,7 +92,7 @@ void GameScene::Update()
 void GameScene::Draw()
 {
 	//ground->Draw();
-	player_->Draw();
+	//player_->Draw();
 	//whale_->Draw();
 	for (Enemy* enemy_ : enemys_)
 	{
@@ -303,11 +303,12 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 			std::uniform_real_distribution<float> enemySort(0, 2);
 			Enemy* enemy_ = new Enemy;
 			enemy_ = new Enemy;
-			enemy_->SetSort(/*(int)enemySort(randomEngine)*/0);
-			//enemy_->Initialize(player_, whale_, enemy_->GetSort());
-			//enemys_.push_back(enemy_);
-			//enemy_->SetTranslate({ x,y,z });
-			//enemy_->SetEnemyVector(whale_->GetTranslate());
+			enemy_->SetSort((int)enemySort(randomEngine)/*0*/);
+			enemy_->Initialize(player_, whale_, enemy_->GetSort());
+			enemys_.push_back(enemy_);
+			enemy_->SetTranslate({ x,y,z });
+			enemy_->SetEnemyVector(whale_->GetTranslate());
+ 			int i = 0;
 		}
 		else if (word.find("WAIT") == 0)
 		{
