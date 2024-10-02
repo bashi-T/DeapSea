@@ -83,7 +83,7 @@ void Enemy::Update(int sort)
 	case 0:
 		if (object3d->GetTranslate().z > player_->GetTranslate().z)
 		{
-			Shot();
+			//Shot();
 		}
 		if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
 		{
