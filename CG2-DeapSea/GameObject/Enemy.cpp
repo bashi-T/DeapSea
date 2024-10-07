@@ -29,7 +29,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 			const std::string enemyModel = "fish/improvisedFish.obj";
 			const std::string enemySkin = "Resource/uvChecker.png";
 			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin);
+			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin, true);
 			object3d->SetModel(enemyModel);
 			Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
 			Model::ModelData* modelData = model->GetModelData();
@@ -49,7 +49,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 			const std::string enemyModel = "straight/improvisedStraight.obj";
 			const std::string enemySkin = "Resource/uvChecker.png";
 			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin);
+			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin, true);
 			object3d->SetModel(enemyModel);
 			Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
 			Model::ModelData* modelData = model->GetModelData();

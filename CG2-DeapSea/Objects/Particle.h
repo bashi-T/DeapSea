@@ -18,13 +18,35 @@ class Particle
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Particle();
-	void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon);
-	void Update(bool isRevive);
+	struct ElementsParticle
+	{
+		float colorMin;
+		float colorMax;
+		float timeMin;
+		float timeMax;
+		float posxMin;
+		float posxMax;
+		float posyMin;
+		float posyMax;
+		float poszMin;
+		float poszMax;
+		float velxMin;
+		float velxMax;
+		float velyMin;
+		float velyMax;
+		float velzMin;
+		float velzMax;
+	};
+	ElementsParticle elements;
+	void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements);
+	void RandomInitialize(ElementsParticle elements);
+
+	void Update(bool isRevive,ElementsParticle elements);
 	void Draw();
 
 	ComPtr<ID3D12Resource> CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes);
 	void MakeBufferView();
-	void InputData(bool isRevive);
+	void InputData(bool isRevive,ElementsParticle elements);
 
 	void MakeShaderResourceViewInstance();
 
@@ -74,11 +96,20 @@ public:
 
 	CameraTransform* cameraData = nullptr;
 
-	Particles MakeNewParticle(std::mt19937& randomEngine);
+	Particles MakeNewParticle(std::mt19937& randomEngine, float colorMin, float colorMax, float timeMin, float timeMax);
+	Particles MakeNewParticlePosition(std::mt19937& randomEngine,
+		float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
+		float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);
 
 	//void ParticleRelease();
 
 	//ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
+	
+	void SetElements(float colorMin, float colorMax, float timeMin, float timeMax,
+		float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
+		float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);
+
+	ElementsParticle GetElements() { return elements; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }

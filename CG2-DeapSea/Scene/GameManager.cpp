@@ -32,9 +32,9 @@ int GameManager::Run()
 	imgui = MyImGui::GetInstance();
 	SPCommon = SpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
+	particleCommon = ParticleCommon::GetInstance();
 	object3d = new Object3d;
 	camera = new Camera();
-	particleCommon = new ParticleCommon;
 	skyDome = new SkyDome;
 	std::vector<Model*> models;
 
@@ -61,7 +61,7 @@ int GameManager::Run()
 	object3d->Initialize(object3dCommon, srvManager);
 	SPCommon->Initialize(dx12Common);
 	particleCommon->Initialize(dx12Common);
-	//skyDome->Initialize();
+	skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 
 	while (NewMSG.message != WM_QUIT)
@@ -86,7 +86,7 @@ int GameManager::Run()
 			sceneArr_[currentSceneNo_]->Init();
 		}
 		imgui->Update();
-		//skyDome->Update();
+		skyDome->Update();
 		sceneArr_[currentSceneNo_]->Update();
 #ifdef _DEBUG
 		ImGui::Begin("camera");
@@ -124,7 +124,7 @@ int GameManager::Run()
 			break;
 		}
 		srvManager->PreDraw();
-		//skyDome->Draw();
+		skyDome->Draw();
 		sceneArr_[currentSceneNo_]->Draw();
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
@@ -134,11 +134,9 @@ int GameManager::Run()
 
 	CloseHandle(srvManager->GetFenceEvent());
 	sceneArr_[currentSceneNo_]->Finalize();
-	//delete skyDome;
-	//skyDome = NULL;
+	delete skyDome;
+	skyDome = NULL;
 	particleCommon->DeleteInstance();
-	delete particleCommon;
-	particleCommon = NULL;
 	for (Model* model : models)
 	{
 		delete model;
@@ -146,8 +144,6 @@ int GameManager::Run()
 	}
 	SPCommon->DeleteInstance();
 	camera->DeleteInstance();
-	delete camera;
-	camera = NULL;
 	delete object3d;
 	ModelManager::GetInstance()->Finalize();
 	object3dCommon->DeleteInstance();

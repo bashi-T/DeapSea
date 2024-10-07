@@ -4,7 +4,7 @@ Model::~Model()
 {
 }
 
-void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
+void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath,bool isLighting)
 {
 	this->modelCommon_ = modelCommon;
 
@@ -28,7 +28,7 @@ void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, s
 	//modelData_.isEnvironment = false;
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = true;
+	materialData[0].enableLighting = isLighting;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	materialData[0].shininess = 50.0f;
 
@@ -36,7 +36,7 @@ void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, s
 	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 }
 
-void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath)
+void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting)
 {
 	this->modelCommon_ = modelCommon;
 	//modelCommon_->MakePSO(DX12Common::GetInstance());
@@ -62,7 +62,7 @@ void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePat
 	//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = true;
+	materialData[0].enableLighting = isLighting;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	materialData[0].shininess = 50.0f;
 
@@ -70,7 +70,7 @@ void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePat
 	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 }
 
-void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager)
+void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager, bool isLighting)
 {
 	this->modelCommon_ = modelCommon;
 	this->srvManager_ = srvManager;
@@ -94,7 +94,7 @@ void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath,
 	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
 	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = true;
+	materialData[0].enableLighting = isLighting;
 	materialData[0].uvTransform = MakeIdentity4x4();
 	materialData[0].shininess = 50.0f;
 
@@ -501,4 +501,9 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 	}
 
 	return skinCluster;
+}
+
+void Model::SetIsLighting(bool lighting)
+{
+	materialData[0].enableLighting = lighting;
 }

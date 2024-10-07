@@ -23,9 +23,9 @@ public:
 
 	void Finalize();
 	void Initialize(DX12Common* dxCommon);
-	void LoadModel(const std::string& filePath, const std::string& TextureFilePath);
-	void LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath);
-	void LoadSkeltonAnimation(const std::string& filePath, const std::string& TextureFilePath, SRVManager* srvManager);
+	void LoadModel(const std::string& filePath, const std::string& TextureFilePath, bool isLighting);
+	void LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath, bool isLighting);
+	void LoadSkeltonAnimation(const std::string& filePath, const std::string& TextureFilePath, SRVManager* srvManager, bool isLighting);
 
 	Model* FindModel(const std::string& filePath);
 

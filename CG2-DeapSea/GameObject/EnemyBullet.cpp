@@ -14,7 +14,7 @@ void EnemyBullet::Initialize(Vector3 firstPos)
 {
 	object3d = new Object3d;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin);
+	ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin, true);
 	object3d->SetModel(bulletModel);
 	Model* model = ModelManager::GetInstance()->FindModel(bulletModel);
 	Model::ModelData* modelData = model->GetModelData();

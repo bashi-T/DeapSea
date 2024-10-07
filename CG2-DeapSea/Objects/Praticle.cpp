@@ -4,15 +4,13 @@
 Particle::~Particle() {
 }
 
-void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon)
+void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements)
 {
 	this->particleCommon_ = particleCommon;
 	this->object3dCommon_ = object3dCommon;
 	this->srvManager = srvManager;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
 	kNumMaxInstance = 10;
-	std::random_device seedGenerator;
-	std::mt19937 randomEngine(seedGenerator());
 
 	LeftTop = { -0.5f, 0.5f, 0.0f, 1.0f };
 	RightTop = { 0.5f, 0.5f, 0.0f, 1.0f };
@@ -24,11 +22,6 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	texcoordRightTop = { 0.0f,1.0f };
 	texcoordRightBottom = { 1.0f,1.0f };
 	texcoordLeftBottom = { 1.0f,0.0f };
-
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
-	{
-		particles[index] = MakeNewParticle(randomEngine);
-	}
 
 	projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(WinAPP::clientWidth_) / float(WinAPP::clientHeight_), 0.1f, 100.0f);
 	vertexResource = CreateBufferResource(particleCommon_, sizeof(VertexData) * 6);
@@ -44,25 +37,36 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
 
-	InputData(true);
+	RandomInitialize(elements);
+	InputData(true,elements);
 
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
-	{
-		instancingData[index].WVP = MakeIdentity4x4();
-		instancingData[index].World = MakeIdentity4x4();
-		instancingData[index].color = particles[index].color;
-	}
 	MakeShaderResourceViewInstance();
 
 	materialData.textureFilePath = textureFilePath;
 	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
+	
 }
 
-
-void Particle::Update(bool isRevive)
+void Particle::RandomInitialize(ElementsParticle elements)
 {
-	InputData(isRevive);
+	std::random_device seedGenerator;
+	std::mt19937 randomEngine(seedGenerator());
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+	{
+		particles[index] = MakeNewParticle(randomEngine, elements.colorMin, elements.colorMax, elements.timeMin, elements.timeMax);
+		particles[index] = MakeNewParticlePosition(randomEngine,
+			elements.posxMin, elements.posxMax, elements.posyMin, elements.posyMax, elements.poszMin, elements.poszMax,
+			elements.velxMin, elements.velxMax, elements.velyMin, elements.velyMax, elements.velzMin, elements.velzMax);
+		instancingData[index].WVP = MakeIdentity4x4();
+		instancingData[index].World = MakeIdentity4x4();
+		instancingData[index].color = particles[index].color;
+	}
+}
+
+void Particle::Update(bool isRevive, ElementsParticle elements)
+{
+	InputData(isRevive,elements);
 }
 
 void Particle::Draw()
@@ -133,7 +137,7 @@ void Particle::MakeBufferView()
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
-void Particle::InputData(bool isRevive)
+void Particle::InputData(bool isRevive, ElementsParticle elements)
 {
 	uint32_t* indexData = nullptr;
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
@@ -153,7 +157,16 @@ void Particle::InputData(bool isRevive)
 		{
 			std::random_device seedGenerator;
 			std::mt19937 randomEngine(seedGenerator());
-			particles[index] = MakeNewParticle(randomEngine);
+			for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+			{
+				particles[index] = MakeNewParticle(randomEngine, elements.colorMin, elements.colorMax, elements.timeMin, elements.timeMax);
+				particles[index] = MakeNewParticlePosition(randomEngine,
+					elements.posxMin, elements.posxMax, elements.posyMin, elements.posyMax, elements.poszMin, elements.poszMax,
+					elements.velxMin, elements.velxMax, elements.velyMin, elements.velyMax, elements.velzMin, elements.velzMax);
+				instancingData[index].WVP = MakeIdentity4x4();
+				instancingData[index].World = MakeIdentity4x4();
+				instancingData[index].color = particles[index].color;
+			}
 		}
 		particles[index].transform.translate.x += particles[index].velocity.x * kDeltaTime;
 		particles[index].transform.translate.y += particles[index].velocity.y * kDeltaTime;
@@ -220,18 +233,53 @@ void Particle::MakeShaderResourceViewInstance()
 	srvManager->CreateSRVforStructuredBuffer(index, instancingResource.Get(), kNumInstance, sizeof(ParticleForGPU));
 }
 
-Particle::Particles Particle::MakeNewParticle(std::mt19937& randomEngine)
+Particle::Particles Particle::MakeNewParticlePosition(std::mt19937& randomEngine,
+	float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
+	float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax)
 {
-	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
-	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
+	std::uniform_real_distribution<float> distPosX(posxMin, posxMax);
+	std::uniform_real_distribution<float> distPosY(posyMin, posyMax);
+	std::uniform_real_distribution<float> distPosZ(poszMin, poszMax);
+	std::uniform_real_distribution<float> distVelocityX(velxMin, velxMax);
+	std::uniform_real_distribution<float> distVelocityY(velyMin, velyMax);
+	std::uniform_real_distribution<float> distVelocityZ(velzMin, velzMax);
+	Particles particle;
+	particle.transform.translate = { distPosX(randomEngine),distPosY(randomEngine),distPosZ(randomEngine) };
+	particle.velocity = { distVelocityX(randomEngine) ,distVelocityY(randomEngine) ,distVelocityZ(randomEngine) };
+	return particle;
+}
+
+Particle::Particles Particle::MakeNewParticle(std::mt19937& randomEngine, float colorMin,float colorMax,float timeMin,float timeMax)
+{
+	std::uniform_real_distribution<float> distColor(colorMin, colorMax);
+	std::uniform_real_distribution<float> distTime(timeMin, timeMax);
 	Particles particle;
 	particle.transform.scale = { 1.0f,1.0f,1.0f };
 	particle.transform.rotate = { 0.0f,0.0f,0.0f };
-	particle.transform.translate = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
-	particle.velocity = { distribution(randomEngine) ,distribution(randomEngine) ,distribution(randomEngine) };
 	particle.color = { distColor(randomEngine) ,distColor(randomEngine) ,distColor(randomEngine) ,1.0f };
 	particle.lifeTime = distTime(randomEngine);
 	particle.currentTime = 0;
 	return particle;
+}
+
+void Particle::SetElements(float colorMin, float colorMax, float timeMin, float timeMax,
+	float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
+	float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax)
+{
+	elements.colorMin = colorMin;
+	elements.colorMax = colorMax;
+	elements.timeMin = timeMin;
+	elements.timeMax = timeMax;
+	elements.posxMin = posxMin;
+	elements.posxMax = posxMax;
+	elements.posyMin = posyMin;
+	elements.posyMax = posyMax;
+	elements.poszMin = poszMin;
+	elements.poszMax = poszMax;
+	elements.velxMin = velxMin;
+	elements.velxMax = velxMax;
+	elements.velyMin = velyMin;
+	elements.velyMax = velyMax;
+	elements.velzMin = velzMin;
+	elements.velzMax = velzMax;
 }

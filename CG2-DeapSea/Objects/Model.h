@@ -130,9 +130,9 @@ public:
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>paletteSrvHandle;
 	};
 
-	void ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath);
-	void AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath);
-	void SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager);
+	void ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting);
+	void AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting);
+	void SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager, bool isLighting);
 	void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void Memcpy();
@@ -152,6 +152,8 @@ public:
 		const ModelData& modelData,
 		const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap,
 		uint32_t descriptorSize);
+
+	void SetIsLighting(bool lighting);
 
 	ModelData* GetModelData() { return &modelData_; }
 	Animation& GetAnimation() { return animation_; }

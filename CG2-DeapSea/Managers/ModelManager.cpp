@@ -25,7 +25,20 @@ void ModelManager::Initialize(DX12Common* dxCommon)
 	modelCommon_->Initialize(dxCommon);
 }
 
-void ModelManager::LoadModel(const std::string& filePath, const std::string& TextureFilePath)
+void ModelManager::LoadModel(const std::string& filePath, const std::string& TextureFilePath, bool isLighting)
+{
+	if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
+	{
+		return;
+	}
+	//モデル生成とファイル読み込み、初期化
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	model->ModelInitialize(modelCommon_, filePath, TextureFilePath,isLighting);
+	//モデルをmapコンテナに格納
+	models.insert(std::make_pair(filePath, std::move(model)));
+}
+
+void ModelManager::LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath, bool isLighting)//処理に問題の可能性あり
 {
 	if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
 	{
@@ -33,31 +46,19 @@ void ModelManager::LoadModel(const std::string& filePath, const std::string& Tex
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->ModelInitialize(modelCommon_, filePath, TextureFilePath);
+	model->AnimationInitialize(modelCommon_, filePath, TextureFilePath,isLighting);
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 
-void ModelManager::LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath)//処理に問題の可能性あり
+void ModelManager::LoadSkeltonAnimation(const std::string& filePath, const std::string& TextureFilePath, SRVManager* srvManager, bool isLighting)
 {
-	//if (models.contains(filePath))
-	//{
-	//	return;
-	//}
+	if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
+	{
+		return;
+	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->AnimationInitialize(modelCommon_, filePath, TextureFilePath);
-	models.insert(std::make_pair(filePath, std::move(model)));
-}
-
-void ModelManager::LoadSkeltonAnimation(const std::string& filePath, const std::string& TextureFilePath, SRVManager* srvManager)
-{
-	//if (models.contains(filePath))
-	//{
-	//	return;
-	//}
-
-	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->SkeltonInitialize(modelCommon_, filePath, TextureFilePath,srvManager);
+	model->SkeltonInitialize(modelCommon_, filePath, TextureFilePath, srvManager, isLighting);
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 

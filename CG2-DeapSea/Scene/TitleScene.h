@@ -7,6 +7,7 @@
 #include"Objects/Particle.h"
 #include "GameManager.h"
 #include"GameObject/Cursor.h"
+#include"GameObject/UIPlane.h"
 #include"GameObject/Whale.h"
 #include"Managers/AudioManager.h"
 
@@ -23,13 +24,12 @@ private:
 	//Object3dCommon* object3dCommon;
 	//SRVManager* srvManager;
 	//Camera* camera;
-	std::vector<Object3d*> objects3d;
 	std::vector <Particle*> particles;
 	std::vector <Sprite*> sprites;
+	std::vector <UIPlane*>uiPlanes;
 	Cursor* cursor;
 	Whale* whale;
-
-
+	
 	bool isSceneTransition;
 	bool isStageSelect;
 	int numStage;

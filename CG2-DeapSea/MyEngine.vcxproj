@@ -54,6 +54,7 @@
     <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="GameObject\Whale.cpp" />
     <ClCompile Include="GameObject\Tide.cpp" />
+    <ClCompile Include="GameObject\UIPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Managers\AudioManager.h" />
@@ -99,6 +100,7 @@
     <ClInclude Include="Scene\TitleScene.h" />
     <ClInclude Include="GameObject\Whale.h" />
     <ClInclude Include="GameObject\Tide.h" />
+    <ClInclude Include="GameObject\UIPlane.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\Object3d.VS.hlsl">
