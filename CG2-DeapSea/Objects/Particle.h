@@ -130,7 +130,7 @@ private:
 	uint32_t kNumMaxInstance = 10;
 	ComPtr<ID3D12Resource> cameraResource;
 
-	Particles particles[10];
+	Particles particles[1000];
 
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 

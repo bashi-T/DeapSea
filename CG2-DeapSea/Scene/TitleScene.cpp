@@ -25,10 +25,10 @@ void TitleScene::Init()
 	for(uint32_t i = 0; i < 1; i++)
 	{
 		Particle* particle = new Particle;
-		particle->SetElements(1.0f, 1.0f, 1.0f, 3.0f,
-			-5.0f, 5.0f, -3.0f, -3.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 3.0f, 0.0f, 0.0f);
-		particle->Initialize("Resource/colorbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+		particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+			-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 6.0f, 0.0f, 0.0f);
+		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
 		particles.push_back(particle);
 	}
 	for (uint32_t i = 0; i < 5; i++)
@@ -147,12 +147,12 @@ void TitleScene::Update()
 	if (isSceneTransition == true)
 	{
 		sceneTransitionTime++;
-		if(sceneTransitionTime>=20)
+		if (sceneTransitionTime >= 20)
 		{
 			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 3.0f, Camera::GetInstance()->GetTranslate().z });
-			//uiPlanes[nowStage]->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x,uiPlanes[nowStage]->GetTranslate().y - 1.0f,uiPlanes[nowStage]->GetTranslate().z });
+			uiPlanes[nowStage]->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x,uiPlanes[nowStage]->GetTranslate().y - 2.75f,uiPlanes[nowStage]->GetTranslate().z });
 		}
-		if(sceneTransitionTime==90)
+		if (sceneTransitionTime == 90)
 		{
 			sceneNo = INGAME;
 			GameManager::stageNumber = nowStage - 1;

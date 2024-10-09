@@ -10,7 +10,7 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	this->object3dCommon_ = object3dCommon;
 	this->srvManager = srvManager;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
-	kNumMaxInstance = 10;
+	kNumMaxInstance = 100;
 
 	LeftTop = { -0.5f, 0.5f, 0.0f, 1.0f };
 	RightTop = { 0.5f, 0.5f, 0.0f, 1.0f };
@@ -45,13 +45,12 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	materialData.textureFilePath = textureFilePath;
 	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
-	
 }
 
 void Particle::RandomInitialize(ElementsParticle elements)
 {
-	std::random_device seedGenerator;
-	std::mt19937 randomEngine(seedGenerator());
+		std::random_device seedGenerator;
+		std::mt19937 randomEngine(seedGenerator());
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
 		particles[index] = MakeNewParticle(randomEngine, elements.colorMin, elements.colorMax, elements.timeMin, elements.timeMax);
@@ -155,10 +154,10 @@ void Particle::InputData(bool isRevive, ElementsParticle elements)
 				particles[index].transform.translate);
 		if (particles[index].lifeTime <= particles[index].currentTime && isRevive == true)
 		{
-			std::random_device seedGenerator;
-			std::mt19937 randomEngine(seedGenerator());
 			for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 			{
+			std::random_device seedGenerator;
+			std::mt19937 randomEngine(seedGenerator());
 				particles[index] = MakeNewParticle(randomEngine, elements.colorMin, elements.colorMax, elements.timeMin, elements.timeMax);
 				particles[index] = MakeNewParticlePosition(randomEngine,
 					elements.posxMin, elements.posxMax, elements.posyMin, elements.posyMax, elements.poszMin, elements.poszMax,
