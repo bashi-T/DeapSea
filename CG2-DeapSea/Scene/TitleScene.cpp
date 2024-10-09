@@ -21,21 +21,21 @@ void TitleScene::Init()
 		//particle->Initialize("Resource/colorbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance());
 		//particles.push_back(particle);
 	//}
-	for (uint32_t i = 0; i < 6; i++)
-	{
-		Sprite* sprite = new Sprite;
-		sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), PNGs[i]);
-		sprites.push_back(sprite);
-	}
-	sprites[0]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[0]->GetSize().x / 2),0.0f });
-	sprites[1]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[1]->GetSize().x / 2),100.0f });
-	sprites[2]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[2]->GetSize().x / 2),sprites[1]->GetSize().y / 3 + sprites[1]->GetPosition().y });
-	sprites[3]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[3]->GetSize().x / 2),sprites[2]->GetSize().y / 3 + sprites[2]->GetPosition().y });
-	sprites[4]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[4]->GetSize().x / 2),sprites[3]->GetSize().y / 3 + sprites[3]->GetPosition().y });
+	//for (uint32_t i = 0; i < 6; i++)
+	//{
+	//	Sprite* sprite = new Sprite;
+	//	sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), PNGs[i]);
+	//	sprites.push_back(sprite);
+	//}
+	//sprites[0]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[0]->GetSize().x / 2),0.0f });
+	//sprites[1]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[1]->GetSize().x / 2),100.0f });
+	//sprites[2]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[2]->GetSize().x / 2),sprites[1]->GetSize().y / 3 + sprites[1]->GetPosition().y });
+	//sprites[3]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[3]->GetSize().x / 2),sprites[2]->GetSize().y / 3 + sprites[2]->GetPosition().y });
+	//sprites[4]->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprites[4]->GetSize().x / 2),sprites[3]->GetSize().y / 3 + sprites[3]->GetPosition().y });
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
-	cursor = new Cursor;
-	cursor->Initialize();
-	cursor->SetTranslate({ -2.7f,1.7f,0.0f });
+	//cursor = new Cursor;
+	//cursor->Initialize();
+	//cursor->SetTranslate({ -2.7f,1.7f,0.0f });
 	Camera::GetInstance()->SetTranslate({0.0f,2.0f,-20.0f});
 
 	//whale = new Whale;
@@ -63,11 +63,11 @@ void TitleScene::Update()
 	//{
 	//	particle->Update(true);
 	//}
-	for (Sprite* sprite : sprites)
-	{
-		sprite->Update();
-	}
-	cursor->Update();
+	//for (Sprite* sprite : sprites)
+	//{
+	//	sprite->Update();
+	//}
+	//cursor->Update();
 
 	//if(floatTime<120)
 	//{
@@ -154,23 +154,23 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	if (isStageSelect == false)
-	{
-		sprites[0]->Draw();
-	}
-	else if(isSceneTransition==false)
-	{
-		cursor->Draw();
-		sprites[1]->Draw();
-		sprites[2]->Draw();
-		sprites[3]->Draw();
-		sprites[4]->Draw();
-		//sprites[5]->Draw();
-	}
-	else if (isSceneTransition == true)
-	{
-		sprites[nowStage]->Draw();
-	}
+	//if (isStageSelect == false)
+	//{
+	//	sprites[0]->Draw();
+	//}
+	//else if(isSceneTransition==false)
+	//{
+	//	cursor->Draw();
+	//	sprites[1]->Draw();
+	//	sprites[2]->Draw();
+	//	sprites[3]->Draw();
+	//	sprites[4]->Draw();
+	//	//sprites[5]->Draw();
+	//}
+	//else if (isSceneTransition == true)
+	//{
+	//	sprites[nowStage]->Draw();
+	//}
 	//whale->Draw();
 }
 

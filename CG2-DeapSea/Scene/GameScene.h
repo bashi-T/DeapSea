@@ -40,6 +40,6 @@ private:
 	bool gameEnd = false;
 	Ground* ground;
 	AudioManager::SoundData bgm;
-
+	int i = 0;
 };
 

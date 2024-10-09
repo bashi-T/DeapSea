@@ -7,49 +7,50 @@
 void GameScene::Init()
 {
 	player_ = new Player;
-	whale_ = new Whale;
-	ground = new Ground;
+	//whale_ = new Whale;
+	//ground = new Ground;
 	player_->Initialize();
 	//whale_->Initialize(player_);
 	//ground->Initialize();
-	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
-	enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
-	enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
-	enemyPopFile[3] = "Resource/CSV/STAGE3File.csv";
+	//enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
+	//enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
+	//enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
+	//enemyPopFile[3] = "Resource/CSV/STAGE3File.csv";
 
-	LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
-	gameEnd = false;
-	bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
+	//LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
+	//gameEnd = false;
+	//bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
 	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
-
+	i = 0;
 }
 
 void GameScene::Update()
 {
-	enemys_.remove_if([](Enemy* enemy)
-		{
-			if (enemy->IsDead())
-			{
-				delete enemy;
-				return true;
-			}
-			return false;
-		});
+	i++;
+	//enemys_.remove_if([](Enemy* enemy)
+	//	{
+	//		if (enemy->IsDead())
+	//		{
+	//			delete enemy;
+	//			return true;
+	//		}
+	//		return false;
+	//	});
 	//if (whale_->GetLife() == 0)
 	//{
 	//	enemys_.resize(0);
 	//	sceneNo = GAMEOVER;
 	//}
-	/*else*/ if (enemys_.size() == 0 && gameEnd||Input::GetInstance()->TriggerKey(DIK_RETURN))
+	/*else*/ if (/*enemys_.size() == 0 && gameEnd||Input::GetInstance()->TriggerKey(DIK_RETURN)*/i==5)
 	{
-		enemys_.resize(0);
+		//enemys_.resize(0);
 		sceneNo = CLEAR;
-	}else
+	}/*else
 	if (Input::GetInstance()->TriggerKey(DIK_S))
 	{
 		enemys_.resize(0);
 		sceneNo = TITLE;
-	}
+	}*/
 
 	//if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
 	//{
@@ -81,13 +82,13 @@ void GameScene::Update()
 	//ground->Update();
 	player_->Update();
 	//whale_->Update();
-	UpdateEnemyPopCommands(GameManager::stageNumber);
+	//UpdateEnemyPopCommands(GameManager::stageNumber);
 	//for(Enemy*enemy_:enemys_)
 	//{
 	//	enemy_->Update(enemy_->GetSort());
 	//}
 
-	CheckAllCollisions();
+	//CheckAllCollisions();
 }
 
 void GameScene::Draw()
@@ -116,20 +117,20 @@ void GameScene::Finalize()
 	player_->Finalize();
 	delete player_;
 	player_ = NULL;
-	for (Enemy* enemy_ : enemys_)
-	{
-		delete enemy_;
-		enemy_ = NULL;
-	}
-	enemys_.clear();
-	for (uint32_t i = 0; i < 4; i++)
-	{
-		enemyPopFile[i].clear();
-		enemyPopFile[i].shrink_to_fit();
-		enemyPopCommands[i].str("");
-		enemyPopCommands[i].clear(std::stringstream::goodbit);
-	}
-	AudioManager::GetInstance()->SoundUnload(&bgm);
+	//for (Enemy* enemy_ : enemys_)
+	//{
+	//	delete enemy_;
+	//	enemy_ = NULL;
+	//}
+	//enemys_.clear();
+	//for (uint32_t i = 0; i < 4; i++)
+	//{
+	//	enemyPopFile[i].clear();
+	//	enemyPopFile[i].shrink_to_fit();
+	//	enemyPopCommands[i].str("");
+	//	enemyPopCommands[i].clear(std::stringstream::goodbit);
+	//}
+	//AudioManager::GetInstance()->SoundUnload(&bgm);
 	GameManager::stageNumber = 0;
 }
 

@@ -18,5 +18,6 @@ public:
 
 private:
 	Sprite* sprite;
+	int i = 0;
 };
 

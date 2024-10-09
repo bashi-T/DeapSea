@@ -62,7 +62,7 @@ int GameManager::Run()
 	SPCommon->Initialize(dx12Common);
 	particleCommon->Initialize(dx12Common);
 	//skyDome->Initialize();
-	sceneArr_[TITLE]->Init();
+	sceneArr_[currentSceneNo_]->Init();
 
 	while (NewMSG.message != WM_QUIT)
 	{
