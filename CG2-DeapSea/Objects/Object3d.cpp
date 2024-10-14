@@ -8,11 +8,11 @@
 void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager)
 {
 	this->object3dCommon_ = object3dCommon;
-	this->srvManager = srvManager;
+	this->srvManager_ = srvManager;
 
 	transformationMatrixResource = CreateBufferResource(object3dCommon_,sizeof(TransformationMatrix));
 	directionalLightResource = CreateBufferResource(object3dCommon_, sizeof(DirectionalLight));
-	this->camera = object3dCommon_->GetDefaultCamera();
+	this->camera_ = object3dCommon_->GetDefaultCamera();
 	cameraResource = CreateBufferResource(object3dCommon_, sizeof(CameraTransform));
 	transformMatrix =
 	{
@@ -77,14 +77,14 @@ void Object3d::AnimationUpdate(Camera* camera)//処理に問題の可能性あ�
 
 	if (isAnimation == true)
 	{
-		animationTime += 1.0f / 60.0f;
+		animationTime_ += 1.0f / 60.0f;
 	}
-	animationTime = std::fmod(animationTime, model_->GetAnimation().duration);
-	ApplyAnimation(model_->GetSkelton(), model_->GetAnimation(), animationTime);
+	animationTime_ = std::fmod(animationTime_, model_->GetAnimation().duration);
+	ApplyAnimation(model_->GetSkelton(), model_->GetAnimation(), animationTime_);
 	Model::NodeAnimation& rootNodeAnimation = model_->GetAnimation().nodeAnimations[model_->GetModelData()->rootNode.name];
-	Vector3 translate = CalculatevalueV(rootNodeAnimation.translate.keyframes, animationTime);
-	Quaternion rotate = CalculatevalueQ(rootNodeAnimation.rotate.keyframes, animationTime);
-	Vector3 scale = CalculatevalueV(rootNodeAnimation.scale.keyframes, animationTime);
+	Vector3 translate = CalculatevalueV(rootNodeAnimation.translate.keyframes, animationTime_);
+	Quaternion rotate = CalculatevalueQ(rootNodeAnimation.rotate.keyframes, animationTime_);
+	Vector3 scale = CalculatevalueV(rootNodeAnimation.scale.keyframes, animationTime_);
 	Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
 
 	transformationMatrixData->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
@@ -166,7 +166,7 @@ void Object3d::Draw(ModelCommon* modelCommon)//処理に問題の可能性あり
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
-		srvManager->GetBackBufferIndex());
+		srvManager_->GetBackBufferIndex());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -186,7 +186,7 @@ void Object3d::Draw(ModelCommon* modelCommon)//処理に問題の可能性あり
 
 	if (model_)
 	{
-		model_->Draw(modelCommon_,srvManager);
+		model_->Draw(modelCommon_,srvManager_);
 	}
 }
 
@@ -204,7 +204,7 @@ void Object3d::SkeltonDraw(ModelCommon* modelCommon)
 		IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
-		srvManager->GetBackBufferIndex());
+		srvManager_->GetBackBufferIndex());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
 	object3dCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -224,7 +224,7 @@ void Object3d::SkeltonDraw(ModelCommon* modelCommon)
 
 	if (model_)
 	{
-		model_->SkeltonDraw(modelCommon_, srvManager);
+		model_->SkeltonDraw(modelCommon_, srvManager_);
 	}
 }
 

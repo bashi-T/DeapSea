@@ -14,14 +14,6 @@ void TitleScene::Init()
 		"Resource/Stage2.png",
 		"Resource/Stage3.png",
 	};
-	std::string Planes[5] =
-	{
-		"plane/plane.obj",
-		"plane1/plane.obj",
-		"plane2/plane.obj",
-		"plane3/plane.obj",
-		"plane4/plane.obj",
-	};
 	for(uint32_t i = 0; i < 1; i++)
 	{
 		Particle* particle = new Particle;
@@ -34,7 +26,7 @@ void TitleScene::Init()
 	for (uint32_t i = 0; i < 5; i++)
 	{
 		UIPlane* uiPlane = new UIPlane;
-		uiPlane->Initialize(Planes[i], PNGs[i]);
+		uiPlane->Initialize("plane/plane.obj", PNGs[i]);
 		uiPlanes.push_back(uiPlane);
 	}
 	uiPlanes[0]->SetTranslate({ 0.0f,1.6f,-16.0f });
@@ -54,9 +46,11 @@ void TitleScene::Init()
 	cursor->SetTranslate({ -2.5f,1.5f,0.0f });
 	Camera::GetInstance()->SetTranslate({0.0f,2.0f,-20.0f});
 
-	//whale = new Whale;
-	//whale->Initialize();
-	//whale->SetTranslate({ 0.0f,-13.15f,5.0f });
+	player = new Player;
+	player->Initialize();
+	whale = new Whale;
+	whale->Initialize(player);
+	whale->SetTranslate({ 0.0f,-13.15f,5.0f });
 	floatTime = 0;
 
 	isSceneTransition = false;
@@ -189,7 +183,7 @@ void TitleScene::Draw()
 		particle->Draw();
 	}
 
-	//whale->Draw();
+	whale->Draw();
 }
 
 void TitleScene::Finalize()

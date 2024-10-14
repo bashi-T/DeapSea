@@ -9,6 +9,7 @@
 #include"GameObject/Cursor.h"
 #include"GameObject/UIPlane.h"
 #include"GameObject/Whale.h"
+#include"GameObject/Player.h"
 #include"Managers/AudioManager.h"
 
 class TitleScene:public SceneManager
@@ -29,7 +30,7 @@ private:
 	std::vector <UIPlane*>uiPlanes;
 	Cursor* cursor;
 	Whale* whale;
-	
+	Player* player;
 	bool isSceneTransition;
 	bool isStageSelect;
 	int numStage;

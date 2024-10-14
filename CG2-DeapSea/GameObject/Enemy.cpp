@@ -26,7 +26,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 	{
 	    case 0:
 		{
-			const std::string enemyModel = "fish/improvisedFish.obj";
+			std::string enemyModel = "fish/improvisedFish.obj";
 			const std::string enemySkin = "Resource/uvChecker.png";
 			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin, true);
@@ -46,7 +46,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 	    case 1:
 		{
 			moveInterval = 0;
-			const std::string enemyModel = "straight/improvisedStraight.obj";
+			std::string enemyModel = "straight/improvisedStraight.obj";
 			const std::string enemySkin = "Resource/uvChecker.png";
 			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin, true);

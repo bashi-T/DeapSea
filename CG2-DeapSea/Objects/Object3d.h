@@ -35,7 +35,7 @@ public:
 	void SetScale(const Vector3& scale) { transformMatrix.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
-	void SetCamera(Camera* cameras) { camera = cameras; }
+	void SetCamera(Camera* cameras) { camera_ = cameras; }
 	bool SetIsAnimation(bool IsAnimation) { return isAnimation = IsAnimation; }
 	const Vector3& GetScale()const { return transformMatrix.scale; }
 	const Vector3& GetRotate()const { return transformMatrix.rotate; }
@@ -55,11 +55,11 @@ private:
 	HRESULT hr = NULL;
 	Model* model_ = nullptr;
 	ModelCommon* modelCommon_ = nullptr;
-	SRVManager* srvManager = nullptr;
-	Camera* camera = nullptr;
+	SRVManager* srvManager_ = nullptr;
+	Camera* camera_ = nullptr;
 	
 	//Model::Animation& animation;
-	float animationTime = 0.0f;
+	float animationTime_ = 0.0f;
 	float skeltonAnimationTime = 0.0f;
 
 	DirectionalLight* directionalLightData = nullptr;

@@ -15,6 +15,7 @@ public:
 
 	void OnCollision();
 	void SetTranslate(Vector3 translate);
+	void SetRotate(Vector3 rotate);
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
 	OBB GetCollision() { return wCollision; }
 	int GetLife() { return life; }

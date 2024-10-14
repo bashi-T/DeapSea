@@ -5,7 +5,7 @@ Mesh::~Mesh() {
 
 void Mesh::Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon) {
 	this->object3dCommon_ = object3dCommon;
-	this->srvManager = srvManager;
+	this->srvManager_ = srvManager;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
 	kSubdivision = 16;
 	
@@ -274,7 +274,7 @@ void Mesh::Update()
 
 void Mesh::Draw()
 {
-	DrawSphere(sphere, ColorSphere[0], true);
+	DrawSphere(aSphere, ColorSphere[0]);
 };
 
 ComPtr<ID3D12Resource> Mesh::CreateBufferResource(size_t sizeInBytes)
@@ -464,7 +464,7 @@ void Mesh::InputDataSphere(
 }
 
 void Mesh::DrawSphere(
-	const Sphere& sphere_, Vector4 color, bool useWorldMap)
+	const Sphere& sphere_, Vector4 color)
 {
 	float pi = 3.141592f;
 	const float kLonevery = 2.0f / kSubdivision * pi;
@@ -528,7 +528,7 @@ void Mesh::DrawSphere(
 				IASetPrimitiveTopology(
 				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			srvManager->SetGraphicsRootDescriptorTable(
+			srvManager_->SetGraphicsRootDescriptorTable(
 				2, materialData.textureIndex);
 			DX12Common::GetInstance()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 				3, cameraResource->GetGPUVirtualAddress());
@@ -536,7 +536,7 @@ void Mesh::DrawSphere(
 				SetGraphicsRootConstantBufferView(
 					4, directionalLightResource->GetGPUVirtualAddress());
 			D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-				DX12Common::GetInstance()->GetRtvHandles(srvManager->GetBackBufferIndex());
+				DX12Common::GetInstance()->GetRtvHandles(srvManager_->GetBackBufferIndex());
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
 			DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 

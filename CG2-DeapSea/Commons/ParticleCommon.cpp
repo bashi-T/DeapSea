@@ -52,11 +52,11 @@ ComPtr<IDxcBlob> ParticleCommon::CompileShader(const std::wstring& filePath, con
 
 void ParticleCommon::ResetDXC()
 {
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
 	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
 	assert(SUCCEEDED(hr));
-	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
 	assert(SUCCEEDED(hr));
 }
 
@@ -177,11 +177,11 @@ void ParticleCommon::MakePSO(DX12Common* dxcommon)
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	vertexShaderBlob =
-		CompileShader(L"HLSL/Particle.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Particle.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	pixelShaderBlob =
-		CompileShader(L"HLSL/Particle.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/Particle.PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};

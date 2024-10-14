@@ -47,7 +47,7 @@ void GameScene::Update()
 		sceneNo = CLEAR;
 	}
 	else
-	if (Input::GetInstance()->TriggerKey(DIK_S) || time == 30)
+	if (Input::GetInstance()->TriggerKey(DIK_S) /*|| time == 30*/)
 	{
 		enemys_.resize(0);
 		sceneNo = TITLE;
@@ -95,7 +95,7 @@ void GameScene::Update()
 void GameScene::Draw()
 {
 	ground->Draw();
-	//player_->Draw();
+	player_->Draw();
 	whale_->Draw();
 	for (Enemy* enemy_ : enemys_)
 	{
@@ -303,14 +303,13 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 
 			std::random_device seedGenerator;
 			std::mt19937 randomEngine(seedGenerator());
-			std::uniform_real_distribution<float> enemySort(0, GameManager::stageNumber + 1);
+			std::uniform_real_distribution<float> enemySort(0.0f, (float)(GameManager::stageNumber + 1));
 			Enemy* enemy_ = new Enemy;
-			enemy_->SetSort(/*(int)enemySort(randomEngine)*/1);
+			enemy_->SetSort((int)enemySort(randomEngine));
 			enemy_->Initialize(player_, whale_, enemy_->GetSort());
 			enemys_.push_back(enemy_);
 			enemy_->SetTranslate({ x,y,z });
 			enemy_->SetEnemyVector(whale_->GetTranslate());
- 			int i = 0;
 		}
 		else if (word.find("WAIT") == 0)
 		{

@@ -118,7 +118,7 @@ public:
 	ParticleForGPU* GetInstancingData() { return instancingData; }
 	Particles* GetParticles() { return particles; }
 private:
-	SRVManager* srvManager = nullptr;
+	SRVManager* srvManager_ = nullptr;
 	DX12Common* dx12Common_ = nullptr;
 	Object3dCommon* object3dCommon_ = nullptr;
 	ParticleCommon* particleCommon_;

@@ -22,7 +22,7 @@ public:
 private:
 	Object3d* object3d;
 
-	const std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
+	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
 	const std::string bulletSkin = "Resource/white.png";
 	Vector3 bulletSpeed = { 0.0f,0.0f,-0.1f };
 	bool isDead = false;

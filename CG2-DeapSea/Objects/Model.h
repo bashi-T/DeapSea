@@ -36,7 +36,7 @@ public:
 		Matrix4x4 localMatrix;
 		std::string name;
 		std::vector<Node> children;
-		QuaternionTransform qTransform;
+		QuaternionTransform qTransform{};
 	};
 	struct VertexWeightData
 	{
@@ -122,7 +122,7 @@ public:
 		std::vector<Matrix4x4>inverseBindPoseMatrices;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>influenceResource = nullptr;
-		D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
+		D3D12_VERTEX_BUFFER_VIEW influenceBufferView{};
 		std::span<VertexInfluence>mappedInfluence;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>paletteResource = nullptr;

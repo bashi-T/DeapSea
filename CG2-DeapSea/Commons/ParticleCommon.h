@@ -40,9 +40,9 @@ private:
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	static inline ParticleCommon* instance;
 
-	ComPtr<IDxcUtils> dxcUtils = nullptr;
-	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
+	ComPtr<IDxcUtils> dxcUtils_ = nullptr;
+	ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
+	ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
 	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
 	ComPtr<ID3DBlob> signatureBlob = nullptr;

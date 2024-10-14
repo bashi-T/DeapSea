@@ -4,11 +4,11 @@
 Particle::~Particle() {
 }
 
-void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements)
+void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle element)
 {
 	this->particleCommon_ = particleCommon;
 	this->object3dCommon_ = object3dCommon;
-	this->srvManager = srvManager;
+	this->srvManager_ = srvManager;
 	this->camera_ = object3dCommon_->GetDefaultCamera();
 	kNumMaxInstance = 100;
 
@@ -37,8 +37,8 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
 
-	RandomInitialize(elements);
-	InputData(true,elements);
+	RandomInitialize(element);
+	InputData(true,element);
 
 	MakeShaderResourceViewInstance();
 
@@ -47,25 +47,25 @@ void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* pa
 	materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 }
 
-void Particle::RandomInitialize(ElementsParticle elements)
+void Particle::RandomInitialize(ElementsParticle element)
 {
 		std::random_device seedGenerator;
 		std::mt19937 randomEngine(seedGenerator());
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 	{
-		particles[index] = MakeNewParticle(randomEngine, elements.colorMin, elements.colorMax, elements.timeMin, elements.timeMax);
+		particles[index] = MakeNewParticle(randomEngine, element.colorMin, element.colorMax, element.timeMin, element.timeMax);
 		particles[index] = MakeNewParticlePosition(randomEngine,
-			elements.posxMin, elements.posxMax, elements.posyMin, elements.posyMax, elements.poszMin, elements.poszMax,
-			elements.velxMin, elements.velxMax, elements.velyMin, elements.velyMax, elements.velzMin, elements.velzMax);
+			element.posxMin, element.posxMax, element.posyMin, element.posyMax, element.poszMin, element.poszMax,
+			element.velxMin, element.velxMax, element.velyMin, element.velyMax, element.velzMin, element.velzMax);
 		instancingData[index].WVP = MakeIdentity4x4();
 		instancingData[index].World = MakeIdentity4x4();
 		instancingData[index].color = particles[index].color;
 	}
 }
 
-void Particle::Update(bool isRevive, ElementsParticle elements)
+void Particle::Update(bool isRevive, ElementsParticle element)
 {
-	InputData(isRevive,elements);
+	InputData(isRevive,element);
 }
 
 void Particle::Draw()
@@ -84,13 +84,13 @@ void Particle::Draw()
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(
 			1, instancingSrvHandleGPU);
-	srvManager->SetGraphicsRootDescriptorTable(
+	srvManager_->SetGraphicsRootDescriptorTable(
 		2, materialData.textureIndex);
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, cameraResource->GetGPUVirtualAddress());
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		particleCommon_->GetDx12Common()->GetRtvHandles(srvManager->GetBackBufferIndex());
+		particleCommon_->GetDx12Common()->GetRtvHandles(srvManager_->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = particleCommon_->GetDx12Common()->GetDsvHandle();
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
@@ -136,7 +136,7 @@ void Particle::MakeBufferView()
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
-void Particle::InputData(bool isRevive, ElementsParticle elements)
+void Particle::InputData(bool isRevive, ElementsParticle element)
 {
 	uint32_t* indexData = nullptr;
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
@@ -154,17 +154,17 @@ void Particle::InputData(bool isRevive, ElementsParticle elements)
 				particles[index].transform.translate);
 		if (particles[index].lifeTime <= particles[index].currentTime && isRevive == true)
 		{
-			for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+			for (uint32_t num = 0; num < kNumMaxInstance; ++num)
 			{
-			std::random_device seedGenerator;
-			std::mt19937 randomEngine(seedGenerator());
-				particles[index] = MakeNewParticle(randomEngine, elements.colorMin, elements.colorMax, elements.timeMin, elements.timeMax);
-				particles[index] = MakeNewParticlePosition(randomEngine,
-					elements.posxMin, elements.posxMax, elements.posyMin, elements.posyMax, elements.poszMin, elements.poszMax,
-					elements.velxMin, elements.velxMax, elements.velyMin, elements.velyMax, elements.velzMin, elements.velzMax);
-				instancingData[index].WVP = MakeIdentity4x4();
-				instancingData[index].World = MakeIdentity4x4();
-				instancingData[index].color = particles[index].color;
+				std::random_device seedGenerator;
+				std::mt19937 randomEngine(seedGenerator());
+				particles[num] = MakeNewParticle(randomEngine, element.colorMin, element.colorMax, element.timeMin, element.timeMax);
+				particles[num] = MakeNewParticlePosition(randomEngine,
+					element.posxMin, element.posxMax, element.posyMin, element.posyMax, element.poszMin, element.poszMax,
+					element.velxMin, element.velxMax, element.velyMin, element.velyMax, element.velzMin, element.velzMax);
+				instancingData[num].WVP = MakeIdentity4x4();
+				instancingData[num].World = MakeIdentity4x4();
+				instancingData[num].color = particles[num].color;
 			}
 		}
 		particles[index].transform.translate.x += particles[index].velocity.x * kDeltaTime;
@@ -226,10 +226,10 @@ void Particle::InputData(bool isRevive, ElementsParticle elements)
 
 void Particle::MakeShaderResourceViewInstance()
 {
-	uint32_t index = srvManager->Allocate();
-	instancingSrvHandleCPU = srvManager->GetCPUDescriptorHandle(index);
-	instancingSrvHandleGPU = srvManager->GetGPUDescriptorHandle(index);
-	srvManager->CreateSRVforStructuredBuffer(index, instancingResource.Get(), kNumInstance, sizeof(ParticleForGPU));
+	uint32_t index = srvManager_->Allocate();
+	instancingSrvHandleCPU = srvManager_->GetCPUDescriptorHandle(index);
+	instancingSrvHandleGPU = srvManager_->GetGPUDescriptorHandle(index);
+	srvManager_->CreateSRVforStructuredBuffer(index, instancingResource.Get(), kNumInstance, sizeof(ParticleForGPU));
 }
 
 Particle::Particles Particle::MakeNewParticlePosition(std::mt19937& randomEngine,

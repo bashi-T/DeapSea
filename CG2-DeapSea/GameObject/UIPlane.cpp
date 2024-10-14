@@ -9,7 +9,7 @@ UIPlane::~UIPlane()
 void UIPlane::Initialize(const std::string plane,const std::string skin)
 {
 	object3d = new Object3d;
-	const std::string planeModel = plane;
+	std::string planeModel = plane;
 	const std::string planeSkin = skin;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(planeModel, planeSkin, false);

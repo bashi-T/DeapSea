@@ -12,6 +12,8 @@ private:
 	ModelCommon* modelCommon_ = nullptr;
 
 	std::map<std::string, std::unique_ptr<Model>>models;
+	std::vector<std::string>modelFilePaths;
+	int sameModelNum = 0;
 
 	ModelManager() = default;
 	~ModelManager() = default;
@@ -23,7 +25,7 @@ public:
 
 	void Finalize();
 	void Initialize(DX12Common* dxCommon);
-	void LoadModel(const std::string& filePath, const std::string& TextureFilePath, bool isLighting);
+	void LoadModel(std::string& filePath, const std::string& TextureFilePath, bool isLighting);
 	void LoadAnimationModel(const std::string& filePath, const std::string& TextureFilePath, bool isLighting);
 	void LoadSkeltonAnimation(const std::string& filePath, const std::string& TextureFilePath, SRVManager* srvManager, bool isLighting);
 

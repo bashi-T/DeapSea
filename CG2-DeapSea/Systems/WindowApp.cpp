@@ -6,6 +6,8 @@ int32_t WinAPP::clientHeight_ = 720;
 void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 {
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	assert(SUCCEEDED(hr));
+
 	wc_.lpfnWndProc = WindowProc;
 	wc_.lpszClassName = L"LE2B_12_ツヅキバシ_マサミ";
 	wc_.hInstance = GetModuleHandle(nullptr);

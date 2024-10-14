@@ -91,7 +91,7 @@ int GameManager::Run()
 #ifdef _DEBUG
 		ImGui::Begin("camera");
 		//ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
-			//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
+		//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
 		ImGui::DragFloat3("camera.rotate", (float*)&camera->GetInstance()->GetRotate(), 0.01f);
 		ImGui::DragFloat3("camera.translate", (float*)&camera->GetInstance()->GetTranslate(), 0.01f);
 		ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
@@ -149,7 +149,6 @@ int GameManager::Run()
 	object3dCommon->DeleteInstance();
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
-	//delete imgui;
 	delete input;
 	input = NULL;
 	audioManager->Finalize();

@@ -13,7 +13,7 @@ public:
 	{
 		DirectX::TexMetadata metadata;
 		ComPtr<ID3D12Resource> resource;
-		uint32_t srvIndex;
+		uint32_t srvIndex = 0;
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
 	};
@@ -42,8 +42,8 @@ private:
 	~TextureManager() = default;
 	TextureManager(TextureManager&) = delete;
 	TextureManager& operator=(TextureManager&) = delete;
-	DX12Common* dx12Common_;
-	Debug* debug_;
+	DX12Common* dx12Common_ = nullptr;
+	Debug* debug_ = nullptr;
 	SRVManager* srvManager = nullptr;
 	std::unordered_map<std::string, TextureData>textureDatas;
 

@@ -9,7 +9,7 @@ Cursor::~Cursor()
 void Cursor::Initialize()
 {
 	object3d = new Object3d;
-	const std::string cursorModel = "cursor/cursor.obj";
+	std::string cursorModel = "cursor/cursor.obj";
 	const std::string cursorSkin = "Resource/sea.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(cursorModel, cursorSkin, true);

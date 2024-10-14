@@ -38,11 +38,11 @@ public:
 	void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData);
 	static AudioManager* GetInstance();
 
-	ComPtr<IXAudio2> GetxAudio2() { return xAudio2; }
+	ComPtr<IXAudio2> GetxAudio2() { return xAudio2_; }
 private:
 	static inline AudioManager* instance;
 	HRESULT result;
-	ComPtr<IXAudio2>xAudio2;
+	ComPtr<IXAudio2>xAudio2_;
 	IXAudio2MasteringVoice* masterVoice;
 
 };

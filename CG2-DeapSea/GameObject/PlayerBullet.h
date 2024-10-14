@@ -22,7 +22,7 @@ public:
 private:
 	Object3d* object3d;
 
-	const std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
+	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
 	const std::string bulletSkin = "Resource/AnimatedCube/AnimatedCube_BaseColor.png";
 	Vector3 bulletSpeed = { 0.0f,0.0f,1.0f };
 	static const int32_t kLifeTime = 60 * 2;

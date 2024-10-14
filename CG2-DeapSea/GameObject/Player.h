@@ -24,6 +24,8 @@ public:
 	Vector3 GetMoveVector() { return moveVector; }
 
 	void SetTranslate(Vector3 translate) { object3d->SetTranslate(translate); }
+	void SetIsHit(bool isHit_) { isHit=isHit_; }
+
 private:
 	Object3d* object3d;
 	std::list<PlayerBullet*> pBullets;

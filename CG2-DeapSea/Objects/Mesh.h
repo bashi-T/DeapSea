@@ -40,7 +40,7 @@ public:
 	//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	//    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSphere(
-		const Sphere& sphere_, Vector4 color, bool useWorldMap);
+		const Sphere& sphere_, Vector4 color);
 	void ResetDXC();
 	void MakePSO();
 	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -103,7 +103,7 @@ public:
 private:
 	Debug* debug_;
 	WinAPP* sWinApp;
-	SRVManager* srvManager = nullptr;
+	SRVManager* srvManager_ = nullptr;
 	MyImGui* imgui_;
 	SpriteCommon* spriteCom_;
 	Object3dCommon* object3dCommon_;
@@ -122,11 +122,11 @@ private:
 	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
+	//D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	ComPtr<ID3DBlob> signatureBlob = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
-	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+	//ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	//ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -139,16 +139,16 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
 
 
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	D3D12_BLEND_DESC blendDesc{};
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+	//D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	//D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+	//D3D12_BLEND_DESC blendDesc{};
+	//D3D12_RASTERIZER_DESC rasterizerDesc{};
+	//D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	ComPtr<ID3D12Resource> materialResource;
 	ComPtr<ID3D12Resource> materialResourceSphere;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
 	struct Material {
 		Vector4 color;
@@ -197,7 +197,7 @@ private:
 	const int32_t kNumTriangle = 1;
 	Vector4 ColorSphere[1];
 
-	Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
+	Sphere aSphere = { { 0.0f,0.0f,0.0f },1.0f };
 
 	Vector4 Top[1];
 	Vector4 Left[1];

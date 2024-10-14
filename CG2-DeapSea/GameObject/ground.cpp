@@ -9,7 +9,7 @@ Ground::~Ground()
 void Ground::Initialize()
 {
 	object3d = new Object3d;
-	const std::string groundModel = "ground/newground.obj";
+	std::string groundModel = "ground/newground.obj";
 	const std::string groundSkin = "Resource/ganban.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(groundModel, groundSkin, true);

@@ -86,7 +86,7 @@ private:
 	SpriteCommon* spriteCommon_;
 	HRESULT hr = NULL;
 	uint32_t textureIndex = 0;
-	SRVManager* srvManager = nullptr;
+	SRVManager* srvManager_ = nullptr;
 
 	EulerTransform transformMatrix;
 	Vector2 position = { 0.0f,0.0f };

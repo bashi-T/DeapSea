@@ -15,9 +15,9 @@ public:
 	static int32_t GetClientWidth() { return clientWidth_; }
 	static int32_t GetClientHeight() { return clientHeight_; }
 	static HWND GetHWND() { return hwnd_; }
-	static inline MSG GetMSG() { return msg; }
+	static inline MSG GetMSG() { return msg_; }
 	static void ProcessMessage(MSG NewMSG);
-	static inline MSG msg{};
+	static inline MSG msg_{};
 	static WinAPP* GetInstance();
 	static inline WNDCLASS wc_{};
 	static HINSTANCE GetHInstance() { return wc_.hInstance; }

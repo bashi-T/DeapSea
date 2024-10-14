@@ -8,7 +8,7 @@ Sprite::~Sprite()
 void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::string textureFilePath)
 {
 	this->spriteCommon_ = spriteCommon;
-	this->srvManager = srvManager;
+	this->srvManager_ = srvManager;
 	vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 6);
 	indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
 	materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
@@ -182,12 +182,12 @@ void Sprite::Draw()
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
 		spriteCommon_->GetDx12Common()->
-		GetRtvHandles(srvManager->GetBackBufferIndex());
+		GetRtvHandles(srvManager_->GetBackBufferIndex());
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		OMSetRenderTargets(1, &rtv, false, &dsv);
 
-	srvManager->SetGraphicsRootDescriptorTable(
+	srvManager_->SetGraphicsRootDescriptorTable(
 		2, materialData->material.textureIndex);
 
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -249,7 +249,7 @@ ComPtr<ID3D12Resource> Sprite::CreateTextureResource(ID3D12Device* device, const
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,

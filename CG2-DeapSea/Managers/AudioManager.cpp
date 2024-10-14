@@ -2,8 +2,8 @@
 
 void AudioManager::Initialize()
 {
-	result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	result = xAudio2->CreateMasteringVoice(&masterVoice);
+	result = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
+	result = xAudio2_->CreateMasteringVoice(&masterVoice);
 }
 
 void AudioManager::Finalize()
@@ -14,8 +14,6 @@ void AudioManager::Finalize()
 
 AudioManager::SoundData AudioManager::SoundLoadWave(const char* filename)
 {
-	HRESULT result;
-
 	std::ifstream file;
 
 	file.open(filename, std::ios_base::binary);
@@ -71,7 +69,7 @@ AudioManager::SoundData AudioManager::SoundLoadWave(const char* filename)
 
 void AudioManager::SoundUnload(SoundData* soundData)
 {
-	xAudio2.Reset();
+	xAudio2_.Reset();
 	delete[] soundData->pBuffer;
 	soundData->pBuffer = 0;
 	soundData->bufferSize = 0;
@@ -80,7 +78,6 @@ void AudioManager::SoundUnload(SoundData* soundData)
 
 void AudioManager::SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData)
 {
-	HRESULT result;
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));

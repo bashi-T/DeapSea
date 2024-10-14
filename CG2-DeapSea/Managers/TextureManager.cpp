@@ -27,12 +27,12 @@ void TextureManager::Initialize(DX12Common* dxcommon, SRVManager* srvManager_)
 
 void TextureManager::LoadTexture(const std::string& filePath)
 {
-	//if (textureDatas.contains(filePath))
-	//{
-	//	return;
-	//}
+	if (textureDatas.contains(filePath))
+	{
+		return;
+	}
 
-	assert(srvManager->CheckNumTexture(textureDatas.size()));
+	assert(srvManager->CheckNumTexture((uint32_t)textureDatas.size()));
 
 	DirectX::ScratchImage image{};//テクスチャファイルをプログラムで扱えるように
 	std::wstring filePathW = debug_->ConvertString(filePath);
@@ -69,20 +69,19 @@ void TextureManager::LoadTexture(const std::string& filePath)
 		textureData.srvIndex,
 		textureData.resource.Get(),
 		textureData.metadata.format,
-		textureData.metadata.mipLevels);
+		(UINT)textureData.metadata.mipLevels);
 
 	textureDatas[filePath] = textureData;
 }
 
 void TextureManager::LoadTextureforSRV(const std::string& filePath)
 {
-	//if (textureDatas.contains(filePath))
-	//{
-	//	textureDatas[filePath] = textureDatas.at(filePath);
-	//	return;
-	//}
+	if (textureDatas.contains(filePath))
+	{
+		return;
+	}
 
-	assert(srvManager->CheckNumTexture(textureDatas.size()));
+	assert(srvManager->CheckNumTexture((uint32_t)textureDatas.size()));
 
 	DirectX::ScratchImage image{};//テクスチャファイルをプログラムで扱えるように
 	std::wstring filePathW = debug_->ConvertString(filePath);
@@ -119,7 +118,7 @@ void TextureManager::LoadTextureforSRV(const std::string& filePath)
 		textureData.srvIndex,
 		textureData.resource.Get(),
 		textureData.metadata.format,
-		textureData.metadata.mipLevels);
+		(UINT)textureData.metadata.mipLevels);
 
 	textureDatas[filePath] = textureData;
 }

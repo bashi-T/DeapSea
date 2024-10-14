@@ -12,7 +12,7 @@ void Whale::Initialize(Player* players)
 {
 	object3d = new Object3d; 
 	player = players;
-	const std::string whaleModel = "whale/improvisedWhale2.obj";
+	std::string whaleModel = "whale/improvisedWhale2.obj";
 	const std::string whaleSkin = "Resource/whale5.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin, true);
@@ -184,4 +184,9 @@ void Whale::OnCollision()
 void Whale::SetTranslate(Vector3 translate)
 {
 	object3d->SetTranslate(translate);
+}
+
+void Whale::SetRotate(Vector3 rotate)
+{
+	object3d->SetRotate(rotate);
 }
