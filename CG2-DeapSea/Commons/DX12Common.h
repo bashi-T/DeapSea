@@ -10,12 +10,13 @@
 #include<thread>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
+#include"Math/CGVector.h"
 
 class DX12Common final
 {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	void Initialize(int32_t width, int32_t height, WinAPP* winApp);
+	void Initialize(WinAPP* winApp);
 	void update();
 	void MakeDXGIFactory();
 	void ChoseUseAdapter();
@@ -24,7 +25,7 @@ public:
 	void MakeCommandQueue();
 	void MakeCommandList();
 
-	void MakeSwapchain(int32_t width, int32_t height, HWND hwnd_);
+	void MakeSwapchain(HWND hwnd_);
 	void MakeDescriptorHeap();
 	void BringResources();
 	void MakeRTV();
@@ -35,10 +36,8 @@ public:
 	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 		UINT numDescriptors,
-	    bool shaderVisible);
-	ComPtr<ID3D12Resource> CreatedepthstencilTextureResource(
-		int32_t width,
-		int32_t height);
+		bool shaderVisible);
+	ComPtr<ID3D12Resource> CreatedepthstencilTextureResource();
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
 		ID3D12DescriptorHeap* descriptorHeap,
 		uint32_t descriptorSize,
@@ -51,6 +50,14 @@ public:
 	void DebugLayer();
 	void InfoQueue(ID3D12Device* device);
 
+	void PreDraw();
+	void PostDraw();
+	void PreDrawImGui();
+	void PostDrawImGui();
+	void MakeFence();
+
+	ComPtr<ID3D12Resource> CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color);
+	uint32_t Allocate();
 
 	ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 	ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
@@ -60,38 +67,54 @@ public:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
-	
-	ComPtr<ID3D12Device> GetDevice() { return device_; }
+
+	ComPtr<ID3D12Device> GetDevice() { return device; }
 	ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList.Get(); }
 	ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue.Get(); }
 	ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator.Get(); }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 	ComPtr<IDXGISwapChain4> GetSwapChain() { return swapChain; }
-	std::array<ComPtr<ID3D12Resource>, 10> GetSwapChainResources() { return swapChainResources; }
+	std::array<ComPtr<ID3D12Resource>, 16> GetSwapChainResources() { return swapChainResources; }
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
 	ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
-		
+	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return srvDescriptorHeap; }
+	int GetDescriptorSizeSRV() { return descriptorSizeSRV; }
+
+	ComPtr<ID3D12Resource> GetRenderTextureResource() { return renderTextureResource; }
+	UINT GetBackBufferIndex() { return backBufferIndex; }
+	HANDLE GetFenceEvent() { return fenceEvent; }
+	bool CheckNumHandle(uint32_t textureIndex);
+	int GetRenderTextureIndex() { return renderTextureIndex; }
+	int GetRTVIndex() { return rtvIndex; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU() { return srvHandleGPU; }
 	~DX12Common() {
 		swapChain.Reset();
-		device_.Reset();
+		device.Reset();
 	}
+
+	void CreateSRVforTexture2D(
+		uint32_t srvIndex,
+		ID3D12Resource* pResource,
+		DXGI_FORMAT Format,
+		UINT MipLevels);
 
 private:
 	DX12Common() = default;
 	//~DX12Common() = default;
 	DX12Common(const DX12Common& obj) = delete;
-	DX12Common& oparator(const DX12Common&obj) = delete;
+	DX12Common& oparator(const DX12Common& obj) = delete;
 	static inline DX12Common* instance;
 
 	Debug* debug_ = nullptr;
 	WinAPP* winApp_ = nullptr;
+	//FullScreenSprite* fullScreenSprite;
 
-	ComPtr<ID3D12Device> device_ = nullptr;
+	ComPtr<ID3D12Device> device = nullptr;
 	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	HRESULT hr = NULL;
 	ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[4];
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 
 	ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
@@ -99,11 +122,15 @@ private:
 	ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 	ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	std::array<ComPtr<ID3D12Resource>, 10> swapChainResources;
+	std::array<ComPtr<ID3D12Resource>, 16> swapChainResources;
 	ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	uint32_t descriptorSizeRTV;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
+	uint32_t descriptorSizeDTV;
+
+	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 
 	ComPtr<ID3D12Resource> depthStencilResource;
 
@@ -116,5 +143,23 @@ private:
 
 	std::chrono::steady_clock::time_point reference_;
 
+	UINT backBufferIndex;
+	ComPtr<ID3D12Resource> renderTextureResource;
+	const Vector4 kRenderTargetClearValue{ 1.0f,0.0f,0.0f,1.0f };
+	float clearColor[4] = { 0.1f, 0.25f, 0.5f, 1.0f };
+	D3D12_RESOURCE_BARRIER barrier{};
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv;
+	D3D12_VIEWPORT viewport{};
+	D3D12_RECT scissorRect{};
+	HANDLE fenceEvent;
+	ComPtr<ID3D12Fence> fence = nullptr;
+	uint64_t fenceValue = 0;
+	uint32_t useIndex = 0;
+	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
+	int renderTextureIndex;
+	int rtvIndex;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+	int descriptorSizeSRV;
 };
 

@@ -11,8 +11,22 @@ DX12Common* DX12Common::GetInstance()
 
 void DX12Common::DeleteInstance()
 {
-	delete instance;
+	if (instance != NULL)
+	{
+		delete instance;
+	}
 	instance = NULL;
+}
+
+bool DX12Common::CheckNumHandle(uint32_t textureIndex)
+{
+	if (100 > textureIndex)
+	{
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 void DX12Common::InitializefixFPS()
@@ -36,7 +50,7 @@ void DX12Common::UpdateFixFPS()
 	reference_ = std::chrono::steady_clock::now();
 }
 
-void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
+void DX12Common::Initialize(WinAPP* winApp)
 {
 	this->winApp_ = winApp;
 	assert(winApp_);
@@ -47,14 +61,61 @@ void DX12Common::Initialize(int32_t width, int32_t height, WinAPP* winApp)
 	MakeDXGIFactory();
 	ChoseUseAdapter();
 	MakeD3D12Device();
-	depthStencilResource = CreatedepthstencilTextureResource(
-		width,
-		height);
+	depthStencilResource = CreatedepthstencilTextureResource();
 
 #ifdef _DEBUG
-	InfoQueue(device_.Get());
+	InfoQueue(device.Get());
 #endif
 	MakeScreen(winApp_);
+	MakeFence();
+
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	viewport.Width = float(WinAPP::clientWidth_);
+	viewport.Height = float(WinAPP::clientHeight_);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	scissorRect.left = LONG(0.0f);
+	scissorRect.right = LONG(WinAPP::clientWidth_);
+	scissorRect.top = LONG(0.0f);
+	scissorRect.bottom = LONG(WinAPP::clientHeight_);
+
+	//↓initializeでいいかも
+	renderTextureResource = CreateRenderTextureResource(
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
+
+	//descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	descriptorSizeRTV = device->
+		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	rtvIndex = Allocate();
+	device->CreateRenderTargetView(
+		renderTextureResource.Get(),
+		&rtvDesc,
+		GetCPUDescriptorHandle(
+			rtvDescriptorHeap.Get(),
+			descriptorSizeRTV, rtvIndex));
+
+	srvDescriptorHeap = CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		512,
+		true);
+	//SRV設定　formatはresourceと同じにする
+	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	renderTextureSrvDesc.Texture2D.MipLevels = 1;
+	//SRV生成
+	renderTextureIndex = Allocate();
+	descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	device->CreateShaderResourceView(
+		renderTextureResource.Get(), &renderTextureSrvDesc,
+		GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, renderTextureIndex));
+	srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, renderTextureIndex);
+	//↑initializeでいいかも
+
 }
 
 void DX12Common::update()
@@ -106,40 +167,40 @@ void DX12Common::MakeD3D12Device()
 	for (size_t i = 0; i < _countof(featureLevels); ++i)
 	{
 		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i],
-			IID_PPV_ARGS(&device_));
+			IID_PPV_ARGS(&device));
 		if (SUCCEEDED(hr))
 		{
-			//debug_->Log(std::format("featureLevel {}\n",
-			//	featureLevelStrings[i]));
+			debug_->Log(std::format("featureLevel {}\n",
+				featureLevelStrings[i]));
 			break;
 		}
 	}
-	assert(device_ != nullptr);
-	//debug_->Log("Complete create D3D12Device\n");
+	assert(device != nullptr);
+	debug_->Log("Complete create D3D12Device\n");
 }
 
 void DX12Common::MakeCommandQueue()
 {
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	hr = device_->CreateCommandQueue(
+	hr = device->CreateCommandQueue(
 		&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
 	assert(SUCCEEDED(hr));
 }
 
 void DX12Common::MakeCommandList()
 {
-	hr = device_->CreateCommandAllocator(
+	hr = device->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 	assert(SUCCEEDED(hr));
-	hr = device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
 		commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 	assert(SUCCEEDED(hr));
 }
 
-void DX12Common::MakeSwapchain(int32_t width, int32_t height, HWND hwnd_)
+void DX12Common::MakeSwapchain(HWND hwnd_)
 {
-	swapChainDesc.Width = width;
-	swapChainDesc.Height = height;
+	swapChainDesc.Width = WinAPP::clientWidth_;
+	swapChainDesc.Height = WinAPP::clientHeight_;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -161,8 +222,8 @@ void DX12Common::MakeDescriptorHeap()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	rtvDescriptorHeapDesc.NumDescriptors = 2;
-	hr = device_->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
+	rtvDescriptorHeapDesc.NumDescriptors = 16;
+	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
 		IID_PPV_ARGS(&rtvDescriptorHeap));
 	assert(SUCCEEDED(hr));
 }
@@ -179,18 +240,17 @@ void DX12Common::MakeRTV()
 {
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	const uint32_t descriptorSizeRTV = device_->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	int index = Allocate();
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
-		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, 0);
+		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, index);
 
 	rtvHandles[0] = rtvStartHandle;
-	device_->CreateRenderTargetView(
+	device->CreateRenderTargetView(
 		swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
-
-	rtvHandles[1].ptr = rtvHandles[0].ptr + device_->
-		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	device_->CreateRenderTargetView(
+	index = Allocate();
+	rtvHandles[1] = GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, index);
+	device->CreateRenderTargetView(
 		swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 }
 
@@ -198,20 +258,16 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 {
 	MakeCommandQueue();
 	MakeCommandList();
-	MakeSwapchain(
-		winApp->GetClientWidth(),
-		winApp->GetClientHeight(),
-		winApp->GetHWND()
-	);
+	MakeSwapchain(winApp->GetHWND());
 	MakeDescriptorHeap();
 
 	rtvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-		2,
+		16,
 		false);
 	dsvDescriptorHeap = CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-		1,
+		16,
 		false);
 
 	BringResources();
@@ -222,22 +278,22 @@ void DX12Common::MakeScreen(WinAPP* winApp)
 void DX12Common::DX12Release()
 {
 #ifdef _DEBUG
-	debugController->Release();
+	//debugController->Release();
 #endif
 }
 
 ComPtr<ID3D12DescriptorHeap> DX12Common::CreateDescriptorHeap(
 	D3D12_DESCRIPTOR_HEAP_TYPE heapType,
 	UINT numDescriptors,
-    bool shaderVisible)
+	bool shaderVisible)
 {
 	ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC DescriptorHeapDesc{};
 	DescriptorHeapDesc.Type = heapType;
 	DescriptorHeapDesc.NumDescriptors = numDescriptors;
 	DescriptorHeapDesc.Flags =
-	    shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	hr = device_->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+		shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	hr = device->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 	assert(SUCCEEDED(hr));
 	return descriptorHeap;
 }
@@ -247,21 +303,22 @@ void DX12Common::MakeDSV()
 {
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	device_->CreateDepthStencilView(
+	int index = Allocate();
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, index);
+	device->CreateDepthStencilView(
 		depthStencilResource.Get(),
 		&dsvDesc,
-		dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		dsvHandle);
 
-	const uint32_t descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
 }
 
 
-ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(int32_t width, int32_t height)
+ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource()
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = width;
-	resourceDesc.Height = height;
+	resourceDesc.Width = WinAPP::clientWidth_;
+	resourceDesc.Height = WinAPP::clientHeight_;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.DepthOrArraySize = 1;
 	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -277,7 +334,7 @@ ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(int32_t wid
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	hr = device_->CreateCommittedResource(
+	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -308,6 +365,17 @@ D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetGPUDescriptorHandle(
 	return handleGPU;
 }
 
+//D3D12_CPU_DESCRIPTOR_HANDLE DX12Common::GetSRVCPUDescriptorHandle(uint32_t index)
+//{
+//	//return GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,index);
+//	return D3D12_CPU_DESCRIPTOR_HANDLE();
+//}
+//
+//D3D12_GPU_DESCRIPTOR_HANDLE DX12Common::GetSRVGPUDescriptorHandle(uint32_t index)
+//{
+//	return D3D12_GPU_DESCRIPTOR_HANDLE();
+//}
+
 void DX12Common::DebugLayer()
 {
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
@@ -336,4 +404,215 @@ void DX12Common::InfoQueue(ID3D12Device* device)
 		filter.DenyList.pSeverityList = severities;
 		InfoQueue->PushStorageFilter(&filter);
 	}
+}
+
+void DX12Common::PreDraw()
+{
+	//書き込むバックバッファのインデックスを取得
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//現在のバックバッファをバリアを張る対象にする
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
+	//現在のresourceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//遷移後のresourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//transitionBarrierを張る
+	//commandList->ResourceBarrier(1, &barrier);
+
+	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] =
+	{
+		srvDescriptorHeap
+	};
+	commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	rtv = GetCPUDescriptorHandle(
+		rtvDescriptorHeap.Get(), descriptorSizeRTV, rtvIndex);
+	dsv = dsvHandle;
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList.Get()->//描画先のRTV設定
+		OMSetRenderTargets(1, &rtv, false, &dsv);
+
+	commandList->ClearDepthStencilView(
+		dsvHandle,
+		D3D12_CLEAR_FLAG_DEPTH,
+		1.0f,
+		0,
+		0,
+		nullptr);
+
+
+	float newClearColor[4] =
+	{
+		kRenderTargetClearValue.x,
+		kRenderTargetClearValue.y,
+		kRenderTargetClearValue.z,
+		kRenderTargetClearValue.a
+	};
+	//指定した色で画面をクリア
+	commandList->ClearRenderTargetView(
+		rtv,
+		newClearColor, 0, nullptr);
+}
+
+void DX12Common::PostDraw()
+{
+	barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	commandList->ResourceBarrier(1, &barrier);
+
+	//barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	//commandList->ResourceBarrier(1, &barrier);
+
+	//swapChainResources[backBufferIndex] = renderTextureResource;
+	//commandList->CopyResource(swapChainResources[backBufferIndex].Get(), renderTextureResource.Get());
+}
+
+void DX12Common::PreDrawImGui()
+{
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
+
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	commandList->ResourceBarrier(1, &barrier);
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+
+	commandList->ClearRenderTargetView(
+		rtvHandles[backBufferIndex],
+		clearColor, 0, nullptr);
+
+}
+
+void DX12Common::PostDrawImGui()
+{
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	//barrier.Transition.pResource = renderTextureResource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	commandList->ResourceBarrier(1, &barrier);
+
+	barrier.Transition.pResource = renderTextureResource.Get();
+	//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	commandList->ResourceBarrier(1, &barrier);
+
+	HRESULT hr = commandList->Close();
+	assert(SUCCEEDED(hr));
+
+	ComPtr<ID3D12CommandList> commandLists[] =
+	{
+		commandList
+	};
+	commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
+	swapChain->Present(1, 0);
+
+	fenceValue++;
+	commandQueue->Signal(fence.Get(), fenceValue);
+
+	if (fence->GetCompletedValue() < fenceValue)
+	{
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+}
+
+void DX12Common::MakeFence()
+{
+	HRESULT hr = device->CreateFence(fenceValue,
+		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(SUCCEEDED(hr));
+	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent != nullptr);
+}
+
+ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT format, const Vector4& color)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = WinAPP::clientWidth_;
+	resourceDesc.Height = WinAPP::clientHeight_;
+	resourceDesc.Format = format;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = format;
+	clearValue.Color[0] = color.x;
+	clearValue.Color[1] = color.y;
+	clearValue.Color[2] = color.z;
+	clearValue.Color[3] = color.a;
+
+	ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_RENDER_TARGET,//これから描画する前提のtextureなのでrenderTargetとして使う
+		&clearValue,//clearRenderTargetをこの色でclearする
+		IID_PPV_ARGS(&resource));
+
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
+uint32_t DX12Common::Allocate()
+{
+	assert(CheckNumHandle(useIndex));
+	int index = useIndex;
+	useIndex++;
+	return index;
+}
+void DX12Common::CreateSRVforTexture2D(
+	uint32_t srvIndex,
+	ID3D12Resource* pResource,
+	DXGI_FORMAT Format,
+	UINT MipLevels)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = Format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(MipLevels);
+
+	device->CreateShaderResourceView(
+		pResource, &srvDesc, GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, srvIndex));
 }

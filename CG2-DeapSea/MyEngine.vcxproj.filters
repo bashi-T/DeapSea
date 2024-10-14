@@ -379,6 +379,12 @@
     <FxCompile Include="HLSL\Sprite.PS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="HLSL\CopyImage.PS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\CopyImage.VS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -391,6 +397,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\Sprite.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\CopyImage.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>

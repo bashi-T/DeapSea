@@ -14,13 +14,13 @@ MyImGui::~MyImGui()
 }
 
 void MyImGui::Initialize(
-    HWND hwnd,
+	HWND hwnd,
 	ID3D12Device* device,
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
 	ID3D12DescriptorHeap* srvDescriptorHeap)
 {
-	uint32_t index = SRVManager::GetInstance()->Allocate();
+	uint32_t index = DX12Common::GetInstance()->Allocate();
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -30,10 +30,14 @@ void MyImGui::Initialize(
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
 		srvDescriptorHeap,
-		SRVManager::GetInstance()->
-		GetCPUDescriptorHandle(index),
-		SRVManager::GetInstance()->
-		GetGPUDescriptorHandle(index));
+		DX12Common::GetInstance()->GetCPUDescriptorHandle(
+			DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(),
+			DX12Common::GetInstance()->GetDescriptorSizeSRV(),
+			index),
+		DX12Common::GetInstance()->GetGPUDescriptorHandle(
+			DX12Common::GetInstance()->GetSrvDescriptorHeap().Get(),
+			DX12Common::GetInstance()->GetDescriptorSizeSRV(),
+			index));
 }
 
 void MyImGui::Update()

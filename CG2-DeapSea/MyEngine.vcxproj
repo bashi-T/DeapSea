@@ -103,6 +103,12 @@
     <ClInclude Include="GameObject\UIPlane.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\CopyImage.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="HLSL\CopyImage.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="HLSL\Object3d.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
@@ -151,6 +157,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="HLSL\CopyImage.hlsli" />
     <None Include="HLSL\Object3d.hlsli" />
     <None Include="HLSL\Particle.hlsli" />
     <None Include="HLSL\Sprite.hlsli" />
