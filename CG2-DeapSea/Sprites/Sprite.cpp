@@ -180,15 +180,19 @@ void Sprite::Draw()
 		SetGraphicsRootConstantBufferView(
 		1, transformationMatrixResource->GetGPUVirtualAddress());
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		spriteCommon_->GetDx12Common()->
-		GetRtvHandles(srvManager_->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
-	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-		OMSetRenderTargets(1, &rtv, false, &dsv);
+	//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+	//	spriteCommon_->GetDx12Common()->
+	//	GetRtvHandles(srvManager_->GetBackBufferIndex());
+	//D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
+	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+	//	OMSetRenderTargets(1, &rtv, false, &dsv);
 
-	srvManager_->SetGraphicsRootDescriptorTable(
-		2, materialData->material.textureIndex);
+	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		SetGraphicsRootDescriptorTable(
+			2, spriteCommon_->GetDx12Common()->GetGPUDescriptorHandle(
+				spriteCommon_->GetDx12Common()->GetSrvDescriptorHeap().Get(),
+				spriteCommon_->GetDx12Common()->GetDescriptorSizeSRV(),
+				materialData->material.textureIndex));
 
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		DrawIndexedInstanced(6, 1, 0, 0, 0);

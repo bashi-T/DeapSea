@@ -535,10 +535,10 @@ void Mesh::DrawSphere(
 			DX12Common::GetInstance()->GetCommandList().Get()->
 				SetGraphicsRootConstantBufferView(
 					4, directionalLightResource->GetGPUVirtualAddress());
-			D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-				DX12Common::GetInstance()->GetRtvHandles(srvManager_->GetBackBufferIndex());
-			D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
-			DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+			//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+			//	DX12Common::GetInstance()->GetRtvHandles(srvManager_->GetBackBufferIndex());
+			//D3D12_CPU_DESCRIPTOR_HANDLE dsv = DX12Common::GetInstance()->GetDsvHandle();
+			//DX12Common::GetInstance()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 			InputDataSphere(
 				b, d, c, a, color, texcoordB, texcoordD, texcoordC, texcoordA, sphereCount, WinAPP::clientWidth_, WinAPP::clientHeight_);

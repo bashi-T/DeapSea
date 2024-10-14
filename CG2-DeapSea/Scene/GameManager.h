@@ -20,6 +20,8 @@
 #include"Objects/model.h"
 #include"Objects/SkyDome.h"
 #include"Objects/Mesh.h"
+#include"Commons/FullScreenSpriteCommon.h"
+#include"Objects/FullScreenSprite.h"
 
 class GameManager
 {
@@ -35,10 +37,13 @@ private:
 	SpriteCommon* SPCommon;
 	Object3dCommon* object3dCommon;
 	ParticleCommon* particleCommon;
+	FullScreenSpriteCommon* FSSPCommon;
 	Object3d* object3d;
 	Camera* camera;
 	SkyDome* skyDome;
 	AudioManager* audioManager;
+	FullScreenSprite* fullScreenSprite;
+
 public: 
 	GameManager();
 	~GameManager();

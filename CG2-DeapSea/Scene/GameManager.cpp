@@ -31,6 +31,7 @@ int GameManager::Run()
 	MSG NewMSG = winAPP->GetMSG();
 	imgui = MyImGui::GetInstance();
 	SPCommon = SpriteCommon::GetInstance();
+	FSSPCommon = FullScreenSpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
 	particleCommon = ParticleCommon::GetInstance();
 	object3d = new Object3d;
@@ -41,7 +42,7 @@ int GameManager::Run()
 
 
 	winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"GE3");
-	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
+	dx12Common->Initialize(winAPP);
 	srvManager->Initialize(dx12Common);
 	audioManager->Initialize();
 	input->Initialize(winAPP);
@@ -52,7 +53,7 @@ int GameManager::Run()
 		dx12Common->GetRtvDesc(),
 		srvManager->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize(dx12Common, srvManager);
-
+	FSSPCommon->Initialize(dx12Common);
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->GetInstance()->SetRotate({0.1f,0.0f,0.0f});
@@ -60,12 +61,15 @@ int GameManager::Run()
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	object3d->Initialize(object3dCommon, srvManager);
 	SPCommon->Initialize(dx12Common);
+	fullScreenSprite = new FullScreenSprite;
+	fullScreenSprite->MeshInitialize(FullScreenSpriteCommon::GetInstance(), SRVManager::GetInstance());
 	particleCommon->Initialize(dx12Common);
 	skyDome->Initialize();
 	sceneArr_[TITLE]->Init();
 
 	while (NewMSG.message != WM_QUIT)
 	{
+		imgui->Update();
 		dx12Common->update();
 		Input::GetInstance()->Update();
 		if (Input::GetInstance()->PushKey(DIK_RIGHT))
@@ -85,7 +89,6 @@ int GameManager::Run()
 			audioManager->Initialize();
 			sceneArr_[currentSceneNo_]->Init();
 		}
-		imgui->Update();
 		skyDome->Update();
 		sceneArr_[currentSceneNo_]->Update();
 #ifdef _DEBUG
@@ -123,16 +126,19 @@ int GameManager::Run()
 			ImGui::Render();
 			break;
 		}
-		srvManager->PreDraw();
+		dx12Common->PreDraw();
 		skyDome->Draw();
 		sceneArr_[currentSceneNo_]->Draw();
+		dx12Common->PostDraw();
+
+		dx12Common->PreDrawImGui();
+		fullScreenSprite->MeshDraw(FullScreenSpriteCommon::GetInstance());
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
-
-		srvManager->PostDraw();
+		dx12Common->PostDrawImGui();
 	}
 
-	CloseHandle(srvManager->GetFenceEvent());
+	CloseHandle(dx12Common->GetFenceEvent());
 	sceneArr_[currentSceneNo_]->Finalize();
 	delete skyDome;
 	skyDome = NULL;
@@ -142,9 +148,11 @@ int GameManager::Run()
 		delete model;
 		model = NULL;
 	}
+	FSSPCommon->DeleteInstance();
 	SPCommon->DeleteInstance();
 	camera->DeleteInstance();
 	delete object3d;
+	delete fullScreenSprite;
 	ModelManager::GetInstance()->Finalize();
 	object3dCommon->DeleteInstance();
 	TextureManager::GetInstance()->Finalize();

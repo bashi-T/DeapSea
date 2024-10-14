@@ -240,7 +240,7 @@ void DX12Common::MakeRTV()
 {
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	int index = Allocate();
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
 		GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, index);
@@ -334,7 +334,7 @@ ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource()
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	 hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -385,10 +385,10 @@ void DX12Common::DebugLayer()
 	}
 }
 
-void DX12Common::InfoQueue(ID3D12Device* device)
+void DX12Common::InfoQueue(ID3D12Device* device_)
 {
 	ComPtr<ID3D12InfoQueue> InfoQueue = nullptr;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&InfoQueue))))
+	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&InfoQueue))))
 	{
 		InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 		InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
@@ -524,7 +524,7 @@ void DX12Common::PostDrawImGui()
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
 
-	HRESULT hr = commandList->Close();
+	 hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
 	ComPtr<ID3D12CommandList> commandLists[] =
@@ -551,7 +551,7 @@ void DX12Common::PostDrawImGui()
 
 void DX12Common::MakeFence()
 {
-	HRESULT hr = device->CreateFence(fenceValue,
+	 hr = device->CreateFence(fenceValue,
 		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -581,7 +581,7 @@ ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT forma
 	clearValue.Color[3] = color.a;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
+	 hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,

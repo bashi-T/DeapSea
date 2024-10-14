@@ -122,8 +122,12 @@ void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 		IASetVertexBuffers(0, 1, &vertexBufferView);
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferView);
-	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData_.material.textureIndex);
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+		2, modelCommon_->GetDx12Common()->
+		GetGPUDescriptorHandle(
+			modelCommon_->GetDx12Common()->GetSrvDescriptorHeap().Get(),
+			modelCommon_->GetDx12Common()->GetDescriptorSizeSRV(),
+			modelData_.material.textureIndex));
 
 	//if (modelData_.isEnvironment == true)
 	//{
@@ -441,7 +445,7 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 	skinCluster.paletteResource = CreateBufferResource(sizeof(WellForGPU) * skelton.joints.size());
 	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedParette));
 	skinCluster.mappedPalette = { mappedParette,skelton.joints.size() };
-	uint32_t index = srvManager_->Allocate();
+	uint32_t index = DX12Common::GetInstance()->Allocate();
 
 	skinCluster.paletteSrvHandle.first = modelCommon_->GetDx12Common()->GetCPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
 	skinCluster.paletteSrvHandle.second = modelCommon_->GetDx12Common()->GetGPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);

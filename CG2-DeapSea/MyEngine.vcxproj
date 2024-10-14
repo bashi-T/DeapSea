@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Commons\FullScreenSpriteCommon.cpp" />
     <ClCompile Include="Managers\AudioManager.cpp" />
     <ClCompile Include="GameObject\Cursor.cpp" />
     <ClCompile Include="GameObject\ground.cpp" />
     <ClCompile Include="Commons\ParticleCommon.cpp" />
+    <ClCompile Include="Objects\FullScreenSprite.cpp" />
     <ClCompile Include="Scene\ClearScene.cpp" />
     <ClCompile Include="GameObject\EnemyBullet.cpp" />
     <ClCompile Include="GameObject\PlayerBullet.cpp" />
@@ -57,10 +59,12 @@
     <ClCompile Include="GameObject\UIPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Commons\FullScreenSpriteCommon.h" />
     <ClInclude Include="Managers\AudioManager.h" />
     <ClInclude Include="GameObject\Cursor.h" />
     <ClInclude Include="GameObject\ground.h" />
     <ClInclude Include="Commons\ParticleCommon.h" />
+    <ClInclude Include="Objects\FullScreenSprite.h" />
     <ClInclude Include="Scene\ClearScene.h" />
     <ClInclude Include="GameObject\EnemyBullet.h" />
     <ClInclude Include="GameObject\PlayerBullet.h" />
@@ -104,9 +108,13 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\CopyImage.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HLSL\CopyImage.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HLSL\Object3d.VS.hlsl">

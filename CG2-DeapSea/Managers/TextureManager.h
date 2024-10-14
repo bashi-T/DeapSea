@@ -5,6 +5,7 @@
 #include "Commons/DX12Common.h"
 #include"SRVManager.h"
 #include<unordered_map>
+#include"Math/CGVector.h"
 
 class TextureManager
 {
@@ -13,7 +14,7 @@ public:
 	{
 		DirectX::TexMetadata metadata;
 		ComPtr<ID3D12Resource> resource;
-		uint32_t srvIndex = 0;
+		uint32_t srvIndex;
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
 	};
@@ -22,7 +23,7 @@ public:
 	void Finalize();
 	void Initialize(DX12Common* dxcommon, SRVManager* srvManager_);
 	void LoadTexture(const std::string& filePath);
-	void LoadTextureforSRV(const std::string& filePath);
+	void LoadRenderTexture(const std::string& filePath);
 	ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 	const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
 	uint32_t GetSrvIndex(const std::string& filePath);
@@ -42,8 +43,8 @@ private:
 	~TextureManager() = default;
 	TextureManager(TextureManager&) = delete;
 	TextureManager& operator=(TextureManager&) = delete;
-	DX12Common* dx12Common_ = nullptr;
-	Debug* debug_ = nullptr;
+	DX12Common* dx12Common_;
+	Debug* debug_;
 	SRVManager* srvManager = nullptr;
 	std::unordered_map<std::string, TextureData>textureDatas;
 

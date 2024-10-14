@@ -89,10 +89,10 @@ void Particle::Draw()
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, cameraResource->GetGPUVirtualAddress());
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-		particleCommon_->GetDx12Common()->GetRtvHandles(srvManager_->GetBackBufferIndex());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = particleCommon_->GetDx12Common()->GetDsvHandle();
-	particleCommon_->GetDx12Common()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
+	//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
+	//	particleCommon_->GetDx12Common()->GetRtvHandles(srvManager_->GetBackBufferIndex());
+	//D3D12_CPU_DESCRIPTOR_HANDLE dsv = particleCommon_->GetDx12Common()->GetDsvHandle();
+	//particleCommon_->GetDx12Common()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
 
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 }
@@ -226,7 +226,7 @@ void Particle::InputData(bool isRevive, ElementsParticle element)
 
 void Particle::MakeShaderResourceViewInstance()
 {
-	uint32_t index = srvManager_->Allocate();
+	uint32_t index = DX12Common::GetInstance()->Allocate();
 	instancingSrvHandleCPU = srvManager_->GetCPUDescriptorHandle(index);
 	instancingSrvHandleGPU = srvManager_->GetGPUDescriptorHandle(index);
 	srvManager_->CreateSRVforStructuredBuffer(index, instancingResource.Get(), kNumInstance, sizeof(ParticleForGPU));
