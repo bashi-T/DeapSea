@@ -10,6 +10,7 @@ void GameScene::Init()
 	whale_ = new Whale;
 	ground = new Ground;
 	player_->Initialize();
+	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,Camera::GetInstance()->GetTranslate().y ,0.0f });
 	whale_->Initialize(player_);
 	ground->Initialize();
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
@@ -22,78 +23,102 @@ void GameScene::Init()
 	bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
 	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
 	time = 0;
+
+	for (uint32_t i = 0; i < 1; i++)
+	{
+		Sprite* sprite = new Sprite;
+		sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/black.png");
+		sprite->SetSize({ (float)WinAPP::clientWidth_,(float)WinAPP::clientHeight_ });
+		sprite->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+		sprites.push_back(sprite);
+	}
+
+	isGameStart = false;
 }
 
 void GameScene::Update()
 {
-	time++;
-	enemys_.remove_if([](Enemy* enemy)
-		{
-			if (enemy->IsDead())
+	if (isGameStart==true)
+	{
+		time++;
+		enemys_.remove_if([](Enemy* enemy)
 			{
-				delete enemy;
-				return true;
-			}
-			return false;
-		});
-	if (whale_->GetLife() == 0)
-	{
-		enemys_.resize(0);
-		sceneNo = GAMEOVER;
-	}
-	else if (enemys_.size() == 0 && gameEnd||Input::GetInstance()->TriggerKey(DIK_RETURN))
-	{
-		enemys_.resize(0);
-		sceneNo = CLEAR;
+				if (enemy->IsDead())
+				{
+					delete enemy;
+					return true;
+				}
+				return false;
+			});
+		if (whale_->GetLife() == 0)
+		{
+			enemys_.resize(0);
+			sceneNo = GAMEOVER;
+		}
+		else if (enemys_.size() == 0 && gameEnd || Input::GetInstance()->TriggerKey(DIK_RETURN))
+		{
+			enemys_.resize(0);
+			sceneNo = CLEAR;
+		}
+		else if (Input::GetInstance()->TriggerKey(DIK_S) || time == 30)
+		{
+			enemys_.resize(0);
+			sceneNo = TITLE;
+		}
+
+		if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
+		{
+			whale_->SetTranslate({ player_->GetTranslate().x + whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
+		}
+		if (whale_->GetTranslate().x < player_->GetTranslate().x - whale_->GetMaxDistance())
+		{
+			whale_->SetTranslate({ player_->GetTranslate().x - whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
+		}
+
+		if (whale_->GetTranslate().z > player_->GetTranslate().z + whale_->GetMaxDistance())
+		{
+			whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y,player_->GetTranslate().z + whale_->GetMaxDistance() });
+		}
+		if (whale_->GetTranslate().z < player_->GetTranslate().z - whale_->GetMaxDistance())
+		{
+			whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y,player_->GetTranslate().z - whale_->GetMaxDistance() });
+		}
+
+		if (player_->GetTranslate().x <= -10.0f)
+		{
+			player_->SetTranslate({ -10.0f,player_->GetTranslate().y,player_->GetTranslate().z });
+		}
+
+		if (player_->GetTranslate().x >= 10.0f)
+		{
+			player_->SetTranslate({ 10.0f,player_->GetTranslate().y,player_->GetTranslate().z });
+		}
+		UpdateEnemyPopCommands(GameManager::stageNumber);
+		for (Enemy* enemy_ : enemys_)
+		{
+			enemy_->Update(enemy_->GetSort());
+		}
+
+		CheckAllCollisions();
 	}
 	else
-	if (Input::GetInstance()->TriggerKey(DIK_S) /*|| time == 30*/)
 	{
-		enemys_.resize(0);
-		sceneNo = TITLE;
-	}
-
-	if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ player_->GetTranslate().x + whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
-	}
-	if (whale_->GetTranslate().x < player_->GetTranslate().x - whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ player_->GetTranslate().x - whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
-	}
-
-	if (whale_->GetTranslate().z > player_->GetTranslate().z + whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y,player_->GetTranslate().z + whale_->GetMaxDistance() });
-	}
-	if (whale_->GetTranslate().z < player_->GetTranslate().z - whale_->GetMaxDistance())
-	{
-		whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y,player_->GetTranslate().z - whale_->GetMaxDistance() });
-	}
-
-	if (player_->GetTranslate().x <= -10.0f)
-	{
-		player_->SetTranslate({ -10.0f,player_->GetTranslate().y,player_->GetTranslate().z });
-	}
-
-	if (player_->GetTranslate().x >= 10.0f)
-	{
-		player_->SetTranslate({ 10.0f,player_->GetTranslate().y,player_->GetTranslate().z });
+		player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 3.0f, player_->GetTranslate().z });
+		sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a - 0.02f });
+		sprites[0]->Update();
+		if (sprites[0]->GetColor().a <= 0.0f)
+		{
+			isGameStart = true;
+		}
 	}
 	ground->Update();
 	player_->Update();
 	whale_->Update();
-	UpdateEnemyPopCommands(GameManager::stageNumber);
-	for(Enemy*enemy_:enemys_)
-	{
-		enemy_->Update(enemy_->GetSort());
-	}
-
-	CheckAllCollisions();
 }
 
 void GameScene::Draw()
 {
+	sprites[0]->Draw();
 	ground->Draw();
 	player_->Draw();
 	whale_->Draw();

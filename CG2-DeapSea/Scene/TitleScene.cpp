@@ -214,6 +214,12 @@ void TitleScene::Finalize()
 	//  particle = NULL;
 	//}
 	//particles.clear();
+	for (Sprite* sprite : sprites)
+	{
+		delete sprite;
+		sprite = NULL;
+	}
+	sprites.clear();
 	for (UIPlane* uiPlane : uiPlanes)
 	{
 		delete uiPlane;
@@ -224,6 +230,8 @@ void TitleScene::Finalize()
 	cursor = NULL;
 	delete whale;
 	whale = NULL;
+	delete player;
+	player = NULL;
 	AudioManager::GetInstance()->SoundUnload(&bgm);
 	AudioManager::GetInstance()->SoundUnload(&enterSound);
 	AudioManager::GetInstance()->SoundUnload(&moveSound);

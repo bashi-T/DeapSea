@@ -28,11 +28,7 @@ void ModelManager::Initialize(DX12Common* dxCommon)
 
 void ModelManager::LoadModel(std::string& filePath, const std::string& TextureFilePath, bool isLighting)
 {
-	if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
-	{
-		return;
-	}
-	else if (models.contains(filePath))
+	if (models.contains(filePath))
 	{
 		std::string num = std::to_string(sameModelNum);
 		std::string modelFilePath = num + filePath;
