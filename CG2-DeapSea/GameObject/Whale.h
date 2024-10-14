@@ -17,6 +17,7 @@ public:
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 rotate);
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
+	Vector3 GetRotate() { return object3d->GetRotate(); }
 	OBB GetCollision() { return wCollision; }
 	int GetLife() { return life; }
 	bool GetIsHit() { return isHit; }

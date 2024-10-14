@@ -46,13 +46,13 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,SRVManager* srvManager, std::
 	RightTop = { float(WinAPP::clientWidth_) / 3, 0.0f, 0.0f, 1.0f };
 	RightBottom = { float(WinAPP::clientWidth_) / 3, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
 	LeftBottom = { 0.0f, float(WinAPP::clientHeight_) / 3, 0.0f, 1.0f };
-	Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	coordLeftTop = { 0.0f, 0.0f };
 	coordRightTop = { 1.0f, 0.0f };
 	coordRightBottom = { 1.0f, 1.0f };
 	coordLeftBottom = { 0.0f, 1.0f };
 	
-	InputData(Color);
+	InputData(materialData->color);
 	materialData->material.textureFilePath = textureFilePath;
 	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 	materialData->material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
@@ -69,7 +69,7 @@ void Sprite::Update()
 	transformMatrix.translate = { position.x,position.y,0.0f };
 	transformMatrix.rotate = { 0.0f,0.0f,rotation };
 	transformMatrix.scale = { size.x,size.y,1.0f };
-	InputData(Color);
+	InputData(materialData->color);
 
 	//ImGui::Begin("spriteEdit");
 	//int num = textureIndex;

@@ -60,7 +60,6 @@ public:
 	Vector4 GetRightTop() { return RightTop; }
 	Vector4 GetRightBottom(){ return RightBottom; }
 	Vector4 GetLeftBottom(){ return LeftBottom; }
-	Vector4 GetColor(){ return LeftTop; }
 	Vector2 GetTexcoordLeftTop(){ return coordLeftTop; }
 	Vector2 GetTexcoordRightTop(){ return coordRightTop; }
 	Vector2 GetTexcoordRightBottom(){ return coordRightBottom; }
@@ -127,7 +126,6 @@ private:
 	Vector4 RightTop;
 	Vector4 RightBottom;
 	Vector4 LeftBottom;
-	Vector4 Color;
 	Vector2 coordLeftTop;
 	Vector2 coordRightTop;
 	Vector2 coordRightBottom;

@@ -6,23 +6,24 @@
 
 void TitleScene::Init()
 {
-	std::string PNGs[5] =
+	std::string PNGs[6] =
 	{
 		"Resource/sinkaiTitle4.png",
 		"Resource/practice.png",
 		"Resource/Stage1.png",
 		"Resource/Stage2.png",
 		"Resource/Stage3.png",
+		//"Resource/black.png"
 	};
-	for(uint32_t i = 0; i < 1; i++)
-	{
-		Particle* particle = new Particle;
-		particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-			-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 6.0f, 0.0f, 0.0f);
-		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
-		particles.push_back(particle);
-	}
+	//for(uint32_t i = 0; i < 1; i++)
+	//{
+	//	Particle* particle = new Particle;
+	//	particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+	//		-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
+	//		0.0f, 0.0f, 1.0f, 6.0f, 0.0f, 0.0f);
+	//	particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+	//	particles.push_back(particle);
+	//}
 	for (uint32_t i = 0; i < 5; i++)
 	{
 		UIPlane* uiPlane = new UIPlane;
@@ -48,9 +49,10 @@ void TitleScene::Init()
 
 	player = new Player;
 	player->Initialize();
+	player->SetIsHit(true);
 	whale = new Whale;
 	whale->Initialize(player);
-	whale->SetTranslate({ 0.0f,-13.15f,5.0f });
+	whale->SetTranslate({ 0.0f,0.15f,5.0f });
 	floatTime = 0;
 
 	isSceneTransition = false;
@@ -64,36 +66,47 @@ void TitleScene::Init()
 	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
 	enterSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei.wav");
 	moveSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei2.wav");
+	for (uint32_t i = 0; i < 1; i++)
+	{
+		Sprite* sprite = new Sprite;
+		sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/black.png");
+		sprite->SetSize({ (float)WinAPP::clientWidth_,(float)WinAPP::clientHeight_ });
+		sprite->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+		sprites.push_back(sprite);
+	}
 }
 
 void TitleScene::Update()
 {
 	XINPUT_STATE joyState;
-	for (Particle* particle : particles)
-	{
-		particle->Update(true, particle->GetElements());
-	}
+	//for (Particle* particle : particles)
+	//{
+	//	particle->Update(true, particle->GetElements());
+	//}
 	for (UIPlane* uiPlane : uiPlanes)
 	{
 		uiPlane->Update();
 	}
 	cursor->Update();
 
-	if(floatTime<120)
+	if(floatTime<120)//title上下動
 	{
-		uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y - 0.001f,uiPlanes[0]->GetTranslate().z});
+		uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y - 0.001f,uiPlanes[0]->GetTranslate().z });
+		whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y - 0.003f,whale->GetTranslate().z });
 		floatTime++;
 	}
 	else if (floatTime >= 120 && floatTime < 240)
 	{
-		uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y+0.001f,uiPlanes[0]->GetTranslate().z });
+		uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y + 0.001f,uiPlanes[0]->GetTranslate().z });
+		whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y + 0.003f,whale->GetTranslate().z });
 		floatTime++;
 	}
 	else if (floatTime <= 240)
 	{
 		floatTime = 0;
 	}
-	//whale->Update();
+	whale->SetRotate({ whale->GetRotate().x, whale->GetRotate().y + 0.01f, whale->GetRotate().z });
+	whale->Update();
 	Input::GetInstance()->GetJoystickState(0, joyState);
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isStageSelect == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isStageSelect == false)
 	{
@@ -146,6 +159,10 @@ void TitleScene::Update()
 			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 3.0f, Camera::GetInstance()->GetTranslate().z });
 			uiPlanes[nowStage]->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x,uiPlanes[nowStage]->GetTranslate().y - 2.75f,uiPlanes[nowStage]->GetTranslate().z });
 		}
+		if (sceneTransitionTime >= 40)
+		{
+			sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a + 0.02f });
+		}
 		if (sceneTransitionTime == 90)
 		{
 			sceneNo = INGAME;
@@ -157,6 +174,7 @@ void TitleScene::Update()
 	ImGui::InputInt("num", &nowStage);
 	ImGui::End();
 #endif
+	sprites[0]->Update();
 }
 
 void TitleScene::Draw()
@@ -177,23 +195,25 @@ void TitleScene::Draw()
 	{
 		uiPlanes[nowStage]->Draw();
 	}
-
-	for (Particle* particle : particles)
+	if (isSceneTransition == false)
 	{
-		particle->Draw();
+		//for (Particle* particle : particles)
+		//{
+		//	particle->Draw();
+		//}
 	}
-
+	sprites[0]->Draw();
 	whale->Draw();
 }
 
 void TitleScene::Finalize()
 {
-	for (Particle* particle : particles)
-	{
-		delete particle;
-	  particle = NULL;
-	}
-	particles.clear();
+	//for (Particle* particle : particles)
+	//{
+	//	delete particle;
+	//  particle = NULL;
+	//}
+	//particles.clear();
 	for (UIPlane* uiPlane : uiPlanes)
 	{
 		delete uiPlane;
