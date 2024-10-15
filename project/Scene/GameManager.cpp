@@ -105,7 +105,7 @@ int GameManager::Run()
 		dx12Common->PostDraw();
 
 		dx12Common->PreDrawImGui();
-			fullScreenSprite->MeshDraw(FullScreenSpriteCommon::GetInstance());
+		fullScreenSprite->MeshDraw(FullScreenSpriteCommon::GetInstance());
 
 		imgui->Endframe(dx12Common->GetCommandList().Get());
 		dx12Common->PostDrawImGui();
