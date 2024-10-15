@@ -171,7 +171,7 @@ void DX12Common::MakeD3D12Device()
 		if (SUCCEEDED(hr))
 		{
 			debug_->Log(std::format("featureLevel {}\n",
-				featureLevelStrings[i]));
+			featureLevelStrings[i]));
 			break;
 		}
 	}
