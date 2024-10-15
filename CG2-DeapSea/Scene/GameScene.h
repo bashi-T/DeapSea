@@ -42,5 +42,7 @@ private:
 	AudioManager::SoundData bgm;
 	int time = 0;
 	bool isGameStart = false;
+	int sceneTransitionTime = 0;
+
 };
 

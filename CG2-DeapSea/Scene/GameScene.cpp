@@ -10,7 +10,7 @@ void GameScene::Init()
 	whale_ = new Whale;
 	ground = new Ground;
 	player_->Initialize();
-	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,Camera::GetInstance()->GetTranslate().y ,0.0f });
+	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,140.0f ,0.0f });
 	whale_->Initialize(player_);
 	ground->Initialize();
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
@@ -32,8 +32,9 @@ void GameScene::Init()
 		sprite->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 		sprites.push_back(sprite);
 	}
-
 	isGameStart = false;
+	sceneTransitionTime = 0;
+	Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 72.0f, Camera::GetInstance()->GetTranslate().z });
 }
 
 void GameScene::Update()
@@ -41,31 +42,6 @@ void GameScene::Update()
 	if (isGameStart==true)
 	{
 		time++;
-		enemys_.remove_if([](Enemy* enemy)
-			{
-				if (enemy->IsDead())
-				{
-					delete enemy;
-					return true;
-				}
-				return false;
-			});
-		if (whale_->GetLife() == 0)
-		{
-			enemys_.resize(0);
-			sceneNo = GAMEOVER;
-		}
-		else if (enemys_.size() == 0 && gameEnd || Input::GetInstance()->TriggerKey(DIK_RETURN))
-		{
-			enemys_.resize(0);
-			sceneNo = CLEAR;
-		}
-		else if (Input::GetInstance()->TriggerKey(DIK_S) || time == 30)
-		{
-			enemys_.resize(0);
-			sceneNo = TITLE;
-		}
-
 		if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
 		{
 			whale_->SetTranslate({ player_->GetTranslate().x + whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
@@ -103,17 +79,51 @@ void GameScene::Update()
 	}
 	else
 	{
-		player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 3.0f, player_->GetTranslate().z });
+		sceneTransitionTime++;
+
+		player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y -2.0f, player_->GetTranslate().z });
+		Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y -1.0f, Camera::GetInstance()->GetTranslate().z });
 		sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a - 0.02f });
 		sprites[0]->Update();
-		if (sprites[0]->GetColor().a <= 0.0f)
+		if (sceneTransitionTime==70)
 		{
 			isGameStart = true;
 		}
 	}
+	enemys_.remove_if([](Enemy* enemy)
+		{
+			if (enemy->IsDead())
+			{
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
+	if (whale_->GetLife() == 0)
+	{
+		enemys_.resize(0);
+		sceneNo = GAMEOVER;
+	}
+	else if (enemys_.size() == 0 && gameEnd || Input::GetInstance()->TriggerKey(DIK_RETURN))
+	{
+		enemys_.resize(0);
+		sceneNo = CLEAR;
+	}
+	else if (Input::GetInstance()->TriggerKey(DIK_S) || time == 60)
+	{
+		enemys_.resize(0);
+		sceneNo = TITLE;
+	}
+
 	ground->Update();
 	player_->Update();
 	whale_->Update();
+	for (Enemy* enemy_ : enemys_)
+	{
+		enemy_->Update(enemy_->GetSort());
+	}
+	//Camera::GetInstance()->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 3.0f,player_->GetTranslate().z - 20.0f });
+
 }
 
 void GameScene::Draw()
