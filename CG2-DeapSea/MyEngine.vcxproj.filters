@@ -391,12 +391,16 @@
     <FxCompile Include="HLSL\Sprite.PS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\CopyImage.PS.hlsl">
+    <FxCompile Include="HLSL\FullScreen.PS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\CopyImage.VS.hlsl">
+    <FxCompile Include="HLSL\FullScreen.VS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="HLSL\GrayScale.PS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Vignette.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -411,7 +415,7 @@
     <None Include="HLSL\Sprite.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\CopyImage.hlsli">
+    <None Include="HLSL\FullScreen.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>

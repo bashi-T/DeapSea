@@ -12,8 +12,15 @@
 class FullScreenSpriteCommon
 {
 public:
+	enum fullScreenEffects
+	{
+		NORMAL,
+		GRAYSCALE,
+		VIGNETTING,
+
+	};
 	~FullScreenSpriteCommon();
-	void Initialize(DX12Common* dxcommon);
+	void Initialize(DX12Common* dxcommon, int numEffect);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -21,7 +28,7 @@ public:
 		IDxcCompiler3* dxcCompiler,
 		IDxcIncludeHandler* includeHandler);
 	void ResetDXC();
-	void MakePSO(DX12Common* dxcommon);
+	void MakePSO(DX12Common* dxcommon, int numEffect);
 	static FullScreenSpriteCommon* GetInstance();
 	static void DeleteInstance();
 
@@ -60,6 +67,5 @@ private:
 	ComPtr<ID3D12Resource> materialResource;
 
 	ComPtr<ID3D12Resource> directionalLightResource;
-
 };
 

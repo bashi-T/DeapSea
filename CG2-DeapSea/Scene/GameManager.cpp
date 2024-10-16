@@ -53,7 +53,7 @@ int GameManager::Run()
 		dx12Common->GetRtvDesc(),
 		srvManager->GetSrvDescriptorHeap().Get());
 	TextureManager::GetInstance()->Initialize(dx12Common, srvManager);
-	FSSPCommon->Initialize(dx12Common);
+	FSSPCommon->Initialize(dx12Common, FullScreenSpriteCommon::VIGNETTING);
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->GetInstance()->SetRotate({0.1f,0.0f,0.0f});
@@ -72,14 +72,6 @@ int GameManager::Run()
 		imgui->Update();
 		dx12Common->update();
 		Input::GetInstance()->Update();
-		if (Input::GetInstance()->PushKey(DIK_RIGHT))
-		{
-			camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x + 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z });
-		}
-		if (Input::GetInstance()->PushKey(DIK_LEFT))
-		{
-			camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x - 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z});
-		}
 		camera->GetInstance()->Update();
 		prevSceneNo_ = currentSceneNo_;
 		currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();

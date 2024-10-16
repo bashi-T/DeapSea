@@ -160,11 +160,15 @@ void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 		IASetVertexBuffers(0, 2, vbvs);//開始スロット番号、使用スロット数、vbv配列へのポインタ
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferView);
-	DX12Common::GetInstance()->GetCommandList().Get()->
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(
 			5, skinCluster.paletteSrvHandle.second);
-	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData_.material.textureIndex);
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootDescriptorTable(
+		2, modelCommon_->GetDx12Common()->
+		GetGPUDescriptorHandle(
+			modelCommon_->GetDx12Common()->GetSrvDescriptorHeap().Get(),
+			modelCommon_->GetDx12Common()->GetDescriptorSizeSRV(),
+			modelData_.material.textureIndex));
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
 		UINT(modelData_.indices.size()), 1, 0, 0, 0);

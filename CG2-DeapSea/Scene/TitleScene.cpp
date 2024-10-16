@@ -158,6 +158,7 @@ void TitleScene::Update()
 		{
 			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 3.0f, Camera::GetInstance()->GetTranslate().z });
 			uiPlanes[nowStage]->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x,uiPlanes[nowStage]->GetTranslate().y - 2.75f,uiPlanes[nowStage]->GetTranslate().z });
+			whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y - 2.75f,whale->GetTranslate().z });
 		}
 		if (sceneTransitionTime >= 40)
 		{
@@ -202,7 +203,7 @@ void TitleScene::Draw()
 		//	particle->Draw();
 		//}
 	}
-	sprites[0]->Draw();
+	//sprites[0]->Draw();
 	whale->Draw();
 }
 

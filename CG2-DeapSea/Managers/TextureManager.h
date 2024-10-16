@@ -12,7 +12,7 @@ class TextureManager
 public:
 	struct TextureData
 	{
-		DirectX::TexMetadata metadata;
+		DirectX::TexMetadata metadata_;
 		ComPtr<ID3D12Resource> resource;
 		uint32_t srvIndex;
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;

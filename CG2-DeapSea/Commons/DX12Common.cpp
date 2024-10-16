@@ -170,13 +170,13 @@ void DX12Common::MakeD3D12Device()
 			IID_PPV_ARGS(&device));
 		if (SUCCEEDED(hr))
 		{
-			debug_->Log(std::format("featureLevel {}\n",
-			featureLevelStrings[i]));
+			//debug_->Log(std::format("featureLevel {}\n",
+			//	featureLevelStrings[i]));
 			break;
 		}
 	}
 	assert(device != nullptr);
-	debug_->Log("Complete create D3D12Device\n");
+	//debug_->Log("Complete create D3D12Device\n");
 }
 
 void DX12Common::MakeCommandQueue()
@@ -334,7 +334,7 @@ ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource()
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	 hr = device->CreateCommittedResource(
+	hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -524,7 +524,7 @@ void DX12Common::PostDrawImGui()
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList->ResourceBarrier(1, &barrier);
 
-	 hr = commandList->Close();
+	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
 	ComPtr<ID3D12CommandList> commandLists[] =
@@ -551,7 +551,7 @@ void DX12Common::PostDrawImGui()
 
 void DX12Common::MakeFence()
 {
-	 hr = device->CreateFence(fenceValue,
+	hr = device->CreateFence(fenceValue,
 		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -581,7 +581,7 @@ ComPtr<ID3D12Resource> DX12Common::CreateRenderTextureResource(DXGI_FORMAT forma
 	clearValue.Color[3] = color.a;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	 hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
+	hr = DX12Common::GetInstance()->GetDevice()->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,

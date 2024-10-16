@@ -11,6 +11,7 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #include"Math/CGVector.h"
+//#include"Objects/FullScreenSprite.h"
 
 class DX12Common final
 {
@@ -130,6 +131,7 @@ private:
 	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 	uint32_t descriptorSizeDTV;
 
+	//uint32_t descriptorSize;
 	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 
 	ComPtr<ID3D12Resource> depthStencilResource;

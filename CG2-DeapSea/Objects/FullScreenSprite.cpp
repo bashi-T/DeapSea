@@ -85,35 +85,12 @@ void FullScreenSprite::Update()
 void FullScreenSprite::MeshDraw(FullScreenSpriteCommon* spriteCommon)
 {
 	this->spriteCommon_ = spriteCommon;
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	IASetVertexBuffers(0, 1, &vertexBufferView);
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	IASetIndexBuffer(&indexBufferView);
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	SetGraphicsRootConstantBufferView(
-	//		0, materialResource->GetGPUVirtualAddress());
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	SetGraphicsRootConstantBufferView(
-	//		1, transformationMatrixResource->GetGPUVirtualAddress());
-	//
-	//
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	DrawInstanced(3, 1, 0, 0);
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetVertexBuffers(0, 1, &vertexBufferView);
-	//spriteCommon_->GetDx12Common()->GetCommandList().Get()->
-	//	IASetIndexBuffer(&indexBufferView);
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(2, spriteCommon_->GetDx12Common()->GetSrvHandleGPU());
 	spriteCommon_->GetDx12Common()->GetCommandList().Get()->
@@ -201,12 +178,12 @@ void FullScreenSprite::MakeBufferView()
 
 void FullScreenSprite::InputData(Vector4 color)
 {
-	
-	//	Material* materialData = nullptr;
-	//	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	Color = color;
-	//	materialData[0].color = color;
-	//	materialData[0].enableLighting = true;
+
+	Material* materialData_ = nullptr;
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	//Color = color;
+	materialData_[0].color = color;
+	materialData_[0].enableLighting = true;
 }
 
 void FullScreenSprite::InputDataTexture(Vector4 color)

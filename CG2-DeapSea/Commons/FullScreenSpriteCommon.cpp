@@ -4,12 +4,12 @@ FullScreenSpriteCommon::~FullScreenSpriteCommon()
 {
 }
 
-void FullScreenSpriteCommon::Initialize(DX12Common* dxcommon)
+void FullScreenSpriteCommon::Initialize(DX12Common* dxcommon, int numEffect)
 {
 	dx12Common_ = dxcommon;
 	ResetDXC();
 
-	MakePSO(dx12Common_);
+	MakePSO(dx12Common_,numEffect);
 }
 
 ComPtr<IDxcBlob> FullScreenSpriteCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils_, IDxcCompiler3* dxcCompiler_, IDxcIncludeHandler* includeHandler_)
@@ -60,7 +60,7 @@ void FullScreenSpriteCommon::ResetDXC()
 	assert(SUCCEEDED(hr));
 }
 
-void FullScreenSpriteCommon::MakePSO(DX12Common* dxcommon)
+void FullScreenSpriteCommon::MakePSO(DX12Common* dxcommon, int numEffect)
 {
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -157,17 +157,29 @@ void FullScreenSpriteCommon::MakePSO(DX12Common* dxcommon)
 	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	vertexShaderBlob =
-		CompileShader(L"HLSL/CopyImage.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		CompileShader(L"HLSL/FullScreen.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
-
-	pixelShaderBlob =
-		CompileShader(L"HLSL/CopyImage.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
-	assert(pixelShaderBlob != nullptr);
+	switch(numEffect)
+	{
+	case 0:
+		pixelShaderBlob =
+			CompileShader(L"HLSL/FullScreen.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		assert(pixelShaderBlob != nullptr);
+		break;
+	case 1:
+		pixelShaderBlob =
+			CompileShader(L"HLSL/GrayScale.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		assert(pixelShaderBlob != nullptr);
+		break;
+	case 2:
+		pixelShaderBlob =
+			CompileShader(L"HLSL/Vignette.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+		assert(pixelShaderBlob != nullptr);
+		break;
+	}
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = false;
-	//depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	//depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
