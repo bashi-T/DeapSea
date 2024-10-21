@@ -133,6 +133,7 @@ public:
 	void ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting);
 	void AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting);
 	void SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager, bool isLighting);
+	void Update();
 	void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager);
 	void Memcpy();
@@ -152,13 +153,15 @@ public:
 		const ModelData& modelData,
 		const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap,
 		uint32_t descriptorSize);
-
+	void SetColor(Vector4 color);
 	void SetIsLighting(bool lighting);
 
 	ModelData* GetModelData() { return &modelData_; }
 	Animation& GetAnimation() { return animation_; }
 	Skelton& GetSkelton() { return skelton_; }
 	const SkinCluster& GetSkinCluster() { return skinCluster; }
+	Material* GetMaterialData() { return materialData; }
+
 private:
 	ModelData modelData_;
 	ModelCommon* modelCommon_ = nullptr;

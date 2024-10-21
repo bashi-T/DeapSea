@@ -19,9 +19,9 @@ void Player::Initialize()
 {
 	object3d = new Object3d; 
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	const std::string playerModel = "human/walk.gltf";
-	const std::string playerSkin = "Resource/monsterBall.png";
-	ModelManager::GetInstance()->LoadSkeltonAnimation(playerModel, playerSkin, SRVManager::GetInstance(),true);
+	playerModel = "human/walk.gltf";
+	playerSkin = "Resource/monsterBall.png";
+	ModelManager::GetInstance()->LoadSkeltonAnimation(playerModel, playerSkin, SRVManager::GetInstance(), true);
 	object3d->SetModel(playerModel);
 	Model* model = ModelManager::GetInstance()->FindModel(playerModel);
 	Model::ModelData* modelData = model->GetModelData();
@@ -185,12 +185,12 @@ void Player::Update()
 
 			if (Input::GetInstance()->PushKey(DIK_SPACE))
 			{
+				isShot = true;
 			}
 			else
 			{
 				isShot = false;
 			}
-			isShot = true;
 
 		}
 		//Shot();

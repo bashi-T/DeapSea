@@ -8,6 +8,7 @@
 #include"GameObject/Enemy.h"
 #include "GameManager.h"
 #include"GameObject/ground.h"
+#include"GameObject/UIPlane.h"
 #include"Managers/AudioManager.h"
 #include <random>
 
@@ -32,7 +33,9 @@ private:
 	Player* player_;
 	Whale* whale_;
 	std::list<Enemy*> enemys_;
-	Object3d* object3d;
+	UIPlane* uiPlane;
+	std::vector <Particle*> particles;
+	
 	std::stringstream enemyPopCommands[10];
 	std::string enemyPopFile[10];
 	bool isWait = false;
@@ -43,6 +46,6 @@ private:
 	int time = 0;
 	bool isGameStart = false;
 	int sceneTransitionTime = 0;
-
+	std::string plane ="plane/plane.obj";
 };
 

@@ -6,7 +6,7 @@ class UIPlane
 {
 public:
 	~UIPlane();
-	void Initialize(const std::string plane,const std::string skin);
+	void Initialize(std::string plane,std::string skin);
 	void Update();
 	void Draw();
 
@@ -14,8 +14,15 @@ public:
 	void SetTranslate(Vector3 translate) { object3d->SetTranslate(translate); }
 	Vector3 GetScale() { return object3d->GetScale(); }
 	void SetScale(Vector3 scale) { object3d->SetScale(scale); }
+	Vector3 GetRotate() { return object3d->GetRotate(); }
+	void SetRotate(Vector3 rotate) { object3d->SetRotate(rotate); }
+	Vector4 GetColor() { return model->GetMaterialData()->color; }
+	void SetColor(Vector4 color);
 private:
 	Object3d* object3d = nullptr;
+	std::string planeModel;
+	std::string planeSkin;
+	Model* model;
 
 };
 

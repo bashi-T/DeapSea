@@ -11,6 +11,10 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
+/*
+ * DX12Common.h
+ * directX12に関する処理
+ */
 class DX12Common final
 {
 public:

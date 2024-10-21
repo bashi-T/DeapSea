@@ -12,7 +12,7 @@
 #include"GameObject/Player.h"
 #include"Managers/AudioManager.h"
 
-class TitleScene:public SceneManager
+class TitleScene :public SceneManager
 {
 public:
 	//~TitleScene();
@@ -42,5 +42,15 @@ private:
 	AudioManager::SoundData bgm;
 	AudioManager::SoundData enterSound;
 	AudioManager::SoundData moveSound;
-};
+	//std::string PNGs[6];
+	std::string Planes[6]
+	{
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+	};
 
+};

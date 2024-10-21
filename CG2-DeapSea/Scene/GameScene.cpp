@@ -9,10 +9,12 @@ void GameScene::Init()
 	player_ = new Player;
 	whale_ = new Whale;
 	ground = new Ground;
+	uiPlane = new UIPlane;
 	player_->Initialize();
-	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,140.0f ,0.0f });
 	whale_->Initialize(player_);
 	ground->Initialize();
+	uiPlane->Initialize(plane, "Resource/startUI.png");
+
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
 	enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
 	enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
@@ -34,14 +36,48 @@ void GameScene::Init()
 	}
 	isGameStart = false;
 	sceneTransitionTime = 0;
-	Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 72.0f, Camera::GetInstance()->GetTranslate().z });
+	Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 73.0f, Camera::GetInstance()->GetTranslate().z });
+	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,87.5f ,0.0f });
+	whale_->SetTranslate({ 0.0f,0.0f,1.5f });
+	uiPlane->SetScale({ 1.5f,1.0f,1.0f });
+	uiPlane->SetTranslate({ 0.0f,-6.0f,-10.0f });
+
+	for (uint32_t i = 0; i < 1; i++)
+	{
+		Particle* particle = new Particle;
+		particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+			-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
+		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+		particles.push_back(particle);
+	}
+
 }
 
 void GameScene::Update()
 {
-	if (isGameStart==true)
+	if (isGameStart == true)//ゲーム中
 	{
 		time++;
+		if (uiPlane->GetTranslate().y >= -0.5f && uiPlane->GetTranslate().y <= 0.5f)
+		{
+			uiPlane->SetTranslate({ uiPlane->GetTranslate().x, uiPlane->GetTranslate().y + 0.1f, uiPlane->GetTranslate().z });
+		}
+		else if (uiPlane->GetTranslate().y >= 0.5f)
+		{
+			uiPlane->SetTranslate({ uiPlane->GetTranslate().x, uiPlane->GetTranslate().y + 0.2f, uiPlane->GetTranslate().z });
+			uiPlane->SetRotate({ uiPlane->GetRotate().x,uiPlane->GetRotate().y + 0.1f,uiPlane->GetRotate().z });
+		}
+		else
+		{
+			uiPlane->SetTranslate({ uiPlane->GetTranslate().x, uiPlane->GetTranslate().y + 0.2f, uiPlane->GetTranslate().z });
+		}
+		uiPlane->Update();
+		for (Particle* particle : particles)
+		{
+			particle->Update(false, particle->GetElements());
+		}
+
 		if (whale_->GetTranslate().x > player_->GetTranslate().x + whale_->GetMaxDistance())
 		{
 			whale_->SetTranslate({ player_->GetTranslate().x + whale_->GetMaxDistance(),whale_->GetTranslate().y,whale_->GetTranslate().z });
@@ -76,16 +112,26 @@ void GameScene::Update()
 		}
 
 		CheckAllCollisions();
+		Camera::GetInstance()->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 3.0f,player_->GetTranslate().z - 20.0f });
+		ground->SetTranslate({ ground->GetTranslate().x, ground->GetTranslate().y, ground->GetTranslate().z - 0.1f });
+
 	}
-	else
+	else//遷移中
 	{
 		sceneTransitionTime++;
-
-		player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y -2.0f, player_->GetTranslate().z });
-		Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y -1.0f, Camera::GetInstance()->GetTranslate().z });
-		sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a - 0.02f });
-		sprites[0]->Update();
-		if (sceneTransitionTime==70)
+		if (sceneTransitionTime <= 60)
+		{
+			player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f, player_->GetTranslate().z });
+			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 1.0f, Camera::GetInstance()->GetTranslate().z });
+			sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a - 0.02f });
+			sprites[0]->Update();
+		}
+		if (sceneTransitionTime >= 60 && sceneTransitionTime <= 80)
+		{
+			player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f/2, player_->GetTranslate().z });
+			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y -0.5f, Camera::GetInstance()->GetTranslate().z });
+		}
+		if (sceneTransitionTime >= 120)
 		{
 			isGameStart = true;
 		}
@@ -109,7 +155,7 @@ void GameScene::Update()
 		enemys_.resize(0);
 		sceneNo = CLEAR;
 	}
-	else if (Input::GetInstance()->TriggerKey(DIK_S) || time == 60)
+	else if (Input::GetInstance()->TriggerKey(DIK_S) || time == 150)
 	{
 		enemys_.resize(0);
 		sceneNo = TITLE;
@@ -122,20 +168,25 @@ void GameScene::Update()
 	{
 		enemy_->Update(enemy_->GetSort());
 	}
-	//Camera::GetInstance()->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 3.0f,player_->GetTranslate().z - 20.0f });
 
 }
 
 void GameScene::Draw()
 {
-	sprites[0]->Draw();
+	//sprites[0]->Draw();
 	ground->Draw();
 	player_->Draw();
 	whale_->Draw();
+	uiPlane->Draw();
 	for (Enemy* enemy_ : enemys_)
 	{
 		enemy_->Draw(enemy_->GetSort());
 	}
+	for (Particle* particle : particles)
+	{
+		particle->Draw();
+	}
+
 }
 
 void GameScene::Finalize()
@@ -146,6 +197,8 @@ void GameScene::Finalize()
 		sprite = NULL;
 	}
 	sprites.clear();
+	delete uiPlane;
+	uiPlane = NULL;
 	delete ground;
 	ground = NULL;
 	delete whale_;

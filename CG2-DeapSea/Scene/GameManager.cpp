@@ -56,7 +56,7 @@ int GameManager::Run()
 	object3dCommon->Initialize(dx12Common);
 	ModelManager::GetInstance()->Initialize(dx12Common);
 	camera->GetInstance()->SetRotate({0.1f,0.0f,0.0f});
-	camera->GetInstance()->SetTranslate({ 0.0f,2.0f,-20.0f });
+	camera->GetInstance()->SetTranslate({ 0.0f,3.0f,-20.0f });
 	object3dCommon->SetDefaultCamera(camera->GetInstance());
 	object3d->Initialize(object3dCommon, srvManager);
 	SPCommon->Initialize(dx12Common);

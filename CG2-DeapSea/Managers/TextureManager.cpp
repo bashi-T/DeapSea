@@ -123,6 +123,11 @@ void TextureManager::LoadTextureforSRV(const std::string& filePath)
 	textureDatas[filePath] = textureData;
 }
 
+void TextureManager::EraseTexture(std::string& filePath)
+{
+	textureDatas.erase(filePath);
+}
+
 ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexMetadata& metadata)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};

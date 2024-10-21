@@ -18,7 +18,10 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
 	WPARAM wparam,
 	LPARAM lparam
 );
-
+/*
+ * MyImGui.h
+ * ImGui用の処理を行う
+ */
 class MyImGui
 {
 public:

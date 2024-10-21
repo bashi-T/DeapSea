@@ -20,7 +20,7 @@ void DX12Common::InitializefixFPS()
 	reference_ = std::chrono::steady_clock::now();
 }
 
-void DX12Common::UpdateFixFPS()
+void DX12Common::UpdateFixFPS()//FPSを60に固定
 {
 	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
 	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));

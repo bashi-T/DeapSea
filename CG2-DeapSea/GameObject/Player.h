@@ -38,5 +38,7 @@ private:
 	bool isHit = false;
 	uint32_t hitTimer = 0;
 	float angle_;
+	std::string playerModel = "human/walk.gltf";
+	std::string playerSkin = "Resource/monsterBall.png";
 };
 

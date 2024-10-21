@@ -28,7 +28,6 @@ void Ground::Initialize()
 
 void Ground::Update()
 {
-	object3d->SetTranslate({ object3d->GetTranslate().x, object3d->GetTranslate().y, object3d->GetTranslate().z - 0.1f });
 	object3d->Update(Camera::GetInstance());
 #ifdef _DEBUG
 	ImGui::Begin("ground");

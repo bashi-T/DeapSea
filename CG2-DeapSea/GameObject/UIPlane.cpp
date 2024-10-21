@@ -4,17 +4,18 @@ UIPlane::~UIPlane()
 {
 	delete object3d;
 	object3d = NULL;
+	ModelManager::GetInstance()->EraseModel(planeModel, planeSkin);
 }
 
-void UIPlane::Initialize(const std::string plane,const std::string skin)
+void UIPlane::Initialize(std::string plane,std::string skin)
 {
 	object3d = new Object3d;
-	std::string planeModel = plane;
-	const std::string planeSkin = skin;
+	 planeModel = plane;
+	 planeSkin = skin;
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(planeModel, planeSkin, false);
 	object3d->SetModel(planeModel);
-	Model* model = ModelManager::GetInstance()->FindModel(planeModel);
+	model = ModelManager::GetInstance()->FindModel(planeModel);
 	Model::ModelData* modelData = model->GetModelData();
 	for (Model::VertexData& vertex : modelData->vertices)
 	{
@@ -34,4 +35,9 @@ void UIPlane::Update()
 void UIPlane::Draw()
 {
 	object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+}
+
+void UIPlane::SetColor(Vector4 color)
+{
+	model->SetColor(color);
 }

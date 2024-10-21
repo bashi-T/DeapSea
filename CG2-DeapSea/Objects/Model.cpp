@@ -106,6 +106,11 @@ void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath,
 		GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 }
 
+void Model::Update()
+{
+
+}
+
 void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 {
 	this->modelCommon_ = modelCommon;
@@ -124,12 +129,6 @@ void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 		IASetIndexBuffer(&indexBufferView);
 	srvManager_->SetGraphicsRootDescriptorTable(
 		2, modelData_.material.textureIndex);
-
-	//if (modelData_.isEnvironment == true)
-	//{
-	//	srvManager_->SetGraphicsRootDescriptorTable(
-	//		5, modelData_.eMaterial.textureIndex);
-	//}
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
 		UINT(modelData_.indices.size()), 1, 0, 0, 0);
@@ -156,7 +155,7 @@ void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 		IASetVertexBuffers(0, 2, vbvs);//開始スロット番号、使用スロット数、vbv配列へのポインタ
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferView);
-	DX12Common::GetInstance()->GetCommandList().Get()->
+	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootDescriptorTable(
 			5, skinCluster.paletteSrvHandle.second);
 	srvManager_->SetGraphicsRootDescriptorTable(
@@ -503,6 +502,10 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 	return skinCluster;
 }
 
+void Model::SetColor(Vector4 color)
+{
+	materialData[0].color = color;
+}
 void Model::SetIsLighting(bool lighting)
 {
 	materialData[0].enableLighting = lighting;
