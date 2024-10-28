@@ -80,22 +80,38 @@ void Enemy::Update(int sort)
 	switch (sort)
 	{
 	case 0:
-		if (object3d->GetTranslate().z > player_->GetTranslate().z)
+		if (isDead == true)
 		{
-			Shot();
+			if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+			{
+				enemyVector = { -2.0f,2.0f,2.0f };
+				object3d->SetRotate({-1.0f,0.5f,-0.2f});
+			}
+			else
+			{
+				enemyVector = { 2.0f,2.0f,2.0f };
+				object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+			}
 		}
-		if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+		else
 		{
-			SetEnemyVector(whale_->GetTranslate());
-		}
-		else if (shotInterval == 1 && enemyVector.z > 0.0f)
-		{
-			SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
-		}
-		object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
-		if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
-		{
-			isDead = true;
+			if (object3d->GetTranslate().z > player_->GetTranslate().z)
+			{
+				Shot();
+			}
+			if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+			{
+				SetEnemyVector(whale_->GetTranslate());
+			}
+			else if (shotInterval == 1 && enemyVector.z > 0.0f)
+			{
+				SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
+			}
+			object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
+			if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
+			{
+				isDead = true;
+			}
 		}
 		object3d->Update(Camera::GetInstance());
 		for (EnemyBullet* bullet : eBullets)
@@ -104,23 +120,30 @@ void Enemy::Update(int sort)
 		}
 		break;
 	case 1:
-		moveInterval++;
-		if (moveInterval == 120)
+		if (isDead == true)
 		{
-			moveInterval = 0;
+
 		}
-		if (moveInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+		else
 		{
-			SetEnemyVector(whale_->GetTranslate());
-		}
-		else if (moveInterval == 1 && enemyVector.z > 0.0f)
-		{
-			SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
-		}
-		object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
-		if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
-		{
-			isDead = true;
+			moveInterval++;
+			if (moveInterval == 120)
+			{
+				moveInterval = 0;
+			}
+			if (moveInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+			{
+				SetEnemyVector(whale_->GetTranslate());
+			}
+			else if (moveInterval == 1 && enemyVector.z > 0.0f)
+			{
+				SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
+			}
+			object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
+			if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
+			{
+				isDead = true;
+			}
 		}
 		object3d->Update(Camera::GetInstance());
 		break;
@@ -162,7 +185,11 @@ void Enemy::Shot()
 
 void Enemy::OnCollision()
 {
-	isDead = true;
+	SubtractLife();
+	if(life<=0)
+	{
+		isDead = true;
+	}
 }
 
 void Enemy::SetTranslate(Vector3 translate)

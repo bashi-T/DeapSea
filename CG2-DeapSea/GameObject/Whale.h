@@ -22,7 +22,7 @@ public:
 	int GetLife() { return life; }
 	bool GetIsHit() { return isHit; }
 	float GetMaxDistance() { return maxDistance; }
-
+	void ChangeModel(std::string shape, std::string skin);
 private:
 	Object3d* object3d;
 	Player* player;

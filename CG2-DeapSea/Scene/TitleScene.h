@@ -37,7 +37,7 @@ private:
 	int sceneTransitionTime = 0;
 	int nowStage;
 	int cooltime = 0;
-	int floatTime = 0;
+	int floatingTime = 0;
 
 	AudioManager::SoundData bgm;
 	AudioManager::SoundData enterSound;

@@ -32,7 +32,7 @@ void TitleScene::Init()
 	whale = new Whale;
 	whale->Initialize(player);
 	whale->SetTranslate({ 0.0f,0.15f,5.0f });
-	floatTime = 0;
+	floatingTime = 0;
 
 	isSceneTransition = false;
 	isStageSelect = false;
@@ -94,21 +94,21 @@ void TitleScene::Update()
 	}
 	cursor->Update();
 
-	if(floatTime<120)//title上下動
+	if(floatingTime<120)//title上下動
 	{
 		uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y - 0.001f,uiPlanes[0]->GetTranslate().z });
 		whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y - 0.003f,whale->GetTranslate().z });
-		floatTime++;
+		floatingTime++;
 	}
-	else if (floatTime >= 120 && floatTime < 240)
+	else if (floatingTime >= 120 && floatingTime < 240)
 	{
 		uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y + 0.001f,uiPlanes[0]->GetTranslate().z });
 		whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y + 0.003f,whale->GetTranslate().z });
-		floatTime++;
+		floatingTime++;
 	}
-	else if (floatTime <= 240)
+	else if (floatingTime <= 240)
 	{
-		floatTime = 0;
+		floatingTime = 0;
 	}
 	whale->SetRotate({ whale->GetRotate().x, whale->GetRotate().y + 0.01f, whale->GetRotate().z });
 	whale->Update();

@@ -68,6 +68,8 @@ int GameManager::Run()
 	{
 		dx12Common->update();
 		Input::GetInstance()->Update();
+
+#ifdef DEBUG
 		if (Input::GetInstance()->PushKey(DIK_RIGHT))
 		{
 			camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x + 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z });
@@ -76,6 +78,8 @@ int GameManager::Run()
 		{
 			camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x - 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z});
 		}
+#endif // DEBUG
+
 		camera->GetInstance()->Update();
 		prevSceneNo_ = currentSceneNo_;
 		currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();

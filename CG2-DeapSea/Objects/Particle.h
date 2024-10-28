@@ -12,6 +12,10 @@
 #include <random>
 #pragma comment(lib, "dxcompiler.lib")
 
+/// <summary>
+/// particle本機能
+/// </summary>
+
 class ParticleCommon;
 class Particle
 {
@@ -38,16 +42,50 @@ public:
 		float velzMax;
 	};
 	ElementsParticle elements;
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="filename"></param>
+	/// <param name="particleCommon"></param>
+	/// <param name="srvManager"></param>
+	/// <param name="object3dCommon"></param>
+	/// <param name="elements"></param>
 	void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements);
+	/// <summary>
+	/// particleを生成
+	/// </summary>
+	/// <param name="elements"></param>
 	void RandomInitialize(ElementsParticle elements);
-
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="isRevive"></param>
+	/// <param name="elements"></param>
 	void Update(bool isRevive,ElementsParticle elements);
+	/// <summary>
+	/// 描画
+	/// </summary>
 	void Draw();
-
+	/// <summary>
+	/// bufferResourceの生成
+	/// </summary>
+	/// <param name="particleCommon"></param>
+	/// <param name="sizeInBytes"></param>
+	/// <returns></returns>
 	ComPtr<ID3D12Resource> CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes);
+	/// <summary>
+	/// bufferViewの生成
+	/// </summary>
 	void MakeBufferView();
+	/// <summary>
+	/// particleのデータを送る
+	/// </summary>
+	/// <param name="isRevive"></param>
+	/// <param name="elements"></param>
 	void InputData(bool isRevive,ElementsParticle elements);
-
+	/// <summary>
+	/// insatnce描画用のSRV生成
+	/// </summary>
 	void MakeShaderResourceViewInstance();
 
 	struct VertexData
@@ -96,15 +134,55 @@ public:
 
 	CameraTransform* cameraData = nullptr;
 
+	/// <summary>
+	/// particleの色と出現時間を細かく設定
+	/// </summary>
+	/// <param name="randomEngine"></param>
+	/// <param name="colorMin">particleの色の最小値</param>
+	/// <param name="colorMax">particleの色の最大値</param>
+	/// <param name="timeMin">particleの出現時間の最小値</param>
+	/// <param name="timeMax">particleの出現時間の最大値</param>
+	/// <returns></returns>
 	Particles MakeNewParticle(std::mt19937& randomEngine, float colorMin, float colorMax, float timeMin, float timeMax);
+	/// <summary>
+	/// particleの座標関連の要素を細かく設定　
+	/// </summary>
+	/// <param name="randomEngine"></param>
+	/// <param name="posxMin">particleが発生するX座標の最小値</param>
+	/// <param name="posxMax">particleが発生するX座標の最大値</param>
+	/// <param name="posyMin">particleが発生するY座標の最小値</param>
+	/// <param name="posyMax">particleが発生するY座標の最大値</param>
+	/// <param name="poszMin">particleが発生するZ座標の最小値</param>
+	/// <param name="poszMax">particleが発生するZ座標の最大値</param>
+	/// <param name="velxMin">particleが移動するX方向ベクトルの最小値</param>
+	/// <param name="velxMax">particleが移動するX方向ベクトルの最大値</param>
+	/// <param name="velyMin">particleが移動するY方向ベクトルの最小値</param>
+	/// <param name="velyMax">particleが移動するY方向ベクトルの最大値</param>
+	/// <param name="velzMin">particleが移動するZ方向ベクトルの最小値</param>
+	/// <param name="velzMax">particleが移動するZ方向ベクトルの最大値</param>
+	/// <returns></returns>
 	Particles MakeNewParticlePosition(std::mt19937& randomEngine,
 		float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
 		float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);
-
-	//void ParticleRelease();
-
-	//ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
-	
+	/// <summary>
+	/// ElementsParticleに任意の要素を入れる
+	/// </summary>
+	/// <param name="colorMin"></param>
+	/// <param name="colorMax"></param>
+	/// <param name="timeMin"></param>
+	/// <param name="timeMax"></param>
+	/// <param name="posxMin"></param>
+	/// <param name="posxMax"></param>
+	/// <param name="posyMin"></param>
+	/// <param name="posyMax"></param>
+	/// <param name="poszMin"></param>
+	/// <param name="poszMax"></param>
+	/// <param name="velxMin"></param>
+	/// <param name="velxMax"></param>
+	/// <param name="velyMin"></param>
+	/// <param name="velyMax"></param>
+	/// <param name="velzMin"></param>
+	/// <param name="velzMax"></param>
 	void SetElements(float colorMin, float colorMax, float timeMin, float timeMax,
 		float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
 		float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);

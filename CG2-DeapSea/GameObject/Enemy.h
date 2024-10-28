@@ -19,12 +19,15 @@ public:
 	void SetTranslate(Vector3 translate);
 	void SetEnemyVector(Vector3 translate);
 	void SetSort(int i) { enemySort = i; }
+	void SubtractLife() { life--; }
 
 	bool IsDead()const { return isDead; }
 	const std::list<EnemyBullet*>& GetBullets()const { return eBullets; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
 	OBB GetCollision() { return eCollision; }
 	int GetSort() { return enemySort; }
+	int Getlife() { return life; }
+
 private:
 	Object3d* object3d;
 	std::list<EnemyBullet*> eBullets;
@@ -38,6 +41,7 @@ private:
 	Vector3 enemyVector;
 	int enemySort;
 	int moveInterval = 0;
+	int life;
 	//const std::string enemyModel;
 	//const std::string enemySkin;
 };

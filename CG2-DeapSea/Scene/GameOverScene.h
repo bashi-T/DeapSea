@@ -6,6 +6,8 @@
 #include"Objects/Particle.h"
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
+#include"GameObject/Whale.h"
+#include"GameObject/Player.h"
 
 class GameOverScene :public SceneManager
 {
@@ -18,5 +20,8 @@ public:
 
 private:
 	Sprite* sprite;
+	Whale* whale;
+	Player* player;
+
 };
 

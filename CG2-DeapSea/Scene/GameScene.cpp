@@ -35,6 +35,8 @@ void GameScene::Init()
 		sprites.push_back(sprite);
 	}
 	isGameStart = false;
+	isGameOver = false;
+	isGameClear = false;
 	sceneTransitionTime = 0;
 	Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 73.0f, Camera::GetInstance()->GetTranslate().z });
 	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,87.5f ,0.0f });
@@ -116,6 +118,26 @@ void GameScene::Update()
 		ground->SetTranslate({ ground->GetTranslate().x, ground->GetTranslate().y, ground->GetTranslate().z - 0.1f });
 
 	}
+	else if (isGameOver == true)//GameOverSceneへ遷移
+	{
+		Vector3 zoomPos = { whale_->GetTranslate().x, whale_->GetTranslate().y, whale_->GetTranslate().z - 4.0f };
+		if (Camera::GetInstance()->GetTranslate().x != zoomPos.x && Camera::GetInstance()->GetTranslate().y != zoomPos.y && Camera::GetInstance()->GetTranslate().z != zoomPos.z)
+		{
+			Camera::GetInstance()->SetTranslate(Normalize(Subtract(Camera::GetInstance()->GetTranslate(), zoomPos)));
+		}
+		else
+		{
+			sceneTransitionTime++;
+			if (sceneTransitionTime <= 30)
+			{
+
+			}
+		}
+	}
+	else if (isGameClear == true)//GameClearSceneへ遷移
+	{
+		sceneTransitionTime++;
+	}
 	else//遷移中
 	{
 		sceneTransitionTime++;
@@ -126,14 +148,15 @@ void GameScene::Update()
 			sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a - 0.02f });
 			sprites[0]->Update();
 		}
-		if (sceneTransitionTime >= 60 && sceneTransitionTime <= 80)
+		if (sceneTransitionTime >= 61 && sceneTransitionTime <= 80)
 		{
-			player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f/2, player_->GetTranslate().z });
-			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y -0.5f, Camera::GetInstance()->GetTranslate().z });
+			player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f / 2, player_->GetTranslate().z });
+			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 0.5f, Camera::GetInstance()->GetTranslate().z });
 		}
 		if (sceneTransitionTime >= 120)
 		{
 			isGameStart = true;
+			sceneTransitionTime = 0;
 		}
 	}
 	enemys_.remove_if([](Enemy* enemy)
@@ -145,20 +168,25 @@ void GameScene::Update()
 			}
 			return false;
 		});
-	if (whale_->GetLife() == 0)
+	if (whale_->GetLife() == 0 /*|| time == 150*/)
 	{
 		enemys_.resize(0);
 		sceneNo = GAMEOVER;
+		isGameOver = true;
 	}
 	else if (enemys_.size() == 0 && gameEnd || Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
 		enemys_.resize(0);
 		sceneNo = CLEAR;
+		isGameClear = true;
+
 	}
-	else if (Input::GetInstance()->TriggerKey(DIK_S) || time == 150)
+	else if (Input::GetInstance()->TriggerKey(DIK_S))
 	{
+#ifdef DEBUG
 		enemys_.resize(0);
 		sceneNo = TITLE;
+#endif // DEBUG
 	}
 
 	ground->Update();
@@ -169,6 +197,7 @@ void GameScene::Update()
 		enemy_->Update(enemy_->GetSort());
 	}
 
+	
 }
 
 void GameScene::Draw()

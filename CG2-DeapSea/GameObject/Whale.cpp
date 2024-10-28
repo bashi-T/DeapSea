@@ -190,3 +190,21 @@ void Whale::SetRotate(Vector3 rotate)
 {
 	object3d->SetRotate(rotate);
 }
+
+void Whale::ChangeModel(std::string shape, std::string skin)
+{
+	ModelManager::GetInstance()->EraseModel(whaleModel, whaleSkin);
+	whaleModel = shape;
+	whaleSkin = skin;
+	ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin, true);
+	object3d->SetModel(whaleModel);
+	Model* model = ModelManager::GetInstance()->FindModel(whaleModel);
+	Model::ModelData* modelData = model->GetModelData();
+	for (Model::VertexData& vertex : modelData->vertices)
+	{
+		vertex.normal.x = vertex.position.x;
+		vertex.normal.y = vertex.position.y;
+		vertex.normal.z = vertex.position.z;
+	}
+	model->Memcpy();
+}

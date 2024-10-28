@@ -14,7 +14,10 @@
     <ClCompile Include="Managers\AudioManager.cpp" />
     <ClCompile Include="GameObject\Cursor.cpp" />
     <ClCompile Include="GameObject\ground.cpp" />
-    <ClCompile Include="Commons\ParticleCommon.cpp" />
+    <ClCompile Include="Commons\ParticleCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Scene\ClearScene.cpp" />
     <ClCompile Include="GameObject\EnemyBullet.cpp" />
     <ClCompile Include="GameObject\PlayerBullet.cpp" />
@@ -25,7 +28,10 @@
     <ClCompile Include="Scene\GameManager.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Math\CGVector.cpp" />
-    <ClCompile Include="Objects\Praticle.cpp" />
+    <ClCompile Include="Objects\Praticle.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Managers\SRVManager.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="Objects\SkyDome.cpp" />
@@ -60,7 +66,10 @@
     <ClInclude Include="Managers\AudioManager.h" />
     <ClInclude Include="GameObject\Cursor.h" />
     <ClInclude Include="GameObject\ground.h" />
-    <ClInclude Include="Commons\ParticleCommon.h" />
+    <ClInclude Include="Commons\ParticleCommon.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Scene\ClearScene.h" />
     <ClInclude Include="GameObject\EnemyBullet.h" />
     <ClInclude Include="GameObject\PlayerBullet.h" />

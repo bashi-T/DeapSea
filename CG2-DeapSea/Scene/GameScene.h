@@ -45,6 +45,8 @@ private:
 	AudioManager::SoundData bgm;
 	int time = 0;
 	bool isGameStart = false;
+	bool isGameOver = false;
+	bool isGameClear = false;
 	int sceneTransitionTime = 0;
 	std::string plane ="plane/plane.obj";
 };

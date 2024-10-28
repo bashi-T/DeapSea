@@ -9,7 +9,7 @@ void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 	assert(SUCCEEDED(hr));
 
 	wc_.lpfnWndProc = WindowProc;
-	wc_.lpszClassName = L"LE2B_12_ツヅキバシ_マサミ";
+	wc_.lpszClassName = L"深海デリバリー";
 	wc_.hInstance = GetModuleHandle(nullptr);
 	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	RegisterClass(&wc_);

@@ -193,7 +193,7 @@ void Player::Update()
 			}
 
 		}
-		//Shot();
+		Shot();
 
 		object3d->SkeltonUpdate(Camera::GetInstance());
 		pCollision.center = object3d->GetTranslate();
