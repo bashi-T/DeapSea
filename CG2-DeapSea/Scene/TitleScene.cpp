@@ -65,15 +65,12 @@ void TitleScene::Init()
 	uiPlanes[2]->SetTranslate({ 0.0f,0.7f,0.0f });
 	uiPlanes[3]->SetTranslate({ 0.0f,-0.7f,0.0f });
 	uiPlanes[4]->SetTranslate({ 0.0f,-2.1f,0.0f });
-	//uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x,Camera::GetInstance()->GetTranslate().y ,Camera::GetInstance()->GetTranslate().z + 0.5f });
 
 	uiPlanes[1]->SetScale({ 1.5f,1.0f,1.0f });
 	uiPlanes[2]->SetScale({ 1.5f,1.0f,1.0f });
 	uiPlanes[3]->SetScale({ 1.5f,1.0f,1.0f });
 	uiPlanes[4]->SetScale({ 1.5f,1.0f,1.0f });
-	//uiPlanes[5]->SetScale({ 3.0f,3.0f,.0f });
 
-	//uiPlanes[5]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	cursor = new Cursor;
 	cursor->Initialize();
@@ -164,12 +161,10 @@ void TitleScene::Update()
 			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 3.0f, Camera::GetInstance()->GetTranslate().z });
 			uiPlanes[nowStage]->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x,uiPlanes[nowStage]->GetTranslate().y - 2.75f,uiPlanes[nowStage]->GetTranslate().z });
 			whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y - 2.75f,whale->GetTranslate().z });
-			//uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x,Camera::GetInstance()->GetTranslate().y ,Camera::GetInstance()->GetTranslate().z + 0.5f });
 		}
 		if (sceneTransitionTime >= 40)
 		{
 			sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a + 0.02f });
-			//uiPlanes[5]->SetColor({ uiPlanes[5]->GetColor().x, uiPlanes[5]->GetColor().y, uiPlanes[5]->GetColor().z, uiPlanes[5]->GetColor().a + 0.02f });
 		}
 		if (sceneTransitionTime == 90)
 		{
@@ -202,8 +197,6 @@ void TitleScene::Draw()
 	else if (isSceneTransition == true)
 	{
 		uiPlanes[nowStage]->Draw();
-		//sprites[0]->Draw();
-		//uiPlanes[5]->Draw();
 	}
 	if (isSceneTransition == false)
 	{
@@ -212,6 +205,7 @@ void TitleScene::Draw()
 		//	particle->Draw();
 		//}
 	}
+	sprites[0]->Draw();
 	whale->Draw();
 }
 

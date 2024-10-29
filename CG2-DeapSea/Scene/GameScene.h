@@ -33,7 +33,7 @@ private:
 	Player* player_;
 	Whale* whale_;
 	std::list<Enemy*> enemys_;
-	UIPlane* uiPlane;
+	std::vector <UIPlane*>uiPlanes;
 	std::vector <Particle*> particles;
 	
 	std::stringstream enemyPopCommands[10];
@@ -48,6 +48,16 @@ private:
 	bool isGameOver = false;
 	bool isGameClear = false;
 	int sceneTransitionTime = 0;
-	std::string plane ="plane/plane.obj";
+	std::string Planes[6]
+	{
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+		"plane/plane.obj",
+	};
+	Vector3 v;
+	Vector3 zoomPos;
 };
 

@@ -40,7 +40,7 @@ int GameManager::Run()
 
 
 
-	winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"GE3");
+	winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"深海デリバリー");
 	dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
 	srvManager->Initialize(dx12Common);
 	audioManager->Initialize();

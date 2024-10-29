@@ -4,6 +4,8 @@
 #include"Commons/Object3dCommon.h"
 #include"Objects/Particle.h"
 #include"Player.h"
+#include"Commons/ParticleCommon.h"
+#include"Objects/Particle.h"
 
 class Whale
 {
@@ -16,6 +18,7 @@ public:
 	void OnCollision();
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 rotate);
+	void SetLife(int i) { life = i; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
 	Vector3 GetRotate() { return object3d->GetRotate(); }
 	OBB GetCollision() { return wCollision; }
@@ -29,7 +32,7 @@ private:
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };
 	Vector3 nowWhaleSpeed = { 0.0f,0.0f,0.0f };
 	Vector3 accSpeed = { 0.0f,0.0f,0.0f };
-
+	Particle* particle;
 	bool isDead = false;
 	bool isHit = false;
 	OBB wCollision;

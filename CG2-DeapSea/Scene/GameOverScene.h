@@ -22,6 +22,11 @@ private:
 	Sprite* sprite;
 	Whale* whale;
 	Player* player;
+	Object3d* object3d;
+
+	std::string boneWhaleModel = "whale/BoneWhale.obj";
+	std::string boneWhaleSkin = "Resource/boneColor.png";
+	int floatingTime = 0;
 
 };
 

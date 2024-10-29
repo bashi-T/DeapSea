@@ -39,5 +39,5 @@ void UIPlane::Draw()
 
 void UIPlane::SetColor(Vector4 color)
 {
-	model->SetColor(color);
+	object3d->SetColor(color);
 }

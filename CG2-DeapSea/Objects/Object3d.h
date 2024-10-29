@@ -49,6 +49,13 @@ public:
 	};
 	DirectionalLight* GetDirectionalLightData() { return directionalLightData; }
 	DirectionalLight& GetDirectionalLight() { return directionalLight; }
+	void SetDirectionalLight(Vector4 color, Vector3 direction, float intensity) {
+		directionalLight.color = color; 
+		directionalLight.direction = direction;
+		directionalLight.intensity = intensity;
+	}
+	Vector4 GetColor() { return model_->GetMaterialData()->color; }
+	void SetColor(Vector4 color);
 
 private:
 	Object3dCommon* object3dCommon_ = nullptr;
@@ -65,7 +72,7 @@ private:
 	DirectionalLight* directionalLightData = nullptr;
 	DirectionalLight directionalLight =
 	{
-		{1.0f,1.0f,1.0f,1.0f},
+		{0.5f,0.5f,0.5f,1.0f},
 		{0.0f,-1.0f,0.0f},
 		1.0f
 	};

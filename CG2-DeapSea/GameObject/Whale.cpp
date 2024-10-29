@@ -28,6 +28,13 @@ void Whale::Initialize(Player* players)
 	model->Memcpy();
 	life = 4;
 	coolTimer = 0;
+
+	particle = new Particle;
+	particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+		-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
+	particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+
 }
 
 void Whale::Update()
@@ -149,6 +156,32 @@ void Whale::Update()
 
 	if (isHit == true)
 	{
+		if(coolTimer==0)
+		{
+			switch (life)
+			{
+			case 0:
+				ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
+				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
+					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				particle->RandomInitialize(particle->GetElements());
+				break;
+			case 1:
+
+				break;
+			case 2:
+
+				break;
+
+			case 3:
+
+				break;
+			}
+		}
+
 		object3d->SetRotate({ object3d->GetRotate().x,object3d->GetRotate().y + 0.3f,object3d->GetRotate().z });
 		coolTimer++;
 		if (coolTimer == 120)
@@ -162,6 +195,8 @@ void Whale::Update()
 	nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
 	object3d->SetTranslate(Add(object3d->GetTranslate(), nowWhaleSpeed));
 	object3d->Update(Camera::GetInstance());
+	particle->Update(false, particle->GetElements());
+
 #ifdef _DEBUG
 	ImGui::Begin("whale");
 	ImGui::DragFloat3("whale.translate", (float*)&object3d->GetTranslate(), 0.01f);
@@ -173,6 +208,10 @@ void Whale::Update()
 void Whale::Draw()
 {
 	object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+	if(life!=4)
+	{
+		particle->Draw();
+	}
 }
 
 void Whale::OnCollision()
