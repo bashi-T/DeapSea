@@ -33,7 +33,7 @@ void Whale::Initialize(Player* players)
 	particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
 		-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
-	particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+	particle->Initialize("Resource/particle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
 
 }
 
@@ -158,7 +158,7 @@ void Whale::Update()
 	{
 		if(coolTimer==0)
 		{
-			switch (life)
+			switch (life)//ダメージ表現パーティクル
 			{
 			case 0:
 				ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
@@ -170,13 +170,31 @@ void Whale::Update()
 				particle->RandomInitialize(particle->GetElements());
 				break;
 			case 1:
+				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
+					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				particle->RandomInitialize(particle->GetElements());
 
 				break;
 			case 2:
+				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
+					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				particle->RandomInitialize(particle->GetElements());
 
 				break;
 
 			case 3:
+				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
+					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				particle->RandomInitialize(particle->GetElements());
 
 				break;
 			}

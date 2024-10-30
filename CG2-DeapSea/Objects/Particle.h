@@ -187,6 +187,17 @@ public:
 		float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
 		float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);
 
+	/// <summary>
+	/// particleの拡縮(一律)
+	/// </summary>
+	/// <param name="scale"></param>
+	void SetScale(Vector3 scale);
+	/// <summary>
+	/// particleの回転(一律)
+	/// </summary>
+	/// <param name="rotate"></param>
+	void SetRotate(Vector3 rotate);
+
 	ElementsParticle GetElements() { return elements; }
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }

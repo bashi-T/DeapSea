@@ -19,8 +19,8 @@ void Player::Initialize()
 {
 	object3d = new Object3d; 
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	playerModel = "human/walk.gltf";
-	playerSkin = "Resource/monsterBall.png";
+	//playerModel = "human/walk.gltf";
+	//playerSkin = "Resource/monsterBall.png";
 	ModelManager::GetInstance()->LoadSkeltonAnimation(playerModel, playerSkin, SRVManager::GetInstance(), true);
 	object3d->SetModel(playerModel);
 	Model* model = ModelManager::GetInstance()->FindModel(playerModel);
@@ -255,8 +255,4 @@ void Player::Shot()
 void Player::OnCollision()
 {
 	isHit = true;
-}
-
-void Player::Finalize()
-{
 }

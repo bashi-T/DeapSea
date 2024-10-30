@@ -9,6 +9,7 @@
 #include "GameManager.h"
 #include"GameObject/ground.h"
 #include"GameObject/UIPlane.h"
+#include"GameObject/Tide.h"
 #include"Managers/AudioManager.h"
 #include <random>
 
@@ -35,6 +36,7 @@ private:
 	std::list<Enemy*> enemys_;
 	std::vector <UIPlane*>uiPlanes;
 	std::vector <Particle*> particles;
+	Tide* tide_;
 	
 	std::stringstream enemyPopCommands[10];
 	std::string enemyPopFile[10];

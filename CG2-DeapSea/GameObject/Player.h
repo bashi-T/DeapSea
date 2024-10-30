@@ -14,7 +14,6 @@ public:
 	void Draw();
 	void Shot();
 	void OnCollision();
-	void Finalize();
 
 	const std::list<PlayerBullet*>& GetBullets()const { return pBullets; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
@@ -39,6 +38,6 @@ private:
 	uint32_t hitTimer = 0;
 	float angle_;
 	std::string playerModel = "human/walk.gltf";
-	std::string playerSkin = "Resource/monsterBall.png";
+	std::string playerSkin = "Resource/world.png";
 };
 

@@ -282,3 +282,19 @@ void Particle::SetElements(float colorMin, float colorMax, float timeMin, float 
 	elements.velzMin = velzMin;
 	elements.velzMax = velzMax;
 }
+
+void Particle::SetScale(Vector3 scale)
+{
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+	{
+		particles[index].transform.scale = scale;
+	}
+}
+
+void Particle::SetRotate(Vector3 rotate)
+{
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+	{
+		particles[index].transform.rotate = rotate;
+	}
+}

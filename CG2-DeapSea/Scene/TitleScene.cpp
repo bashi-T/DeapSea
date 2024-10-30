@@ -13,7 +13,7 @@ void TitleScene::Init()
 		"Resource/Stage1.png",
 		"Resource/Stage2.png",
 		"Resource/Stage3.png",
-		"Resource/black.png"
+		"Resource/black.png",
 	};
 
 	//for(uint32_t i = 0; i < 1; i++)
@@ -45,16 +45,8 @@ void TitleScene::Init()
 	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
 	enterSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei.wav");
 	moveSound = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/kettei2.wav");
-	for (uint32_t i = 0; i < 1; i++)
-	{
-		Sprite* sprite = new Sprite;
-		sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/black.png");
-		sprite->SetSize({ (float)WinAPP::clientWidth_,(float)WinAPP::clientHeight_ });
-		sprite->SetColor({ 0.0f,0.0f,0.0f,0.0f });
-		sprites.push_back(sprite);
-	}
 
-	for (uint32_t i = 0; i < 5; i++)
+	for (uint32_t i = 0; i < 6; i++)
 	{
 		UIPlane* uiPlane = new UIPlane;
 		uiPlane->Initialize(Planes[i], PNGs[i]);
@@ -66,11 +58,16 @@ void TitleScene::Init()
 	uiPlanes[3]->SetTranslate({ 0.0f,-0.7f,0.0f });
 	uiPlanes[4]->SetTranslate({ 0.0f,-2.1f,0.0f });
 
-	uiPlanes[1]->SetScale({ 1.5f,1.0f,1.0f });
-	uiPlanes[2]->SetScale({ 1.5f,1.0f,1.0f });
-	uiPlanes[3]->SetScale({ 1.5f,1.0f,1.0f });
-	uiPlanes[4]->SetScale({ 1.5f,1.0f,1.0f });
+	uiPlanes[1]->SetScale({ 1.5f,1.0f,0.0f });
+	uiPlanes[2]->SetScale({ 1.5f,1.0f,0.0f });
+	uiPlanes[3]->SetScale({ 1.5f,1.0f,0.0f });
+	uiPlanes[4]->SetScale({ 1.5f,1.0f,0.0f });
 
+	//uiPlanes[1]->SetColor({ 1.0f,0.0f,0.0f,0.1f });
+
+	uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + 2.0f });
+	uiPlanes[5]->SetScale({ 10.0f,10.0f,0.0f });
+	uiPlanes[5]->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 
 	cursor = new Cursor;
 	cursor->Initialize();
@@ -164,7 +161,9 @@ void TitleScene::Update()
 		}
 		if (sceneTransitionTime >= 40)
 		{
-			sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a + 0.02f });
+			uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + 2.0f });
+			uiPlanes[5]->SetColor({ uiPlanes[5]->GetColor().x,uiPlanes[5]->GetColor().y,uiPlanes[5]->GetColor().z,uiPlanes[5]->GetColor().a - 0.02f });
+			uiPlanes[5]->Update();
 		}
 		if (sceneTransitionTime == 90)
 		{
@@ -177,7 +176,6 @@ void TitleScene::Update()
 	ImGui::InputInt("num", &nowStage);
 	ImGui::End();
 #endif
-	sprites[0]->Update();
 }
 
 void TitleScene::Draw()
@@ -197,6 +195,7 @@ void TitleScene::Draw()
 	else if (isSceneTransition == true)
 	{
 		uiPlanes[nowStage]->Draw();
+		uiPlanes[5]->Draw();
 	}
 	if (isSceneTransition == false)
 	{
@@ -205,7 +204,6 @@ void TitleScene::Draw()
 		//	particle->Draw();
 		//}
 	}
-	sprites[0]->Draw();
 	whale->Draw();
 }
 
@@ -217,12 +215,6 @@ void TitleScene::Finalize()
 	//  particle = NULL;
 	//}
 	//particles.clear();
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-		sprite = NULL;
-	}
-	sprites.clear();
 	for (UIPlane* uiPlane : uiPlanes)
 	{
 		delete uiPlane;

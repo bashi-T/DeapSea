@@ -34,7 +34,7 @@ void PlayerBullet::Initialize(Vector3 firstPos,Vector3 angle)
 			direction.y + firstPos.y,
 			-(direction.x - firstPos.x) * std::sin(angle.y) + (direction.z - firstPos.z) * std::cos(angle.y) + firstPos.z,
 		});
-	bulletSpeed = { 0.0f,0.0f,1.0f };
+	bulletSpeed = { 0.0f,0.0f,3.0f };
 	object3d->SetScale({ 0.5f,0.5f,0.5f });
 	object3d->SetIsAnimation(false);
 }

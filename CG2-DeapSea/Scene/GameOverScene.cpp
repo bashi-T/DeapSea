@@ -26,7 +26,7 @@ void GameOverScene::Update()
 {
 	XINPUT_STATE joyState;
 	sprite->Update();
-	if (floatingTime < 120)//title上下動
+	if (floatingTime < 120)//whale上下動
 	{
 		whale->SetTranslate({ whale->GetTranslate().x,whale->GetTranslate().y - 0.002f,whale->GetTranslate().z });
 		floatingTime++;

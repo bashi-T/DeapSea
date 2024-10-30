@@ -25,13 +25,13 @@ void GameScene::Init()
 		uiPlane->Initialize(Planes[i], PNGs[i]);
 		uiPlanes.push_back(uiPlane);
 	}
-	uiPlanes[0]->SetScale({ 1.5f,1.0f,1.0f });
+	uiPlanes[0]->SetScale({ 1.5f,1.0f,0.0f });
 	uiPlanes[0]->SetTranslate({ 0.0f,-6.0f,-10.0f });
 	uiPlanes[0]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	uiPlanes[1]->SetScale({ 10.0f,10.0f,1.0f });
-	uiPlanes[1]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z+1.0f });
-	uiPlanes[1]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	uiPlanes[1]->SetScale({ 10.0f,10.0f,0.0f });
+	uiPlanes[1]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z+2.0f });
+	uiPlanes[1]->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
 	enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
 	enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
@@ -44,14 +44,6 @@ void GameScene::Init()
 	//AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), bgm);
 	time = 0;
 
-	//for (uint32_t i = 0; i < 1; i++)
-	//{
-	//	Sprite* sprite = new Sprite;
-	//	sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/black.png");
-	//	sprite->SetSize({ (float)WinAPP::clientWidth_,(float)WinAPP::clientHeight_ });
-	//	sprite->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-	//	sprites.push_back(sprite);
-	//}
 	isGameStart = false;
 	isGameOver = false;
 	isGameClear = false;
@@ -68,7 +60,11 @@ void GameScene::Init()
 		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
 		particles.push_back(particle);
 	}
+	if (GameManager::stageNumber >= 2)
+	{
 
+	}
+	
 }
 
 void GameScene::Update()
@@ -180,8 +176,7 @@ void GameScene::Update()
 		{
 			player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f, player_->GetTranslate().z });
 			Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 1.0f, Camera::GetInstance()->GetTranslate().z });
-			//sprites[0]->SetColor({ sprites[0]->GetColor().x,sprites[0]->GetColor().y,sprites[0]->GetColor().z,sprites[0]->GetColor().a - 0.02f });
-			//sprites[0]->Update();
+			uiPlanes[1]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + 2.0f });
 			uiPlanes[1]->SetColor({ uiPlanes[1]->GetColor().x,uiPlanes[1]->GetColor().y,uiPlanes[1]->GetColor().z,uiPlanes[1]->GetColor().a - 0.02f });
 			uiPlanes[1]->Update();
 		}
@@ -238,7 +233,6 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	//sprites[0]->Draw();
 	ground->Draw();
 	player_->Draw();
 	whale_->Draw();
@@ -260,12 +254,6 @@ void GameScene::Draw()
 
 void GameScene::Finalize()
 {
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-		sprite = NULL;
-	}
-	sprites.clear();
 	for (UIPlane* uiPlane : uiPlanes)
 	{
 		delete uiPlane;
