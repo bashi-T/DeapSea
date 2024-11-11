@@ -31,19 +31,19 @@ public:
 	void CheckAllCollisions();
 private:
 	std::vector<Sprite*> sprites;
-	Player* player_;
-	Whale* whale_;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<Whale> whale_;
 	std::list<Enemy*> enemys_;
 	std::vector <UIPlane*>uiPlanes;
 	std::vector <Particle*> particles;
 	Tide* tide_;
+	Ground* ground;
 	
 	std::stringstream enemyPopCommands[10];
 	std::string enemyPopFile[10];
 	bool isWait = false;
 	int32_t WaitTimer = 1;
 	bool gameEnd = false;
-	Ground* ground;
 	AudioManager::SoundData bgm;
 	int time = 0;
 	bool isGameStart = false;

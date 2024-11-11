@@ -1,6 +1,7 @@
 #pragma once
 #include"Objects/Object3d.h"
 #include"Commons/Object3dCommon.h"
+#include"Commons/ParticleCommon.h"
 #include"Objects/Particle.h"
 
 class Tide
@@ -13,7 +14,7 @@ public:
 
 private:
 	Object3d* object3d;
-	Particle* particle;
+	std::vector <Particle*> particles;
 
 };
 

@@ -13,7 +13,7 @@ void Whale::Initialize(Player* players)
 	object3d = new Object3d; 
 	player = players;
 	 whaleModel = "whale/improvisedWhale2.obj";
-	 whaleSkin = "Resource/whale5.png";
+	 whaleSkin = "Resource/whaleSkin.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin, true);
 	object3d->SetModel(whaleModel);
@@ -30,10 +30,10 @@ void Whale::Initialize(Player* players)
 	coolTimer = 0;
 
 	particle = new Particle;
-	particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
+	particle->SetElements(1.0f, 1.0f, 1.0f, 2.0f,
 		-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
-	particle->Initialize("Resource/particle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+	particle->Initialize("Resource/bloodParticle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
 
 }
 
@@ -162,37 +162,40 @@ void Whale::Update()
 			{
 			case 0:
 				ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
-				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+				particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 				particle->RandomInitialize(particle->GetElements());
 				break;
 			case 1:
-				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+				ChangeModel("whale/3DamagedWhale.obj", "Resource/3DamageBone.png");
+				particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 				particle->RandomInitialize(particle->GetElements());
 
 				break;
 			case 2:
-				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+				ChangeModel("whale/2DamagedWhale.obj", "Resource/2DamageBone.png");
+				particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 				particle->RandomInitialize(particle->GetElements());
 
 				break;
 
 			case 3:
-				particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-					object3d->GetTranslate().x - 3.0f, object3d->GetTranslate().x + 3.0f,
+				ChangeModel("whale/1DamagedWhale.obj", "Resource/1DamagedBone.png");
+				particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 					object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-					object3d->GetTranslate().z - 2.0f, object3d->GetTranslate().z,
+					object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 					-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 				particle->RandomInitialize(particle->GetElements());
 
@@ -200,7 +203,7 @@ void Whale::Update()
 			}
 		}
 
-		object3d->SetRotate({ object3d->GetRotate().x,object3d->GetRotate().y + 0.3f,object3d->GetRotate().z });
+		//object3d->SetRotate({ object3d->GetRotate().x,object3d->GetRotate().y + 0.3f,object3d->GetRotate().z });
 		coolTimer++;
 		if (coolTimer == 120)
 		{

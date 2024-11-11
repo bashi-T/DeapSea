@@ -29,8 +29,8 @@ private:
 	std::vector <Sprite*> sprites;
 	std::vector <UIPlane*>uiPlanes;
 	Cursor* cursor;
-	Whale* whale;
-	Player* player;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<Whale> whale_;
 	bool isSceneTransition;
 	bool isStageSelect;
 	int numStage;

@@ -38,7 +38,7 @@ private:
 	OBB wCollision;
 	int life = 4;
 	uint32_t coolTimer;
-	float maxDistance = 8.0f;
+	float maxDistance = 6.0f;
 	std::string whaleModel = "whale/improvisedWhale2.obj";
 	std::string whaleSkin = "Resource/whale5.png";
 

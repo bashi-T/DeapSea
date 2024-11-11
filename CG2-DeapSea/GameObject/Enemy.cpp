@@ -40,6 +40,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 				vertex.normal.z = vertex.position.z;
 			}
 			model->Memcpy();
+			life = 1;
 			break;
 		}
 
@@ -60,6 +61,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 				vertex.normal.z = vertex.position.z;
 			}
 			model->Memcpy();
+			life = 1;
 			break;
 		}
 	}
@@ -122,7 +124,16 @@ void Enemy::Update(int sort)
 	case 1:
 		if (isDead == true)
 		{
-
+			if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+			{
+				enemyVector = { -2.0f,2.0f,2.0f };
+				object3d->SetRotate({ -1.0f,0.5f,-0.2f });
+			}
+			else
+			{
+				enemyVector = { 2.0f,2.0f,2.0f };
+				object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+			}
 		}
 		else
 		{
@@ -177,7 +188,7 @@ void Enemy::Shot()
 			newBullet->SetEnemyBulletVector(player_->GetTranslate());
 		eBullets.push_back(newBullet);
 	}
-	if (shotInterval == 60)
+	if (shotInterval == 180)
 	{
 		shotInterval = 0;
 	}

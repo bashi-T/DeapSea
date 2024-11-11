@@ -10,6 +10,7 @@
 #include"Managers/TextureManager.h"
 
 #include <random>
+#include<numbers>
 #pragma comment(lib, "dxcompiler.lib")
 
 /// <summary>

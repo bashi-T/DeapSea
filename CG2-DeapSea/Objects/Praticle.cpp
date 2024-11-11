@@ -89,11 +89,6 @@ void Particle::Draw()
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 		3, cameraResource->GetGPUVirtualAddress());
 
-	//D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-	//	particleCommon_->GetDx12Common()->GetRtvHandles(srvManager_->GetBackBufferIndex());
-	//D3D12_CPU_DESCRIPTOR_HANDLE dsv = particleCommon_->GetDx12Common()->GetDsvHandle();
-	//particleCommon_->GetDx12Common()->GetCommandList().Get()->OMSetRenderTargets(1, &rtv, false, &dsv);
-
 	particleCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 }
 
@@ -147,11 +142,15 @@ void Particle::InputData(bool isRevive, ElementsParticle element)
 	for (uint32_t index = 0; index <kNumMaxInstance; ++index)
 	{
 		float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
-		Matrix4x4 worldMatrix =
-			MakeAffineMatrix(
-				particles[index].transform.scale,
-				particles[index].transform.rotate,
-				particles[index].transform.translate);
+		Matrix4x4 backToFrontMatrix = MakerotateYMatrix(std::numbers::pi_v<float>);
+		Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, Camera::GetInstance()->GetWorldMatrix());
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
+		Matrix4x4 scaleMatrix = MakeScaleMatrix(particles[index].transform.scale);
+		Matrix4x4 translateMatrix = MakeTranslateMatrix(particles[index].transform.translate);
+		Matrix4x4 worldMatrix = Multiply(scaleMatrix, Multiply(billboardMatrix, translateMatrix));
+
 		if (particles[index].lifeTime <= particles[index].currentTime && isRevive == true)
 		{
 			for (uint32_t num = 0; num < kNumMaxInstance; ++num)

@@ -6,12 +6,15 @@
 
 void GameScene::Init()
 {
-	player_ = new Player;
-	whale_ = new Whale;
+	player_ = std::make_unique<Player>();
+	whale_ = std::make_unique<Whale>(); 
 	ground = new Ground;
 	player_->Initialize();
-	whale_->Initialize(player_);
+	whale_->Initialize(player_.get());
 	ground->Initialize();
+	
+	Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 76.0f, Camera::GetInstance()->GetTranslate().z });
+	Camera::GetInstance()->SetRotate({ 0.2f,0.0f,0.0f });
 	
 	std::string PNGs[6] =
 	{
@@ -26,7 +29,7 @@ void GameScene::Init()
 		uiPlanes.push_back(uiPlane);
 	}
 	uiPlanes[0]->SetScale({ 1.5f,1.0f,0.0f });
-	uiPlanes[0]->SetTranslate({ 0.0f,-6.0f,-10.0f });
+	uiPlanes[0]->SetTranslate({ 0.0f, -3.0f,-10.0f });
 	uiPlanes[0]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	uiPlanes[1]->SetScale({ 10.0f,10.0f,0.0f });
@@ -48,14 +51,13 @@ void GameScene::Init()
 	isGameOver = false;
 	isGameClear = false;
 	sceneTransitionTime = 0;
-	Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 73.0f, Camera::GetInstance()->GetTranslate().z });
 	player_->SetTranslate({ Camera::GetInstance()->GetTranslate().x ,87.5f ,0.0f });
 	whale_->SetTranslate({ 0.0f,0.0f,1.5f });
 	for (uint32_t i = 0; i < 1; i++)
 	{
 		Particle* particle = new Particle;
 		particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-			-7.0f, 7.0f, -6.0f, -6.0f, -2.0f, -2.0f,
+			-7.0f, 7.0f, -3.0f, -3.0f, -2.0f, -2.0f,
 			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
 		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
 		particles.push_back(particle);
@@ -76,11 +78,11 @@ void GameScene::Update()
 		//{
 		//	whale_->SetLife(0);
 		//}
-		if (uiPlanes[0]->GetTranslate().y >= -0.5f && uiPlanes[0]->GetTranslate().y <= 0.5f)
+		if (uiPlanes[0]->GetTranslate().y >= 2.0f && uiPlanes[0]->GetTranslate().y <= 3.0f)
 		{
 			uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x, uiPlanes[0]->GetTranslate().y + 0.1f, uiPlanes[0]->GetTranslate().z });
 		}
-		else if (uiPlanes[0]->GetTranslate().y >= 0.5f)
+		else if (uiPlanes[0]->GetTranslate().y >= 3.0f)
 		{
 			uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x, uiPlanes[0]->GetTranslate().y + 0.2f, uiPlanes[0]->GetTranslate().z });
 			uiPlanes[0]->SetRotate({ uiPlanes[0]->GetRotate().x,uiPlanes[0]->GetRotate().y + 0.1f,uiPlanes[0]->GetRotate().z });
@@ -129,7 +131,7 @@ void GameScene::Update()
 		}
 
 		CheckAllCollisions();
-		Camera::GetInstance()->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 3.0f,player_->GetTranslate().z - 20.0f });
+		Camera::GetInstance()->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
 		ground->SetTranslate({ ground->GetTranslate().x, ground->GetTranslate().y, ground->GetTranslate().z - 0.1f });
 
 	}
@@ -262,11 +264,8 @@ void GameScene::Finalize()
 	uiPlanes.clear();
 	delete ground;
 	ground = NULL;
-	delete whale_;
-	whale_ = NULL;
-	player_->Finalize();
-	delete player_;
-	player_ = NULL;
+	whale_.release();
+	player_.release();
 	for (Enemy* enemy_ : enemys_)
 	{
 		delete enemy_;
@@ -332,7 +331,7 @@ void GameScene::CheckAllCollisions()
 			posB = bullet->GetTranslate();
 			Vector3 distance = Subtract(posA, posB);
 			if ((distance.x * distance.x) + (distance.y * distance.y) +
-				(distance.z * distance.z) <= 2)
+				(distance.z * distance.z) <= 4)
 			{
 				enemy_->OnCollision();
 				bullet->OnCollision();
@@ -391,7 +390,7 @@ void GameScene::CheckAllCollisions()
 				posB = bullet->GetTranslate();
 				Vector3 distance = Subtract(posA, posB);
 				if ((distance.x * distance.x) + (distance.y * distance.y) +
-					(distance.z * distance.z) <= 4)
+					(distance.z * distance.z) <= 2)
 				{
 					whale_->OnCollision();
 					bullet->OnCollision();
@@ -455,7 +454,7 @@ void GameScene::UpdateEnemyPopCommands(int fileNum)
 			std::uniform_real_distribution<float> enemySort(0.0f, (float)(GameManager::stageNumber + 1));
 			Enemy* enemy_ = new Enemy;
 			enemy_->SetSort((int)enemySort(randomEngine));
-			enemy_->Initialize(player_, whale_, enemy_->GetSort());
+			enemy_->Initialize(player_.get(), whale_.get(), enemy_->GetSort());
 			enemys_.push_back(enemy_);
 			enemy_->SetTranslate({ x,y,z });
 			enemy_->SetEnemyVector(whale_->GetTranslate());
