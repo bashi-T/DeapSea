@@ -22,15 +22,15 @@ public:
 	void SubtractLife() { life--; }
 
 	bool IsDead()const { return isDead; }
-	const std::list<EnemyBullet*>& GetBullets()const { return eBullets; }
+	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets()const { return eBullets; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
 	OBB GetCollision() { return eCollision; }
 	int GetSort() { return enemySort; }
 	int Getlife() { return life; }
 
 private:
-	Object3d* object3d;
-	std::list<EnemyBullet*> eBullets;
+	std::unique_ptr< Object3d> object3d;
+	std::list<std::unique_ptr<EnemyBullet>> eBullets;
 	Player* player_;
 	Whale* whale_;
 

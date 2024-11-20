@@ -1,14 +1,14 @@
-#include "ground.h"
+#include "Sand.h"
 
-Ground::~Ground()
+Sand::~Sand()
 {
 }
 
-void Ground::Initialize()
+void Sand::Initialize()
 {
 	object3d = std::make_unique<Object3d>();
-	std::string groundModel = "ground/newground.obj";
-	const std::string groundSkin = "Resource/ganban.png";
+	std::string groundModel = "floor/floor.obj";
+	const std::string groundSkin = "Resource/sand.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(groundModel, groundSkin, true);
 	object3d->SetModel(groundModel);
@@ -21,20 +21,16 @@ void Ground::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	object3d->SetTranslate({ 0.0f,-25.0f,100.0f });
+	object3d->SetTranslate({ 0.0f,0.0f,0.0f });
+
 }
 
-void Ground::Update()
+void Sand::Update()
 {
 	object3d->Update(Camera::GetInstance());
-#ifdef _DEBUG
-	ImGui::Begin("ground");
-	ImGui::DragFloat3("ground.translate", (float*)&object3d->GetTranslate(), 0.01f);
-	ImGui::End();
-#endif
 }
 
-void Ground::Draw()
+void Sand::Draw()
 {
 	object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
 }

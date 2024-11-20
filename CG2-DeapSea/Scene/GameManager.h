@@ -35,10 +35,12 @@ private:
 	SpriteCommon* SPCommon;
 	Object3dCommon* object3dCommon;
 	ParticleCommon* particleCommon;
-	Object3d* object3d;
-	Camera* camera;
-	SkyDome* skyDome;
 	AudioManager* audioManager;
+	std::unique_ptr< Object3d> object3d;
+	std::unique_ptr<Camera> camera;
+	std::unique_ptr<SkyDome> skyDome;
+
+	HRESULT hr;
 public: 
 	GameManager();
 	~GameManager();

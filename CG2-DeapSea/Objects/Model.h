@@ -53,9 +53,9 @@ public:
 		std::map<std::string, JointWeightData>skinClusterData;
 		std::vector<VertexData> vertices;
 		std::vector<uint32_t> indices;
-		MaterialData material;
+		MaterialData materialData;
 		Node rootNode;
-		//MaterialData eMaterial;
+		//MaterialData eMaterialData;
 		//bool isEnvironment = true;
 	};
 	struct Joint
@@ -160,7 +160,7 @@ public:
 	Animation& GetAnimation() { return animation_; }
 	Skelton& GetSkelton() { return skelton_; }
 	const SkinCluster& GetSkinCluster() { return skinCluster; }
-	Material* GetMaterialData() { return materialData; }
+	Material* GetMaterial() { return material_; }
 
 private:
 	ModelData modelData_;
@@ -176,7 +176,7 @@ private:
 	ComPtr<ID3D12Resource> indexResource = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
-	Material* materialData = nullptr;
+	Material* material_ = nullptr;
 	ComPtr<ID3D12Resource> materialResource = nullptr;
 
 	Animation animation_;

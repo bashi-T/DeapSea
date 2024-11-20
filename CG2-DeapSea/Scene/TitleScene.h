@@ -25,10 +25,10 @@ private:
 	//Object3dCommon* object3dCommon;
 	//SRVManager* srvManager;
 	//Camera* camera;
-	std::vector <Particle*> particles;
-	std::vector <Sprite*> sprites;
-	std::vector <UIPlane*>uiPlanes;
-	Cursor* cursor;
+	std::vector<std::unique_ptr<Particle>> particles;
+	std::vector<std::unique_ptr<Sprite>> sprites;
+	std::vector<std::unique_ptr<UIPlane>> uiPlanes;
+	std::unique_ptr<Cursor> cursor_;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<Whale> whale_;
 	bool isSceneTransition;

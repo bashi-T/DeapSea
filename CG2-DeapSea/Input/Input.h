@@ -24,6 +24,11 @@ public:
 	static Input* GetInstance();
 
 private:
+	Input() = default;
+	~Input() = default;
+	Input(Input&) = delete;
+	Input& operator=(Input&) = delete;
+	
 	WinAPP* winApp_ = nullptr;
 	HRESULT hr;
 	ComPtr<IDirectInput8>directInput = nullptr;

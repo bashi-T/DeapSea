@@ -4,6 +4,11 @@
 class SRVManager
 {
 private:
+	SRVManager() = default;
+	~SRVManager() = default;
+	SRVManager(SRVManager&) = delete;
+	SRVManager& operator=(SRVManager&) = delete;
+
 	DX12Common* dxCommon_ = nullptr;
 	uint32_t descriptorSize;
 	ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
@@ -16,7 +21,6 @@ private:
 	ComPtr<ID3D12Fence> fence = nullptr;
 	HANDLE fenceEvent;
 	static inline SRVManager* instance;
-
 
 public:
 	static const uint32_t kMaxSRVCount;
@@ -46,6 +50,6 @@ public:
 	ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 	HANDLE GetFenceEvent() { return fenceEvent; }
 	static SRVManager* GetInstance();
-
+	HRESULT hr;
 };
 

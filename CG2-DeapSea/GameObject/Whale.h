@@ -27,12 +27,12 @@ public:
 	float GetMaxDistance() { return maxDistance; }
 	void ChangeModel(std::string shape, std::string skin);
 private:
-	Object3d* object3d;
+	std::unique_ptr< Object3d> object3d;
 	Player* player;
+	std::unique_ptr<Particle> particle;
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };
 	Vector3 nowWhaleSpeed = { 0.0f,0.0f,0.0f };
 	Vector3 accSpeed = { 0.0f,0.0f,0.0f };
-	Particle* particle;
 	bool isDead = false;
 	bool isHit = false;
 	OBB wCollision;
@@ -40,7 +40,7 @@ private:
 	uint32_t coolTimer;
 	float maxDistance = 6.0f;
 	std::string whaleModel = "whale/improvisedWhale2.obj";
-	std::string whaleSkin = "Resource/whale5.png";
+	std::string whaleSkin = "Resource/whaleSkin.png";
 
 };
 

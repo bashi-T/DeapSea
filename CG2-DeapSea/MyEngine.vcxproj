@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Objects\Light.cpp" />
     <ClCompile Include="Managers\AudioManager.cpp" />
     <ClCompile Include="GameObject\Cursor.cpp" />
     <ClCompile Include="GameObject\ground.cpp" />
@@ -18,6 +19,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GameObject\Sand.cpp" />
     <ClCompile Include="Scene\ClearScene.cpp" />
     <ClCompile Include="GameObject\EnemyBullet.cpp" />
     <ClCompile Include="GameObject\PlayerBullet.cpp" />
@@ -35,6 +37,7 @@
     <ClCompile Include="Managers\SRVManager.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="Objects\SkyDome.cpp" />
+    <ClCompile Include="GameObject\Shield.cpp" />
     <ClCompile Include="Systems\Debug.cpp" />
     <ClCompile Include="Commons\DX12Common.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -63,6 +66,7 @@
     <ClCompile Include="GameObject\UIPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Objects\Light.h" />
     <ClInclude Include="Managers\AudioManager.h" />
     <ClInclude Include="GameObject\Cursor.h" />
     <ClInclude Include="GameObject\ground.h" />
@@ -70,6 +74,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="GameObject\Sand.h" />
     <ClInclude Include="Scene\ClearScene.h" />
     <ClInclude Include="GameObject\EnemyBullet.h" />
     <ClInclude Include="GameObject\PlayerBullet.h" />
@@ -83,6 +88,7 @@
     <ClInclude Include="Managers\SRVManager.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Objects\SkyDome.h" />
+    <ClInclude Include="GameObject\Shield.h" />
     <ClInclude Include="Systems\Debug.h" />
     <ClInclude Include="Commons\DX12Common.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />

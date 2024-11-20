@@ -4,10 +4,6 @@
 #include <crtdbg.h>
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
-ModelCommon::~ModelCommon()
-{
-}
-
 void ModelCommon::Initialize(DX12Common* dxCommon)
 {
 	this->dxCommon_ = dxCommon;
@@ -372,4 +368,19 @@ void ModelCommon::MakeSkeltonPSO(DX12Common* dxcommon)
 	hr = dxcommon->GetDevice().Get()->CreateGraphicsPipelineState(
 		&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
+}
+
+ModelCommon* ModelCommon::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = new ModelCommon;
+	}
+	return instance;
+}
+
+void ModelCommon::Finalize()
+{
+	delete instance;
+	instance = NULL;
 }

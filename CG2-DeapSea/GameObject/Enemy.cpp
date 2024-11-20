@@ -7,13 +7,6 @@
 
 Enemy::~Enemy()
 {
-	delete object3d;
-	object3d = NULL;
-	for (EnemyBullet* bullet : eBullets)
-	{
-		delete bullet;
-		bullet = NULL;
-	}
 	eBullets.clear();
 }
 
@@ -21,7 +14,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 {
 	player_ = player;
 	whale_ = whale;
-	object3d = new Object3d;
+	object3d = std::make_unique<Object3d>();
 	switch (sort)
 	{
 	    case 0:
@@ -69,11 +62,11 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 
 void Enemy::Update(int sort)
 {
-	eBullets.remove_if([](EnemyBullet* bullet)
+	eBullets.remove_if([](std::unique_ptr<EnemyBullet>& bullet)
 		{
 			if (bullet->IsDead())
 			{
-				delete bullet;
+				bullet.reset();
 				return true;
 			}
 			return false;
@@ -116,7 +109,7 @@ void Enemy::Update(int sort)
 			}
 		}
 		object3d->Update(Camera::GetInstance());
-		for (EnemyBullet* bullet : eBullets)
+		for (const auto& bullet : eBullets)
 		{
 			bullet->Update();
 		}
@@ -167,7 +160,7 @@ void Enemy::Draw(int sort)
 	{
 	case 0:
 		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
-		for (EnemyBullet* bullet : eBullets)
+		for (const auto& bullet : eBullets)
 		{
 			bullet->Draw();
 		}
@@ -183,10 +176,10 @@ void Enemy::Shot()
 	shotInterval++;
 	if (shotInterval == 1)
 	{
-		EnemyBullet* newBullet = new EnemyBullet;
+		std::unique_ptr<EnemyBullet> newBullet = std::make_unique< EnemyBullet>();
 		newBullet->Initialize(object3d->GetTranslate());
 			newBullet->SetEnemyBulletVector(player_->GetTranslate());
-		eBullets.push_back(newBullet);
+		eBullets.push_back(std::move(newBullet));
 	}
 	if (shotInterval == 180)
 	{

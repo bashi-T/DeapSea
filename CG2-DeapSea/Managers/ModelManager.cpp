@@ -13,15 +13,14 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Finalize()
 {
-	delete modelCommon_;
-	modelCommon_ = NULL;
+	modelCommon_->Finalize();
 	delete instance;
 	instance = NULL;
 }
 
 void ModelManager::Initialize(DX12Common* dxCommon)
 {
-	modelCommon_ = new ModelCommon;
+	modelCommon_ = ModelCommon::GetInstance();
 	modelCommon_->Initialize(dxCommon);
 	sameModelNum = 0;
 }

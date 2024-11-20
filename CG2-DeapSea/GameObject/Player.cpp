@@ -6,18 +6,12 @@
 
 Player::~Player()
 {
-	delete object3d;
-	object3d = NULL;
-	for (PlayerBullet* bullet : pBullets)
-	{
-		delete bullet;
-		bullet = NULL;
-	}
+	pBullets.clear();
 }
 
 void Player::Initialize()
 {
-	object3d = new Object3d; 
+	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	//playerModel = "human/walk.gltf";
 	//playerSkin = "Resource/monsterBall.png";
@@ -42,17 +36,17 @@ void Player::Initialize()
 
 void Player::Update()
 {
-	pBullets.remove_if([](PlayerBullet* bullet)
+	pBullets.remove_if([](std::unique_ptr<PlayerBullet>& bullet)
 		{
 			if (bullet->IsDead())
 			{
-				delete bullet;
+				bullet.reset();
 				return true;
 			}
 			return false;
 		});
 	XINPUT_STATE joyState;
-	if (isHit == false)
+	if (isHit == false&&isMovable==true)
 	{
 		if (Input::GetInstance()->GetJoystickState(0, joyState))//joystick操作
 		{
@@ -137,19 +131,19 @@ void Player::Update()
 			moveVector = { 0.0f,0.0f,0.0f };
 			if (Input::GetInstance()->PushKey(DIK_RIGHT))
 			{
-				moveVector = { 0.05f, 0.0f,0.0f };
+				moveVector = { 0.075f, 0.0f,0.0f };
 			}
 			if (Input::GetInstance()->PushKey(DIK_LEFT))
 			{
-				moveVector = { -0.05f, 0.0f,0.0f };
+				moveVector = { -0.075f, 0.0f,0.0f };
 			}
 			if (Input::GetInstance()->PushKey(DIK_UP))
 			{
-				moveVector = { 0.0f, 0.0f,0.05f };
+				moveVector = { 0.0f, 0.0f,0.075f };
 			}
 			if (Input::GetInstance()->PushKey(DIK_DOWN))
 			{
-				moveVector = { 0.0f, 0.0f,-0.05f };
+				moveVector = { 0.0f, 0.0f,-0.075f };
 			}
 
 			if (Input::GetInstance()->PushKey(DIK_A))
@@ -195,7 +189,6 @@ void Player::Update()
 		}
 		Shot();
 
-		object3d->SkeltonUpdate(Camera::GetInstance());
 		pCollision.center = object3d->GetTranslate();
 		if(hitTimer>=60)
 		{
@@ -206,15 +199,18 @@ void Player::Update()
 			}
 		}
 	}
-	else
+	else if(isHit==true)
 	{
 		hitTimer++;
 		if (hitTimer == 60)
 		{
 			isHit = false;
+			isMovable = true;
 		}
 	}
-	for (PlayerBullet* bullet : pBullets)
+
+	object3d->SkeltonUpdate(Camera::GetInstance());
+	for (const auto& bullet : pBullets)
 	{
 		bullet->Update();
 	}
@@ -223,7 +219,7 @@ void Player::Update()
 void Player::Draw()
 {
 	object3d->SkeltonDraw(ModelManager::GetInstance()->GetModelCommon());
-	for (PlayerBullet* bullet : pBullets)
+	for (const auto& bullet : pBullets)
 	{
 		bullet->Draw();
 	}
@@ -236,9 +232,9 @@ void Player::Shot()
 		shotInterval++;
 		if (shotInterval == 1)
 		{
-			PlayerBullet* newBullet = new PlayerBullet;
+			std::unique_ptr<PlayerBullet> newBullet = std::make_unique< PlayerBullet>();
 			newBullet->Initialize(object3d->GetTranslate(), object3d->GetRotate());
-			pBullets.push_back(newBullet);
+			pBullets.push_back(std::move(newBullet));
 		}
 		if (shotInterval == 15)
 		{
@@ -255,4 +251,5 @@ void Player::Shot()
 void Player::OnCollision()
 {
 	isHit = true;
+	isMovable = false;
 }

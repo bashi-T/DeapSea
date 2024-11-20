@@ -2,18 +2,14 @@
 
 Whale::~Whale()
 {
-	delete 	object3d;
-	object3d = NULL;
-	//delete player;
-	//player = NULL;
 }
 
 void Whale::Initialize(Player* players)
 {
-	object3d = new Object3d; 
 	player = players;
-	 whaleModel = "whale/improvisedWhale2.obj";
-	 whaleSkin = "Resource/whaleSkin.png";
+	object3d = std::make_unique<Object3d>();
+	//whaleModel = "whale/improvisedWhale2.obj";
+	 //whaleSkin = "Resource/whaleSkin.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 	ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin, true);
 	object3d->SetModel(whaleModel);
@@ -29,9 +25,9 @@ void Whale::Initialize(Player* players)
 	life = 4;
 	coolTimer = 0;
 
-	particle = new Particle;
+	particle = std::make_unique<Particle>();
 	particle->SetElements(1.0f, 1.0f, 1.0f, 2.0f,
-		-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
+		-7.0f, 7.0f, -6.0f, -4.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
 	particle->Initialize("Resource/bloodParticle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
 

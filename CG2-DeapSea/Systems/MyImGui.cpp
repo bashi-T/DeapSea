@@ -1,18 +1,6 @@
 #include "MyImGui.h"
 #include"Managers/SRVManager.h"
 
-MyImGui::~MyImGui()
-{
-	//if (instance != NULL)
-	//{
-	//	delete instance;
-	//}
-	//instance = NULL;
-	//ImGui_ImplDX12_Shutdown();
-	//ImGui_ImplWin32_Shutdown();
-	//ImGui::DestroyContext();
-}
-
 void MyImGui::Initialize(
     HWND hwnd,
 	ID3D12Device* device,

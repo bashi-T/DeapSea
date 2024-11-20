@@ -19,7 +19,7 @@ GameManager::~GameManager() {}
 
 int GameManager::Run()
 {
-	CoInitializeEx(0, COINIT_MULTITHREADED);
+	hr=CoInitializeEx(0, COINIT_MULTITHREADED);
 	Debug::D3DResourceLeakChecker* leakCheck = new Debug::D3DResourceLeakChecker;
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -33,10 +33,10 @@ int GameManager::Run()
 	SPCommon = SpriteCommon::GetInstance();
 	object3dCommon = Object3dCommon::GetInstance();
 	particleCommon = ParticleCommon::GetInstance();
-	object3d = new Object3d;
-	camera = new Camera();
-	skyDome = new SkyDome;
-	std::vector<Model*> models;
+
+	object3d = std::make_unique<Object3d>();
+	camera = std::make_unique <Camera>();
+	skyDome = std::make_unique <SkyDome>();
 
 
 
@@ -138,23 +138,13 @@ int GameManager::Run()
 
 	CloseHandle(srvManager->GetFenceEvent());
 	sceneArr_[currentSceneNo_]->Finalize();
-	delete skyDome;
-	skyDome = NULL;
 	particleCommon->DeleteInstance();
-	for (Model* model : models)
-	{
-		delete model;
-		model = NULL;
-	}
 	SPCommon->DeleteInstance();
 	camera->DeleteInstance();
-	delete object3d;
 	ModelManager::GetInstance()->Finalize();
 	object3dCommon->DeleteInstance();
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
-	delete input;
-	input = NULL;
 	audioManager->Finalize();
 	srvManager->Finalize();
 	dx12Common->DeleteInstance();

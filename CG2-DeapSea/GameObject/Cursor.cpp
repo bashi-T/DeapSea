@@ -2,13 +2,11 @@
 
 Cursor::~Cursor()
 {
-	delete object3d;
-	object3d = NULL;
 }
 
 void Cursor::Initialize()
 {
-	object3d = new Object3d;
+	object3d = std::make_unique<Object3d>();
 	std::string cursorModel = "cursor/cursor.obj";
 	const std::string cursorSkin = "Resource/sea.png";
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());

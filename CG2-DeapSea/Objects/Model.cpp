@@ -16,21 +16,21 @@ void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, s
 	MakeBufferView();
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material_));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	modelData_.material.textureFilePath = TextureFilePath;
-	TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
-	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+	modelData_.materialData.textureFilePath = TextureFilePath;
+	TextureManager::GetInstance()->LoadTexture(modelData_.materialData.textureFilePath);
+	modelData_.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
 	//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";
 	//TextureManager::GetInstance()->LoadTexture("Resource/rostock_laage_airport_4k.dds");
 	//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
 	//modelData_.isEnvironment = false;
 
-	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = isLighting;
-	materialData[0].uvTransform = MakeIdentity4x4();
-	materialData[0].shininess = 50.0f;
+	material_[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	material_[0].enableLighting = isLighting;
+	material_[0].uvTransform = MakeIdentity4x4();
+	material_[0].shininess = 50.0f;
 
 	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
@@ -49,21 +49,21 @@ void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePat
 	MakeBufferView();
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material_));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
-	modelData_.material.textureFilePath = TextureFilePath;
+	modelData_.materialData.textureFilePath = TextureFilePath;
 	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+	modelData_.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
 	//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";
 	//TextureManager::GetInstance()->LoadTexture("Resource/rostock_laage_airport_4k.dds");
 	//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
 
-	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = isLighting;
-	materialData[0].uvTransform = MakeIdentity4x4();
-	materialData[0].shininess = 50.0f;
+	material_[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	material_[0].enableLighting = isLighting;
+	material_[0].uvTransform = MakeIdentity4x4();
+	material_[0].shininess = 50.0f;
 
 	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
@@ -84,17 +84,17 @@ void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath,
 	MakeBufferView();
 
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material_));
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
-	modelData_.material.textureFilePath = TextureFilePath;
+	modelData_.materialData.textureFilePath = TextureFilePath;
 	TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+	modelData_.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
 
-	materialData[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData[0].enableLighting = isLighting;
-	materialData[0].uvTransform = MakeIdentity4x4();
-	materialData[0].shininess = 50.0f;
+	material_[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	material_[0].enableLighting = isLighting;
+	material_[0].uvTransform = MakeIdentity4x4();
+	material_[0].shininess = 50.0f;
 
 	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 	std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
@@ -116,7 +116,7 @@ void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
-	materialData[0].uvTransform = uvTransformMatrix;
+	material_[0].uvTransform = uvTransformMatrix;
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
@@ -126,7 +126,7 @@ void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		IASetIndexBuffer(&indexBufferView);
 	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData_.material.textureIndex);
+		2, modelData_.materialData.textureIndex);
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
 		UINT(modelData_.indices.size()), 1, 0, 0, 0);
@@ -139,7 +139,7 @@ void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
-	materialData[0].uvTransform = uvTransformMatrix;
+	material_[0].uvTransform = uvTransformMatrix;
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->
 		SetGraphicsRootConstantBufferView(
@@ -157,7 +157,7 @@ void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 		SetGraphicsRootDescriptorTable(
 			5, skinCluster.paletteSrvHandle.second);
 	srvManager_->SetGraphicsRootDescriptorTable(
-		2, modelData_.material.textureIndex);
+		2, modelData_.materialData.textureIndex);
 
 	modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
 		UINT(modelData_.indices.size()), 1, 0, 0, 0);
@@ -241,7 +241,7 @@ Model::ModelData Model::LoadOBJFile(const std::string directryPath, const std::s
 		{
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.material.textureFilePath = directryPath + "/" + textureFilePath.C_Str();
+			modelData.materialData.textureFilePath = directryPath + "/" + textureFilePath.C_Str();
 		}
 	}
 	modelData.rootNode = ReadNode(scene->mRootNode);
@@ -316,7 +316,7 @@ Model::ModelData Model::LoadModelFile(const std::string& directryPath, const std
 		{
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.material.textureFilePath = directryPath + "/" + textureFilePath.C_Str();
+			modelData.materialData.textureFilePath = directryPath + "/" + textureFilePath.C_Str();
 		}
 	}
 
@@ -502,9 +502,9 @@ Model::SkinCluster Model::CreateSkinCluster(const Skelton& skelton, const ModelD
 
 void Model::SetColor(Vector4 color)
 {
-	materialData[0].color = color;
+	material_[0].color = color;
 }
 void Model::SetIsLighting(bool lighting)
 {
-	materialData[0].enableLighting = lighting;
+	material_[0].enableLighting = lighting;
 }

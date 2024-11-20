@@ -8,17 +8,17 @@
 class ModelManager
 {
 private:
+	ModelManager() = default;
+	~ModelManager() = default;
+	ModelManager(ModelManager&) = delete;
+	ModelManager& operator=(ModelManager&) = delete;
+
 	static ModelManager* instance;
 	ModelCommon* modelCommon_ = nullptr;
 
 	std::map<std::string, std::unique_ptr<Model>>models;
 	std::vector<std::string>modelFilePaths;
 	int sameModelNum = 0;
-
-	ModelManager() = default;
-	~ModelManager() = default;
-	ModelManager(ModelManager&) = delete;
-	ModelManager& operator=(ModelManager&) = delete;
 
 public:
 	static ModelManager* GetInstance();

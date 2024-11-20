@@ -8,6 +8,7 @@
 #include"Commons/SpriteCommon.h"
 #include"GameObject/Whale.h"
 #include"GameObject/Player.h"
+#include"GameObject/Sand.h"
 
 class GameOverScene :public SceneManager
 {
@@ -23,6 +24,7 @@ private:
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<Whale> whale_;
 	Object3d* object3d;
+	std::unique_ptr<Sand> sand_;
 
 	std::string boneWhaleModel = "whale/BoneWhale.obj";
 	std::string boneWhaleSkin = "Resource/boneColor.png";

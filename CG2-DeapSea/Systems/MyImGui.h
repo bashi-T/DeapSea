@@ -25,7 +25,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
 class MyImGui
 {
 public:
-	~MyImGui();
 	void Initialize(
 	    HWND hwnd,
 		ID3D12Device* device,
@@ -39,5 +38,10 @@ public:
 	void Finalize();
 
 private:
+	MyImGui() = default;
+	~MyImGui() = default;
+	MyImGui(MyImGui&) = delete;
+	MyImGui& operator=(MyImGui&) = delete;
+
 	static inline MyImGui* instance;
 };

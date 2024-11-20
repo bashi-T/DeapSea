@@ -147,7 +147,7 @@ void SRVManager::PostDraw()
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 
-	HRESULT hr = dxCommon_->GetCommandList()->Close();
+	hr = dxCommon_->GetCommandList()->Close();
 	assert(SUCCEEDED(hr));
 
 	ComPtr<ID3D12CommandList> commandLists[] =
@@ -187,7 +187,7 @@ void SRVManager::Finalize()
 
 void SRVManager::MakeFence()
 {
-	HRESULT hr = dxCommon_->GetDevice()->CreateFence(fenceValue,
+	hr = dxCommon_->GetDevice()->CreateFence(fenceValue,
 		D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);

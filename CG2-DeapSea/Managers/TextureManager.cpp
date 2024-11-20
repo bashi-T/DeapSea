@@ -36,7 +36,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 	DirectX::ScratchImage image{};//テクスチャファイルをプログラムで扱えるように
 	std::wstring filePathW = debug_->ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(
+	hr = DirectX::LoadFromWICFile(
 		filePathW.c_str(),
 		DirectX::WIC_FLAGS_FORCE_SRGB,
 		nullptr,
@@ -145,7 +145,7 @@ ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexM
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
 	ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = dx12Common_->GetDevice()->CreateCommittedResource(
+	hr = dx12Common_->GetDevice()->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -180,7 +180,7 @@ void TextureManager::UploadTextureData(
 	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
 	{
 		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		HRESULT hr = texture->WriteToSubresource(
+		hr = texture->WriteToSubresource(
 			UINT(mipLevel),
 			nullptr,
 			img->pixels,

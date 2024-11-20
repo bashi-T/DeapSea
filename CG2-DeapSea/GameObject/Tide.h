@@ -13,8 +13,8 @@ public:
 	void Draw();
 
 private:
-	Object3d* object3d;
-	std::vector <Particle*> particles;
+	std::unique_ptr< Object3d> object3d;
+	std::vector < std::unique_ptr<Particle>> particles;
 
 };
 

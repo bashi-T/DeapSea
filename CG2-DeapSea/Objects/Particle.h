@@ -203,17 +203,13 @@ public:
 	Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU2() { return textureSrvHandleCPU2; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2; }
 	ParticleForGPU* GetInstancingData() { return instancingData; }
 	Particles* GetParticles() { return particles; }
 private:
 	SRVManager* srvManager_ = nullptr;
-	DX12Common* dx12Common_ = nullptr;
 	Object3dCommon* object3dCommon_ = nullptr;
 	ParticleCommon* particleCommon_;
 	Camera* camera_ = nullptr;
-	DX12Common* dxCommon = nullptr;
 	HRESULT hr = NULL;
 
 	uint32_t kNumInstance = 10;
@@ -226,28 +222,11 @@ private:
 
 	ComPtr<ID3D12Resource> instancingResource;
 
-	ComPtr<IDxcUtils> dxcUtils = nullptr;
-	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-	ComPtr<ID3DBlob> signatureBlob = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
-
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	ComPtr<ID3D12Resource> indexResource = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 	ComPtr<ID3D12Resource> colorResource;
-
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	D3D12_BLEND_DESC blendDesc{};
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
 	ComPtr<ID3D12Resource> directionalLightResource = nullptr;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -273,11 +252,9 @@ private:
 	ParticleForGPU* instancingData = nullptr;
 
 	DirectX::ScratchImage mipImages;
-	DirectX::ScratchImage mipImages2;
+
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;

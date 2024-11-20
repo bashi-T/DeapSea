@@ -54,7 +54,22 @@ public:
 		directionalLight.direction = direction;
 		directionalLight.intensity = intensity;
 	}
-	Vector4 GetColor() { return model_->GetMaterialData()->color; }
+
+	struct PointLight
+	{
+		Vector4 color;
+		Vector3 direction;
+		float intensity;
+	};
+	PointLight* GetPointLightData() { return pointLightData; }
+	PointLight& GetPointLight() { return pointLight; }
+	void SetPointLight(Vector4 color, Vector3 direction, float intensity) {
+		pointLight.color = color;
+		pointLight.direction = direction;
+		pointLight.intensity = intensity;
+	}
+
+	Vector4 GetColor() { return model_->GetMaterial()->color; }
 	void SetColor(Vector4 color);
 
 private:
@@ -76,6 +91,14 @@ private:
 		{0.0f,-1.0f,0.0f},
 		1.0f
 	};
+	PointLight* pointLightData = nullptr;
+	PointLight pointLight =
+	{
+		{0.5f,0.5f,0.5f,1.0f},
+		{0.0f,-1.0f,0.0f},
+		1.0f
+	};
+
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	ComPtr<ID3D12Resource> cameraResource;
 

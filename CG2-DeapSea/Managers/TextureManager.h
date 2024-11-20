@@ -100,6 +100,6 @@ private:
 	Debug* debug_ = nullptr;
 	SRVManager* srvManager = nullptr;
 	std::unordered_map<std::string, TextureData>textureDatas;
-
+	HRESULT hr;
 };
 

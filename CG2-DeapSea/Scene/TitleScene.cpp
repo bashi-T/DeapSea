@@ -16,18 +16,11 @@ void TitleScene::Init()
 		"Resource/black.png",
 	};
 
-	//for(uint32_t i = 0; i < 1; i++)
-	//{
-	//	Particle* particle = new Particle;
-	//	particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-	//		-7.0f, 7.0f, -6.0f, -6.0f, 0.0f, 0.0f,
-	//		0.0f, 0.0f, 1.0f, 6.0f, 0.0f, 0.0f);
-	//	particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
-	//	particles.push_back(particle);
-	//}
 	Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance());
 	player_ = std::make_unique<Player>();
 	whale_ = std::make_unique<Whale>();
+	cursor_ = std::make_unique<Cursor>();
+
 	player_->Initialize();
 	player_->SetIsHit(true);
 	whale_->Initialize(player_.get());
@@ -48,9 +41,9 @@ void TitleScene::Init()
 
 	for (uint32_t i = 0; i < 6; i++)
 	{
-		UIPlane* uiPlane = new UIPlane;
+		std::unique_ptr<UIPlane> uiPlane = std::make_unique<UIPlane>();
 		uiPlane->Initialize(Planes[i], PNGs[i]);
-		uiPlanes.push_back(uiPlane);
+		uiPlanes.push_back(std::move(uiPlane));
 	}
 	uiPlanes[0]->SetTranslate({ 0.0f,1.6f,-16.0f });
 	uiPlanes[1]->SetTranslate({ 0.0f,2.1f,0.0f });
@@ -69,9 +62,8 @@ void TitleScene::Init()
 	uiPlanes[5]->SetScale({ 10.0f,10.0f,0.0f });
 	uiPlanes[5]->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 
-	cursor = new Cursor;
-	cursor->Initialize();
-	cursor->SetTranslate({ uiPlanes[1]->GetTranslate().x - 2.5f,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
+	cursor_->Initialize();
+	cursor_->SetTranslate({ uiPlanes[1]->GetTranslate().x - 2.5f,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
 	Camera::GetInstance()->SetTranslate({ 0.0f,2.0f,-20.0f });
 	Camera::GetInstance()->SetRotate({ 0.1f,0.0f,0.0f });
 
@@ -84,11 +76,11 @@ void TitleScene::Update()
 	//{
 	//	particle->Update(true, particle->GetElements());
 	//}
-	for (UIPlane* uiPlane : uiPlanes)
+	for (int i=0;i<uiPlanes.size();i++)
 	{
-		uiPlane->Update();
+		uiPlanes[i]->Update();
 	}
-	cursor->Update();
+	cursor_->Update();
 
 	if(floatingTime<120)//title上下動
 	{
@@ -116,7 +108,7 @@ void TitleScene::Update()
 	}
 	if (isStageSelect == true && isSceneTransition == false)//stageselect
 	{
-		if (cooltime <= 12)
+		if (cooltime <= 10)
 		{
 			cooltime++;
 		}
@@ -130,7 +122,7 @@ void TitleScene::Update()
 				{
 					nowStage = 1;
 				}
-				cursor->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
+				cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
 				cooltime = 0;
 			}
 			else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP || Input::GetInstance()->TriggerKey(DIK_UP))
@@ -141,7 +133,7 @@ void TitleScene::Update()
 				{
 					nowStage = 4;
 				}
-				cursor->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
+				cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
 				cooltime = 0;
 			}
 			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isSceneTransition == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isSceneTransition == false)
@@ -182,13 +174,14 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
+	whale_->Draw();
 	if (isStageSelect == false)
 	{
 		uiPlanes[0]->Draw();
 	}
 	else if (isSceneTransition == false)
 	{
-		cursor->Draw();
+		cursor_->Draw();
 		uiPlanes[1]->Draw();
 		uiPlanes[2]->Draw();
 		uiPlanes[3]->Draw();
@@ -206,27 +199,13 @@ void TitleScene::Draw()
 		//	particle->Draw();
 		//}
 	}
-	whale_->Draw();
 }
 
 void TitleScene::Finalize()
 {
-	//for (Particle* particle : particles)
-	//{
-	//	delete particle;
-	//  particle = NULL;
-	//}
-	//particles.clear();
-	for (UIPlane* uiPlane : uiPlanes)
-	{
-		delete uiPlane;
-		uiPlane = NULL;
-	}
+	whale_.reset();
+	player_.reset();
 	uiPlanes.clear();
-	delete cursor;
-	cursor = NULL;
-	whale_.release();
-	player_.release();
 	AudioManager::GetInstance()->SoundUnload(&bgm);
 	AudioManager::GetInstance()->SoundUnload(&enterSound);
 	AudioManager::GetInstance()->SoundUnload(&moveSound);

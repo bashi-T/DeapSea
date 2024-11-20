@@ -13,7 +13,6 @@
 class Object3dCommon
 {
 public:
-	~Object3dCommon();
 	void Initialize(DX12Common* dxcommon);
 	ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
@@ -35,6 +34,11 @@ public:
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
 private:
+	Object3dCommon() = default;
+	~Object3dCommon() = default;
+	Object3dCommon(const Object3dCommon& obj) = delete;
+	Object3dCommon& oparator(const Object3dCommon& obj) = delete;
+
 	Debug* debug_;
 	WinAPP* sWinApp;
 	MyImGui* imgui_;

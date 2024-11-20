@@ -6,6 +6,9 @@
 #include"Objects/Particle.h"
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
+#include"GameObject/Whale.h"
+#include"GameObject/Player.h"
+#include"GameObject/Sand.h"
 
 class ClearScene :public SceneManager
 {
@@ -17,6 +20,10 @@ public:
 	void Finalize() override;
 
 private:
-	Sprite* sprite;
+	std::unique_ptr<Sprite> sprite;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<Whale> whale_;
+	std::unique_ptr<Sand> sand_;
+
 };
 

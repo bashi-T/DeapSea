@@ -1,9 +1,5 @@
 #include "SpriteCommon.h"
 
-SpriteCommon::~SpriteCommon()
-{
-}
-
 void SpriteCommon::Initialize(DX12Common* dxCommon)
 {
 	dx12Common_ = dxCommon;

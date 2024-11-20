@@ -12,7 +12,6 @@
 class SpriteCommon
 {
 public:
-	~SpriteCommon();
 	void Initialize(DX12Common* dxcommon);
 	//void Update();
 	//void Draw(int32_t width, int32_t height);
@@ -47,6 +46,11 @@ public:
 	};
 
 private:
+	SpriteCommon() = default;
+	~SpriteCommon() = default;
+	SpriteCommon(SpriteCommon&) = delete;
+	SpriteCommon& operator=(SpriteCommon&) = delete;
+
 	Debug* debug_;
 	WinAPP* sWinApp;
 	MyImGui* imgui_;

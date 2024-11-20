@@ -40,6 +40,11 @@ public:
 
 	ComPtr<IXAudio2> GetxAudio2() { return xAudio2_; }
 private:
+	AudioManager() = default;
+	~AudioManager() = default;
+	AudioManager(AudioManager&) = delete;
+	AudioManager& operator=(AudioManager&) = delete;
+
 	static inline AudioManager* instance;
 	HRESULT result;
 	ComPtr<IXAudio2>xAudio2_;

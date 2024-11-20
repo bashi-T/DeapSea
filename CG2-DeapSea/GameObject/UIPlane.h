@@ -16,10 +16,10 @@ public:
 	void SetScale(Vector3 scale) { object3d->SetScale(scale); }
 	Vector3 GetRotate() { return object3d->GetRotate(); }
 	void SetRotate(Vector3 rotate) { object3d->SetRotate(rotate); }
-	Vector4 GetColor() { return model->GetMaterialData()->color; }
+	Vector4 GetColor() { return model->GetMaterial()->color; }
 	void SetColor(Vector4 color);
 private:
-	Object3d* object3d = nullptr;
+	std::unique_ptr< Object3d> object3d;
 	std::string planeModel;
 	std::string planeSkin;
 	Model* model;

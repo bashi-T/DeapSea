@@ -30,14 +30,14 @@ public:
 
 	void CheckAllCollisions();
 private:
-	std::vector<Sprite*> sprites;
+	std::unique_ptr<Particle> particle;
+	std::vector<std::unique_ptr<Sprite>>sprites;
+	std::vector<std::unique_ptr<UIPlane>>uiPlanes;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<Whale> whale_;
-	std::list<Enemy*> enemys_;
-	std::vector <UIPlane*>uiPlanes;
-	std::vector <Particle*> particles;
-	Tide* tide_;
-	Ground* ground;
+	std::list<std::unique_ptr<Enemy>> enemys_;
+	std::unique_ptr<Tide>tide_;
+	std::unique_ptr<Ground>ground;
 	
 	std::stringstream enemyPopCommands[10];
 	std::string enemyPopFile[10];

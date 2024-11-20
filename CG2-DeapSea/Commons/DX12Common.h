@@ -76,14 +76,14 @@ public:
 	ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
 		
-	~DX12Common() {
-		swapChain.Reset();
-		device_.Reset();
-	}
+	//~DX12Common() {
+	//	swapChain.Reset();
+	//	device_.Reset();
+	//}
 
 private:
 	DX12Common() = default;
-	//~DX12Common() = default;
+	~DX12Common() = default;
 	DX12Common(const DX12Common& obj) = delete;
 	DX12Common& oparator(const DX12Common&obj) = delete;
 	static inline DX12Common* instance;
