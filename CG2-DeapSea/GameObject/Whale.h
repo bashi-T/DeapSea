@@ -7,6 +7,8 @@
 #include"Commons/ParticleCommon.h"
 #include"Objects/Particle.h"
 
+using namespace MyEngine;
+
 class Whale
 {
 public:
@@ -41,6 +43,4 @@ private:
 	float maxDistance = 6.0f;
 	std::string whaleModel = "whale/improvisedWhale2.obj";
 	std::string whaleSkin = "Resource/whaleSkin.png";
-
 };
-

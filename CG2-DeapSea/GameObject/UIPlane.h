@@ -2,11 +2,12 @@
 #include"Objects/Object3d.h"
 #include"Commons/Object3dCommon.h"
 
+using namespace MyEngine;
 class UIPlane
 {
 public:
 	~UIPlane();
-	void Initialize(std::string plane,std::string skin);
+	void Initialize(std::string plane, std::string skin);
 	void Update();
 	void Draw();
 
@@ -23,6 +24,4 @@ private:
 	std::string planeModel;
 	std::string planeSkin;
 	Model* model;
-
 };
-

@@ -10,25 +10,26 @@
 #include"GameObject/Player.h"
 #include"GameObject/Sand.h"
 
-class GameOverScene :public SceneManager
+namespace MyEngine
 {
-public:
-	//~GameOverScene();
-	void Init() override;
-	void Update() override;
-	void Draw() override;
-	void Finalize() override;
+	class GameOverScene :public SceneManager
+	{
+	public:
+		void Init() override;
+		void Update() override;
+		void Draw() override;
+		void Finalize() override;
 
-private:
-	Sprite* sprite;
-	std::unique_ptr<Player> player_;
-	std::unique_ptr<Whale> whale_;
-	Object3d* object3d;
-	std::unique_ptr<Sand> sand_;
+	private:
+		Sprite* sprite;
+		std::unique_ptr<Player> player_;
+		std::unique_ptr<Whale> whale_;
+		Object3d* object3d;
+		std::unique_ptr<Sand> sand_;
 
-	std::string boneWhaleModel = "whale/BoneWhale.obj";
-	std::string boneWhaleSkin = "Resource/boneColor.png";
-	int floatingTime = 0;
+		std::string boneWhaleModel = "whale/BoneWhale.obj";
+		std::string boneWhaleSkin = "Resource/boneColor.png";
+		int floatingTime = 0;
 
-};
-
+	};
+}

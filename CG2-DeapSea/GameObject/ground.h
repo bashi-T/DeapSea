@@ -2,6 +2,8 @@
 #include"Objects/Object3d.h"
 #include"Commons/Object3dCommon.h"
 
+using namespace MyEngine;
+
 class Ground
 {
 public:
@@ -14,6 +16,7 @@ public:
 	void SetTranslate(Vector3 translate) { object3d->SetTranslate(translate); }
 private:
 	std::unique_ptr< Object3d> object3d;
+	std::string groundModel = "ground/newground.obj";
+	const std::string groundSkin = "Resource/ganban.png";
 
 };
-

@@ -4,20 +4,19 @@
 #include <crtdbg.h>
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
-
-Enemy::~Enemy()
-{
-	eBullets.clear();
-}
-
-void Enemy::Initialize(Player* player, Whale* whale, int sort)
-{
-	player_ = player;
-	whale_ = whale;
-	object3d = std::make_unique<Object3d>();
-	switch (sort)
+	Enemy::~Enemy()
 	{
-	    case 0:
+		eBullets.clear();
+	}
+
+	void Enemy::Initialize(Player* player, Whale* whale, int sort)
+	{
+		player_ = player;
+		whale_ = whale;
+		object3d = std::make_unique<Object3d>();
+		switch (sort)
+		{
+		case 0:
 		{
 			std::string enemyModel = "fish/improvisedFish.obj";
 			const std::string enemySkin = "Resource/uvChecker.png";
@@ -37,7 +36,7 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 			break;
 		}
 
-	    case 1:
+		case 1:
 		{
 			moveInterval = 0;
 			std::string enemyModel = "straight/improvisedStraight.obj";
@@ -57,151 +56,151 @@ void Enemy::Initialize(Player* player, Whale* whale, int sort)
 			life = 1;
 			break;
 		}
+		}
 	}
-}
 
-void Enemy::Update(int sort)
-{
-	eBullets.remove_if([](std::unique_ptr<EnemyBullet>& bullet)
-		{
-			if (bullet->IsDead())
-			{
-				bullet.reset();
-				return true;
-			}
-			return false;
-		});
-
-	switch (sort)
+	void Enemy::Update(int sort)
 	{
-	case 0:
-		if (isDead == true)
-		{
-			if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+		eBullets.remove_if([](std::unique_ptr<EnemyBullet>& bullet)
 			{
-				enemyVector = { -2.0f,2.0f,2.0f };
-				object3d->SetRotate({-1.0f,0.5f,-0.2f});
+				if (bullet->IsDead())
+				{
+					bullet.reset();
+					return true;
+				}
+				return false;
+			});
+
+		switch (sort)
+		{
+		case 0:
+			if (isDead == true)
+			{
+				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+				{
+					enemyVector = { -2.0f,2.0f,2.0f };
+					object3d->SetRotate({ -1.0f,0.5f,-0.2f });
+				}
+				else
+				{
+					enemyVector = { 2.0f,2.0f,2.0f };
+					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+				}
 			}
 			else
 			{
-				enemyVector = { 2.0f,2.0f,2.0f };
-				object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+				if (object3d->GetTranslate().z > player_->GetTranslate().z)
+				{
+					Shot();
+				}
+				if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+				{
+					SetEnemyVector(whale_->GetTranslate());
+				}
+				else if (shotInterval == 1 && enemyVector.z > 0.0f)
+				{
+					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
+				}
+				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
+				if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
+				{
+					isDead = true;
+				}
 			}
-		}
-		else
-		{
-			if (object3d->GetTranslate().z > player_->GetTranslate().z)
+			object3d->Update(Camera::GetInstance());
+			for (const auto& bullet : eBullets)
 			{
-				Shot();
+				bullet->Update();
 			}
-			if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+			break;
+		case 1:
+			if (isDead == true)
 			{
-				SetEnemyVector(whale_->GetTranslate());
-			}
-			else if (shotInterval == 1 && enemyVector.z > 0.0f)
-			{
-				SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
-			}
-			object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
-			if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
-			{
-				isDead = true;
-			}
-		}
-		object3d->Update(Camera::GetInstance());
-		for (const auto& bullet : eBullets)
-		{
-			bullet->Update();
-		}
-		break;
-	case 1:
-		if (isDead == true)
-		{
-			if (player_->GetTranslate().x >= object3d->GetTranslate().x)
-			{
-				enemyVector = { -2.0f,2.0f,2.0f };
-				object3d->SetRotate({ -1.0f,0.5f,-0.2f });
+				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+				{
+					enemyVector = { -2.0f,2.0f,2.0f };
+					object3d->SetRotate({ -1.0f,0.5f,-0.2f });
+				}
+				else
+				{
+					enemyVector = { 2.0f,2.0f,2.0f };
+					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+				}
 			}
 			else
 			{
-				enemyVector = { 2.0f,2.0f,2.0f };
-				object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+				moveInterval++;
+				if (moveInterval == 120)
+				{
+					moveInterval = 0;
+				}
+				if (moveInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+				{
+					SetEnemyVector(whale_->GetTranslate());
+				}
+				else if (moveInterval == 1 && enemyVector.z > 0.0f)
+				{
+					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
+				}
+				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
+				if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
+				{
+					isDead = true;
+				}
 			}
+			object3d->Update(Camera::GetInstance());
+			break;
 		}
-		else
-		{
-			moveInterval++;
-			if (moveInterval == 120)
-			{
-				moveInterval = 0;
-			}
-			if (moveInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
-			{
-				SetEnemyVector(whale_->GetTranslate());
-			}
-			else if (moveInterval == 1 && enemyVector.z > 0.0f)
-			{
-				SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
-			}
-			object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
-			if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
-			{
-				isDead = true;
-			}
-		}
-		object3d->Update(Camera::GetInstance());
-		break;
 	}
-}
 
-void Enemy::Draw(int sort)
-{
-	switch (sort)
+	void Enemy::Draw(int sort)
 	{
-	case 0:
-		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
-		for (const auto& bullet : eBullets)
+		switch (sort)
 		{
-			bullet->Draw();
+		case 0:
+			object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+			for (const auto& bullet : eBullets)
+			{
+				bullet->Draw();
+			}
+			break;
+		case 1:
+			object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+			break;
 		}
-		break;
-	case 1:
-		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
-		break;
 	}
-}
 
-void Enemy::Shot()
-{
-	shotInterval++;
-	if (shotInterval == 1)
+	void Enemy::Shot()
 	{
-		std::unique_ptr<EnemyBullet> newBullet = std::make_unique< EnemyBullet>();
-		newBullet->Initialize(object3d->GetTranslate());
+		shotInterval++;
+		if (shotInterval == 1)
+		{
+			std::unique_ptr<EnemyBullet> newBullet = std::make_unique< EnemyBullet>();
+			newBullet->Initialize(object3d->GetTranslate());
 			newBullet->SetEnemyBulletVector(player_->GetTranslate());
-		eBullets.push_back(std::move(newBullet));
+			eBullets.push_back(std::move(newBullet));
+		}
+		if (shotInterval == 180)
+		{
+			shotInterval = 0;
+		}
 	}
-	if (shotInterval == 180)
+
+	void Enemy::OnCollision()
 	{
-		shotInterval = 0;
+		SubtractLife();
+		if (life <= 0)
+		{
+			isDead = true;
+		}
 	}
-}
 
-void Enemy::OnCollision()
-{
-	SubtractLife();
-	if(life<=0)
+	void Enemy::SetTranslate(Vector3 translate)
 	{
-		isDead = true;
+		object3d->SetTranslate(translate);
 	}
-}
 
-void Enemy::SetTranslate(Vector3 translate)
-{
-	object3d->SetTranslate(translate);
-}
-
-void Enemy::SetEnemyVector(Vector3 position)
-{
-	enemyVector = Normalize(Subtract(position, object3d->GetTranslate()));
-}
+	void Enemy::SetEnemyVector(Vector3 position)
+	{
+		enemyVector = Normalize(Subtract(position, object3d->GetTranslate()));
+	}

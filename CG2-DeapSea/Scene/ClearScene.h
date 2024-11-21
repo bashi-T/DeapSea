@@ -10,20 +10,22 @@
 #include"GameObject/Player.h"
 #include"GameObject/Sand.h"
 
-class ClearScene :public SceneManager
+namespace MyEngine
 {
-public:
-	//~ClearScene();
-	void Init() override;
-	void Update() override;
-	void Draw() override;
-	void Finalize() override;
+	class ClearScene :public SceneManager
+	{
+	public:
+		void Init() override;
+		void Update() override;
+		void Draw() override;
+		void Finalize() override;
 
-private:
-	std::unique_ptr<Sprite> sprite;
-	std::unique_ptr<Player> player_;
-	std::unique_ptr<Whale> whale_;
-	std::unique_ptr<Sand> sand_;
+	private:
+		std::unique_ptr<Sprite> sprite;
+		std::unique_ptr<Player> player_;
+		std::unique_ptr<Whale> whale_;
+		std::unique_ptr<Sand> sand_;
 
-};
+	};
+}
 

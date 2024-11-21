@@ -5,6 +5,8 @@
 #include"Objects/Particle.h"
 #include"PlayerBullet.h"
 
+using namespace MyEngine;
+
 class Player
 {
 public:
@@ -29,7 +31,7 @@ public:
 	void SetIsMovable(bool isMovable_) { isMovable = isMovable_; }
 
 private:
-	std::unique_ptr< Object3d> object3d;
+	std::unique_ptr<Object3d> object3d;
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;
 	OBB pCollision;
 	Vector3 moveVector;
@@ -42,6 +44,5 @@ private:
 	uint32_t hitTimer = 0;
 	float angle_;
 	std::string playerModel = "human/walk.gltf";
-	std::string playerSkin = "Resource/world.png";
+	const std::string& playerSkin = "Resource/world.png";
 };
-

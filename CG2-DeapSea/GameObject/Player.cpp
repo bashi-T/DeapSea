@@ -6,15 +6,12 @@
 
 Player::~Player()
 {
-	pBullets.clear();
 }
 
 void Player::Initialize()
 {
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	//playerModel = "human/walk.gltf";
-	//playerSkin = "Resource/monsterBall.png";
 	ModelManager::GetInstance()->LoadSkeltonAnimation(playerModel, playerSkin, SRVManager::GetInstance(), true);
 	object3d->SetModel(playerModel);
 	Model* model = ModelManager::GetInstance()->FindModel(playerModel);
@@ -46,7 +43,7 @@ void Player::Update()
 			return false;
 		});
 	XINPUT_STATE joyState;
-	if (isHit == false&&isMovable==true)
+	if (isHit == false && isMovable == true)
 	{
 		if (Input::GetInstance()->GetJoystickState(0, joyState))//joystick操作
 		{
@@ -117,7 +114,7 @@ void Player::Update()
 			//	object3d->SetTranslate({ object3d->GetTranslate().x - 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
 			//}
 
-			if (joyState.Gamepad.bRightTrigger )
+			if (joyState.Gamepad.bRightTrigger)
 			{
 				isShot = true;
 			}
@@ -148,11 +145,12 @@ void Player::Update()
 
 			if (Input::GetInstance()->PushKey(DIK_A))
 			{
-			}else
+			}
+			else
 			{
 				object3d->SetTranslate(Add(object3d->GetTranslate(), moveVector));
 			}
-			if ( moveVector.x !=0.0f|| moveVector.z != 0.0f)
+			if (moveVector.x != 0.0f || moveVector.z != 0.0f)
 			{
 				object3d->SetIsAnimation(true);
 			}
@@ -190,7 +188,7 @@ void Player::Update()
 		Shot();
 
 		pCollision.center = object3d->GetTranslate();
-		if(hitTimer>=60)
+		if (hitTimer >= 60)
 		{
 			hitTimer++;
 			if (hitTimer == 120)
@@ -199,7 +197,7 @@ void Player::Update()
 			}
 		}
 	}
-	else if(isHit==true)
+	else if (isHit == true)
 	{
 		hitTimer++;
 		if (hitTimer == 60)

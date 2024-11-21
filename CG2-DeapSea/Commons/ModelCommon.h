@@ -9,42 +9,43 @@
 #include"Managers/TextureManager.h"
 
 #pragma comment(lib, "dxcompiler.lib")
-
-class ModelCommon
+namespace MyEngine
 {
-private:
-	ModelCommon() = default;
-	~ModelCommon() = default;
-	ModelCommon(ModelCommon&) = delete;
-	ModelCommon& operator=(ModelCommon&) = delete;
-	
-	DX12Common* dxCommon_ = nullptr;
-	HRESULT hr = NULL;
-	Debug* debug_ = nullptr;
+	class ModelCommon
+	{
+	private:
+		ModelCommon() = default;
+		~ModelCommon() = default;
+		ModelCommon(ModelCommon&) = delete;
+		ModelCommon& operator=(ModelCommon&) = delete;
 
-	ComPtr<IDxcUtils> dxcUtils = nullptr;
-	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	ComPtr<ID3DBlob> signatureBlob = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-	static inline ModelCommon* instance;
+		DX12Common* dxCommon_ = nullptr;
+		HRESULT hr = NULL;
+		Debug* debug_ = nullptr;
 
-public:
-	void Initialize(DX12Common* dxCommon);
-	ComPtr<IDxcBlob> CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler,
-		IDxcIncludeHandler* includeHandler);
-	void ResetDXC();
-	void MakePSO(DX12Common* dxcommon);
-	void MakeSkeltonPSO(DX12Common* dxcommon);
-	static ModelCommon* GetInstance();
-	void Finalize();
+		ComPtr<IDxcUtils> dxcUtils = nullptr;
+		ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+		ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
+		ComPtr<ID3DBlob> signatureBlob = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+		ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
+		static inline ModelCommon* instance;
 
-	DX12Common* GetDx12Common()const { return dxCommon_; }
-};
+	public:
+		void Initialize(DX12Common* dxCommon);
+		ComPtr<IDxcBlob> CompileShader(
+			const std::wstring& filePath,
+			const wchar_t* profile,
+			IDxcUtils* dxcUtils,
+			IDxcCompiler3* dxcCompiler,
+			IDxcIncludeHandler* includeHandler);
+		void ResetDXC();
+		void MakePSO(DX12Common* dxcommon);
+		void MakeSkeltonPSO(DX12Common* dxcommon);
+		static ModelCommon* GetInstance();
+		void Finalize();
 
+		DX12Common* GetDx12Common()const { return dxCommon_; }
+	};
+}

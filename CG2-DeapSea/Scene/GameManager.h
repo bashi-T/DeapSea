@@ -21,30 +21,33 @@
 #include"Objects/SkyDome.h"
 #include"Objects/Mesh.h"
 
-class GameManager
+
+namespace MyEngine
 {
-private:
-	std::unique_ptr<SceneManager> sceneArr_[4];
-	int currentSceneNo_ = 0;
-	int prevSceneNo_ = 0;
-	WinAPP* winAPP;
-	DX12Common* dx12Common;
-	SRVManager* srvManager;
-	Input* input;
-	MyImGui* imgui;
-	SpriteCommon* SPCommon;
-	Object3dCommon* object3dCommon;
-	ParticleCommon* particleCommon;
-	AudioManager* audioManager;
-	std::unique_ptr< Object3d> object3d;
-	std::unique_ptr<Camera> camera;
-	std::unique_ptr<SkyDome> skyDome;
+	class GameManager
+	{
+	private:
+		std::unique_ptr<SceneManager> sceneArr_[4];
+		int currentSceneNo_ = 0;
+		int prevSceneNo_ = 0;
+		WinAPP* winAPP;
+		DX12Common* dx12Common;
+		SRVManager* srvManager;
+		Input* input;
+		MyImGui* imgui;
+		SpriteCommon* SPCommon;
+		Object3dCommon* object3dCommon;
+		ParticleCommon* particleCommon;
+		AudioManager* audioManager;
+		std::unique_ptr< Object3d> object3d;
+		std::unique_ptr<Camera> camera;
+		std::unique_ptr<SkyDome> skyDome;
 
-	HRESULT hr;
-public: 
-	GameManager();
-	~GameManager();
-	int Run();
-	static int stageNumber;
-};
-
+		HRESULT hr;
+	public:
+		GameManager();
+		~GameManager();
+		int Run();
+		static int stageNumber;
+	};
+}

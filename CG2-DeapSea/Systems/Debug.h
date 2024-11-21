@@ -10,18 +10,21 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxguid.lib")
 
-class Debug
+namespace MyEngine
 {
-public:
-	~Debug();
-	void Log(const std::string& message);
-	std::string ConvertString(const std::wstring& str);
-	std::wstring ConvertString(const std::string& str);
+	class Debug
+	{
+	public:
+		~Debug();
+		void Log(const std::string& message);
+		std::string ConvertString(const std::wstring& str);
+		std::wstring ConvertString(const std::string& str);
 
-	struct D3DResourceLeakChecker {
-		~D3DResourceLeakChecker();
+		struct D3DResourceLeakChecker {
+			~D3DResourceLeakChecker();
+		};
+
+	private:
 	};
-	
-private:
-};
+}
 

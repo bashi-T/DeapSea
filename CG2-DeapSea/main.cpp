@@ -6,7 +6,8 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	GameManager* gameManager = new GameManager;
+	MyEngine::GameManager* gameManager = new MyEngine::GameManager;
+	
 #ifdef _DEBUG
 	//_CrtSetBreakAlloc(num);//
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);

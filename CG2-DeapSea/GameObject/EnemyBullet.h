@@ -4,6 +4,8 @@
 #include"Commons/Object3dCommon.h"
 #include"Objects/Particle.h"
 
+using namespace MyEngine;
+
 class EnemyBullet
 {
 public:
@@ -20,7 +22,7 @@ public:
 	OBB GetCollision() { return ebCollision; }
 
 private:
-	Object3d* object3d;
+	std::unique_ptr< Object3d> object3d;
 
 	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
 	const std::string bulletSkin = "Resource/white.png";
@@ -28,6 +30,4 @@ private:
 	bool isDead = false;
 	OBB ebCollision;
 	Vector3 enemyBulletVector;
-
 };
-

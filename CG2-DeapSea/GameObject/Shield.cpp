@@ -1,17 +1,17 @@
 #include "Shield.h"
 
-Shield::~Shield()
-{
-}
+	Shield::~Shield()
+	{
+	}
 
-void Shield::Initialize()
-{
-}
+	void Shield::Initialize()
+	{
+	}
 
-void Shield::Update()
-{
-}
+	void Shield::Update()
+	{
+	}
 
-void Shield::Draw()
-{
-}
+	void Shield::Draw()
+	{
+	}

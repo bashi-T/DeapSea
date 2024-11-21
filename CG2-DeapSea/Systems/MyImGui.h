@@ -10,38 +10,43 @@
 #include<dxgi1_6.h>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-using Microsoft::WRL::ComPtr;
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
-	HWND hWnd,
-	UINT msg,
-	WPARAM wparam,
-	LPARAM lparam
-);
-/*
- * MyImGui.h
- * ImGui用の処理を行う
- */
-class MyImGui
+	extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
+		HWND hWnd,
+		UINT msg,
+		WPARAM wparam,
+		LPARAM lparam
+	);
+
+namespace MyEngine
 {
-public:
-	void Initialize(
-	    HWND hwnd,
-		ID3D12Device* device,
-		DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
-		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
-		ID3D12DescriptorHeap* srvDescriptorHeap);
-	void Update();
-	void Endframe(ID3D12GraphicsCommandList* commandList);
-	static MyImGui* GetInstance();
+	using Microsoft::WRL::ComPtr;
 
-	void Finalize();
+	/*
+	 * MyImGui.h
+	 * ImGui用の処理を行う
+	 */
+	class MyImGui
+	{
+	public:
+		void Initialize(
+			HWND hwnd,
+			ID3D12Device* device,
+			DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc,
+			ID3D12DescriptorHeap* srvDescriptorHeap);
+		void Update();
+		void Endframe(ID3D12GraphicsCommandList* commandList);
+		static MyImGui* GetInstance();
 
-private:
-	MyImGui() = default;
-	~MyImGui() = default;
-	MyImGui(MyImGui&) = delete;
-	MyImGui& operator=(MyImGui&) = delete;
+		void Finalize();
 
-	static inline MyImGui* instance;
-};
+	private:
+		MyImGui() = default;
+		~MyImGui() = default;
+		MyImGui(MyImGui&) = delete;
+		MyImGui& operator=(MyImGui&) = delete;
+
+		static inline MyImGui* instance;
+	};
+}
