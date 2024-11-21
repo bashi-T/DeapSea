@@ -33,7 +33,7 @@ public:
 	/// <param name="srvManager_"></param>
 	void Initialize(DX12Common* dxcommon, SRVManager* srvManager_);
 	/// <summary>
-	/// 解放
+	/// instance解放
 	/// </summary>
 	void Finalize();
 	/// <summary>

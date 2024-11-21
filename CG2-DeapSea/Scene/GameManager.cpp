@@ -145,6 +145,7 @@ int GameManager::Run()
 	object3dCommon->DeleteInstance();
 	TextureManager::GetInstance()->Finalize();
 	imgui->Finalize();
+	input->Finalize();
 	audioManager->Finalize();
 	srvManager->Finalize();
 	dx12Common->DeleteInstance();

@@ -34,6 +34,12 @@ void Input::Update()
 	keyboard->GetDeviceState(sizeof(key), key);
 }
 
+void Input::Finalize()
+{
+	delete instance;
+	instance = NULL;
+}
+
 bool Input::PushKey(BYTE keyNumber)
 {
 	if (key[keyNumber])

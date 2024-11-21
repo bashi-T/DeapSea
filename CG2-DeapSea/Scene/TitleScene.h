@@ -31,17 +31,17 @@ private:
 	std::unique_ptr<Cursor> cursor_;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<Whale> whale_;
-	bool isSceneTransition;
-	bool isStageSelect;
-	int numStage;
+	bool isSceneTransition = false;
+	bool isStageSelect = false;
+	int numStage = 0;
 	int sceneTransitionTime = 0;
-	int nowStage;
+	int nowStage = 0;
 	int cooltime = 0;
 	int floatingTime = 0;
 
-	AudioManager::SoundData bgm;
-	AudioManager::SoundData enterSound;
-	AudioManager::SoundData moveSound;
+	AudioManager::SoundData bgm = {};
+	AudioManager::SoundData enterSound = {};
+	AudioManager::SoundData moveSound = {};
 	//std::string PNGs[6];
 	std::string Planes[6]
 	{

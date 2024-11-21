@@ -2,6 +2,7 @@
 
 Whale::~Whale()
 {
+	delete player;
 }
 
 void Whale::Initialize(Player* players)

@@ -15,6 +15,7 @@
 #include"Camera/Camera.h"
 #include"Managers/TextureManager.h"
 #include "Commons/Object3dCommon.h"
+#include "Commons/MeshCommon.h"
 #include <random>
 
 #pragma comment(lib, "d3d12.lib")
@@ -26,23 +27,13 @@ class Mesh
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	~Mesh();
-	void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon);
+	void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon, MeshCommon* meshCommon);
 	void Update();
-	void Draw();
-	ComPtr<IDxcBlob> CompileShader(
-	    const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler,
-		IDxcIncludeHandler* includeHandler);
-
 	//void DrawTriangle(
 	//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
 	//    Vector2 coordRight, Vector2 coordLeft, bool useWorldMap);
 	void DrawSphere(
 		const Sphere& sphere_, Vector4 color);
-	void ResetDXC();
-	void MakePSO();
 	ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void MakeBufferView();
 	//void InputDataTriangle(
@@ -105,8 +96,9 @@ private:
 	WinAPP* sWinApp;
 	SRVManager* srvManager_ = nullptr;
 	MyImGui* imgui_;
-	SpriteCommon* spriteCom_;
 	Object3dCommon* object3dCommon_;
+	SpriteCommon* spriteCom_;
+	MeshCommon* meshCommon_;
 	Camera* camera_;
 	DX12Common* dxCommon;
 	HRESULT hr = NULL;
@@ -116,17 +108,6 @@ private:
 
 	ComPtr<ID3D12Resource> transformationMatrixResource;
 	ComPtr<ID3D12Resource> transformationMatrixResourceSphere;
-
-	ComPtr<IDxcUtils> dxcUtils = nullptr;
-	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-	//D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-	ComPtr<ID3DBlob> signatureBlob = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	//ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	//ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 
 	ComPtr<ID3D12Resource> vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};

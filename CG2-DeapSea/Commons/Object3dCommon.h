@@ -27,7 +27,6 @@ public:
 	static Object3dCommon* GetInstance();
 	static void DeleteInstance();
 
-	ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 	ComPtr<ID3D12PipelineState> GetGraphicsPipelineStates(int t) { return graphicsPipelineStates[t]; }
 	ComPtr<ID3D12RootSignature> GetRootSignatures(int t) { return rootSignatures[t]; }
 	DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
@@ -40,8 +39,6 @@ private:
 	Object3dCommon& oparator(const Object3dCommon& obj) = delete;
 
 	Debug* debug_;
-	WinAPP* sWinApp;
-	MyImGui* imgui_;
 	HRESULT hr = NULL;
 	DX12Common* dx12Common_;
 	EulerTransform transformMatrix;
@@ -56,9 +53,6 @@ private:
 	std::array < ComPtr<ID3D12PipelineState>, 2>  graphicsPipelineStates;
 	ComPtr<ID3DBlob> signatureBlob = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
-
-	ComPtr<ID3D12Resource> vertexResource = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
 	ComPtr<ID3D12Resource> materialResource;
 
