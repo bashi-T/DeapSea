@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/CGVector.h"
+#include "Math/Collision.h"
 #include "Commons/DX12Common.h"
 #include "Systems/MyImGui.h"
 #include <cassert>

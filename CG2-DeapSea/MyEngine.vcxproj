@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Commons\MeshCommon.cpp" />
+    <ClCompile Include="Math\Collision.cpp" />
     <ClCompile Include="Objects\Light.cpp" />
     <ClCompile Include="Managers\AudioManager.cpp" />
     <ClCompile Include="GameObject\Cursor.cpp" />
@@ -68,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Commons\MeshCommon.h" />
+    <ClInclude Include="Math\Collision.h" />
     <ClInclude Include="Objects\Light.h" />
     <ClInclude Include="Managers\AudioManager.h" />
     <ClInclude Include="GameObject\Cursor.h" />

@@ -116,34 +116,36 @@ namespace MyEngine
 			}
 			else
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN || Input::GetInstance()->TriggerKey(DIK_DOWN))
-				{
-					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
-					nowStage++;
-					if (nowStage > 4)
-					{
-						nowStage = 1;
-					}
-					cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
-					cooltime = 0;
-				}
-				else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP || Input::GetInstance()->TriggerKey(DIK_UP))
-				{
-					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
-					nowStage--;
-					if (nowStage < 1)
-					{
-						nowStage = 4;
-					}
-					cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
-					cooltime = 0;
-				}
+				//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN || Input::GetInstance()->TriggerKey(DIK_DOWN))
+				//{
+				//	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
+				//	nowStage++;
+				//	if (nowStage > 4)
+				//	{
+				//		nowStage = 1;
+				//	}
+				//	cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
+				//	cooltime = 0;
+				//}
+				//else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP || Input::GetInstance()->TriggerKey(DIK_UP))
+				//{
+				//	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
+				//	nowStage--;
+				//	if (nowStage < 1)
+				//	{
+				//		nowStage = 4;
+				//	}
+				//	cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
+				//	cooltime = 0;
+				//}
+				cursor_->SetTranslate({ uiPlanes[1]->GetTranslate().x - 2.5f,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
 				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isSceneTransition == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isSceneTransition == false)
 				{
 					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
 					isSceneTransition = true;
 					cooltime = 0;
 				}
+
 			}
 		}
 		if (isSceneTransition == true)//gameSceneへ遷移

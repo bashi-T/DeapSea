@@ -26,7 +26,7 @@ class Enemy
 		bool IsDead()const { return isDead; }
 		const std::list<std::unique_ptr<EnemyBullet>>& GetBullets()const { return eBullets; }
 		Vector3 GetTranslate() { return object3d->GetTranslate(); }
-		OBB GetCollision() { return eCollision; }
+		AABB GetCollision() { return eCollision; }
 		int GetSort() { return enemySort; }
 		int Getlife() { return life; }
 
@@ -39,7 +39,7 @@ class Enemy
 		uint32_t shotInterval = 0;
 		bool isShot = false;
 		bool isDead = false;
-		OBB eCollision;
+		AABB eCollision;
 		Vector3 enemyVector;
 		int enemySort;
 		int moveInterval = 0;

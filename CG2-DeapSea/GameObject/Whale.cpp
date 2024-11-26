@@ -22,13 +22,17 @@
 		model->Memcpy();
 		life = 4;
 		coolTimer = 0;
+		wCollision =
+		{
+			.min{-3.0f,-1.0f,-1.0f},
+			.max{3.0f,1.0f,1.0f}
+		};
 
 		particle = std::make_unique<Particle>();
-		particle->SetElements(1.0f, 1.0f, 1.0f, 2.0f,
+		particle->SetElements(0.0f, 1.0f, 1.0f, 2.0f,
 			-7.0f, 7.0f, -6.0f, -4.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
-		particle->Initialize("Resource/bloodParticle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
-
+		particle->Initialize("Resource/bloodParticle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements(),300);
 	}
 
 	void Whale::Update()
@@ -156,42 +160,47 @@
 				{
 				case 0:
 					ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
-					particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
 						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 					particle->RandomInitialize(particle->GetElements());
+					particle->SetColorRed(1.0f);
+
 					break;
 				case 1:
 					ChangeModel("whale/3DamagedWhale.obj", "Resource/3DamageBone.png");
-					particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
 						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 					particle->RandomInitialize(particle->GetElements());
+					particle->SetColorRed(1.0f);
 
 					break;
 				case 2:
 					ChangeModel("whale/2DamagedWhale.obj", "Resource/2DamageBone.png");
-					particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
 						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 					particle->RandomInitialize(particle->GetElements());
+					particle->SetColorRed(1.0f);
 
 					break;
 
 				case 3:
 					ChangeModel("whale/1DamagedWhale.obj", "Resource/1DamagedBone.png");
-					particle->SetElements(1.0f, 1.0f, 0.5f, 1.5f,
+					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
 						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
 						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
 						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 					particle->RandomInitialize(particle->GetElements());
+					particle->SetColorRed(1.0f);
 
 					break;
 				}
@@ -203,13 +212,20 @@
 			{
 				isHit = false;
 				coolTimer = 0;
-				object3d->SetRotate({ 0.0f,0.0f,0.0f });
+				SetColor({ 1.0f,1.0f,1.0f,1.0f });
 			}
 		}
 
 		nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
 		object3d->SetTranslate(Add(object3d->GetTranslate(), nowWhaleSpeed));
 		object3d->Update(Camera::GetInstance());
+		
+		wCollision =
+		{
+			.min{object3d->GetTranslate().x - 3.0f,object3d->GetTranslate().y - 1.0f,object3d->GetTranslate().z - 1.0f},
+			.max{object3d->GetTranslate().x + 3.0f,object3d->GetTranslate().y + 1.0f,object3d->GetTranslate().z + 1.0f}
+		};
+
 		particle->Update(false, particle->GetElements());
 
 #ifdef _DEBUG
@@ -233,6 +249,11 @@
 	{
 		life -= 1;
 		isHit = true;
+	}
+
+	void Whale::OnTideCollision(Vector3 tideVector)
+	{
+		object3d->SetTranslate(Add(object3d->GetTranslate(),tideVector));
 	}
 
 	void Whale::SetTranslate(Vector3 translate)

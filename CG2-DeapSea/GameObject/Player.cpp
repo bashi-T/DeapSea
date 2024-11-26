@@ -23,11 +23,12 @@ void Player::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	pCollision.center = object3d->GetTranslate();
-	pCollision.orientations[0] = { 1.0f,0.0f,0.0f };
-	pCollision.orientations[1] = { 0.0f,1.0f,0.0f };
-	pCollision.orientations[2] = { 0.0f,0.0f,1.0f };
-	pCollision.size = { 0.5f,1.0f,0.5f };
+	pCollision =
+	{
+		.min{-2.0f,-2.0f,-2.0f},
+		.max{2.0f,2.0f,2.0f}
+	};
+	//pCollision.radius = 2.0f;
 	angle_ = 0.0f;
 }
 
@@ -187,7 +188,7 @@ void Player::Update()
 		}
 		Shot();
 
-		pCollision.center = object3d->GetTranslate();
+		//pCollision.center = object3d->GetTranslate();
 		if (hitTimer >= 60)
 		{
 			hitTimer++;
@@ -208,6 +209,7 @@ void Player::Update()
 	}
 
 	object3d->SkeltonUpdate(Camera::GetInstance());
+	//pCollision.center = object3d->GetTranslate();
 	for (const auto& bullet : pBullets)
 	{
 		bullet->Update();

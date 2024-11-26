@@ -19,7 +19,7 @@ class PlayerBullet
 		void SetTranslate(Vector3 translate);
 
 		Vector3 GetTranslate() { return object3d->GetTranslate(); }
-		OBB GetCollision() { return pbCollision; }
+		Sphere GetCollision() { return pbCollision; }
 
 	private:
 		std::unique_ptr< MyEngine::Object3d> object3d;
@@ -30,5 +30,5 @@ class PlayerBullet
 		static const int32_t kLifeTime = 60 * 2;
 		int32_t deathTimer = kLifeTime;
 		bool isDead = false;
-		OBB pbCollision;
+		Sphere pbCollision;
 	};

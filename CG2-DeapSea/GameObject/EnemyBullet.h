@@ -19,7 +19,7 @@ public:
 	void SetTranslate(Vector3 translate);
 	void SetEnemyBulletVector(Vector3 translate);
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
-	OBB GetCollision() { return ebCollision; }
+	Sphere GetCollision() { return ebCollision; }
 
 private:
 	std::unique_ptr< Object3d> object3d;
@@ -28,6 +28,6 @@ private:
 	const std::string bulletSkin = "Resource/white.png";
 	Vector3 bulletSpeed = { 0.0f,0.0f,-0.1f };
 	bool isDead = false;
-	OBB ebCollision;
+	Sphere ebCollision;
 	Vector3 enemyBulletVector;
 };

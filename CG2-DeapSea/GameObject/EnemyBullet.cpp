@@ -25,6 +25,7 @@
 		model->Memcpy();
 		object3d->SetTranslate({ firstPos.x /*+ 0.01f*/, firstPos.y,firstPos.z });
 		object3d->SetScale({ 0.5f,0.5f,0.5f });
+		ebCollision.radius = 0.5f;
 		object3d->SetIsAnimation(false);
 	}
 
@@ -36,6 +37,7 @@
 		}
 		object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.1f, enemyBulletVector)));
 		object3d->Update(Camera::GetInstance());
+		ebCollision.center = object3d->GetTranslate();
 	}
 
 	void EnemyBullet::Draw()

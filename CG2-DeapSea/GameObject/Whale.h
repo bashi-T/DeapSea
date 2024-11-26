@@ -18,12 +18,14 @@ public:
 	void Draw();
 
 	void OnCollision();
+	void OnTideCollision(Vector3 tideVector);
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 rotate);
 	void SetLife(int i) { life = i; }
+	void SetColor(Vector4 color) { object3d->SetColor(color); }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
 	Vector3 GetRotate() { return object3d->GetRotate(); }
-	OBB GetCollision() { return wCollision; }
+	AABB GetCollision() { return wCollision; }
 	int GetLife() { return life; }
 	bool GetIsHit() { return isHit; }
 	float GetMaxDistance() { return maxDistance; }
@@ -37,7 +39,7 @@ private:
 	Vector3 accSpeed = { 0.0f,0.0f,0.0f };
 	bool isDead = false;
 	bool isHit = false;
-	OBB wCollision;
+	AABB wCollision;
 	int life = 4;
 	uint32_t coolTimer;
 	float maxDistance = 6.0f;

@@ -7,13 +7,13 @@ namespace MyEngine
 	{
 	}
 
-	void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle element)
+	void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle element,int numMaxInstance)
 	{
 		this->particleCommon_ = particleCommon;
 		this->object3dCommon_ = object3dCommon;
 		this->srvManager_ = srvManager;
 		this->camera_ = object3dCommon_->GetDefaultCamera();
-		kNumMaxInstance = 100;
+		kNumMaxInstance = numMaxInstance;
 
 		LeftTop = { -0.5f, 0.5f, 0.0f, 1.0f };
 		RightTop = { 0.5f, 0.5f, 0.0f, 1.0f };
@@ -156,19 +156,17 @@ namespace MyEngine
 
 			if (particles[index].lifeTime <= particles[index].currentTime && isRevive == true)
 			{
-				for (uint32_t num = 0; num < kNumMaxInstance; ++num)
-				{
-					std::random_device seedGenerator;
-					std::mt19937 randomEngine(seedGenerator());
-					particles[num] = MakeNewParticle(randomEngine, element.colorMin, element.colorMax, element.timeMin, element.timeMax);
-					particles[num] = MakeNewParticlePosition(randomEngine,
-						element.posxMin, element.posxMax, element.posyMin, element.posyMax, element.poszMin, element.poszMax,
-						element.velxMin, element.velxMax, element.velyMin, element.velyMax, element.velzMin, element.velzMax);
-					instancingData[num].WVP = MakeIdentity4x4();
-					instancingData[num].World = MakeIdentity4x4();
-					instancingData[num].color = particles[num].color;
-				}
+				std::random_device seedGenerator;
+				std::mt19937 randomEngine(seedGenerator());
+				particles[index] = MakeNewParticle(randomEngine, element.colorMin, element.colorMax, element.timeMin, element.timeMax);
+				particles[index] = MakeNewParticlePosition(randomEngine,
+					element.posxMin, element.posxMax, element.posyMin, element.posyMax, element.poszMin, element.poszMax,
+					element.velxMin, element.velxMax, element.velyMin, element.velyMax, element.velzMin, element.velzMax);
+				instancingData[index].WVP = MakeIdentity4x4();
+				instancingData[index].World = MakeIdentity4x4();
+				instancingData[index].color = particles[index].color;
 			}
+
 			particles[index].transform.translate.x += particles[index].velocity.x * kDeltaTime;
 			particles[index].transform.translate.y += particles[index].velocity.y * kDeltaTime;
 			particles[index].transform.translate.z += particles[index].velocity.z * kDeltaTime;
@@ -298,6 +296,13 @@ namespace MyEngine
 		for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 		{
 			particles[index].transform.rotate = rotate;
+		}
+	}
+	void Particle::SetColorRed(float red)
+	{
+		for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+		{
+			particles[index].color.x = red;
 		}
 	}
 }

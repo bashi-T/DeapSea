@@ -19,7 +19,8 @@ public:
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets()const { return pBullets; }
 	Vector3 GetTranslate() { return object3d->GetTranslate(); }
-	OBB GetCollision() { return pCollision; }
+	AABB GetAABBCollision() { return pCollision; }
+	//Sphere GetSphereCollision() { return pCollision; }
 	bool GetIsHit() { return isHit; }
 	bool GetIsMovable() { return isMovable; }
 	uint32_t GetIsHitTimer() { return hitTimer; }
@@ -33,7 +34,8 @@ public:
 private:
 	std::unique_ptr<Object3d> object3d;
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;
-	OBB pCollision;
+	AABB pCollision;
+	//Sphere pCollision;
 	Vector3 moveVector;
 	//Vector3 preVector;
 

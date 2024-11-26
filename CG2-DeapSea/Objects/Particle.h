@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/CGVector.h"
+#include "Math/Collision.h"
 #include "Commons/DX12Common.h"
 #include "Systems/MyImGui.h"
 #include <cassert>
@@ -53,7 +53,8 @@ namespace MyEngine
 		/// <param name="srvManager"></param>
 		/// <param name="object3dCommon"></param>
 		/// <param name="elements"></param>
-		void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements);
+		/// <param name="numMaxInstance"></param>
+		void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements, int numMaxInstance);
 		/// <summary>
 		/// particleを生成
 		/// </summary>
@@ -200,6 +201,11 @@ namespace MyEngine
 		/// </summary>
 		/// <param name="rotate"></param>
 		void SetRotate(Vector3 rotate);
+		/// <summary>
+		/// 赤色調整
+		/// </summary>
+		/// <param name="red"></param>
+		void SetColorRed(float red);
 
 		ElementsParticle GetElements() { return elements; }
 		Matrix4x4 GetCameraMatrix() { return cameraMatrix; }

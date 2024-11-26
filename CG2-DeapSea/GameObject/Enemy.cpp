@@ -74,18 +74,24 @@
 		switch (sort)
 		{
 		case 0:
-			if (isDead == true)
+			if (life <= 0)
 			{
 				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
 				{
-					enemyVector = { -2.0f,2.0f,2.0f };
+					enemyVector = { -2.0f,1.0f,2.0f };
 					object3d->SetRotate({ -1.0f,0.5f,-0.2f });
 				}
 				else
 				{
-					enemyVector = { 2.0f,2.0f,2.0f };
+					enemyVector = { 2.0f,1.0f,2.0f };
 					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
 				}
+				if (object3d->GetTranslate().z <= Camera::GetInstance()->GetTranslate().z + 30.0f)
+				{
+					isDead = true;
+				}
+				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
+
 			}
 			else
 			{
@@ -108,13 +114,19 @@
 				}
 			}
 			object3d->Update(Camera::GetInstance());
+			eCollision =
+			{
+				.min{object3d->GetTranslate().x - 0.1f,object3d->GetTranslate().y - 0.25f,object3d->GetTranslate().z - 1.5f},
+				.max{object3d->GetTranslate().x + 0.1f,object3d->GetTranslate().y + 0.25f,object3d->GetTranslate().z + 1.5f}
+			};
+
 			for (const auto& bullet : eBullets)
 			{
 				bullet->Update();
 			}
 			break;
 		case 1:
-			if (isDead == true)
+			if (life <= 0)
 			{
 				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
 				{
@@ -126,6 +138,11 @@
 					enemyVector = { 2.0f,2.0f,2.0f };
 					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
 				}
+				if (object3d->GetTranslate().z <= Camera::GetInstance()->GetTranslate().z + 30.0f)
+				{
+					isDead = true;
+				}
+				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
 			}
 			else
 			{
@@ -149,6 +166,11 @@
 				}
 			}
 			object3d->Update(Camera::GetInstance());
+			eCollision =
+			{
+				.min{object3d->GetTranslate().x - 0.05f,object3d->GetTranslate().y - 0.4f,object3d->GetTranslate().z - 2.5f},
+				.max{object3d->GetTranslate().x + 0.05f,object3d->GetTranslate().y + 0.4f,object3d->GetTranslate().z + 2.5f}
+			};
 			break;
 		}
 	}
@@ -189,10 +211,10 @@
 	void Enemy::OnCollision()
 	{
 		SubtractLife();
-		if (life <= 0)
-		{
-			isDead = true;
-		}
+		//if (life <= 0)
+		//{
+		//	isDead = true;
+		//}
 	}
 
 	void Enemy::SetTranslate(Vector3 translate)

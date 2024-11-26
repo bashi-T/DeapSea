@@ -11,10 +11,12 @@ namespace MyEngine
 		player_ = std::make_unique<Player>();
 		whale_ = std::make_unique<Whale>();
 		ground = std::make_unique<Ground>();
+		tide_ = std::make_unique<Tide>();
 		player_->Initialize();
 		player_->SetIsMovable(false);
 		whale_->Initialize(player_.get());
 		ground->Initialize();
+		tide_->Initialize();
 
 		Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, 76.0f, Camera::GetInstance()->GetTranslate().z });
 		Camera::GetInstance()->SetRotate({ 0.2f,0.0f,0.0f });
@@ -60,7 +62,7 @@ namespace MyEngine
 		particle->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
 			-7.0f, 7.0f, -5.0f, -5.0f, -2.0f, -2.0f,
 			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 1.0f);
-		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements());
+		particle->Initialize("Resource/clearbabble.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements(),100);
 		if (GameManager::stageNumber >= 2)
 		{
 
@@ -69,15 +71,15 @@ namespace MyEngine
 
 	void GameScene::Update()
 	{
-		if (isGameStart == true && whale_->GetLife() != 0)//ゲーム中
+		if (isGameStart == true && whale_->GetLife() != 0)//gameScene
 		{
-			time++;
-			if (time == 150)
-			{
-				//isGameStart = false;
-				//isGameClear = true;
-				whale_->SetLife(0);
-			}
+			//time++;
+			//if (time == 150)
+			//{
+			//	//isGameStart = false;
+			//	//isGameClear = true;
+			//	whale_->SetLife(0);
+			//}
 			if (uiPlanes[0]->GetTranslate().y >= 2.0f && uiPlanes[0]->GetTranslate().y <= 3.0f)
 			{
 				uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x, uiPlanes[0]->GetTranslate().y + 0.1f, Camera::GetInstance()->GetTranslate().z + 10.0f });
@@ -140,7 +142,7 @@ namespace MyEngine
 			CheckAllCollisions();
 			Camera::GetInstance()->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
 			ground->SetTranslate({ ground->GetTranslate().x, ground->GetTranslate().y, ground->GetTranslate().z - 0.1f });
-
+			tide_->SetTranslate({ tide_->GetTranslate().x, tide_->GetTranslate().y, tide_->GetTranslate().z - 0.1f });
 		}
 		else if (isGameOver == true)//GameOverSceneへ遷移
 		{
@@ -211,7 +213,7 @@ namespace MyEngine
 
 			uiPlanes[1]->Update();
 		}
-		else//遷移中
+		else//導入遷移中
 		{
 			sceneTransitionTime++;
 			if (sceneTransitionTime <= 60)
@@ -248,11 +250,11 @@ namespace MyEngine
 			enemys_.resize(0);
 			isGameOver = true;
 		}
-		else if (enemys_.size() == 0 && gameEnd || Input::GetInstance()->TriggerKey(DIK_RETURN))
+		else if (enemys_.size() == 0 && gameEnd == true || Input::GetInstance()->TriggerKey(DIK_RETURN))
 		{
 			enemys_.resize(0);
+			isGameStart = false;
 			isGameClear = true;
-
 		}
 		else if (Input::GetInstance()->TriggerKey(DIK_S))
 		{
@@ -260,7 +262,7 @@ namespace MyEngine
 			enemys_.resize(0);
 			sceneNo = TITLE;
 #endif // DEBUG
-	}
+		}
 
 		if (isGameStart == false)
 		{
@@ -269,11 +271,12 @@ namespace MyEngine
 		ground->Update();
 		player_->Update();
 		whale_->Update();
+		tide_->Update();
 		for (const auto& enemy_ : enemys_)
 		{
 			enemy_->Update(enemy_->GetSort());
 		}
-}
+	}
 
 	void GameScene::Draw()
 	{
@@ -287,7 +290,7 @@ namespace MyEngine
 			enemy_->Draw(enemy_->GetSort());
 		}
 		particle->Draw();
-
+		tide_->Draw();
 	}
 
 	void GameScene::Finalize()
@@ -309,7 +312,6 @@ namespace MyEngine
 
 	void GameScene::CheckAllCollisions()
 	{
-		Vector3 posA, posB;
 		const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
 		if (player_->GetIsHit() == false && player_->GetIsHitTimer() == 0)
 		{
@@ -317,14 +319,9 @@ namespace MyEngine
 			for (const auto& enemy_ : enemys_)
 			{
 				const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy_->GetBullets();
-
-				posA = player_->GetTranslate();
 				for (const auto& bullet : enemyBullets)
 				{
-					posB = bullet->GetTranslate();
-					Vector3 distance = Subtract(posA, posB);
-					if ((distance.x * distance.x) + (distance.y * distance.y) +
-						(distance.z * distance.z) <= 4)
+					if (isCollision(player_->GetAABBCollision(), bullet->GetCollision()))
 					{
 						player_->OnCollision();
 						bullet->OnCollision();
@@ -335,11 +332,7 @@ namespace MyEngine
 #pragma region 自機と敵の当たり判定
 			for (const auto& enemy_ : enemys_)
 			{
-				posA = player_->GetTranslate();
-				posB = enemy_->GetTranslate();
-				Vector3 distance = Subtract(posA, posB);
-				if ((distance.x * distance.x) + (distance.y * distance.y) +
-					(distance.z * distance.z) <= 4)
+				if (isCollision(enemy_->GetCollision(), player_->GetAABBCollision()))
 				{
 					player_->OnCollision();
 				}
@@ -349,13 +342,9 @@ namespace MyEngine
 #pragma region 敵と自弾の当たり判定
 		for (const auto& enemy_ : enemys_)
 		{
-			posA = enemy_->GetTranslate();
 			for (const auto& bullet : playerBullets)
 			{
-				posB = bullet->GetTranslate();
-				Vector3 distance = Subtract(posA, posB);
-				if ((distance.x * distance.x) + (distance.y * distance.y) +
-					(distance.z * distance.z) <= 4)
+				if (isCollision(enemy_->GetCollision(), bullet->GetCollision()))
 				{
 					enemy_->OnCollision();
 					bullet->OnCollision();
@@ -367,16 +356,11 @@ namespace MyEngine
 		for (const auto& enemy_ : enemys_)
 		{
 			const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy_->GetBullets();
-
 			for (const auto& pBullet : playerBullets)
 			{
 				for (const auto& eBullet : enemyBullets)
 				{
-					posA = pBullet->GetTranslate();
-					posB = eBullet->GetTranslate();
-					Vector3 distance = Subtract(posA, posB);
-					if ((distance.x * distance.x) + (distance.y * distance.y) +
-						(distance.z * distance.z) <= 3)
+					if (isCollision(pBullet->GetCollision(), eBullet->GetCollision()))
 					{
 						pBullet->OnCollision();
 						eBullet->OnCollision();
@@ -391,11 +375,7 @@ namespace MyEngine
 #pragma region 敵とクジラの当たり判定
 			for (const auto& enemy_ : enemys_)
 			{
-				posA = whale_->GetTranslate();
-				posB = enemy_->GetTranslate();
-				Vector3 distance = Subtract(posA, posB);
-				if ((distance.x * distance.x) + (distance.y * distance.y) +
-					(distance.z * distance.z) <= 4)
+				if (isCollision(whale_->GetCollision(), enemy_->GetCollision()))
 				{
 					whale_->OnCollision();
 					enemy_->OnCollision();
@@ -407,14 +387,9 @@ namespace MyEngine
 			for (const auto& enemy_ : enemys_)
 			{
 				const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy_->GetBullets();
-
-				posA = whale_->GetTranslate();
 				for (const auto& bullet : enemyBullets)
 				{
-					posB = bullet->GetTranslate();
-					Vector3 distance = Subtract(posA, posB);
-					if ((distance.x * distance.x) + (distance.y * distance.y) +
-						(distance.z * distance.z) <= 2)
+					if (isCollision(whale_->GetCollision(), bullet->GetCollision()))
 					{
 						whale_->OnCollision();
 						bullet->OnCollision();
@@ -424,6 +399,12 @@ namespace MyEngine
 			}
 #pragma endregion
 		}
+#pragma region 潮流とクジラの当たり判定
+		if (isCollision(whale_->GetCollision(), tide_->GetCollision()))
+		{
+			whale_->OnTideCollision(tide_->GetTideVector());
+		}
+#pragma endregion
 	}
 
 	void GameScene::LoadEnemyPopData(std::string filePath, int fileNum)

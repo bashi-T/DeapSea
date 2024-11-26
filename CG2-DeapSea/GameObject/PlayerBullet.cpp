@@ -25,7 +25,7 @@ PlayerBullet::~PlayerBullet()
 		}
 		model->Memcpy();
 		object3d->SetTranslate({ firstPos.x + 0.01f, firstPos.y,firstPos.z });
-
+		pbCollision.radius = 1.0f;
 		Vector3 direction = { firstPos.x + 0.01f, firstPos.y,firstPos.z + 1.0f };
 		bulletSpeed = Normalize(
 			Vector3{
@@ -46,6 +46,9 @@ PlayerBullet::~PlayerBullet()
 		}
 		object3d->SetTranslate(Add(object3d->GetTranslate(), bulletSpeed));
 		object3d->Update(MyEngine::Camera::GetInstance());
+
+		pbCollision.center = object3d->GetTranslate();
+
 	}
 
 	void PlayerBullet::Draw()
