@@ -23,25 +23,25 @@ public:
 	void SetRotate(Vector3 rotate);
 	void SetLife(int i) { life = i; }
 	void SetColor(Vector4 color) { object3d->SetColor(color); }
-	Vector3 GetTranslate() { return object3d->GetTranslate(); }
-	Vector3 GetRotate() { return object3d->GetRotate(); }
-	AABB GetCollision() { return wCollision; }
-	int GetLife() { return life; }
-	bool GetIsHit() { return isHit; }
-	float GetMaxDistance() { return maxDistance; }
+	const Vector3& GetTranslate()const { return object3d->GetTranslate(); }
+	const Vector3& GetRotate()const { return object3d->GetRotate(); }
+	const AABB& GetCollision()const { return wCollision; }
+	const int& GetLife()const { return life; }
+	const bool& GetIsHit()const { return isHit; }
+	const float& GetMaxDistance()const { return maxDistance; }
 	void ChangeModel(std::string shape, std::string skin);
 private:
 	std::unique_ptr< Object3d> object3d;
-	Player* player;
+	Player* player = nullptr;
 	std::unique_ptr<Particle> particle;
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };
 	Vector3 nowWhaleSpeed = { 0.0f,0.0f,0.0f };
 	Vector3 accSpeed = { 0.0f,0.0f,0.0f };
 	bool isDead = false;
 	bool isHit = false;
-	AABB wCollision;
+	AABB wCollision = {};
 	int life = 4;
-	uint32_t coolTimer;
+	uint32_t coolTimer = 0;
 	float maxDistance = 6.0f;
 	std::string whaleModel = "whale/improvisedWhale2.obj";
 	std::string whaleSkin = "Resource/whaleSkin.png";

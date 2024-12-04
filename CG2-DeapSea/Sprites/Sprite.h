@@ -56,23 +56,23 @@ namespace MyEngine
 		void AdjestTextureSize();
 
 		ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
-		EulerTransform GetCameraTransform() { return cameraTransform; }
-		Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
-		Vector4 GetLeftTop() { return LeftTop; }
-		Vector4 GetRightTop() { return RightTop; }
-		Vector4 GetRightBottom() { return RightBottom; }
-		Vector4 GetLeftBottom() { return LeftBottom; }
-		Vector2 GetTexcoordLeftTop() { return coordLeftTop; }
-		Vector2 GetTexcoordRightTop() { return coordRightTop; }
-		Vector2 GetTexcoordRightBottom() { return coordRightBottom; }
-		Vector2 GetTexcoordLeftBottom() { return coordLeftBottom; }
+		const EulerTransform& GetCameraTransform()const { return cameraTransform; }
+		const Matrix4x4& GetCameraMatrix()const { return cameraMatrix; }
+		const Vector4& GetLeftTop()const { return LeftTop; }
+		const Vector4& GetRightTop()const { return RightTop; }
+		const Vector4& GetRightBottom()const { return RightBottom; }
+		const Vector4& GetLeftBottom()const { return LeftBottom; }
+		const Vector2& GetTexcoordLeftTop()const { return coordLeftTop; }
+		const Vector2& GetTexcoordRightTop()const { return coordRightTop; }
+		const Vector2& GetTexcoordRightBottom()const { return coordRightBottom; }
+		const Vector2& GetTexcoordLeftBottom()const { return coordLeftBottom; }
 		const Vector2& GetPosition()const { return position; }
-		float GetRotation()const { return rotation; }
+		const float& GetRotation()const { return rotation; }
 		const Vector4& GetColor()const { return materialData->color; }
 		const Vector2& GetSize()const { return size; }
 		const Vector2& GetAnchorPoint()const { return anchorPoint; }
-		const bool& GetIsFlipX() { return isFlipX_; }
-		const bool& GetIsFlipY() { return isFlipY_; }
+		const bool& GetIsFlipX()const { return isFlipX_; }
+		const bool& GetIsFlipY()const { return isFlipY_; }
 		const Vector2& GetTextureLeftTop()const { return textureLeftTop; }
 		const Vector2& GetTextureSize()const { return textureSize; }
 
@@ -133,18 +133,18 @@ namespace MyEngine
 		Vector2 coordRightBottom;
 		Vector2 coordLeftBottom;
 
-		EulerTransform cameraTransform;
+		EulerTransform cameraTransform = {};
 		DirectionalLight* DirectionalLightData = nullptr;
 
-		Matrix4x4 cameraMatrix;
+		Matrix4x4 cameraMatrix = {};
 
-		Matrix4x4 viewMatrix;
+		Matrix4x4 viewMatrix = {};
 
-		Matrix4x4 projectionMatrix;
+		Matrix4x4 projectionMatrix = {};
 
-		Matrix4x4 ViewProjectionMatrix;
+		Matrix4x4 ViewProjectionMatrix = {};
 
-		Matrix4x4 worldViewProjectionMatrix;
+		Matrix4x4 worldViewProjectionMatrix = {};
 
 		ComPtr<ID3D12Resource> textureResource;
 

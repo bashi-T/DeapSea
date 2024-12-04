@@ -46,26 +46,16 @@ namespace MyEngine
 			std::unique_ptr<UIPlane> uiPlane = std::make_unique<UIPlane>();
 			uiPlane->Initialize(Planes[i], PNGs[i]);
 			uiPlanes.push_back(std::move(uiPlane));
+			uiPlanes[i]->SetTranslate(UIPos[i]);
+			uiPlanes[i]->SetScale(UIScale[i]);
 		}
-		uiPlanes[0]->SetTranslate({ 0.0f,1.6f,-16.0f });
-		uiPlanes[1]->SetTranslate({ 0.0f,2.1f,0.0f });
-		uiPlanes[2]->SetTranslate({ 0.0f,0.7f,0.0f });
-		uiPlanes[3]->SetTranslate({ 0.0f,-0.7f,0.0f });
-		uiPlanes[4]->SetTranslate({ 0.0f,-2.1f,0.0f });
-
-		uiPlanes[1]->SetScale({ 1.5f,1.0f,0.0f });
-		uiPlanes[2]->SetScale({ 1.5f,1.0f,0.0f });
-		uiPlanes[3]->SetScale({ 1.5f,1.0f,0.0f });
-		uiPlanes[4]->SetScale({ 1.5f,1.0f,0.0f });
-
 		//uiPlanes[1]->SetColor({ 1.0f,0.0f,0.0f,0.1f });
 
-		uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + 2.0f });
-		uiPlanes[5]->SetScale({ 10.0f,10.0f,0.0f });
+		uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + zfar });
 		uiPlanes[5]->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 
 		cursor_->Initialize();
-		cursor_->SetTranslate({ uiPlanes[1]->GetTranslate().x - 2.5f,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
+		cursor_->SetTranslate({ uiPlanes[1]->GetTranslate().x + cursorX,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
 		Camera::GetInstance()->SetTranslate({ 0.0f,2.0f,-20.0f });
 		Camera::GetInstance()->SetRotate({ 0.1f,0.0f,0.0f });
 
@@ -84,23 +74,23 @@ namespace MyEngine
 		}
 		cursor_->Update();
 
-		if (floatingTime < 120)//title上下動
+		if (floatingTime < floatingTimes[0])//title上下動
 		{
-			uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y - 0.001f,uiPlanes[0]->GetTranslate().z });
-			whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y - 0.003f,whale_->GetTranslate().z });
+			uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y - uiFloating,uiPlanes[0]->GetTranslate().z });
+			whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y - whaleFloating,whale_->GetTranslate().z });
 			floatingTime++;
 		}
-		else if (floatingTime >= 120 && floatingTime < 240)
+		else if (floatingTime >= floatingTimes[0] && floatingTime < floatingTimes[1])
 		{
-			uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y + 0.001f,uiPlanes[0]->GetTranslate().z });
-			whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y + 0.003f,whale_->GetTranslate().z });
+			uiPlanes[0]->SetTranslate({ uiPlanes[0]->GetTranslate().x,uiPlanes[0]->GetTranslate().y + uiFloating,uiPlanes[0]->GetTranslate().z });
+			whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y + whaleFloating,whale_->GetTranslate().z });
 			floatingTime++;
 		}
-		else if (floatingTime <= 240)
+		else if (floatingTimes[1])
 		{
 			floatingTime = 0;
 		}
-		whale_->SetRotate({ whale_->GetRotate().x, whale_->GetRotate().y + 0.01f, whale_->GetRotate().z });
+		whale_->SetRotate({ whale_->GetRotate().x, whale_->GetRotate().y + whaleRotateY, whale_->GetRotate().z });
 		whale_->Update();
 		Input::GetInstance()->GetJoystickState(0, joyState);
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isStageSelect == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isStageSelect == false)
@@ -110,35 +100,35 @@ namespace MyEngine
 		}
 		if (isStageSelect == true && isSceneTransition == false)//stageselect
 		{
-			if (cooltime <= 10)
+			if (cooltime <= maxCoolTime)
 			{
 				cooltime++;
 			}
 			else
 			{
-				//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN || Input::GetInstance()->TriggerKey(DIK_DOWN))
-				//{
-				//	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
-				//	nowStage++;
-				//	if (nowStage > 4)
-				//	{
-				//		nowStage = 1;
-				//	}
-				//	cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
-				//	cooltime = 0;
-				//}
-				//else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP || Input::GetInstance()->TriggerKey(DIK_UP))
-				//{
-				//	AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
-				//	nowStage--;
-				//	if (nowStage < 1)
-				//	{
-				//		nowStage = 4;
-				//	}
-				//	cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x - 2.5f,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
-				//	cooltime = 0;
-				//}
-				cursor_->SetTranslate({ uiPlanes[1]->GetTranslate().x - 2.5f,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
+				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN || Input::GetInstance()->TriggerKey(DIK_DOWN))
+				{
+					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
+					nowStage++;
+					if (nowStage > 4)
+					{
+						nowStage = 1;
+					}
+					cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x + cursorX,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
+					cooltime = 0;
+				}
+				else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP || Input::GetInstance()->TriggerKey(DIK_UP))
+				{
+					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
+					nowStage--;
+					if (nowStage < 1)
+					{
+						nowStage = 4;
+					}
+					cursor_->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x + cursorX,uiPlanes[nowStage]->GetTranslate().y,uiPlanes[nowStage]->GetTranslate().z });
+					cooltime = 0;
+				}
+				cursor_->SetTranslate({ uiPlanes[1]->GetTranslate().x + cursorX,uiPlanes[1]->GetTranslate().y,uiPlanes[1]->GetTranslate().z });
 				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isSceneTransition == false || Input::GetInstance()->TriggerKey(DIK_SPACE) && isSceneTransition == false)
 				{
 					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), enterSound);
@@ -151,19 +141,19 @@ namespace MyEngine
 		if (isSceneTransition == true)//gameSceneへ遷移
 		{
 			sceneTransitionTime++;
-			if (sceneTransitionTime >= 20)
+			if (sceneTransitionTime >= sceneTransitionTimes[0])
 			{
 				Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 3.0f, Camera::GetInstance()->GetTranslate().z });
 				uiPlanes[nowStage]->SetTranslate({ uiPlanes[nowStage]->GetTranslate().x,uiPlanes[nowStage]->GetTranslate().y - 2.75f,uiPlanes[nowStage]->GetTranslate().z });
 				whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y - 2.75f,whale_->GetTranslate().z });
 			}
-			if (sceneTransitionTime >= 40)
+			if (sceneTransitionTime >= sceneTransitionTimes[1])
 			{
 				uiPlanes[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + 2.0f });
 				uiPlanes[5]->SetColor({ uiPlanes[5]->GetColor().x,uiPlanes[5]->GetColor().y,uiPlanes[5]->GetColor().z,uiPlanes[5]->GetColor().a - 0.02f });
 				uiPlanes[5]->Update();
 			}
-			if (sceneTransitionTime == 90)
+			if (sceneTransitionTime == sceneTransitionTimes[2])
 			{
 				sceneNo = INGAME;
 				GameManager::stageNumber = nowStage - 1;

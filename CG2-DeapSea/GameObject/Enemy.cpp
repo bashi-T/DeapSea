@@ -35,7 +35,6 @@
 			life = 1;
 			break;
 		}
-
 		case 1:
 		{
 			moveInterval = 0;

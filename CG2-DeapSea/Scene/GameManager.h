@@ -30,20 +30,20 @@ namespace MyEngine
 		std::unique_ptr<SceneManager> sceneArr_[4];
 		int currentSceneNo_ = 0;
 		int prevSceneNo_ = 0;
-		WinAPP* winAPP;
-		DX12Common* dx12Common;
-		SRVManager* srvManager;
-		Input* input;
-		MyImGui* imgui;
-		SpriteCommon* SPCommon;
-		Object3dCommon* object3dCommon;
-		ParticleCommon* particleCommon;
-		AudioManager* audioManager;
+		WinAPP* winAPP = nullptr;
+		DX12Common* dx12Common = nullptr;
+		SRVManager* srvManager = nullptr;
+		Input* input = nullptr;
+		MyImGui* imgui = nullptr;
+		SpriteCommon* SPCommon = nullptr;
+		Object3dCommon* object3dCommon = nullptr;
+		ParticleCommon* particleCommon = nullptr;
+		AudioManager* audioManager = nullptr;
 		std::unique_ptr< Object3d> object3d;
 		std::unique_ptr<Camera> camera;
 		std::unique_ptr<SkyDome> skyDome;
 
-		HRESULT hr;
+		HRESULT hr = NULL;
 	public:
 		GameManager();
 		~GameManager();

@@ -25,8 +25,8 @@ void Player::Initialize()
 	model->Memcpy();
 	pCollision =
 	{
-		.min{-2.0f,-2.0f,-2.0f},
-		.max{2.0f,2.0f,2.0f}
+		.min{-collisionwidth,-collisionwidth,-collisionwidth},
+		.max{collisionwidth,collisionwidth,collisionwidth}
 	};
 	//pCollision.radius = 2.0f;
 	angle_ = 0.0f;
@@ -210,6 +210,11 @@ void Player::Update()
 
 	object3d->SkeltonUpdate(Camera::GetInstance());
 	//pCollision.center = object3d->GetTranslate();
+	pCollision =
+	{
+		{object3d->GetTranslate().x - collisionwidth,object3d->GetTranslate().y - collisionwidth,object3d->GetTranslate().z - collisionwidth},
+		{object3d->GetTranslate().x + collisionwidth,object3d->GetTranslate().y + collisionwidth,object3d->GetTranslate().z + collisionwidth}
+	};
 	for (const auto& bullet : pBullets)
 	{
 		bullet->Update();

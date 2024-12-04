@@ -52,6 +52,42 @@ namespace MyEngine
 			"plane/plane.obj",
 			"plane/plane.obj",
 		};
+		Vector3 UIPos[6]
+		{
+			{ 0.0f,1.6f,-16.0f },
+			{ 0.0f,2.1f,0.0f },
+			{ 0.0f,0.7f,0.0f },
+			{ 0.0f,-0.7f,0.0f },
+			{ 0.0f,-2.1f,0.0f },
+			{0.0f,0.0f,0.0f},
+		};
+		Vector3 UIScale[6]
+		{
+			{ 1.0f,1.0f,1.0f },
+			{ 1.5f,1.0f,0.0f },
+			{ 1.5f,1.0f,0.0f },
+			{ 1.5f,1.0f,0.0f },
+			{ 0.0f,-2.1f,0.0f },
+			{ 10.0f,10.0f,0.0f },
+		};
+		const float zfar = 2.0f;
+		const float cursorX = -2.5f;
+		const int maxCoolTime = 10;
+		const int floatingTimes[2]
+		{
+			120,
+			240
+		};
+		const int sceneTransitionTimes[3]
+		{
+			20,
+			40,
+			90
+		};
+
+		const float whaleRotateY = 0.003f;
+		const float whaleFloating = 0.01f;
+		const float uiFloating = 0.001f;
 
 	};
 }

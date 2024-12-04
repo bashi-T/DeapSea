@@ -207,10 +207,10 @@ namespace MyEngine
 		/// <param name="red"></param>
 		void SetColorRed(float red);
 
-		ElementsParticle GetElements() { return elements; }
-		Matrix4x4 GetCameraMatrix() { return cameraMatrix; }
-		D3D12_CPU_DESCRIPTOR_HANDLE GetTextureSrvHandleCPU() { return textureSrvHandleCPU; }
-		D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU; }
+		const ElementsParticle& GetElements()const { return elements; }
+		const Matrix4x4& GetCameraMatrix()const { return cameraMatrix; }
+		const D3D12_CPU_DESCRIPTOR_HANDLE& GetTextureSrvHandleCPU()const { return textureSrvHandleCPU; }
+		const D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandleGPU()const { return textureSrvHandleGPU; }
 		ParticleForGPU* GetInstancingData() { return instancingData; }
 		Particles* GetParticles() { return particles; }
 	private:

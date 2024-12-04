@@ -23,5 +23,5 @@ private:
 	std::unique_ptr< Object3d> object3d;
 	std::string planeModel;
 	std::string planeSkin;
-	Model* model;
+	Model* model = nullptr;
 };

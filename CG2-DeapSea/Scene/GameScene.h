@@ -45,7 +45,7 @@ namespace MyEngine
 		bool isWait = false;
 		int32_t WaitTimer = 1;
 		bool gameEnd = false;
-		AudioManager::SoundData bgm;
+		AudioManager::SoundData bgm = {};
 		int time = 0;
 		bool isGameStart = false;
 		bool isGameOver = false;
@@ -60,7 +60,7 @@ namespace MyEngine
 			"plane/plane.obj",
 			"plane/plane.obj",
 		};
-		Vector3 v;
-		Vector3 zoomPos;
+		Vector3 v = {};
+		Vector3 zoomPos = {};
 	};
 }

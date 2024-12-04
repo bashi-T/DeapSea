@@ -221,7 +221,6 @@ namespace MyEngine
 		indexData[3] = 0;
 		indexData[4] = 2;
 		indexData[5] = 3;
-
 	}
 
 	void Particle::MakeShaderResourceViewInstance()
@@ -242,7 +241,7 @@ namespace MyEngine
 		std::uniform_real_distribution<float> distVelocityX(velxMin, velxMax);
 		std::uniform_real_distribution<float> distVelocityY(velyMin, velyMax);
 		std::uniform_real_distribution<float> distVelocityZ(velzMin, velzMax);
-		Particles particle;
+		Particles particle = {};
 		particle.transform.translate = { distPosX(randomEngine),distPosY(randomEngine),distPosZ(randomEngine) };
 		particle.velocity = { distVelocityX(randomEngine) ,distVelocityY(randomEngine) ,distVelocityZ(randomEngine) };
 		return particle;
@@ -252,7 +251,7 @@ namespace MyEngine
 	{
 		std::uniform_real_distribution<float> distColor(colorMin, colorMax);
 		std::uniform_real_distribution<float> distTime(timeMin, timeMax);
-		Particles particle;
+		Particles particle = {};
 		particle.transform.scale = { 1.0f,1.0f,1.0f };
 		particle.transform.rotate = { 0.0f,0.0f,0.0f };
 		particle.color = { distColor(randomEngine) ,distColor(randomEngine) ,distColor(randomEngine) ,1.0f };

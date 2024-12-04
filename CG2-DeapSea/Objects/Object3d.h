@@ -119,10 +119,10 @@ namespace MyEngine
 		TransformationMatrix* transformationMatrixData = nullptr;
 		CameraTransform* cameraData = nullptr;
 
-		EulerTransform transformMatrix;
-		Matrix4x4 worldViewProjectionMatrix;
+		EulerTransform transformMatrix = {};
+		Matrix4x4 worldViewProjectionMatrix = {};
 
-		Matrix4x4 skeltonSpaceMatrix;
+		Matrix4x4 skeltonSpaceMatrix = {};
 
 		ComPtr<ID3D12Resource> directionalLightResource;
 
