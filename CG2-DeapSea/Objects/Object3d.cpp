@@ -135,7 +135,7 @@ namespace MyEngine
 			joint.worldMatrix = Multiply(joint.skeltonSpaceMatrix, worldMatrix);
 		}
 		transformationMatrixData->WVP = worldViewProjectionMatrix;
-		//transformationMatrixData->World = worldViewProjectionMatrix;
+		transformationMatrixData->World = worldMatrix;
 		transformationMatrixData->WorldInverseTranspose = Transpose(Inverse(worldViewProjectionMatrix));
 
 		for (size_t jointIndex = 0; jointIndex < model_->GetSkelton().joints.size(); jointIndex++)

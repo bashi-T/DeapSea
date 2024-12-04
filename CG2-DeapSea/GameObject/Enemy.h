@@ -44,5 +44,6 @@ class Enemy
 		int enemySort;
 		int moveInterval = 0;
 		int life;
+		int escapeTime = 0;
 	};
 

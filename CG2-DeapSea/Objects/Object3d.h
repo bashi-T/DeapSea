@@ -19,7 +19,6 @@ namespace MyEngine
 	class Object3d
 	{
 	public:
-		//~Object3d();
 		void Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager);
 		void Update(Camera* camera);
 		void SkeltonUpdate(Camera* camera);
@@ -39,9 +38,11 @@ namespace MyEngine
 		void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
 		void SetCamera(Camera* cameras) { camera_ = cameras; }
 		bool SetIsAnimation(bool IsAnimation) { return isAnimation = IsAnimation; }
+
 		const Vector3& GetScale()const { return transformMatrix.scale; }
 		const Vector3& GetRotate()const { return transformMatrix.rotate; }
 		const Vector3& GetTranslate()const { return transformMatrix.translate; }
+		const Matrix4x4& GetObjectMatrix()const { return transformationMatrixData->World; }
 
 		struct DirectionalLight
 		{
@@ -50,8 +51,10 @@ namespace MyEngine
 			float intensity;
 		};
 		DirectionalLight* GetDirectionalLightData() { return directionalLightData; }
-		DirectionalLight& GetDirectionalLight() { return directionalLight; }
-		void SetDirectionalLight(Vector4 color, Vector3 direction, float intensity) {
+		const DirectionalLight& GetDirectionalLight()const { return directionalLight; }
+
+		void SetDirectionalLight(Vector4 color, Vector3 direction, float intensity)
+		{
 			directionalLight.color = color;
 			directionalLight.direction = direction;
 			directionalLight.intensity = intensity;
@@ -64,14 +67,15 @@ namespace MyEngine
 			float intensity;
 		};
 		PointLight* GetPointLightData() { return pointLightData; }
-		PointLight& GetPointLight() { return pointLight; }
-		void SetPointLight(Vector4 color, Vector3 direction, float intensity) {
+		const PointLight& GetPointLight()const { return pointLight; }
+		void SetPointLight(Vector4 color, Vector3 direction, float intensity)
+		{
 			pointLight.color = color;
 			pointLight.direction = direction;
 			pointLight.intensity = intensity;
 		}
 
-		Vector4 GetColor() { return model_->GetMaterial()->color; }
+		const Vector4& GetColor()const { return model_->GetMaterial()->color; }
 		void SetColor(Vector4 color);
 
 	private:

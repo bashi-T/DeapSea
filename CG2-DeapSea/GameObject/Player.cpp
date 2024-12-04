@@ -144,13 +144,14 @@ void Player::Update()
 				moveVector = { 0.0f, 0.0f,-0.075f };
 			}
 
-			if (Input::GetInstance()->PushKey(DIK_A))
-			{
-			}
-			else
-			{
-				object3d->SetTranslate(Add(object3d->GetTranslate(), moveVector));
-			}
+			//if (Input::GetInstance()->PushKey(DIK_A))
+			//{
+			//}
+			//else
+			//{
+			//}
+			object3d->SetTranslate(Add(object3d->GetTranslate(), moveVector));
+
 			if (moveVector.x != 0.0f || moveVector.z != 0.0f)
 			{
 				object3d->SetIsAnimation(true);
@@ -238,7 +239,7 @@ void Player::Shot()
 		if (shotInterval == 1)
 		{
 			std::unique_ptr<PlayerBullet> newBullet = std::make_unique< PlayerBullet>();
-			newBullet->Initialize(object3d->GetTranslate(), object3d->GetRotate());
+			newBullet->Initialize(object3d->GetTranslate(), object3d->GetObjectMatrix());
 			pBullets.push_back(std::move(newBullet));
 		}
 		if (shotInterval == 15)

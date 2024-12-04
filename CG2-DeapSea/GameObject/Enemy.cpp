@@ -75,6 +75,7 @@
 		case 0:
 			if (life <= 0)
 			{
+				escapeTime++;
 				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
 				{
 					enemyVector = { -2.0f,1.0f,2.0f };
@@ -85,7 +86,7 @@
 					enemyVector = { 2.0f,1.0f,2.0f };
 					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
 				}
-				if (object3d->GetTranslate().z <= Camera::GetInstance()->GetTranslate().z + 30.0f)
+				if (escapeTime>=180)
 				{
 					isDead = true;
 				}
@@ -107,10 +108,6 @@
 					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 				}
 				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
-				if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
-				{
-					isDead = true;
-				}
 			}
 			object3d->Update(Camera::GetInstance());
 			eCollision =
@@ -127,6 +124,7 @@
 		case 1:
 			if (life <= 0)
 			{
+				escapeTime++;
 				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
 				{
 					enemyVector = { -2.0f,2.0f,2.0f };
@@ -137,7 +135,7 @@
 					enemyVector = { 2.0f,2.0f,2.0f };
 					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
 				}
-				if (object3d->GetTranslate().z <= Camera::GetInstance()->GetTranslate().z + 30.0f)
+				if (escapeTime >= 180)
 				{
 					isDead = true;
 				}
@@ -159,10 +157,6 @@
 					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 				}
 				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
-				if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
-				{
-					isDead = true;
-				}
 			}
 			object3d->Update(Camera::GetInstance());
 			eCollision =
