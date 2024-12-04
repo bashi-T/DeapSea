@@ -34,5 +34,6 @@ namespace MyEngine
 
 		static HWND hwnd_;
 		static HINSTANCE hInstance;
+		HRESULT hr;
 	};
 }

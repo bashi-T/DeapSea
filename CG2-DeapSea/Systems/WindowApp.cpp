@@ -7,7 +7,7 @@ namespace MyEngine
 
 	void WinAPP::Initialize(int32_t width, int32_t height, const wchar_t* title)
 	{
-		HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+		[[maybe_unused]] HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 		assert(SUCCEEDED(hr));
 
 		wc_.lpfnWndProc = WindowProc;
