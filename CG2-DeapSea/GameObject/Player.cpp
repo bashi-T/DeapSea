@@ -10,11 +10,12 @@ Player::~Player()
 
 void Player::Initialize()
 {
-	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-	ModelManager::GetInstance()->LoadSkeltonAnimation(playerModel, playerSkin, SRVManager::GetInstance(), true);
-	object3d->SetModel(playerModel);
-	Model* model = ModelManager::GetInstance()->FindModel(playerModel);
+	object3d_ = std::make_unique<Object3d>();
+	object3d_->Initialize();
+	modelManager_ = ModelManager::GetInstance();
+	modelManager_->LoadSkeltonAnimation(playerModel, playerSkin, true);
+	object3d_->SetModel(playerModel);
+	Model* model = modelManager_->FindModel(playerModel);
 	Model::ModelData* modelData = model->GetModelData();
 	for (Model::VertexData& vertex : modelData->vertices)
 	{
@@ -23,12 +24,12 @@ void Player::Initialize()
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	pCollision =
+	collision =
 	{
 		.min{-collisionwidth,-collisionwidth,-collisionwidth},
 		.max{collisionwidth,collisionwidth,collisionwidth}
 	};
-	//pCollision.radius = 2.0f;
+	//collision.radius = 2.0f;
 	angle_ = 0.0f;
 }
 
@@ -78,41 +79,41 @@ void Player::Update()
 
 			if ((float)joyState.Gamepad.sThumbLX != 0.0f || (float)joyState.Gamepad.sThumbLY != 0.0f)
 			{
-				object3d->SetIsAnimation(true);
+				object3d_->SetIsAnimation(true);
 			}
 			else
 			{
-				object3d->SetIsAnimation(false);
+				object3d_->SetIsAnimation(false);
 			}
 
 			//if ((float)joyState.Gamepad.sThumbLY > 0)
 			//{
-			//	object3d->SetRotate({ 0.0f,0.0f,0.0f });
+			//	object3d_->SetRotate({ 0.0f,0.0f,0.0f });
 			//}
 			//if ((float)joyState.Gamepad.sThumbLY < 0)
 			//{
-			//	object3d->SetRotate({ 0.0f,3.0f,0.0f });
+			//	object3d_->SetRotate({ 0.0f,3.0f,0.0f });
 			//}
 			//if ((float)joyState.Gamepad.sThumbLX > 0)
 			//{
-			//	object3d->SetRotate({ 0.0f,1.5f,0.0f });
+			//	object3d_->SetRotate({ 0.0f,1.5f,0.0f });
 			//}
 			//if ((float)joyState.Gamepad.sThumbLX < 0)
 			//{
-			//	object3d->SetRotate({ 0.0f,4.5f,0.0f });
+			//	object3d_->SetRotate({ 0.0f,4.5f,0.0f });
 			//}
 
-			angle_ = std::atan2(object3d->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f), object3d->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f));
-			object3d->SetRotate({ 0.0f,/*object3d->GetRotate().y+*/LerpShortAngle(object3d->GetRotate().y, angle_,0.1f),0.0f });
+			angle_ = std::atan2(object3d_->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f), object3d_->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f));
+			object3d_->SetRotate({ 0.0f,/*object3d_->GetRotate().y+*/LerpShortAngle(object3d_->GetRotate().y, angle_,0.1f),0.0f });
 
 
 			//if (Input::GetInstance()->PushKey(DIK_D))
 			//{
-			//	object3d->SetTranslate({ object3d->GetTranslate().x + 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
+			//	object3d_->SetTranslate({ object3d_->GetTranslate().x + 0.05f, object3d_->GetTranslate().y, object3d_->GetTranslate().z });
 			//}
 			//if (Input::GetInstance()->PushKey(DIK_A))
 			//{
-			//	object3d->SetTranslate({ object3d->GetTranslate().x - 0.05f, object3d->GetTranslate().y, object3d->GetTranslate().z });
+			//	object3d_->SetTranslate({ object3d_->GetTranslate().x - 0.05f, object3d_->GetTranslate().y, object3d_->GetTranslate().z });
 			//}
 
 			if (joyState.Gamepad.bRightTrigger)
@@ -144,37 +145,31 @@ void Player::Update()
 				moveVector = { 0.0f, 0.0f,-0.075f };
 			}
 
-			//if (Input::GetInstance()->PushKey(DIK_A))
-			//{
-			//}
-			//else
-			//{
-			//}
-			object3d->SetTranslate(Add(object3d->GetTranslate(), moveVector));
+			object3d_->SetTranslate(Add(object3d_->GetTranslate(), moveVector));
 
 			if (moveVector.x != 0.0f || moveVector.z != 0.0f)
 			{
-				object3d->SetIsAnimation(true);
+				object3d_->SetIsAnimation(true);
 			}
 			else
 			{
-				object3d->SetIsAnimation(false);
+				object3d_->SetIsAnimation(false);
 			}
 			if (moveVector.z > 0)
 			{
-				object3d->SetRotate({ 0.0f,0.0f,0.0f });
+				object3d_->SetRotate({ 0.0f,0.0f,0.0f });
 			}
 			if (moveVector.z < 0)
 			{
-				object3d->SetRotate({ 0.0f,3.0f,0.0f });
+				object3d_->SetRotate({ 0.0f,3.14f,0.0f });
 			}
 			if (moveVector.x > 0)
 			{
-				object3d->SetRotate({ 0.0f,1.5f,0.0f });
+				object3d_->SetRotate({ 0.0f,1.57f,0.0f });
 			}
 			if (moveVector.x < 0)
 			{
-				object3d->SetRotate({ 0.0f,4.5f,0.0f });
+				object3d_->SetRotate({ 0.0f,4.71f,0.0f });
 			}
 
 			if (Input::GetInstance()->PushKey(DIK_SPACE))
@@ -189,9 +184,10 @@ void Player::Update()
 		}
 		Shot();
 
-		//pCollision.center = object3d->GetTranslate();
+		//collision.center = object3d_->GetTranslate();
 		if (hitTimer >= 60)
 		{
+			object3d_->SetColor({ 1.0f,1.0f,1.0f,0.25f });
 			hitTimer++;
 			if (hitTimer == 120)
 			{
@@ -201,20 +197,23 @@ void Player::Update()
 	}
 	else if (isHit == true)
 	{
+		object3d_->SetIsAnimation(false);
+		object3d_->SetColor({ 1.0f,1.0f,1.0f,0.15f });
 		hitTimer++;
 		if (hitTimer == 60)
 		{
 			isHit = false;
+			object3d_->SetIsAnimation(true);
 			isMovable = true;
 		}
 	}
 
-	object3d->SkeltonUpdate(Camera::GetInstance());
-	//pCollision.center = object3d->GetTranslate();
-	pCollision =
+	object3d_->SkeltonUpdate(Camera::GetInstance().get());
+	//collision.center = object3d_->GetTranslate();
+	collision =
 	{
-		{object3d->GetTranslate().x - collisionwidth,object3d->GetTranslate().y - collisionwidth,object3d->GetTranslate().z - collisionwidth},
-		{object3d->GetTranslate().x + collisionwidth,object3d->GetTranslate().y + collisionwidth,object3d->GetTranslate().z + collisionwidth}
+		{object3d_->GetTranslate().x - collisionwidth,object3d_->GetTranslate().y - collisionwidth,object3d_->GetTranslate().z - collisionwidth},
+		{object3d_->GetTranslate().x + collisionwidth,object3d_->GetTranslate().y + collisionwidth,object3d_->GetTranslate().z + collisionwidth}
 	};
 	for (const auto& bullet : pBullets)
 	{
@@ -224,7 +223,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	object3d->SkeltonDraw(ModelManager::GetInstance()->GetModelCommon());
+	object3d_->SkeltonDraw();
 	for (const auto& bullet : pBullets)
 	{
 		bullet->Draw();
@@ -239,7 +238,7 @@ void Player::Shot()
 		if (shotInterval == 1)
 		{
 			std::unique_ptr<PlayerBullet> newBullet = std::make_unique< PlayerBullet>();
-			newBullet->Initialize(object3d->GetTranslate(), object3d->GetObjectMatrix());
+			newBullet->Initialize(object3d_->GetTranslate(), object3d_->GetObjectMatrix());
 			pBullets.push_back(std::move(newBullet));
 		}
 		if (shotInterval == 15)
@@ -258,4 +257,16 @@ void Player::OnCollision()
 {
 	isHit = true;
 	isMovable = false;
+}
+
+void Player::SetMaxPosition(float pos, float maxPos)
+{
+	if (pos >= maxPos)
+	{
+		pos = maxPos;
+	}
+	if (pos <= -maxPos)
+	{
+		pos = -maxPos;
+	}
 }

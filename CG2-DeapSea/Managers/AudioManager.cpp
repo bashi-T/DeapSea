@@ -4,14 +4,13 @@ namespace MyEngine
 {
 	void AudioManager::Initialize()
 	{
-		result = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
-		result = xAudio2_->CreateMasteringVoice(&masterVoice);
+		hr = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
+		hr = xAudio2_->CreateMasteringVoice(&masterVoice);
 	}
 
 	void AudioManager::Finalize()
 	{
-		delete instance;
-		instance = NULL;
+		instance.reset();
 	}
 
 	AudioManager::SoundData AudioManager::SoundLoadWave(const char* filename)
@@ -81,24 +80,28 @@ namespace MyEngine
 	void AudioManager::SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData)
 	{
 		IXAudio2SourceVoice* pSourceVoice = nullptr;
-		result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
-		assert(SUCCEEDED(result));
+		hr = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+		assert(SUCCEEDED(hr));
 
 		XAUDIO2_BUFFER buf{};
 		buf.pAudioData = soundData.pBuffer;
 		buf.AudioBytes = soundData.bufferSize;
 		buf.Flags = XAUDIO2_END_OF_STREAM;
 
-		result = pSourceVoice->SubmitSourceBuffer(&buf);
-		result = pSourceVoice->Start();
+		hr = pSourceVoice->SubmitSourceBuffer(&buf);
+		hr = pSourceVoice->Start();
 	}
 
-	AudioManager* AudioManager::GetInstance()
+	std::shared_ptr<AudioManager> AudioManager::GetInstance()
 	{
-		if (instance == NULL)
+		auto ret_ptr = instance.lock();
+		if (!ret_ptr)
 		{
-			instance = new AudioManager;
+			ret_ptr = std::shared_ptr<AudioManager>(new AudioManager{});
+			instance = std::weak_ptr<AudioManager>(ret_ptr);
+			return ret_ptr;
 		}
-		return instance;
+
+		return instance.lock();
 	}
 }

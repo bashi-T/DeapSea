@@ -4,9 +4,9 @@ namespace MyEngine
 {
 	void ClearScene::Init()
 	{
-		sprite = std::make_unique<Sprite>();
-		sprite->Initialize(SpriteCommon::GetInstance(), SRVManager::GetInstance(), "Resource/clearExample.png");
-		sprite->SetPositoin({ float(WinAPP::clientWidth_ / 2) - (sprite->GetSize().x / 2),0.0f });
+		sprite_ = std::make_unique<Sprite>();
+		sprite_->Initialize("Resource/clearExample.png");
+		sprite_->SetPosition({ float(WinAPP::clientWidth_ / 2) - (sprite_->GetSize().x / 2),0.0f });
 		Camera::GetInstance()->SetTranslate({ 0.0f,-270.0f,-20.0f });
 		Camera::GetInstance()->SetRotate({ -1.0f,0.0f,0.0f });
 
@@ -21,7 +21,7 @@ namespace MyEngine
 	void ClearScene::Update()
 	{
 		XINPUT_STATE joyState;
-		sprite->Update();
+		sprite_->Update();
 		sand_->Update();
 		if (Input::GetInstance()->GetJoystickState(0, joyState))
 		{
@@ -35,7 +35,7 @@ namespace MyEngine
 	void ClearScene::Draw()
 	{
 		sand_->Draw();
-		sprite->Draw();
+		sprite_->Draw();
 	}
 
 	void ClearScene::Finalize()

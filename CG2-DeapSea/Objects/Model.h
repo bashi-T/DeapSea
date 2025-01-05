@@ -35,7 +35,7 @@ namespace MyEngine
 		};
 		struct Node
 		{
-			Matrix4x4 localMatrix;
+			Matrix4x4 localMatrix{};
 			std::string name;
 			std::vector<Node> children;
 			QuaternionTransform qTransform{};
@@ -47,7 +47,7 @@ namespace MyEngine
 		};
 		struct JointWeightData
 		{
-			Matrix4x4 inverseBindPoseMatrix;
+			Matrix4x4 inverseBindPoseMatrix{};
 			std::vector<VertexWeightData>vertexWeights;
 		};
 		struct ModelData
@@ -62,12 +62,12 @@ namespace MyEngine
 		};
 		struct Joint
 		{
-			QuaternionTransform transform;
-			Matrix4x4 localMatrix;
-			Matrix4x4 skeltonSpaceMatrix;
-			Matrix4x4 worldMatrix;
+			QuaternionTransform transform{};
+			Matrix4x4 localMatrix{};
+			Matrix4x4 skeltonSpaceMatrix{};
+			Matrix4x4 worldMatrix{};
 			std::string name;
-			std::vector<int32_t>children;
+			std::vector<int32_t>children{};
 			int32_t index = 0;
 			std::optional<int32_t>parent;
 		};
@@ -132,12 +132,12 @@ namespace MyEngine
 			std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>paletteSrvHandle;
 		};
 
-		void ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting);
-		void AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting);
-		void SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager, bool isLighting);
+		void ModelInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting);
+		void AnimationInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting);
+		void SkeltonInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting);
 		void Update();
-		void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
-		void SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager);
+		void Draw();
+		void SkeltonDraw();
 		void Memcpy();
 		ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 		ModelData LoadOBJFile(const std::string directryPath, const std::string filename);
@@ -166,8 +166,10 @@ namespace MyEngine
 
 	private:
 		ModelData modelData_;
-		ModelCommon* modelCommon_ = nullptr;
-		SRVManager* srvManager_ = nullptr;
+		std::shared_ptr<ModelCommon> modelCommon_ = nullptr;
+		std::shared_ptr<SRVManager> srvManager_ = nullptr;
+		std::shared_ptr<TextureManager> textureManager_ = nullptr;
+		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
 		HRESULT hr = NULL;
 
 		VertexData* vertexData = nullptr;

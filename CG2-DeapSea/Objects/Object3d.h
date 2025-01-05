@@ -19,14 +19,14 @@ namespace MyEngine
 	class Object3d
 	{
 	public:
-		void Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager);
+		void Initialize();
 		void Update(Camera* camera);
 		void SkeltonUpdate(Camera* camera);
 		void AnimationUpdate(Camera* camera);
-		void Draw(ModelCommon* modelCommon);
-		void SkeltonDraw(ModelCommon* modelCommon);
+		void Draw();
+		void SkeltonDraw();
 
-		ComPtr<ID3D12Resource> CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes);
+		ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 		Vector3 CalculatevalueV(const std::vector<Model::KeyFrameVector3>& keyframes, float time);
 		Quaternion CalculatevalueQ(const std::vector<Model::KeyFrameQuaternion>& keyframes, float time);
 		void ApplyAnimation(Model::Skelton& skelton, const Model::Animation& animation, float animationTime);
@@ -52,7 +52,6 @@ namespace MyEngine
 		};
 		DirectionalLight* GetDirectionalLightData() { return directionalLightData; }
 		const DirectionalLight& GetDirectionalLight()const { return directionalLight; }
-
 		void SetDirectionalLight(Vector4 color, Vector3 direction, float intensity)
 		{
 			directionalLight.color = color;
@@ -75,25 +74,26 @@ namespace MyEngine
 			pointLight.intensity = intensity;
 		}
 
+		std::shared_ptr<Object3d>GetInstance();
 		const Vector4& GetColor()const { return model_->GetMaterial()->color; }
 		void SetColor(Vector4 color);
 
 	private:
-		Object3dCommon* object3dCommon_ = nullptr;
 		HRESULT hr = NULL;
+		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
+		std::shared_ptr<Object3dCommon> object3dCommon_ = nullptr;
+		std::shared_ptr<ModelCommon> modelCommon_ = nullptr;
+		std::shared_ptr<SRVManager> srvManager_ = nullptr;
 		Model* model_ = nullptr;
-		ModelCommon* modelCommon_ = nullptr;
-		SRVManager* srvManager_ = nullptr;
 		Camera* camera_ = nullptr;
 
-		//Model::Animation& animation;
 		float animationTime_ = 0.0f;
 		float skeltonAnimationTime = 0.0f;
 
 		DirectionalLight* directionalLightData = nullptr;
 		DirectionalLight directionalLight =
 		{
-			{0.5f,0.5f,0.5f,1.0f},
+			{1.0f,1.0f,1.0f,1.0f},
 			{0.0f,-1.0f,0.0f},
 			1.0f
 		};

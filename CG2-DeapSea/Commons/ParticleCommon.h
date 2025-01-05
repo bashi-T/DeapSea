@@ -14,32 +14,32 @@ namespace MyEngine
 	class ParticleCommon
 	{
 	public:
-		~ParticleCommon();
-		void Initialize(DX12Common* dxcommon);
-		ComPtr<IDxcBlob> CompileShader(
-			const std::wstring& filePath,
-			const wchar_t* profile,
-			IDxcUtils* dxcUtils,
-			IDxcCompiler3* dxcCompiler,
-			IDxcIncludeHandler* includeHandler);
+		void Initialize();
 		void ResetDXC();
 		void MakePSO(DX12Common* dxcommon);
-		static ParticleCommon* GetInstance();
+
+		static std::shared_ptr<ParticleCommon> GetInstance();
 		static void DeleteInstance();
 
 		ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 		ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
-		DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
+		std::shared_ptr<DX12Common> GetDx12Common() { return DX12Common::GetInstance(); }
+
+		~ParticleCommon() = default;
+		ParticleCommon(const ParticleCommon& obj) = delete;
+		ParticleCommon& oparator(const ParticleCommon& obj) = delete;
+	protected:
+		ParticleCommon() = default;
 
 	private:
-		Debug* debug_;
-		WinAPP* sWinApp;
-		MyImGui* imgui_;
+		Debug* debug_ = nullptr;
+		WinAPP* sWinApp = nullptr;
+		MyImGui* imgui_ = nullptr;
 		HRESULT hr = NULL;
-		DX12Common* dx12Common_;
-		EulerTransform transformMatrix;
+		std::shared_ptr<DX12Common> dx12Common_;
+		EulerTransform transformMatrix{};
 		ComPtr<ID3D12Resource> transformationMatrixResource;
-		static inline ParticleCommon* instance;
+		static inline std::weak_ptr<ParticleCommon> instance;
 
 		ComPtr<IDxcUtils> dxcUtils_ = nullptr;
 		ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;

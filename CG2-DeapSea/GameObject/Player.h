@@ -16,25 +16,27 @@ public:
 	void Draw();
 	void Shot();
 	void OnCollision();
+	void SetMaxPosition(float pos,float maxPos);
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets()const { return pBullets; }
-	Vector3 GetTranslate() { return object3d->GetTranslate(); }
-	const AABB& GetAABBCollision() const{ return pCollision; }
-	//Sphere GetSphereCollision() { return pCollision; }
+	Vector3 GetTranslate() { return object3d_->GetTranslate(); }
+	const AABB& GetAABBCollision() const{ return collision; }
 	const bool& GetIsHit()const { return isHit; }
 	const bool& GetIsMovable()const { return isMovable; }
 	const uint32_t& GetIsHitTimer()const { return hitTimer; }
 	const Vector3& GetMoveVector()const { return moveVector; }
 
-	void SetTranslate(Vector3 translate) { object3d->SetTranslate(translate); }
+	void SetTranslate(Vector3 translate) { object3d_->SetTranslate(translate); }
 	void SetIsHit(bool isHit_) { isHit = isHit_; }
 	void SetIsShot(bool isShot_) { isShot = isShot_; }
 	void SetIsMovable(bool isMovable_) { isMovable = isMovable_; }
 
 private:
-	std::unique_ptr<Object3d> object3d;
+	std::shared_ptr<Object3d> object3d_;
+	std::shared_ptr<ModelManager>modelManager_;
+
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;
-	AABB pCollision = {};
+	AABB collision = {};
 	Vector3 moveVector = {};
 
 	uint32_t shotInterval = 0;

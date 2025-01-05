@@ -18,15 +18,12 @@ namespace MyEngine
 	public:
 		template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 		~Sprite();
-		void Initialize(
-			SpriteCommon* spriteCommon,
-			SRVManager* srvManager,
-			std::string texturefilePath);
+		void Initialize(std::string texturefilePath);
 		void Update();
 		void Draw();
 		void Finalize();
 
-		ComPtr<ID3D12Resource> CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes);
+		ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 		void MakeBufferView();
 		void InputData(Vector4 color);
 
@@ -44,7 +41,7 @@ namespace MyEngine
 		ComPtr<ID3D12Resource> CreateTextureResource(
 			ID3D12Device* device,
 			const DirectX::TexMetadata& metadata);
-		void SetPositoin(const Vector2& Position) { position = Position; }
+		void SetPosition(const Vector2& Position) { position = Position; }
 		void SetRotation(float Rotation) { rotation = Rotation; }
 		void SetColor(const Vector4& color) { materialData->color = color; }
 		void SetSize(const Vector2& Size) { size = Size; }
@@ -84,12 +81,13 @@ namespace MyEngine
 		DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 	private:
-		SpriteCommon* spriteCommon_;
+		std::shared_ptr<SRVManager> srvManager_ = nullptr;
+		std::shared_ptr<SpriteCommon> spriteCommon_ = nullptr;
+		std::shared_ptr<DX12Common>dx12Common_ = nullptr;
 		HRESULT hr = NULL;
 		uint32_t textureIndex = 0;
-		SRVManager* srvManager_ = nullptr;
 
-		EulerTransform transformMatrix;
+		EulerTransform transformMatrix{};
 		Vector2 position = { 0.0f,0.0f };
 		float rotation = 0.0f;
 		Vector2 size = { 100.0f,100.0f };
@@ -112,7 +110,8 @@ namespace MyEngine
 		Material* materialData = nullptr;
 		ComPtr<ID3D12Resource> materialResource = nullptr;
 
-		struct TransformationMatrix {
+		struct TransformationMatrix
+		{
 			Matrix4x4 WVP;
 			Matrix4x4 World;
 		};
@@ -124,14 +123,14 @@ namespace MyEngine
 		ComPtr<ID3D12Resource> transformationMatrixResource;
 		TransformationMatrix* transformationMatrixData = nullptr;
 
-		Vector4 LeftTop;
-		Vector4 RightTop;
-		Vector4 RightBottom;
-		Vector4 LeftBottom;
-		Vector2 coordLeftTop;
-		Vector2 coordRightTop;
-		Vector2 coordRightBottom;
-		Vector2 coordLeftBottom;
+		Vector4 LeftTop{};
+		Vector4 RightTop{};
+		Vector4 RightBottom{};
+		Vector4 LeftBottom{};
+		Vector2 coordLeftTop{};
+		Vector2 coordRightTop{};
+		Vector2 coordRightBottom{};
+		Vector2 coordLeftBottom{};
 
 		EulerTransform cameraTransform = {};
 		DirectionalLight* DirectionalLightData = nullptr;

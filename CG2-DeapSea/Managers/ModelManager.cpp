@@ -2,34 +2,39 @@
 
 namespace MyEngine
 {
-	ModelManager* ModelManager::instance = nullptr;
 
-	ModelManager* ModelManager::GetInstance()
+	std::shared_ptr<ModelManager> ModelManager::GetInstance()
 	{
-		if (instance == NULL)
+		auto ret_ptr = instance.lock();
+		if (!ret_ptr)
 		{
-			instance = new ModelManager;
+			ret_ptr = std::shared_ptr<ModelManager>(new ModelManager{});
+			instance = std::weak_ptr<ModelManager>(ret_ptr);
+			return ret_ptr;
 		}
-		return instance;
+
+		return instance.lock();
 	}
 
 	void ModelManager::Finalize()
 	{
 		modelCommon_->Finalize();
-		delete instance;
-		instance = NULL;
+		instance.reset();
 	}
 
-	void ModelManager::Initialize(DX12Common* dxCommon)
+	void ModelManager::Initialize()
 	{
 		modelCommon_ = ModelCommon::GetInstance();
-		modelCommon_->Initialize(dxCommon);
+		dx12Common_ = DX12Common::GetInstance();
+		textureManager_ = TextureManager::GetInstance();
+
+		modelCommon_->Initialize();
 		sameModelNum = 0;
 	}
 
 	void ModelManager::LoadModel(std::string& filePath, const std::string& TextureFilePath, bool isLighting)
 	{
-		if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
+		if (models.contains(filePath) && textureManager_->GetTextureData().contains(TextureFilePath))
 		{
 			return;
 		}
@@ -40,7 +45,7 @@ namespace MyEngine
 			modelFilePaths.push_back(modelFilePath);
 			//モデル生成とファイル読み込み、初期化
 			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->ModelInitialize(modelCommon_, filePath, TextureFilePath, isLighting);
+			model->ModelInitialize(filePath, TextureFilePath, isLighting);
 			//モデルをmapコンテナに格納
 			models.insert(std::make_pair(modelFilePath, std::move(model)));
 			filePath = modelFilePath;
@@ -50,7 +55,7 @@ namespace MyEngine
 		{
 			//モデル生成とファイル読み込み、初期化
 			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->ModelInitialize(modelCommon_, filePath, TextureFilePath, isLighting);
+			model->ModelInitialize(filePath, TextureFilePath, isLighting);
 			//モデルをmapコンテナに格納
 			models.insert(std::make_pair(filePath, std::move(model)));
 		}
@@ -58,7 +63,7 @@ namespace MyEngine
 
 	void ModelManager::LoadAnimationModel(std::string& filePath, const std::string& TextureFilePath, bool isLighting)//処理に問題の可能性あり
 	{
-		if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
+		if (models.contains(filePath) && textureManager_->GetTextureData().contains(TextureFilePath))
 		{
 			return;
 		}
@@ -69,7 +74,7 @@ namespace MyEngine
 			modelFilePaths.push_back(modelFilePath);
 			//モデル生成とファイル読み込み、初期化
 			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->AnimationInitialize(modelCommon_, filePath, TextureFilePath, isLighting);
+			model->AnimationInitialize(filePath, TextureFilePath, isLighting);
 			//モデルをmapコンテナに格納
 			models.insert(std::make_pair(modelFilePath, std::move(model)));
 			filePath = modelFilePath;
@@ -79,15 +84,15 @@ namespace MyEngine
 		{
 			//モデル生成とファイル読み込み、初期化
 			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->AnimationInitialize(modelCommon_, filePath, TextureFilePath, isLighting);
+			model->AnimationInitialize(filePath, TextureFilePath, isLighting);
 			//モデルをmapコンテナに格納
 			models.insert(std::make_pair(filePath, std::move(model)));
 		}
 	}
 
-	void ModelManager::LoadSkeltonAnimation(std::string& filePath, const std::string& TextureFilePath, SRVManager* srvManager, bool isLighting)
+	void ModelManager::LoadSkeltonAnimation(std::string& filePath, const std::string& TextureFilePath,bool isLighting)
 	{
-		if (models.contains(filePath) && TextureManager::GetInstance()->GetTextureData().contains(TextureFilePath))
+		if (models.contains(filePath) && textureManager_->GetTextureData().contains(TextureFilePath))
 		{
 			return;
 		}
@@ -98,7 +103,7 @@ namespace MyEngine
 			modelFilePaths.push_back(modelFilePath);
 			//モデル生成とファイル読み込み、初期化
 			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->SkeltonInitialize(modelCommon_, filePath, TextureFilePath, srvManager, isLighting);
+			model->SkeltonInitialize(filePath, TextureFilePath, isLighting);
 			//モデルをmapコンテナに格納
 			models.insert(std::make_pair(modelFilePath, std::move(model)));
 			filePath = modelFilePath;
@@ -108,7 +113,7 @@ namespace MyEngine
 		{
 			//モデル生成とファイル読み込み、初期化
 			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->SkeltonInitialize(modelCommon_, filePath, TextureFilePath, srvManager, isLighting);
+			model->SkeltonInitialize(filePath, TextureFilePath, isLighting);
 			//モデルをmapコンテナに格納
 			models.insert(std::make_pair(filePath, std::move(model)));
 		}
@@ -117,7 +122,7 @@ namespace MyEngine
 	void ModelManager::EraseModel(const std::string& filePath, const std::string& textureFilePath)//モデル使いまわし用の解放処理
 	{
 		models.erase(filePath);
-		TextureManager::GetInstance()->EraseTexture(textureFilePath);
+		textureManager_->EraseTexture(textureFilePath);
 	}
 
 	Model* ModelManager::FindModel(const std::string& filePath)

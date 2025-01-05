@@ -45,7 +45,6 @@ namespace MyEngine
         return result;
     }
 
-
     Debug::D3DResourceLeakChecker::~D3DResourceLeakChecker()
     {
         Microsoft::WRL::ComPtr<IDXGIDebug1> debug;

@@ -29,7 +29,7 @@ namespace MyEngine
 	public:
 		template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 		~Mesh();
-		void Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon, MeshCommon* meshCommon);
+		void Initialize(const std::string& filename);
 		void Update();
 		//void DrawTriangle(
 		//    Vector4 Top, Vector4 Right, Vector4 Left, Vector4 color, Vector2 coordTop,
@@ -96,13 +96,14 @@ namespace MyEngine
 	private:
 		Debug* debug_;
 		WinAPP* sWinApp;
-		SRVManager* srvManager_ = nullptr;
 		MyImGui* imgui_;
-		Object3dCommon* object3dCommon_;
-		SpriteCommon* spriteCom_;
-		MeshCommon* meshCommon_;
 		Camera* camera_;
-		DX12Common* dxCommon;
+
+		std::shared_ptr<DX12Common> dxCommon;
+		std::shared_ptr<SRVManager> srvManager_;
+		std::shared_ptr<Object3dCommon> object3dCommon_;
+		std::shared_ptr<SpriteCommon> spriteCom_;
+		std::shared_ptr<MeshCommon> meshCommon_;
 		HRESULT hr = NULL;
 
 		EulerTransform transformMatrix;

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
-
+//Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	MyEngine::GameManager* gameManager = new MyEngine::GameManager;

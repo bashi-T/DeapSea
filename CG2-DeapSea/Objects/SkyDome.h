@@ -12,8 +12,9 @@ namespace MyEngine
 		void Draw();
 
 	private:
-		Object3d* object3d;
-
+		std::shared_ptr< Object3d> object3d_;
+		std::shared_ptr< Object3d> instance_;
+		std::shared_ptr<ModelManager>modelManager_;
 	};
 }
 

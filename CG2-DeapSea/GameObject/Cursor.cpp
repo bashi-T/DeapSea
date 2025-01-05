@@ -6,10 +6,10 @@ Cursor::~Cursor()
 
 	void Cursor::Initialize()
 	{
-		object3d = std::make_unique<Object3d>();
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+		object3d_ = std::make_unique<Object3d>();
+		object3d_->Initialize();
 		ModelManager::GetInstance()->LoadModel(cursorModel, cursorSkin, true);
-		object3d->SetModel(cursorModel);
+		object3d_->SetModel(cursorModel);
 		Model* model = ModelManager::GetInstance()->FindModel(cursorModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
@@ -23,11 +23,11 @@ Cursor::~Cursor()
 
 	void Cursor::Update()
 	{
-		object3d->SetRotate({ object3d->GetRotate().x + 0.02f,object3d->GetRotate().y,object3d->GetRotate().z });
-		object3d->Update(Camera::GetInstance());
+		object3d_->SetRotate({ object3d_->GetRotate().x + 0.02f,object3d_->GetRotate().y,object3d_->GetRotate().z });
+		object3d_->Update(Camera::GetInstance().get());
 #ifdef _DEBUG
 		ImGui::Begin("cursor");
-		ImGui::DragFloat3("cursor.translate", (float*)&object3d->GetTranslate(), 0.01f);
+		ImGui::DragFloat3("cursor.translate", (float*)&object3d_->GetTranslate(), 0.01f);
 		ImGui::End();
 #endif
 
@@ -35,5 +35,5 @@ Cursor::~Cursor()
 
 	void Cursor::Draw()
 	{
-		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+		object3d_->Draw();
 	}

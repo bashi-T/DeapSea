@@ -25,6 +25,8 @@ namespace MyEngine
 		};
 
 	private:
+		HRESULT hr = NULL;
+
 	};
 }
 

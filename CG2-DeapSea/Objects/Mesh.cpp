@@ -5,12 +5,12 @@ namespace MyEngine
 	{
 	}
 
-	void Mesh::Initialize(const std::string& filename, SRVManager* srvManager, Object3dCommon* object3dCommon, MeshCommon* meshCommon)
+	void Mesh::Initialize(const std::string& filename)
 	{
-		this->meshCommon_ = meshCommon;
-		this->srvManager_ = srvManager;
-		this->object3dCommon_ = object3dCommon;
-		this->camera_ = object3dCommon->GetDefaultCamera();
+		meshCommon_ = MeshCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		object3dCommon_ = Object3dCommon::GetInstance();
+		camera_ = object3dCommon_->GetDefaultCamera();
 		kSubdivision = 16;
 
 		Sphere sphere = { { 0.0f,0.0f,0.0f },200.0f };

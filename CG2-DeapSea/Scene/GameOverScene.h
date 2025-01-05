@@ -21,10 +21,9 @@ namespace MyEngine
 		void Finalize() override;
 
 	private:
-		Sprite* sprite;
+		std::unique_ptr<Sprite> sprite_;
 		std::unique_ptr<Player> player_;
 		std::unique_ptr<Whale> whale_;
-		Object3d* object3d;
 		std::unique_ptr<Sand> sand_;
 
 		std::string boneWhaleModel = "whale/BoneWhale.obj";

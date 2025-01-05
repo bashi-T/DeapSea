@@ -10,10 +10,10 @@
 
 	void EnemyBullet::Initialize(Vector3 firstPos)
 	{
-		object3d = std::make_unique<Object3d>();
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+		object3d_ = std::make_unique<Object3d>();
+		object3d_->Initialize();
 		ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin, true);
-		object3d->SetModel(bulletModel);
+		object3d_->SetModel(bulletModel);
 		Model* model = ModelManager::GetInstance()->FindModel(bulletModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
@@ -23,26 +23,26 @@
 			vertex.normal.z = vertex.position.z;
 		}
 		model->Memcpy();
-		object3d->SetTranslate({ firstPos.x /*+ 0.01f*/, firstPos.y,firstPos.z });
-		object3d->SetScale({ 0.5f,0.5f,0.5f });
-		ebCollision.radius = 0.5f;
-		object3d->SetIsAnimation(false);
+		object3d_->SetTranslate({ firstPos.x /*+ 0.01f*/, firstPos.y,firstPos.z });
+		object3d_->SetScale({ 0.5f,0.5f,0.5f });
+		enemyBulletCollision.radius = 0.5f;
+		object3d_->SetIsAnimation(false);
 	}
 
 	void EnemyBullet::Update()
 	{
-		if (object3d->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
+		if (object3d_->GetTranslate().z < Camera::GetInstance()->GetTranslate().z)
 		{
 			isDead = true;
 		}
-		object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.1f, enemyBulletVector)));
-		object3d->Update(Camera::GetInstance());
-		ebCollision.center = object3d->GetTranslate();
+		object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.1f, enemyBulletVector)));
+		object3d_->Update(Camera::GetInstance().get());
+		enemyBulletCollision.center = object3d_->GetTranslate();
 	}
 
 	void EnemyBullet::Draw()
 	{
-		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+		object3d_->Draw();
 	}
 
 	void EnemyBullet::OnCollision()
@@ -52,10 +52,10 @@
 
 	void EnemyBullet::SetTranslate(Vector3 translate)
 	{
-		object3d->SetTranslate(translate);
+		object3d_->SetTranslate(translate);
 	}
 
 	void EnemyBullet::SetEnemyBulletVector(Vector3 positoin)
 	{
-		enemyBulletVector = Normalize(Subtract(positoin, object3d->GetTranslate()));
+		enemyBulletVector = Normalize(Subtract(positoin, object3d_->GetTranslate()));
 	}

@@ -11,6 +11,7 @@
 #include"GameObject/Whale.h"
 #include"GameObject/Player.h"
 #include"Managers/AudioManager.h"
+
 namespace MyEngine
 {
 	class TitleScene :public SceneManager
@@ -25,9 +26,9 @@ namespace MyEngine
 		//Object3dCommon* object3dCommon;
 		//SRVManager* srvManager;
 		//Camera* camera;
-		std::vector<std::unique_ptr<Particle>> particles;
-		std::vector<std::unique_ptr<Sprite>> sprites;
-		std::vector<std::unique_ptr<UIPlane>> uiPlanes;
+		std::vector<std::unique_ptr<Particle>> particles_;
+		std::vector<std::unique_ptr<Sprite>> sprites_;
+		std::vector<std::unique_ptr<UIPlane>> uiPlanes_;
 		std::unique_ptr<Cursor> cursor_;
 		std::unique_ptr<Player> player_;
 		std::unique_ptr<Whale> whale_;
@@ -43,6 +44,17 @@ namespace MyEngine
 		AudioManager::SoundData enterSound = {};
 		AudioManager::SoundData moveSound = {};
 		//std::string PNGs[6];
+
+		enum UIType
+		{
+			Title,
+			Practice,
+			Stage1,
+			Stage2,
+			Stage3,
+			Blackout,
+			NumArgument
+		};
 		std::string Planes[6]
 		{
 			"plane/plane.obj",
@@ -73,7 +85,7 @@ namespace MyEngine
 		const float zfar = 2.0f;
 		const float cursorX = -2.5f;
 		const int maxCoolTime = 10;
-		const int floatingTimes[2]
+		const int floatingTimes[2]//折り返しの時間
 		{
 			120,
 			240

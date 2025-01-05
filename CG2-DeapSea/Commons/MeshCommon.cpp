@@ -2,12 +2,12 @@
 
 namespace MyEngine
 {
-	void MeshCommon::Initialize(DX12Common* dxcommon)
+	void MeshCommon::Initialize()
 	{
-		dx12Common_ = dxcommon;
+		dx12Common_ = DX12Common::GetInstance();
 		ResetDXC();
 
-		MakePSO(dx12Common_);
+		MakePSO(dx12Common_.get());
 	}
 
 	void MeshCommon::ResetDXC()
@@ -18,49 +18,6 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 		hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 		assert(SUCCEEDED(hr));
-	}
-
-	ComPtr<IDxcBlob> MeshCommon::CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils_,
-		IDxcCompiler3* dxcCompiler_,
-		IDxcIncludeHandler* includeHandler_)
-	{
-		debug_->Log(
-			debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
-		ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
-		hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
-		assert(SUCCEEDED(hr));
-
-		DxcBuffer shaderSourceBuffer;
-		shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-		shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-		shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-		LPCWSTR arguments[]{
-			filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
-		};
-		ComPtr<IDxcResult> shaderResult = nullptr;
-		hr = dxcCompiler_->Compile(
-			&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
-			IID_PPV_ARGS(&shaderResult));
-		assert(SUCCEEDED(hr));
-
-		ComPtr<IDxcBlobUtf8> shaderError = nullptr;
-		shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-		if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-			debug_->Log(shaderError->GetStringPointer());
-			assert(SUCCEEDED(hr));
-		}
-		ComPtr<IDxcBlob> shaderBlob = nullptr;
-		hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-		assert(SUCCEEDED(hr));
-		debug_->Log(
-			debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
-		shaderSource->Release();
-		shaderResult->Release();
-		return shaderBlob;
 	}
 
 	void MeshCommon::MakePSO(DX12Common* dxcommon)
@@ -166,11 +123,11 @@ namespace MyEngine
 		ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 		ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 		vertexShaderBlob =
-			CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+			dx12Common_->CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 		assert(vertexShaderBlob != nullptr);
 
 		pixelShaderBlob =
-			CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+			dx12Common_->CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 		assert(pixelShaderBlob != nullptr);
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
@@ -198,18 +155,21 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	MeshCommon* MeshCommon::GetInstance()
+	std::shared_ptr<MeshCommon> MeshCommon::GetInstance()
 	{
-		if (instance == NULL)
+		auto ret_ptr = instance.lock();
+		if (!ret_ptr)
 		{
-			instance = new MeshCommon;
+			ret_ptr = std::shared_ptr<MeshCommon>(new MeshCommon{});
+			instance = std::weak_ptr<MeshCommon>(ret_ptr);
+			return ret_ptr;
 		}
-		return instance;
+
+		return instance.lock();
 	}
 
 	void MeshCommon::DeleteInstance()
 	{
-		delete instance;
-		instance = NULL;
+		instance.reset();
 	}
 }

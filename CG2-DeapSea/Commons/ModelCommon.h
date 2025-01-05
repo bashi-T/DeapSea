@@ -13,13 +13,25 @@ namespace MyEngine
 {
 	class ModelCommon
 	{
-	private:
-		ModelCommon() = default;
+	public:
+		void Initialize();
+		void ResetDXC();
+		void MakePSO(DX12Common* dxcommon);
+		void MakeSkeltonPSO(DX12Common* dxcommon);
+		static std::shared_ptr<ModelCommon> GetInstance();
+		void Finalize();
+
+		std::shared_ptr<DX12Common> GetDx12Common()const { return dx12Common_; }
+
 		~ModelCommon() = default;
 		ModelCommon(ModelCommon&) = delete;
 		ModelCommon& operator=(ModelCommon&) = delete;
+	protected:
+		ModelCommon() = default;
 
-		DX12Common* dxCommon_ = nullptr;
+	private:
+		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
+		static inline std::weak_ptr<ModelCommon> instance;
 		HRESULT hr = NULL;
 		Debug* debug_ = nullptr;
 
@@ -30,22 +42,5 @@ namespace MyEngine
 		ComPtr<ID3DBlob> errorBlob = nullptr;
 		ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 		ComPtr<ID3D12PipelineState> graphicsPipelineState = NULL;
-		static inline ModelCommon* instance;
-
-	public:
-		void Initialize(DX12Common* dxCommon);
-		ComPtr<IDxcBlob> CompileShader(
-			const std::wstring& filePath,
-			const wchar_t* profile,
-			IDxcUtils* dxcUtils,
-			IDxcCompiler3* dxcCompiler,
-			IDxcIncludeHandler* includeHandler);
-		void ResetDXC();
-		void MakePSO(DX12Common* dxcommon);
-		void MakeSkeltonPSO(DX12Common* dxcommon);
-		static ModelCommon* GetInstance();
-		void Finalize();
-
-		DX12Common* GetDx12Common()const { return dxCommon_; }
 	};
 }

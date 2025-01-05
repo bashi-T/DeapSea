@@ -2,19 +2,22 @@
 
 namespace MyEngine
 {
-	DX12Common* DX12Common::GetInstance()
+	std::shared_ptr<DX12Common> DX12Common::GetInstance()
 	{
-		if (instance == NULL)
+		auto ret_ptr = instance.lock();
+		if (!ret_ptr)
 		{
-			instance = new DX12Common;
+			ret_ptr = std::shared_ptr<DX12Common>(new DX12Common{});
+			instance = std::weak_ptr<DX12Common>(ret_ptr);
+			return ret_ptr;
 		}
-		return instance;
+
+		return instance.lock();
 	}
 
 	void DX12Common::DeleteInstance()
 	{
-		delete instance;
-		instance = NULL;
+		instance.reset();
 	}
 
 	void DX12Common::InitializefixFPS()
@@ -54,7 +57,7 @@ namespace MyEngine
 			height);
 
 #ifdef _DEBUG
-		InfoQueue(device_.Get());
+		InfoQueue(device.Get());
 #endif
 		MakeScreen(winApp_);
 	}
@@ -108,7 +111,7 @@ namespace MyEngine
 		for (size_t i = 0; i < _countof(featureLevels); ++i)
 		{
 			hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i],
-				IID_PPV_ARGS(&device_));
+				IID_PPV_ARGS(&device));
 			if (SUCCEEDED(hr))
 			{
 				//debug_->Log(std::format("featureLevel {}\n",
@@ -116,24 +119,24 @@ namespace MyEngine
 				break;
 			}
 		}
-		assert(device_ != nullptr);
+		assert(device != nullptr);
 		//debug_->Log("Complete create D3D12Device\n");
 	}
 
 	void DX12Common::MakeCommandQueue()
 	{
 		D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-		hr = device_->CreateCommandQueue(
+		hr = device->CreateCommandQueue(
 			&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
 		assert(SUCCEEDED(hr));
 	}
 
 	void DX12Common::MakeCommandList()
 	{
-		hr = device_->CreateCommandAllocator(
+		hr = device->CreateCommandAllocator(
 			D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 		assert(SUCCEEDED(hr));
-		hr = device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+		hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
 			commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 		assert(SUCCEEDED(hr));
 	}
@@ -164,7 +167,7 @@ namespace MyEngine
 		D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 		rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvDescriptorHeapDesc.NumDescriptors = 2;
-		hr = device_->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
+		hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc,
 			IID_PPV_ARGS(&rtvDescriptorHeap));
 		assert(SUCCEEDED(hr));
 	}
@@ -181,18 +184,18 @@ namespace MyEngine
 	{
 		rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-		const uint32_t descriptorSizeRTV = device_->
+		const uint32_t descriptorSizeRTV = device->
 			GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle =
 			GetCPUDescriptorHandle(rtvDescriptorHeap.Get(), descriptorSizeRTV, 0);
 
 		rtvHandles[0] = rtvStartHandle;
-		device_->CreateRenderTargetView(
+		device->CreateRenderTargetView(
 			swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
 
-		rtvHandles[1].ptr = rtvHandles[0].ptr + device_->
+		rtvHandles[1].ptr = rtvHandles[0].ptr + device->
 			GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		device_->CreateRenderTargetView(
+		device->CreateRenderTargetView(
 			swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 	}
 
@@ -239,7 +242,7 @@ namespace MyEngine
 		DescriptorHeapDesc.NumDescriptors = numDescriptors;
 		DescriptorHeapDesc.Flags =
 			shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		hr = device_->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+		hr = device->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 		assert(SUCCEEDED(hr));
 		return descriptorHeap;
 	}
@@ -249,12 +252,12 @@ namespace MyEngine
 	{
 		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-		device_->CreateDepthStencilView(
+		device->CreateDepthStencilView(
 			depthStencilResource.Get(),
 			&dsvDesc,
 			dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-		const uint32_t descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
 	}
 
@@ -279,7 +282,7 @@ namespace MyEngine
 		depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 		ComPtr<ID3D12Resource> resource = nullptr;
-		hr = device_->CreateCommittedResource(
+		hr = device->CreateCommittedResource(
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&resourceDesc,
@@ -319,10 +322,10 @@ namespace MyEngine
 		}
 	}
 
-	void DX12Common::InfoQueue(ID3D12Device* device)
+	void DX12Common::InfoQueue(ID3D12Device* device_)
 	{
 		ComPtr<ID3D12InfoQueue> InfoQueue = nullptr;
-		if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&InfoQueue))))
+		if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&InfoQueue))))
 		{
 			InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 			InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
@@ -338,5 +341,40 @@ namespace MyEngine
 			filter.DenyList.pSeverityList = severities;
 			InfoQueue->PushStorageFilter(&filter);
 		}
+	}
+	ComPtr<IDxcBlob> DX12Common::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
+	{
+		debug_->Log(debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
+		ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
+		hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
+		assert(SUCCEEDED(hr));
+
+		DxcBuffer shaderSourceBuffer;
+		shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+		shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+		shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+
+		LPCWSTR arguments[]{
+			filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
+		};
+		ComPtr<IDxcResult> shaderResult = nullptr;
+		hr = dxcCompiler->Compile(
+			&shaderSourceBuffer, arguments, _countof(arguments), includeHandler,
+			IID_PPV_ARGS(&shaderResult));
+		assert(SUCCEEDED(hr));
+
+		ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+		shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+		if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+			debug_->Log(shaderError->GetStringPointer());
+			assert(SUCCEEDED(hr));
+		}
+		ComPtr<IDxcBlob> shaderBlob = nullptr;
+		hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+		assert(SUCCEEDED(hr));
+		debug_->Log(debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
+		shaderSource->Release();
+		shaderResult->Release();
+		return shaderBlob;
 	}
 }

@@ -18,11 +18,11 @@ public:
 
 	void SetTranslate(Vector3 translate);
 
-	Vector3 GetTranslate() { return object3d->GetTranslate(); }
-	Sphere GetCollision() { return pbCollision; }
+	Vector3 GetTranslate() { return object3d_->GetTranslate(); }
+	Sphere GetCollision() { return playerBulletCollision; }
 
 private:
-	std::unique_ptr< MyEngine::Object3d> object3d;
+	std::unique_ptr< MyEngine::Object3d> object3d_;
 
 	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
 	const std::string& bulletSkin = "Resource/AnimatedCube/AnimatedCube_BaseColor.png";
@@ -30,5 +30,5 @@ private:
 	static const int32_t kLifeTime = 60 * 2;
 	int32_t deathTimer = kLifeTime;
 	bool isDead = false;
-	Sphere pbCollision;
+	Sphere playerBulletCollision{};
 };

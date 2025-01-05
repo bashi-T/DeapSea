@@ -7,7 +7,7 @@
 namespace MyEngine
 {
 	Vector4* vertexData = nullptr;
-	int GameManager::stageNumber = 0;
+	int32_t GameManager::stageNumber = 0;
 
 	GameManager::GameManager()
 	{
@@ -19,32 +19,35 @@ namespace MyEngine
 
 	GameManager::~GameManager() {}
 
-	int GameManager::Run()
+	int32_t GameManager::Run()
 	{
 		hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 		Debug::D3DResourceLeakChecker* leakCheck = new Debug::D3DResourceLeakChecker;
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 		winAPP = WinAPP::GetInstance();
+		MSG NewMSG = winAPP->GetMSG();
+		input = Input::GetInstance();
+		imgui = MyImGui::GetInstance();
+
 		dx12Common = DX12Common::GetInstance();
 		srvManager = SRVManager::GetInstance();
 		audioManager = AudioManager::GetInstance();
-		input = Input::GetInstance();
-		MSG NewMSG = winAPP->GetMSG();
-		imgui = MyImGui::GetInstance();
-		SPCommon = SpriteCommon::GetInstance();
+		spriteCommon = SpriteCommon::GetInstance();
 		object3dCommon = Object3dCommon::GetInstance();
 		particleCommon = ParticleCommon::GetInstance();
+		textureManager = TextureManager::GetInstance();
+		modelManager = ModelManager::GetInstance();
 
-		object3d = std::make_unique<Object3d>();
 		camera = std::make_unique <Camera>();
-		skyDome = std::make_unique <SkyDome>();
+		object3d = std::make_unique<Object3d>();
+		skyDome = std::make_unique<SkyDome>();
 
 
 
 		winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"深海デリバリー");
 		dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
-		srvManager->Initialize(dx12Common);
+		srvManager->Initialize();
 		audioManager->Initialize();
 		input->Initialize(winAPP);
 		imgui->Initialize(
@@ -53,19 +56,19 @@ namespace MyEngine
 			dx12Common->GetSwapChainDesc(),
 			dx12Common->GetRtvDesc(),
 			srvManager->GetSrvDescriptorHeap().Get());
-		TextureManager::GetInstance()->Initialize(dx12Common, srvManager);
+		textureManager->Initialize();
 
-		object3dCommon->Initialize(dx12Common);
-		ModelManager::GetInstance()->Initialize(dx12Common);
-		camera->GetInstance()->SetRotate({ 0.1f,0.0f,0.0f });
-		camera->GetInstance()->SetTranslate({ 0.0f,3.0f,-20.0f });
-		object3dCommon->SetDefaultCamera(camera->GetInstance());
-		object3d->Initialize(object3dCommon, srvManager);
-		SPCommon->Initialize(dx12Common);
-		particleCommon->Initialize(dx12Common);
+		object3dCommon->Initialize();
+		modelManager->Initialize();
+		camera->SetRotate({ 0.1f,0.0f,0.0f });
+		camera->SetTranslate({ 0.0f,3.0f,-20.0f });
+		object3dCommon->SetDefaultCamera(camera.get());
+		object3d->Initialize();
+		spriteCommon->Initialize();
+		particleCommon->Initialize();
 		skyDome->Initialize();
 		sceneArr_[TITLE]->Init();
-
+		//ウィンドウのボタンが押されるまでループ
 		while (NewMSG.message != WM_QUIT)
 		{
 			dx12Common->update();
@@ -82,7 +85,7 @@ namespace MyEngine
 		    }
 #endif // DEBUG
 
-			camera->GetInstance()->Update();
+			camera->Update();
 			prevSceneNo_ = currentSceneNo_;
 			currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();
 			if (prevSceneNo_ != currentSceneNo_)
@@ -98,8 +101,8 @@ namespace MyEngine
 			ImGui::Begin("camera");
 			//ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);
 			//ImGui::DragFloat3("object.translate", (float*)&object3d->GetTranslate(), 0.01f);
-			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetInstance()->GetRotate(), 0.01f);
-			ImGui::DragFloat3("camera.translate", (float*)&camera->GetInstance()->GetTranslate(), 0.01f);
+			ImGui::DragFloat3("camera.rotate", (float*)&camera->GetRotate(), 0.01f);
+			ImGui::DragFloat3("camera.translate", (float*)&camera->GetTranslate(), 0.01f);
 			ImGui::DragFloat4("light.color", (float*)&object3d->GetDirectionalLightData()->color, 0.01f);
 			ImGui::DragFloat("light.intensity", (float*)&object3d->GetDirectionalLightData()->intensity, 0.01f);
 			ImGui::DragFloat3("light.direction", (float*)&object3d->GetDirectionalLight().direction, 0.01f, -1.0f, 1.0f);
@@ -140,17 +143,18 @@ namespace MyEngine
 
 		CloseHandle(srvManager->GetFenceEvent());
 		sceneArr_[currentSceneNo_]->Finalize();
-		particleCommon->DeleteInstance();
-		SPCommon->DeleteInstance();
-		camera->DeleteInstance();
-		ModelManager::GetInstance()->Finalize();
-		object3dCommon->DeleteInstance();
-		TextureManager::GetInstance()->Finalize();
+		//particleCommon->DeleteInstance();
+		//spriteCommon->DeleteInstance();
+		//camera->DeleteInstance();
+		//modelManager->Finalize();
+		//object3dCommon->DeleteInstance();
+		//textureManager->Finalize();
+		//audioManager->Finalize();
+		//srvManager->Finalize();
+		//dx12Common->DeleteInstance();
+
 		imgui->Finalize();
 		input->Finalize();
-		audioManager->Finalize();
-		srvManager->Finalize();
-		dx12Common->DeleteInstance();
 		winAPP->Finalize();
 		CoUninitialize();
 		delete leakCheck;

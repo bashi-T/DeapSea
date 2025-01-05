@@ -6,9 +6,12 @@ namespace MyEngine
 	{
 	}
 
-	void Model::ModelInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting)
+	void Model::ModelInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting)
 	{
-		this->modelCommon_ = modelCommon;
+		modelCommon_ = ModelCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = modelCommon_->GetDx12Common();
+		textureManager_ = TextureManager::GetInstance();
 
 		modelData_ = LoadModelFile("Resource", objFilePath);
 		vertexResource = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
@@ -21,12 +24,12 @@ namespace MyEngine
 		materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material_));
 		indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 		modelData_.materialData.textureFilePath = TextureFilePath;
-		TextureManager::GetInstance()->LoadTexture(modelData_.materialData.textureFilePath);
-		modelData_.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+		textureManager_->LoadTexture(modelData_.materialData.textureFilePath);
+		modelData_.materialData.textureIndex = textureManager_->GetSrvIndex(TextureFilePath);
 
 		//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";
-		//TextureManager::GetInstance()->LoadTexture("Resource/rostock_laage_airport_4k.dds");
-		//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
+		//textureManager_->LoadTexture("Resource/rostock_laage_airport_4k.dds");
+		//modelData_.eMaterial.textureIndex = textureManager_->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
 		//modelData_.isEnvironment = false;
 
 		material_[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -38,9 +41,12 @@ namespace MyEngine
 		std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 	}
 
-	void Model::AnimationInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, bool isLighting)
+	void Model::AnimationInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting)
 	{
-		this->modelCommon_ = modelCommon;
+		modelCommon_ = ModelCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = modelCommon_->GetDx12Common();
+		textureManager_ = TextureManager::GetInstance();
 
 		modelData_ = LoadModelFile("Resource", objFilePath);
 		animation_ = LoadAnimationFile("Resource", objFilePath);
@@ -55,12 +61,13 @@ namespace MyEngine
 		indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
 		modelData_.materialData.textureFilePath = TextureFilePath;
-		TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-		modelData_.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+		textureManager_->LoadTexture(TextureFilePath);
+		modelData_.materialData.textureIndex = textureManager_->GetSrvIndex(TextureFilePath);
 
 		//modelData_.eMaterial.textureFilePath = "Resource/rostock_laage_airport_4k.dds";
-		//TextureManager::GetInstance()->LoadTexture("Resource/rostock_laage_airport_4k.dds");
-		//modelData_.eMaterial.textureIndex = TextureManager::GetInstance()->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
+		//textureManager_->LoadTexture("Resource/rostock_laage_airport_4k.dds");
+		//modelData_.eMaterial.textureIndex = textureManager_->GetSrvIndex("Resource/rostock_laage_airport_4k.dds");
+		//modelData_.isEnvironment = false;
 
 		material_[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		material_[0].enableLighting = isLighting;
@@ -71,10 +78,12 @@ namespace MyEngine
 		std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 	}
 
-	void Model::SkeltonInitialize(ModelCommon* modelCommon, std::string objFilePath, std::string TextureFilePath, SRVManager* srvManager, bool isLighting)
+	void Model::SkeltonInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting)
 	{
-		this->modelCommon_ = modelCommon;
-		this->srvManager_ = srvManager;
+		modelCommon_ = ModelCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = modelCommon_->GetDx12Common();
+		textureManager_ = TextureManager::GetInstance();
 
 		modelData_ = LoadModelFile("Resource", objFilePath);
 		animation_ = LoadAnimationFile("Resource", objFilePath);
@@ -90,8 +99,8 @@ namespace MyEngine
 		indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
 		modelData_.materialData.textureFilePath = TextureFilePath;
-		TextureManager::GetInstance()->LoadTexture(TextureFilePath);
-		modelData_.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(TextureFilePath);
+		textureManager_->LoadTexture(TextureFilePath);
+		modelData_.materialData.textureIndex = textureManager_->GetSrvIndex(TextureFilePath);
 
 		material_[0].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		material_[0].enableLighting = isLighting;
@@ -102,7 +111,7 @@ namespace MyEngine
 		std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
 
 		CreateSkinCluster(skelton_, modelData_, srvManager_->GetSrvDescriptorHeap(),
-			modelCommon_->GetDx12Common()->GetDevice()->
+			dx12Common_->GetDevice()->
 			GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 	}
 
@@ -111,39 +120,35 @@ namespace MyEngine
 
 	}
 
-	void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
+	void Model::Draw()
 	{
-		this->modelCommon_ = modelCommon;
-		this->srvManager_ = srvManager;
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 		material_[0].uvTransform = uvTransformMatrix;
 
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				0, materialResource->GetGPUVirtualAddress());
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetVertexBuffers(0, 1, &vertexBufferView);
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetIndexBuffer(&indexBufferView);
 		srvManager_->SetGraphicsRootDescriptorTable(
 			2, modelData_.materialData.textureIndex);
 
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
+		dx12Common_->GetCommandList().Get()->DrawIndexedInstanced(
 			UINT(modelData_.indices.size()), 1, 0, 0, 0);
 	}
 
-	void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
+	void Model::SkeltonDraw()
 	{
-		this->modelCommon_ = modelCommon;
-		this->srvManager_ = srvManager;
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 		material_[0].uvTransform = uvTransformMatrix;
 
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				0, materialResource->GetGPUVirtualAddress());
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2]
@@ -151,17 +156,17 @@ namespace MyEngine
 			vertexBufferView,
 			skinCluster.influenceBufferView
 		};
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetVertexBuffers(0, 2, vbvs);//開始スロット番号、使用スロット数、vbv配列へのポインタ
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetIndexBuffer(&indexBufferView);
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootDescriptorTable(
 				5, skinCluster.paletteSrvHandle.second);
 		srvManager_->SetGraphicsRootDescriptorTable(
 			2, modelData_.materialData.textureIndex);
 
-		modelCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(
+		dx12Common_->GetCommandList().Get()->DrawIndexedInstanced(
 			UINT(modelData_.indices.size()), 1, 0, 0, 0);
 	}
 
@@ -190,7 +195,7 @@ namespace MyEngine
 
 		ComPtr<ID3D12Resource> Resource = nullptr;
 
-		hr = modelCommon_->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
+		hr = dx12Common_->GetDevice().Get()->CreateCommittedResource(
 			&uploadHeapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&ResourceDesc,
@@ -442,8 +447,8 @@ namespace MyEngine
 		skinCluster.mappedPalette = { mappedParette,skelton.joints.size() };
 		uint32_t index = srvManager_->Allocate();
 
-		skinCluster.paletteSrvHandle.first = modelCommon_->GetDx12Common()->GetCPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
-		skinCluster.paletteSrvHandle.second = modelCommon_->GetDx12Common()->GetGPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
+		skinCluster.paletteSrvHandle.first = dx12Common_->GetCPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
+		skinCluster.paletteSrvHandle.second = dx12Common_->GetGPUDescriptorHandle(descriptorHeap.Get(), descriptorSize, 0);
 		skinCluster.paletteSrvHandle.first = srvManager_->GetCPUDescriptorHandle(index);
 		skinCluster.paletteSrvHandle.second = srvManager_->GetGPUDescriptorHandle(index);
 
@@ -457,7 +462,7 @@ namespace MyEngine
 		paletteSrvDesc.Buffer.NumElements = UINT(skelton.joints.size());
 		paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
 
-		modelCommon_->GetDx12Common()->GetDevice().Get()->CreateShaderResourceView(
+		dx12Common_->GetDevice().Get()->CreateShaderResourceView(
 			skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
 
 		VertexInfluence* mappedInfluence = nullptr;

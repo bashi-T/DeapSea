@@ -5,29 +5,10 @@ namespace MyEngine
 {
 	class SRVManager
 	{
-	private:
-		SRVManager() = default;
-		~SRVManager() = default;
-		SRVManager(SRVManager&) = delete;
-		SRVManager& operator=(SRVManager&) = delete;
-
-		DX12Common* dxCommon_ = nullptr;
-		uint32_t descriptorSize;
-		ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
-		uint32_t useIndex = 0;
-		UINT backBufferIndex;
-		D3D12_RESOURCE_BARRIER barrier{};
-		float clearColor[4] = { 0.1f, 0.25f, 0.5f, 1.0f };
-		D3D12_VIEWPORT viewport{};
-		D3D12_RECT scissorRect{};
-		ComPtr<ID3D12Fence> fence = nullptr;
-		HANDLE fenceEvent;
-		static inline SRVManager* instance;
-
 	public:
 		static const uint32_t kMaxSRVCount;
 		static const uint32_t kSRVIndexTop;
-		void Initialize(DX12Common* dxCommon);
+		void Initialize();
 		uint32_t Allocate();
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
@@ -51,7 +32,31 @@ namespace MyEngine
 		UINT GetBackBufferIndex() { return backBufferIndex; }
 		ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 		HANDLE GetFenceEvent() { return fenceEvent; }
-		static SRVManager* GetInstance();
-		HRESULT hr;
+		static std::shared_ptr<SRVManager> GetInstance();
+
+		~SRVManager() = default;
+		SRVManager(SRVManager&) = delete;
+		SRVManager& operator=(SRVManager&) = delete;
+	protected:
+		SRVManager() = default;
+	private:
+
+		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
+
+		static inline std::weak_ptr<SRVManager> instance;
+
+		uint32_t descriptorSize;
+		ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+		uint32_t useIndex = 0;
+		UINT backBufferIndex;
+		D3D12_RESOURCE_BARRIER barrier{};
+		float clearColor[4] = { 0.1f, 0.25f, 0.5f, 1.0f };
+		D3D12_VIEWPORT viewport{};
+		D3D12_RECT scissorRect{};
+		ComPtr<ID3D12Fence> fence = nullptr;
+		HANDLE fenceEvent;
+		HRESULT hr = NULL;
+
+
 	};
 }

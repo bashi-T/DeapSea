@@ -103,6 +103,9 @@ struct QuaternionTransform
 	Quaternion rotate;
 	Vector3 translate;
 };
+
+const float radianPerFrequency = 0.0174533f;
+
 constexpr double epsilon = std::numeric_limits<double>::epsilon();
 
 //Matrix2x2 Add(Matrix2x2 a, Matrix2x2 b) {

@@ -25,13 +25,14 @@ class Enemy
 
 		bool IsDead()const { return isDead; }
 		const std::list<std::unique_ptr<EnemyBullet>>& GetBullets()const { return eBullets; }
-		Vector3 GetTranslate() { return object3d->GetTranslate(); }
-		AABB GetCollision() { return eCollision; }
+		Vector3 GetTranslate() { return object3d_->GetTranslate(); }
+		AABB GetCollision() { return enemyCollision; }
 		int GetSort() { return enemySort; }
 		int Getlife() { return life; }
 
 	private:
-		std::unique_ptr< Object3d> object3d;
+		std::unique_ptr< Object3d> object3d_;
+		std::shared_ptr<ModelManager>modelManager_;
 		std::list<std::unique_ptr<EnemyBullet>> eBullets;
 		Player* player_;
 		Whale* whale_;
@@ -39,11 +40,13 @@ class Enemy
 		uint32_t shotInterval = 0;
 		bool isShot = false;
 		bool isDead = false;
-		AABB eCollision;
+		AABB enemyCollision;
 		Vector3 enemyVector;
+		Vector3 enemyEscapeSpeed = { 4.0f, 1.0f, 4.0f };
 		int enemySort;
 		int moveInterval = 0;
 		int life;
 		int escapeTime = 0;
+		std::unique_ptr<Particle> particle;
 	};
 

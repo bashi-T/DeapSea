@@ -10,10 +10,10 @@ PlayerBullet::~PlayerBullet()
 
 void PlayerBullet::Initialize(Vector3 firstPos, Matrix4x4 angle)
 {
-	object3d = std::make_unique<MyEngine::Object3d>();
-	object3d->Initialize(MyEngine::Object3dCommon::GetInstance(), MyEngine::SRVManager::GetInstance());
+	object3d_ = std::make_unique<MyEngine::Object3d>();
+	object3d_->Initialize();
 	MyEngine::ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin, true);
-	object3d->SetModel(bulletModel);
+	object3d_->SetModel(bulletModel);
 	MyEngine::Model* model = MyEngine::ModelManager::GetInstance()->FindModel(bulletModel);
 
 	MyEngine::Model::ModelData* modelData = model->GetModelData();
@@ -24,12 +24,13 @@ void PlayerBullet::Initialize(Vector3 firstPos, Matrix4x4 angle)
 		vertex.normal.z = vertex.position.z;
 	}
 	model->Memcpy();
-	object3d->SetTranslate({ firstPos.x + 0.01f, firstPos.y,firstPos.z });
-	pbCollision.radius = 1.0f;
-	bulletSpeed = TransformNormal(bulletSpeed, angle);
+	object3d_->SetTranslate({ firstPos.x + 0.01f, firstPos.y,firstPos.z });
+	playerBulletCollision.radius = 0.5f;
+	Vector3 bulletSpeeds = TransformNormal(bulletSpeed, angle);
 
-	object3d->SetScale({ 0.5f,0.5f,0.5f });
-	object3d->SetIsAnimation(false);
+
+	object3d_->SetScale({ 0.5f,0.5f,0.5f });
+	object3d_->SetIsAnimation(false);
 }
 
 void PlayerBullet::Update()
@@ -38,16 +39,16 @@ void PlayerBullet::Update()
 	{
 		isDead = true;
 	}
-	object3d->SetTranslate(Add(object3d->GetTranslate(), bulletSpeed));
-	object3d->Update(MyEngine::Camera::GetInstance());
+	object3d_->SetTranslate(Add(object3d_->GetTranslate(), bulletSpeed));
+	object3d_->Update(MyEngine::Camera::GetInstance().get());
 
-	pbCollision.center = object3d->GetTranslate();
+	playerBulletCollision.center = object3d_->GetTranslate();
 
 }
 
 void PlayerBullet::Draw()
 {
-	object3d->Draw(MyEngine::ModelManager::GetInstance()->GetModelCommon());
+	object3d_->Draw();
 }
 
 void PlayerBullet::OnCollision()
@@ -57,6 +58,6 @@ void PlayerBullet::OnCollision()
 
 void PlayerBullet::SetTranslate(Vector3 translate)
 {
-	object3d->SetTranslate(translate);
+	object3d_->SetTranslate(translate);
 }
 

@@ -8,19 +8,19 @@ namespace MyEngine
 {
 	SkyDome::~SkyDome()
 	{
-		delete object3d;
-		object3d = NULL;
 	}
 
 	void SkyDome::Initialize()
 	{
-		object3d = new Object3d;
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
+		object3d_ = std::make_shared<Object3d>();
+		//instance_ = object3d_->GetInstance();
+		object3d_->Initialize();
 		std::string model_ = "world/skyDome.obj";
 		std::string skin = "Resource/sea2.png";
-		ModelManager::GetInstance()->LoadModel(model_, skin, true);
-		object3d->SetModel(model_);
-		Model* model = ModelManager::GetInstance()->FindModel(model_);
+		modelManager_ = ModelManager::GetInstance();
+		modelManager_->LoadModel(model_, skin, true);
+		object3d_->SetModel(model_);
+		Model* model = modelManager_->FindModel(model_);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
@@ -29,17 +29,17 @@ namespace MyEngine
 			vertex.normal.z = vertex.position.z;
 		}
 		model->Memcpy();
-		object3d->SetScale({ -400.0f,400.0f,400.0f });
+		object3d_->SetScale({ -400.0f,400.0f,400.0f });
 	}
 
 	void SkyDome::Update()
 	{
-		object3d->Update(Camera::GetInstance());
+		object3d_->Update(Camera::GetInstance().get());
 	}
 
 	void SkyDome::Draw()
 	{
-		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+		object3d_->Draw();
 	}
 
 }

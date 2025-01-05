@@ -27,13 +27,11 @@ namespace MyEngine
 		/// instance取得
 		/// </summary>
 		/// <returns></returns>
-		static TextureManager* GetInstance();
+		static std::shared_ptr<TextureManager> GetInstance();
 		/// <summary>
 		/// 初期化
 		/// </summary>
-		/// <param name="dxcommon"></param>
-		/// <param name="srvManager_"></param>
-		void Initialize(DX12Common* dxcommon, SRVManager* srvManager_);
+		void Initialize();
 		/// <summary>
 		/// instance解放
 		/// </summary>
@@ -90,19 +88,22 @@ namespace MyEngine
 			const DirectX::ScratchImage& mipImages,
 			const DirectX::TexMetadata& metadata);
 
-	private:
-		template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-		static TextureManager* instance;
-
-		TextureManager() = default;
 		~TextureManager() = default;
 		TextureManager(TextureManager&) = delete;
 		TextureManager& operator=(TextureManager&) = delete;
-		DX12Common* dx12Common_ = nullptr;
+	protected:
+		TextureManager() = default;
+	private:
+		template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+		static inline std::weak_ptr<TextureManager> instance;
+
+		friend std::shared_ptr<TextureManager>;
+
+		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
+		std::shared_ptr<SRVManager> srvManager_ = nullptr;
 		Debug* debug_ = nullptr;
-		SRVManager* srvManager = nullptr;
 		std::unordered_map<std::string, TextureData>textureDatas;
-		HRESULT hr;
+		HRESULT hr = NULL;
 	};
 }
 

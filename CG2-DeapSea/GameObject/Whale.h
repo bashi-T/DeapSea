@@ -16,31 +16,35 @@ public:
 	void Initialize(Player* players);
 	void Update();
 	void Draw();
+	void SetMaxPosition(float pos, float maxPos);
 
+	void ChangeModel(int32_t whaleLife);
 	void OnCollision();
 	void OnTideCollision(Vector3 tideVector);
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 rotate);
-	void SetLife(int i) { life = i; }
-	void SetColor(Vector4 color) { object3d->SetColor(color); }
-	const Vector3& GetTranslate()const { return object3d->GetTranslate(); }
-	const Vector3& GetRotate()const { return object3d->GetRotate(); }
+	void SetLife(int32_t i) { life = i; }
+	void SetColor(Vector4 color) { object3d_->SetColor(color); }
+	const Vector3& GetTranslate()const { return object3d_->GetTranslate(); }
+	const Vector3& GetRotate()const { return object3d_->GetRotate(); }
 	const AABB& GetCollision()const { return wCollision; }
-	const int& GetLife()const { return life; }
+	const int32_t& GetLife()const { return life; }
 	const bool& GetIsHit()const { return isHit; }
 	const float& GetMaxDistance()const { return maxDistance; }
 	void ChangeModel(std::string shape, std::string skin);
 private:
-	std::unique_ptr< Object3d> object3d;
+	std::unique_ptr< Object3d> object3d_;
+	std::shared_ptr<ModelManager>modelManager_;
+	std::unique_ptr<Particle> particle_;
+
 	Player* player = nullptr;
-	std::unique_ptr<Particle> particle;
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };
 	Vector3 nowWhaleSpeed = { 0.0f,0.0f,0.0f };
 	Vector3 accSpeed = { 0.0f,0.0f,0.0f };
 	bool isDead = false;
 	bool isHit = false;
 	AABB wCollision = {};
-	int life = 4;
+	int32_t life = 4;
 	uint32_t coolTimer = 0;
 	float maxDistance = 6.0f;
 	std::string whaleModel = "whale/improvisedWhale2.obj";

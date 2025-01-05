@@ -8,6 +8,8 @@
 #include<array>
 #include<chrono>
 #include<thread>
+#include <dxcapi.h>
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
@@ -57,16 +59,23 @@ namespace MyEngine
 		void DebugLayer();
 		void InfoQueue(ID3D12Device* device);
 
+		ComPtr<IDxcBlob> CompileShader(
+			const std::wstring& filePath,
+			const wchar_t* profile,
+			IDxcUtils* dxcUtils,
+			IDxcCompiler3* dxcCompiler,
+			IDxcIncludeHandler* includeHandler);
+
 		ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 		ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
 
-		static DX12Common* GetInstance();
+		static std::shared_ptr<DX12Common> GetInstance();
 		static void DeleteInstance();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
 
-		ComPtr<ID3D12Device> GetDevice() { return device_; }
+		ComPtr<ID3D12Device> GetDevice() { return device; }
 		ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList.Get(); }
 		ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue.Get(); }
 		ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator.Get(); }
@@ -77,21 +86,22 @@ namespace MyEngine
 		ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 		ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
 
-	private:
-		DX12Common() = default;
 		~DX12Common() = default;
 		DX12Common(const DX12Common& obj) = delete;
 		DX12Common& oparator(const DX12Common& obj) = delete;
-		static inline DX12Common* instance;
+	protected:
+		DX12Common() = default;
+	private:
+		static inline std::weak_ptr<DX12Common> instance;
 
 		Debug* debug_ = nullptr;
 		WinAPP* winApp_ = nullptr;
 
-		ComPtr<ID3D12Device> device_ = nullptr;
+		ComPtr<ID3D12Device> device = nullptr;
 		ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 		HRESULT hr = NULL;
 		ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2]{};
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 
 		ComPtr<ID3D12CommandQueue> commandQueue = nullptr;

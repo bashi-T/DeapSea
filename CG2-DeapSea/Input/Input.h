@@ -33,7 +33,7 @@ namespace MyEngine
 		Input& operator=(Input&) = delete;
 
 		WinAPP* winApp_ = nullptr;
-		HRESULT hr;
+		HRESULT hr = NULL;
 		ComPtr<IDirectInput8>directInput = nullptr;
 		ComPtr<IDirectInputDevice8> keyboard;
 		BYTE key[256] = {};

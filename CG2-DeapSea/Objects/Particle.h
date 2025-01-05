@@ -54,7 +54,7 @@ namespace MyEngine
 		/// <param name="object3dCommon"></param>
 		/// <param name="elements"></param>
 		/// <param name="numMaxInstance"></param>
-		void Initialize(const std::string& filename, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle elements, int numMaxInstance);
+		void Initialize(const std::string& filename, ElementsParticle elements, int32_t numMaxInstance);
 		/// <summary>
 		/// particleを生成
 		/// </summary>
@@ -76,7 +76,7 @@ namespace MyEngine
 		/// <param name="particleCommon"></param>
 		/// <param name="sizeInBytes"></param>
 		/// <returns></returns>
-		ComPtr<ID3D12Resource> CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes);
+		ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 		/// <summary>
 		/// bufferViewの生成
 		/// </summary>
@@ -139,35 +139,12 @@ namespace MyEngine
 		CameraTransform* cameraData = nullptr;
 
 		/// <summary>
-		/// particleの色と出現時間を細かく設定
+		/// particleの要素を細かく設定　
 		/// </summary>
 		/// <param name="randomEngine"></param>
 		/// <param name="colorMin">particleの色の最小値</param>
-		/// <param name="colorMax">particleの色の最大値</param>
-		/// <param name="timeMin">particleの出現時間の最小値</param>
-		/// <param name="timeMax">particleの出現時間の最大値</param>
 		/// <returns></returns>
-		Particles MakeNewParticle(std::mt19937& randomEngine, float colorMin, float colorMax, float timeMin, float timeMax);
-		/// <summary>
-		/// particleの座標関連の要素を細かく設定　
-		/// </summary>
-		/// <param name="randomEngine"></param>
-		/// <param name="posxMin">particleが発生するX座標の最小値</param>
-		/// <param name="posxMax">particleが発生するX座標の最大値</param>
-		/// <param name="posyMin">particleが発生するY座標の最小値</param>
-		/// <param name="posyMax">particleが発生するY座標の最大値</param>
-		/// <param name="poszMin">particleが発生するZ座標の最小値</param>
-		/// <param name="poszMax">particleが発生するZ座標の最大値</param>
-		/// <param name="velxMin">particleが移動するX方向ベクトルの最小値</param>
-		/// <param name="velxMax">particleが移動するX方向ベクトルの最大値</param>
-		/// <param name="velyMin">particleが移動するY方向ベクトルの最小値</param>
-		/// <param name="velyMax">particleが移動するY方向ベクトルの最大値</param>
-		/// <param name="velzMin">particleが移動するZ方向ベクトルの最小値</param>
-		/// <param name="velzMax">particleが移動するZ方向ベクトルの最大値</param>
-		/// <returns></returns>
-		Particles MakeNewParticlePosition(std::mt19937& randomEngine,
-			float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
-			float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);
+		Particles MakeNewParticle(std::mt19937& randomEngine,ElementsParticle element);
 		/// <summary>
 		/// ElementsParticleに任意の要素を入れる
 		/// </summary>
@@ -214,9 +191,11 @@ namespace MyEngine
 		ParticleForGPU* GetInstancingData() { return instancingData; }
 		Particles* GetParticles() { return particles; }
 	private:
-		SRVManager* srvManager_ = nullptr;
-		Object3dCommon* object3dCommon_ = nullptr;
-		ParticleCommon* particleCommon_;
+		std::shared_ptr<SRVManager> srvManager_ = nullptr;
+		std::shared_ptr<Object3dCommon> object3dCommon_ = nullptr;
+		std::shared_ptr<ParticleCommon> particleCommon_;
+		std::shared_ptr<TextureManager>textureManager_;
+		std::shared_ptr<DX12Common>dx12Common_ = nullptr;
 		Camera* camera_ = nullptr;
 		HRESULT hr = NULL;
 
@@ -271,15 +250,15 @@ namespace MyEngine
 
 		Sphere sphere = { { 0.0f,0.0f,0.0f },1.0f };
 
-		Vector4 LeftTop;
-		Vector4 RightTop;
-		Vector4 RightBottom;
-		Vector4 LeftBottom;
-		Vector4 Color;
-		Vector2 texcoordLeftTop;
-		Vector2 texcoordLeftBottom;
-		Vector2 texcoordRightTop;
-		Vector2 texcoordRightBottom;
+		Vector4 LeftTop{};
+		Vector4 RightTop{};
+		Vector4 RightBottom{};
+		Vector4 LeftBottom{};
+		Vector4 Color{};
+		Vector2 texcoordLeftTop{};
+		Vector2 texcoordLeftBottom{};
+		Vector2 texcoordRightTop{};
+		Vector2 texcoordRightBottom{};
 
 		const float kDeltaTime = 1.0f / 60.0f;
 		Vector2 anchorPoint = { 0.0f,0.0f };

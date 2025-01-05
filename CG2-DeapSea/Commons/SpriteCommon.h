@@ -13,18 +13,12 @@ namespace MyEngine
 	class SpriteCommon
 	{
 	public:
-		void Initialize(DX12Common* dxcommon);
+		void Initialize();
 		//void Update();
 		//void Draw(int32_t width, int32_t height);
-		ComPtr<IDxcBlob> CompileShader(
-			const std::wstring& filePath,
-			const wchar_t* profile,
-			IDxcUtils* dxcUtils,
-			IDxcCompiler3* dxcCompiler,
-			IDxcIncludeHandler* includeHandler);
 		void ResetDXC();
 		void MakePSO(DX12Common* dxcommon);
-		static SpriteCommon* GetInstance();
+		static std::shared_ptr<SpriteCommon> GetInstance();
 		static void DeleteInstance();
 
 		//void InputDataTriangle(
@@ -38,7 +32,7 @@ namespace MyEngine
 		ComPtr<ID3D12Resource> GetVertexResource() { return vertexResource; }
 		ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 		ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
-		DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
+		std::shared_ptr<DX12Common> GetDx12Common() { return DX12Common::GetInstance(); }
 
 		struct DirectionalLight {
 			Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -46,20 +40,21 @@ namespace MyEngine
 			float intensity = 1.0f;
 		};
 
-	private:
-		SpriteCommon() = default;
 		~SpriteCommon() = default;
 		SpriteCommon(SpriteCommon&) = delete;
 		SpriteCommon& operator=(SpriteCommon&) = delete;
+	protected:
+		SpriteCommon() = default;
+	private:
 
-		Debug* debug_;
-		WinAPP* sWinApp;
-		MyImGui* imgui_;
+		Debug* debug_ = nullptr;
+		WinAPP* sWinApp = nullptr;
+		MyImGui* imgui_ = nullptr;
 		HRESULT hr = NULL;
-		DX12Common* dx12Common_;
-		EulerTransform transformMatrix;
+		std::shared_ptr<DX12Common> dx12Common_;
+		EulerTransform transformMatrix{};
 		ComPtr<ID3D12Resource> transformationMatrixResource;
-		static inline SpriteCommon* instance;
+		static inline std::weak_ptr<SpriteCommon> instance;
 
 		ComPtr<IDxcUtils> dxcUtils = nullptr;
 		ComPtr<IDxcCompiler3> dxcCompiler = nullptr;

@@ -7,14 +7,15 @@ namespace MyEngine
 	{
 	}
 
-	void Sprite::Initialize(SpriteCommon* spriteCommon, SRVManager* srvManager, std::string textureFilePath)
+	void Sprite::Initialize(std::string textureFilePath)
 	{
-		this->spriteCommon_ = spriteCommon;
-		this->srvManager_ = srvManager;
-		vertexResource = CreateBufferResource(spriteCommon_, sizeof(VertexData) * 6);
-		indexResource = CreateBufferResource(spriteCommon_, sizeof(uint32_t) * 6);
-		materialResource = CreateBufferResource(spriteCommon_, sizeof(Material));
-		transformationMatrixResource = CreateBufferResource(spriteCommon_, sizeof(TransformationMatrix));
+		spriteCommon_ = SpriteCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = spriteCommon_->GetDx12Common();
+		vertexResource = CreateBufferResource(sizeof(VertexData) * 6);
+		indexResource = CreateBufferResource(sizeof(uint32_t) * 6);
+		materialResource = CreateBufferResource(sizeof(Material));
+		transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 
 		uvTransform =
 		{
@@ -74,7 +75,7 @@ namespace MyEngine
 		InputData(materialData->color);
 
 		//ImGui::Begin("spriteEdit");
-		//int num = textureIndex;
+		//int32_t num = textureIndex;
 		//ImGui::InputInt("texture", &num);
 		//ImGui::DragFloat2("position", &position.x, 0.1f);
 		//ImGui::DragFloat("rotate", &rotation, 0.1f);
@@ -116,22 +117,22 @@ namespace MyEngine
 			bottom = -bottom;
 		}
 
-		const DirectX::TexMetadata& metadata =
-			TextureManager::GetInstance()->GetMetaData(materialData->material.textureFilePath);
-		float tex_left = textureLeftTop.x / metadata.width;
-		float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
-		float tex_top = textureLeftTop.y / metadata.width;
-		float tex_bottom = (textureLeftTop.y + textureSize.y) / metadata.width;
+		//const DirectX::TexMetadata& metadata =
+		//	TextureManager::GetInstance()->GetMetaData(materialData->material.textureFilePath);
+		//float tex_left = textureLeftTop.x / metadata.width;
+		//float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
+		//float tex_top = textureLeftTop.y / metadata.width;
+		//float tex_bottom = (textureLeftTop.y + textureSize.y) / metadata.width;
 
 		vertexData[0].position = { left,bottom,0.0f,1.0f };//左下
 		vertexData[1].position = { left,top,0.0f,1.0f };//左上
 		vertexData[2].position = { right,bottom,0.0f,1.0f };//右下
 		vertexData[3].position = { right,top,0.0f,1.0f };//右上
 
-		vertexData[0].texcoord = { tex_left,tex_bottom };
-		vertexData[1].texcoord = { tex_left,tex_top };
-		vertexData[2].texcoord = { tex_right,tex_bottom };
-		vertexData[3].texcoord = { tex_right,tex_top };
+		vertexData[0].texcoord = { 0.0f,1.0f };//左下
+		vertexData[1].texcoord = { 0.0f,0.0f };//左上
+		vertexData[2].texcoord = { 1.0f,1.0f };//右下
+		vertexData[3].texcoord = { 1.0f,0.0f };//右上
 
 		vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
 		vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
@@ -164,35 +165,35 @@ namespace MyEngine
 
 	void Sprite::Draw()
 	{
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetPipelineState(spriteCommon_->GetGraphicsPipelineState().Get());
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootSignature(spriteCommon_->GetRootSignature().Get());
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetVertexBuffers(0, 1, &vertexBufferView);
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetIndexBuffer(&indexBufferView);
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				0, materialResource->GetGPUVirtualAddress());
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				1, transformationMatrixResource->GetGPUVirtualAddress());
 
 		D3D12_CPU_DESCRIPTOR_HANDLE rtv =
-			spriteCommon_->GetDx12Common()->
+			dx12Common_->
 			GetRtvHandles(srvManager_->GetBackBufferIndex());
-		D3D12_CPU_DESCRIPTOR_HANDLE dsv = spriteCommon_->GetDx12Common()->GetDsvHandle();
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		D3D12_CPU_DESCRIPTOR_HANDLE dsv = dx12Common_->GetDsvHandle();
+		dx12Common_->GetCommandList().Get()->
 			OMSetRenderTargets(1, &rtv, false, &dsv);
 
 		srvManager_->SetGraphicsRootDescriptorTable(
 			2, materialData->material.textureIndex);
 
-		spriteCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
@@ -202,9 +203,8 @@ namespace MyEngine
 		materialData->material.textureFilePath.shrink_to_fit();
 	}
 
-	ComPtr<ID3D12Resource> Sprite::CreateBufferResource(SpriteCommon* spriteCommon, size_t sizeInBytes)
+	ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeInBytes)
 	{
-		this->spriteCommon_ = spriteCommon;
 		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 		uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -223,7 +223,7 @@ namespace MyEngine
 
 		ComPtr<ID3D12Resource> Resource = nullptr;
 
-		hr = spriteCommon_->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
+		hr = dx12Common_->GetDevice().Get()->CreateCommittedResource(
 			&uploadHeapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&ResourceDesc,

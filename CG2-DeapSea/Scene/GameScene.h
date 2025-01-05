@@ -25,20 +25,20 @@ namespace MyEngine
 		void Draw() override;
 		void Finalize() override;
 
-		void LoadEnemyPopData(std::string filePath, int fileNum);
-		void UpdateEnemyPopCommands(int fileNum);
+		void LoadEnemyPopData(std::string filePath, int32_t fileNum);
+		void UpdateEnemyPopCommands(int32_t fileNum);
 
 
 		void CheckAllCollisions();
 	private:
-		std::unique_ptr<Particle> particle;
-		std::vector<std::unique_ptr<Sprite>>sprites;
-		std::vector<std::unique_ptr<UIPlane>>uiPlanes;
+		std::unique_ptr<Particle> particle_;
+		std::vector<std::unique_ptr<Sprite>>sprites_;
+		std::vector<std::unique_ptr<UIPlane>>uiPlanes_;
 		std::unique_ptr<Player> player_;
 		std::unique_ptr<Whale> whale_;
 		std::list<std::unique_ptr<Enemy>> enemys_;
 		std::unique_ptr<Tide>tide_;
-		std::unique_ptr<Ground>ground;
+		std::unique_ptr<Ground>ground_;
 
 		std::stringstream enemyPopCommands[10];
 		std::string enemyPopFile[10];
@@ -46,11 +46,19 @@ namespace MyEngine
 		int32_t WaitTimer = 1;
 		bool gameEnd = false;
 		AudioManager::SoundData bgm = {};
-		int time = 0;
+		int32_t time = 0;
 		bool isGameStart = false;
 		bool isGameOver = false;
 		bool isGameClear = false;
-		int sceneTransitionTime = 0;
+		int32_t sceneTransitionTime = 0;
+
+		enum UIType
+		{
+			Start,
+			Blackout,
+			NumArgument
+		};
+
 		std::string Planes[6]
 		{
 			"plane/plane.obj",
@@ -62,5 +70,9 @@ namespace MyEngine
 		};
 		Vector3 v = {};
 		Vector3 zoomPos = {};
+		float ingameCameraY = 76.0f;
+		Vector3 ingameCameraRotate = { 0.2f,0.0f,0.0f };
+		const float zfar = 2.0f;
+		Vector2 spritePos = { 10.0f,-50.0f };
 	};
 }

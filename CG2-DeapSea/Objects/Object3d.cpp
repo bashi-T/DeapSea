@@ -7,15 +7,16 @@
 
 namespace MyEngine
 {
-	void Object3d::Initialize(Object3dCommon* object3dCommon, SRVManager* srvManager)
+	void Object3d::Initialize()
 	{
-		this->object3dCommon_ = object3dCommon;
-		this->srvManager_ = srvManager;
+		object3dCommon_ = Object3dCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = DX12Common::GetInstance();
 
-		transformationMatrixResource = CreateBufferResource(object3dCommon_, sizeof(TransformationMatrix));
-		directionalLightResource = CreateBufferResource(object3dCommon_, sizeof(DirectionalLight));
+		transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
+		directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
 		this->camera_ = object3dCommon_->GetDefaultCamera();
-		cameraResource = CreateBufferResource(object3dCommon_, sizeof(CameraTransform));
+		cameraResource = CreateBufferResource(sizeof(CameraTransform));
 		transformMatrix =
 		{
 		{1.0f, 1.0f, 1.0f},
@@ -118,7 +119,7 @@ namespace MyEngine
 		skeltonAnimationTime = std::fmod(skeltonAnimationTime, model_->GetAnimation().duration);
 		ApplyAnimation(model_->GetSkelton(), model_->GetAnimation(), skeltonAnimationTime);
 
-		int i = 0;
+		int32_t i = 0;
 		for (Model::Joint& joint : model_->GetSkelton().joints)
 		{
 			joint.localMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
@@ -154,85 +155,80 @@ namespace MyEngine
 		(void)test;
 	}
 
-	void Object3d::Draw(ModelCommon* modelCommon)//処理に問題の可能性あり
+	void Object3d::Draw()
 	{
-		this->modelCommon_ = modelCommon;
-
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetPipelineState(object3dCommon_->GetGraphicsPipelineStates(0).Get());
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootSignature(object3dCommon_->GetRootSignatures(0).Get());
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
+		D3D12_CPU_DESCRIPTOR_HANDLE rtv = dx12Common_->GetRtvHandles(
 			srvManager_->GetBackBufferIndex());
 
-		D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		D3D12_CPU_DESCRIPTOR_HANDLE dsv = dx12Common_->GetDsvHandle();
+		dx12Common_->GetCommandList().Get()->
 			OMSetRenderTargets(1, &rtv, false, &dsv);
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				1, transformationMatrixResource->GetGPUVirtualAddress());
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
 
-		object3dCommon_->GetDx12Common()->GetCommandList()->
+		dx12Common_->GetCommandList()->
 			SetGraphicsRootConstantBufferView(
 				4, cameraResource->GetGPUVirtualAddress());
 
 		if (model_)
 		{
-			model_->Draw(modelCommon_, srvManager_);
+			model_->Draw();
 		}
 	}
 
-	void Object3d::SkeltonDraw(ModelCommon* modelCommon)
+	void Object3d::SkeltonDraw()
 	{
-		this->modelCommon_ = modelCommon;
-
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetPipelineState(object3dCommon_->GetGraphicsPipelineStates(1).Get());
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootSignature(object3dCommon_->GetRootSignatures(1).Get());
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		D3D12_CPU_DESCRIPTOR_HANDLE rtv = object3dCommon_->GetDx12Common()->GetRtvHandles(
+		D3D12_CPU_DESCRIPTOR_HANDLE rtv = dx12Common_->GetRtvHandles(
 			srvManager_->GetBackBufferIndex());
 
-		D3D12_CPU_DESCRIPTOR_HANDLE dsv = object3dCommon_->GetDx12Common()->GetDsvHandle();
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		D3D12_CPU_DESCRIPTOR_HANDLE dsv = dx12Common_->GetDsvHandle();
+		dx12Common_->GetCommandList().Get()->
 			OMSetRenderTargets(1, &rtv, false, &dsv);
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				1, transformationMatrixResource->GetGPUVirtualAddress());
 
-		object3dCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootConstantBufferView(
 				3, directionalLightResource->GetGPUVirtualAddress());
 
-		object3dCommon_->GetDx12Common()->GetCommandList()->
+		dx12Common_->GetCommandList()->
 			SetGraphicsRootConstantBufferView(
 				4, cameraResource->GetGPUVirtualAddress());
 
 		if (model_)
 		{
-			model_->SkeltonDraw(modelCommon_, srvManager_);
+			model_->SkeltonDraw();
 		}
 	}
 
-	ComPtr<ID3D12Resource> Object3d::CreateBufferResource(Object3dCommon* object3dCommon, size_t sizeInBytes)
+	ComPtr<ID3D12Resource> Object3d::CreateBufferResource(size_t sizeInBytes)
 	{
-		this->object3dCommon_ = object3dCommon;
 		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 		uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -251,7 +247,7 @@ namespace MyEngine
 
 		ComPtr<ID3D12Resource> Resource = nullptr;
 
-		hr = object3dCommon_->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
+		hr = dx12Common_->GetDevice().Get()->CreateCommittedResource(
 			&uploadHeapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&ResourceDesc,
@@ -317,6 +313,11 @@ namespace MyEngine
 	void Object3d::SetModel(const std::string& filePath)
 	{
 		model_ = ModelManager::GetInstance()->FindModel(filePath);
+	}
+
+	std::shared_ptr<Object3d> Object3d::GetInstance()
+	{
+		return std::make_shared<Object3d>();
 	}
 
 	void Object3d::SetColor(Vector4 color)

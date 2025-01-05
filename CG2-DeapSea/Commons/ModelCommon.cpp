@@ -5,13 +5,9 @@
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 namespace MyEngine
 {
-	void ModelCommon::Initialize(DX12Common* dxCommon)
+	void ModelCommon::Initialize()
 	{
-		this->dxCommon_ = dxCommon;
-		//ResetDXC();
-
-		//MakePSO(dxCommon_);
-		//MakeSkeltonPSO(dxCommon_);
+		dx12Common_ = DX12Common::GetInstance();
 	}
 
 	void ModelCommon::ResetDXC()
@@ -22,49 +18,6 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 		hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 		assert(SUCCEEDED(hr));
-	}
-
-	ComPtr<IDxcBlob> ModelCommon::CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile,
-		IDxcUtils* dxcUtils_,
-		IDxcCompiler3* dxcCompiler_,
-		IDxcIncludeHandler* includeHandler_)
-	{
-		debug_->Log(
-			debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
-		ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
-		hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
-		assert(SUCCEEDED(hr));
-
-		DxcBuffer shaderSourceBuffer;
-		shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-		shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-		shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-		LPCWSTR arguments[]{
-			filePath.c_str(), L"-E", L"main", L"-T", profile, L"-Zi", L"-Qembed_debug", L"-Od", L"-Zpr",
-		};
-		ComPtr<IDxcResult> shaderResult = nullptr;
-		hr = dxcCompiler_->Compile(
-			&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_,
-			IID_PPV_ARGS(&shaderResult));
-		assert(SUCCEEDED(hr));
-
-		ComPtr<IDxcBlobUtf8> shaderError = nullptr;
-		shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-		if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-			debug_->Log(shaderError->GetStringPointer());
-			assert(SUCCEEDED(hr));
-		}
-		ComPtr<IDxcBlob> shaderBlob = nullptr;
-		hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-		assert(SUCCEEDED(hr));
-		debug_->Log(
-			debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
-		shaderSource->Release();
-		shaderResult->Release();
-		return shaderBlob;
 	}
 
 	void ModelCommon::MakePSO(DX12Common* dxcommon)
@@ -175,11 +128,11 @@ namespace MyEngine
 		ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 		ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 		vertexShaderBlob =
-			CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+			dx12Common_->CompileShader(L"HLSL/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 		assert(vertexShaderBlob != nullptr);
 
 		pixelShaderBlob =
-			CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+			dx12Common_->CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 		assert(pixelShaderBlob != nullptr);
 
 		D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -334,11 +287,11 @@ namespace MyEngine
 		ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 		ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 		vertexShaderBlob =
-			CompileShader(L"HLSL/SkinningObject3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+			dx12Common_->CompileShader(L"HLSL/SkinningObject3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 		assert(vertexShaderBlob != nullptr);
 
 		pixelShaderBlob =
-			CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+			dx12Common_->CompileShader(L"HLSL/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 		assert(pixelShaderBlob != nullptr);
 
 		D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -371,18 +324,21 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	ModelCommon* ModelCommon::GetInstance()
+	std::shared_ptr<ModelCommon> ModelCommon::GetInstance()
 	{
-		if (instance == NULL)
+		auto ret_ptr = instance.lock();
+		if (!ret_ptr)
 		{
-			instance = new ModelCommon;
+			ret_ptr = std::shared_ptr<ModelCommon>(new ModelCommon{});
+			instance = std::weak_ptr<ModelCommon>(ret_ptr);
+			return ret_ptr;
 		}
-		return instance;
+
+		return instance.lock();
 	}
 
 	void ModelCommon::Finalize()
 	{
-		delete instance;
-		instance = NULL;
+		instance.reset();
 	}
 }

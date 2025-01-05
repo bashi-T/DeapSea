@@ -33,25 +33,27 @@ namespace MyEngine
 		{
 			WAVEFORMATEX wfex;
 			BYTE* pBuffer;
-			unsigned int bufferSize;
+			int32_t bufferSize;
 		};
 
 		SoundData SoundLoadWave(const char* filename);
 		void SoundUnload(SoundData* soundData);
 		void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData);
-		static AudioManager* GetInstance();
+		static std::shared_ptr<AudioManager> GetInstance();
 
 		ComPtr<IXAudio2> GetxAudio2() { return xAudio2_; }
-	private:
-		AudioManager() = default;
+
 		~AudioManager() = default;
 		AudioManager(AudioManager&) = delete;
 		AudioManager& operator=(AudioManager&) = delete;
+	protected:
+		AudioManager() = default;
+	private:
 
-		static inline AudioManager* instance;
-		HRESULT result;
+		static inline std::weak_ptr<AudioManager> instance;
+		HRESULT hr = NULL;
 		ComPtr<IXAudio2>xAudio2_;
-		IXAudio2MasteringVoice* masterVoice;
+		IXAudio2MasteringVoice* masterVoice = nullptr;
 
 	};
 }

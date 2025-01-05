@@ -13,17 +13,18 @@
 	{
 		player_ = player;
 		whale_ = whale;
-		object3d = std::make_unique<Object3d>();
+		object3d_ = std::make_unique<Object3d>();
+		modelManager_ = ModelManager::GetInstance();
 		switch (sort)
 		{
 		case 0:
 		{
 			std::string enemyModel = "fish/improvisedFish.obj";
-			const std::string enemySkin = "Resource/uvChecker.png";
-			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin, true);
-			object3d->SetModel(enemyModel);
-			Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
+			const std::string enemySkin = "Resource/whale5.png";
+			object3d_->Initialize();
+			modelManager_->LoadModel(enemyModel, enemySkin, true);
+			object3d_->SetModel(enemyModel);
+			Model* model = modelManager_->FindModel(enemyModel);
 			Model::ModelData* modelData = model->GetModelData();
 			for (Model::VertexData& vertex : modelData->vertices)
 			{
@@ -39,11 +40,11 @@
 		{
 			moveInterval = 0;
 			std::string enemyModel = "straight/improvisedStraight.obj";
-			const std::string enemySkin = "Resource/uvChecker.png";
-			object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-			ModelManager::GetInstance()->LoadModel(enemyModel, enemySkin, true);
-			object3d->SetModel(enemyModel);
-			Model* model = ModelManager::GetInstance()->FindModel(enemyModel);
+			const std::string enemySkin = "Resource/whale5.png";
+			object3d_->Initialize();
+			modelManager_->LoadModel(enemyModel, enemySkin, true);
+			object3d_->SetModel(enemyModel);
+			Model* model = modelManager_->FindModel(enemyModel);
 			Model::ModelData* modelData = model->GetModelData();
 			for (Model::VertexData& vertex : modelData->vertices)
 			{
@@ -76,30 +77,30 @@
 			if (life <= 0)
 			{
 				escapeTime++;
-				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+				if (player_->GetTranslate().x >= object3d_->GetTranslate().x)
 				{
-					enemyVector = { -2.0f,1.0f,2.0f };
-					object3d->SetRotate({ -1.0f,0.5f,-0.2f });
+					enemyVector = { -enemyEscapeSpeed.x,enemyEscapeSpeed.y,enemyEscapeSpeed.z };
+					object3d_->SetRotate({ -0.2f,-radianPerFrequency * 135,0.0f });
 				}
 				else
 				{
-					enemyVector = { 2.0f,1.0f,2.0f };
-					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+					enemyVector = enemyEscapeSpeed;
+					object3d_->SetRotate({ -0.2f,radianPerFrequency * 135,0.0f });
 				}
 				if (escapeTime>=180)
 				{
 					isDead = true;
 				}
-				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
+				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
 
 			}
 			else
 			{
-				if (object3d->GetTranslate().z > player_->GetTranslate().z)
+				if (object3d_->GetTranslate().z > player_->GetTranslate().z)
 				{
 					Shot();
 				}
-				if (shotInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+				if (shotInterval == 1 && object3d_->GetTranslate().z > whale_->GetTranslate().z)
 				{
 					SetEnemyVector(whale_->GetTranslate());
 				}
@@ -107,13 +108,13 @@
 				{
 					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 				}
-				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, enemyVector)));
+				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
 			}
-			object3d->Update(Camera::GetInstance());
-			eCollision =
+			object3d_->Update(Camera::GetInstance().get());
+			enemyCollision =
 			{
-				.min{object3d->GetTranslate().x - 0.1f,object3d->GetTranslate().y - 0.25f,object3d->GetTranslate().z - 1.5f},
-				.max{object3d->GetTranslate().x + 0.1f,object3d->GetTranslate().y + 0.25f,object3d->GetTranslate().z + 1.5f}
+				.min{object3d_->GetTranslate().x - 0.1f,object3d_->GetTranslate().y - 0.25f,object3d_->GetTranslate().z - 1.5f},
+				.max{object3d_->GetTranslate().x + 0.1f,object3d_->GetTranslate().y + 0.25f,object3d_->GetTranslate().z + 1.5f}
 			};
 
 			for (const auto& bullet : eBullets)
@@ -125,21 +126,21 @@
 			if (life <= 0)
 			{
 				escapeTime++;
-				if (player_->GetTranslate().x >= object3d->GetTranslate().x)
+				if (player_->GetTranslate().x >= object3d_->GetTranslate().x)
 				{
-					enemyVector = { -2.0f,2.0f,2.0f };
-					object3d->SetRotate({ -1.0f,0.5f,-0.2f });
+					enemyVector = { -enemyEscapeSpeed.x,enemyEscapeSpeed.y,enemyEscapeSpeed.z };
+					object3d_->SetRotate({ -0.2f,-radianPerFrequency * 135,0.0f });
 				}
 				else
 				{
-					enemyVector = { 2.0f,2.0f,2.0f };
-					object3d->SetRotate({ 1.0f,0.5f,-0.2f });
+					enemyVector = enemyEscapeSpeed;
+					object3d_->SetRotate({ -0.2f,radianPerFrequency * 135,0.0f });
 				}
 				if (escapeTime >= 180)
 				{
 					isDead = true;
 				}
-				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
+				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
 			}
 			else
 			{
@@ -148,7 +149,7 @@
 				{
 					moveInterval = 0;
 				}
-				if (moveInterval == 1 && object3d->GetTranslate().z > whale_->GetTranslate().z)
+				if (moveInterval == 1 && object3d_->GetTranslate().z > whale_->GetTranslate().z)
 				{
 					SetEnemyVector(whale_->GetTranslate());
 				}
@@ -156,13 +157,13 @@
 				{
 					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 				}
-				object3d->SetTranslate(Add(object3d->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
+				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
 			}
-			object3d->Update(Camera::GetInstance());
-			eCollision =
+			object3d_->Update(Camera::GetInstance().get());
+			enemyCollision =
 			{
-				.min{object3d->GetTranslate().x - 0.05f,object3d->GetTranslate().y - 0.4f,object3d->GetTranslate().z - 2.5f},
-				.max{object3d->GetTranslate().x + 0.05f,object3d->GetTranslate().y + 0.4f,object3d->GetTranslate().z + 2.5f}
+				.min{object3d_->GetTranslate().x - 0.05f,object3d_->GetTranslate().y - 0.4f,object3d_->GetTranslate().z - 2.5f},
+				.max{object3d_->GetTranslate().x + 0.05f,object3d_->GetTranslate().y + 0.4f,object3d_->GetTranslate().z + 2.5f}
 			};
 			break;
 		}
@@ -173,14 +174,14 @@
 		switch (sort)
 		{
 		case 0:
-			object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+			object3d_->Draw();
 			for (const auto& bullet : eBullets)
 			{
 				bullet->Draw();
 			}
 			break;
 		case 1:
-			object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+			object3d_->Draw();
 			break;
 		}
 	}
@@ -191,7 +192,7 @@
 		if (shotInterval == 1)
 		{
 			std::unique_ptr<EnemyBullet> newBullet = std::make_unique< EnemyBullet>();
-			newBullet->Initialize(object3d->GetTranslate());
+			newBullet->Initialize(object3d_->GetTranslate());
 			newBullet->SetEnemyBulletVector(player_->GetTranslate());
 			eBullets.push_back(std::move(newBullet));
 		}
@@ -212,10 +213,10 @@
 
 	void Enemy::SetTranslate(Vector3 translate)
 	{
-		object3d->SetTranslate(translate);
+		object3d_->SetTranslate(translate);
 	}
 
 	void Enemy::SetEnemyVector(Vector3 position)
 	{
-		enemyVector = Normalize(Subtract(position, object3d->GetTranslate()));
+		enemyVector = Normalize(Subtract(position, object3d_->GetTranslate()));
 	}

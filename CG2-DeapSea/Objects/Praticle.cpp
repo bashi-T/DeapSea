@@ -7,12 +7,13 @@ namespace MyEngine
 	{
 	}
 
-	void Particle::Initialize(const std::string& textureFilePath, ParticleCommon* particleCommon, SRVManager* srvManager, Object3dCommon* object3dCommon, ElementsParticle element,int numMaxInstance)
+	void Particle::Initialize(const std::string& textureFilePath, ElementsParticle element, int32_t numMaxInstance)
 	{
-		this->particleCommon_ = particleCommon;
-		this->object3dCommon_ = object3dCommon;
-		this->srvManager_ = srvManager;
-		this->camera_ = object3dCommon_->GetDefaultCamera();
+		particleCommon_ = ParticleCommon::GetInstance();
+		object3dCommon_ = Object3dCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = particleCommon_->GetDx12Common();
+		camera_ = object3dCommon_->GetDefaultCamera();
 		kNumMaxInstance = numMaxInstance;
 
 		LeftTop = { -0.5f, 0.5f, 0.0f, 1.0f };
@@ -27,11 +28,11 @@ namespace MyEngine
 		texcoordLeftBottom = { 1.0f,0.0f };
 
 		projectionMatrix = MakePerspectiveFovMatrix(0.65f, float(WinAPP::clientWidth_) / float(WinAPP::clientHeight_), 0.1f, 100.0f);
-		vertexResource = CreateBufferResource(particleCommon_, sizeof(VertexData) * 6);
-		colorResource = CreateBufferResource(particleCommon_, sizeof(Material));
-		indexResource = CreateBufferResource(particleCommon_, sizeof(uint32_t) * 6);
-		instancingResource = CreateBufferResource(particleCommon_, sizeof(ParticleForGPU) * kNumMaxInstance);
-		cameraResource = CreateBufferResource(particleCommon_, sizeof(CameraTransform));
+		vertexResource = CreateBufferResource(sizeof(VertexData) * 6);
+		colorResource = CreateBufferResource(sizeof(Material));
+		indexResource = CreateBufferResource(sizeof(uint32_t) * 6);
+		instancingResource = CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
+		cameraResource = CreateBufferResource(sizeof(CameraTransform));
 
 		MakeBufferView();
 
@@ -56,10 +57,7 @@ namespace MyEngine
 		std::mt19937 randomEngine(seedGenerator());
 		for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 		{
-			particles[index] = MakeNewParticle(randomEngine, element.colorMin, element.colorMax, element.timeMin, element.timeMax);
-			particles[index] = MakeNewParticlePosition(randomEngine,
-				element.posxMin, element.posxMax, element.posyMin, element.posyMax, element.poszMin, element.poszMax,
-				element.velxMin, element.velxMax, element.velyMin, element.velyMax, element.velzMin, element.velzMax);
+			particles[index] = MakeNewParticle(randomEngine, element);
 			instancingData[index].WVP = MakeIdentity4x4();
 			instancingData[index].World = MakeIdentity4x4();
 			instancingData[index].color = particles[index].color;
@@ -73,31 +71,30 @@ namespace MyEngine
 
 	void Particle::Draw()
 	{
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->SetPipelineState(particleCommon_->GetGraphicsPipelineState().Get());
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootSignature(particleCommon_->GetRootSignature().Get());
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->IASetPrimitiveTopology(
+		dx12Common_->GetCommandList().Get()->SetPipelineState(particleCommon_->GetGraphicsPipelineState().Get());
+		dx12Common_->GetCommandList().Get()->SetGraphicsRootSignature(particleCommon_->GetRootSignature().Get());
+		dx12Common_->GetCommandList().Get()->IASetPrimitiveTopology(
 			D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->IASetVertexBuffers(0, 1, &vertexBufferView);
+		dx12Common_->GetCommandList().Get()->
 			IASetIndexBuffer(&indexBufferView);
 
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		dx12Common_->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 			0, colorResource->GetGPUVirtualAddress());
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->
+		dx12Common_->GetCommandList().Get()->
 			SetGraphicsRootDescriptorTable(
 				1, instancingSrvHandleGPU);
 		srvManager_->SetGraphicsRootDescriptorTable(
 			2, materialData.textureIndex);
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
+		dx12Common_->GetCommandList().Get()->SetGraphicsRootConstantBufferView(
 			3, cameraResource->GetGPUVirtualAddress());
 
-		particleCommon_->GetDx12Common()->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
+		dx12Common_->GetCommandList().Get()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 	}
 
-	ComPtr<ID3D12Resource> Particle::CreateBufferResource(ParticleCommon* particleCommon, size_t sizeInBytes)
+	ComPtr<ID3D12Resource> Particle::CreateBufferResource(size_t sizeInBytes)
 	{
-		this->particleCommon_ = particleCommon;
 		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 
 		uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -116,7 +113,7 @@ namespace MyEngine
 
 		ComPtr<ID3D12Resource> Resource = nullptr;
 
-		hr = particleCommon->GetDx12Common()->GetDevice().Get()->CreateCommittedResource(
+		hr = dx12Common_->GetDevice().Get()->CreateCommittedResource(
 			&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
 			D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Resource));
 		assert(SUCCEEDED(hr));
@@ -158,10 +155,7 @@ namespace MyEngine
 			{
 				std::random_device seedGenerator;
 				std::mt19937 randomEngine(seedGenerator());
-				particles[index] = MakeNewParticle(randomEngine, element.colorMin, element.colorMax, element.timeMin, element.timeMax);
-				particles[index] = MakeNewParticlePosition(randomEngine,
-					element.posxMin, element.posxMax, element.posyMin, element.posyMax, element.poszMin, element.poszMax,
-					element.velxMin, element.velxMax, element.velyMin, element.velyMax, element.velzMin, element.velzMax);
+				particles[index] = MakeNewParticle(randomEngine, element);
 				instancingData[index].WVP = MakeIdentity4x4();
 				instancingData[index].World = MakeIdentity4x4();
 				instancingData[index].color = particles[index].color;
@@ -231,32 +225,24 @@ namespace MyEngine
 		srvManager_->CreateSRVforStructuredBuffer(index, instancingResource.Get(), kNumInstance, sizeof(ParticleForGPU));
 	}
 
-	Particle::Particles Particle::MakeNewParticlePosition(std::mt19937& randomEngine,
-		float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
-		float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax)
+	Particle::Particles Particle::MakeNewParticle(std::mt19937& randomEngine,ElementsParticle element)
 	{
-		std::uniform_real_distribution<float> distPosX(posxMin, posxMax);
-		std::uniform_real_distribution<float> distPosY(posyMin, posyMax);
-		std::uniform_real_distribution<float> distPosZ(poszMin, poszMax);
-		std::uniform_real_distribution<float> distVelocityX(velxMin, velxMax);
-		std::uniform_real_distribution<float> distVelocityY(velyMin, velyMax);
-		std::uniform_real_distribution<float> distVelocityZ(velzMin, velzMax);
-		Particles particle = {};
-		particle.transform.translate = { distPosX(randomEngine),distPosY(randomEngine),distPosZ(randomEngine) };
-		particle.velocity = { distVelocityX(randomEngine) ,distVelocityY(randomEngine) ,distVelocityZ(randomEngine) };
-		return particle;
-	}
-
-	Particle::Particles Particle::MakeNewParticle(std::mt19937& randomEngine, float colorMin, float colorMax, float timeMin, float timeMax)
-	{
-		std::uniform_real_distribution<float> distColor(colorMin, colorMax);
-		std::uniform_real_distribution<float> distTime(timeMin, timeMax);
+		std::uniform_real_distribution<float> distColor(element.colorMin, element.colorMax);
+		std::uniform_real_distribution<float> distTime(element.timeMin, element.timeMax);
+		std::uniform_real_distribution<float> distPosX(element.posxMin, element.posxMax);
+		std::uniform_real_distribution<float> distPosY(element.posyMin, element.posyMax);
+		std::uniform_real_distribution<float> distPosZ(element.poszMin, element.poszMax);
+		std::uniform_real_distribution<float> distVelocityX(element.velxMin, element.velxMax);
+		std::uniform_real_distribution<float> distVelocityY(element.velyMin, element.velyMax);
+		std::uniform_real_distribution<float> distVelocityZ(element.velzMin, element.velzMax);
 		Particles particle = {};
 		particle.transform.scale = { 1.0f,1.0f,1.0f };
 		particle.transform.rotate = { 0.0f,0.0f,0.0f };
 		particle.color = { distColor(randomEngine) ,distColor(randomEngine) ,distColor(randomEngine) ,1.0f };
 		particle.lifeTime = distTime(randomEngine);
 		particle.currentTime = 0;
+		particle.transform.translate = { distPosX(randomEngine),distPosY(randomEngine),distPosZ(randomEngine) };
+		particle.velocity = { distVelocityX(randomEngine) ,distVelocityY(randomEngine) ,distVelocityZ(randomEngine) };
 		return particle;
 	}
 

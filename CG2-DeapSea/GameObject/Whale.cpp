@@ -7,11 +7,12 @@
 	void Whale::Initialize(Player* players)
 	{
 		player = players;
-		object3d = std::make_unique<Object3d>();
-		object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
-		ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin, true);
-		object3d->SetModel(whaleModel);
-		Model* model = ModelManager::GetInstance()->FindModel(whaleModel);
+		object3d_ = std::make_unique<Object3d>();
+		object3d_->Initialize();
+		modelManager_ = ModelManager::GetInstance();
+		modelManager_->LoadModel(whaleModel, whaleSkin, true);
+		object3d_->SetModel(whaleModel);
+		Model* model = modelManager_->FindModel(whaleModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
@@ -28,11 +29,11 @@
 			.max{3.0f,1.0f,1.0f}
 		};
 
-		particle = std::make_unique<Particle>();
-		particle->SetElements(0.0f, 1.0f, 1.0f, 2.0f,
+		particle_ = std::make_unique<Particle>();
+		particle_->SetElements(0.0f, 1.0f, 1.0f, 2.0f,
 			-7.0f, 7.0f, -6.0f, -4.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
-		particle->Initialize("Resource/bloodParticle.png", ParticleCommon::GetInstance(), SRVManager::GetInstance(), Object3dCommon::GetInstance(), particle->GetElements(),300);
+		particle_->Initialize("Resource/bloodParticle.png", particle_->GetElements(), 300);
 	}
 
 	void Whale::Update()
@@ -156,57 +157,10 @@
 		{
 			if (coolTimer == 0)
 			{
-				switch (life)//ダメージ表現パーティクル
-				{
-				case 0:
-					ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
-					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
-						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
-						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
-						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
-					particle->RandomInitialize(particle->GetElements());
-					particle->SetColorRed(1.0f);
-
-					break;
-				case 1:
-					ChangeModel("whale/3DamagedWhale.obj", "Resource/3DamageBone.png");
-					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
-						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
-						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
-						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
-					particle->RandomInitialize(particle->GetElements());
-					particle->SetColorRed(1.0f);
-
-					break;
-				case 2:
-					ChangeModel("whale/2DamagedWhale.obj", "Resource/2DamageBone.png");
-					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
-						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
-						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
-						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
-					particle->RandomInitialize(particle->GetElements());
-					particle->SetColorRed(1.0f);
-
-					break;
-
-				case 3:
-					ChangeModel("whale/1DamagedWhale.obj", "Resource/1DamagedBone.png");
-					particle->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
-						object3d->GetTranslate().x - 4.0f, object3d->GetTranslate().x + 4.0f,
-						object3d->GetTranslate().y - 2.0f, object3d->GetTranslate().y + 2.0f,
-						object3d->GetTranslate().z - 4.0f, object3d->GetTranslate().z - 2.0f,
-						-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
-					particle->RandomInitialize(particle->GetElements());
-					particle->SetColorRed(1.0f);
-
-					break;
-				}
+				ChangeModel(life);
 			}
 
-			//object3d->SetRotate({ object3d->GetRotate().x,object3d->GetRotate().y + 0.3f,object3d->GetRotate().z });
+			//object3d_->SetRotate({ object3d_->GetRotate().x,object3d_->GetRotate().y + 0.3f,object3d_->GetRotate().z });
 			coolTimer++;
 			if (coolTimer == 120)
 			{
@@ -217,20 +171,20 @@
 		}
 
 		nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
-		object3d->SetTranslate(Add(object3d->GetTranslate(), nowWhaleSpeed));
-		object3d->Update(Camera::GetInstance());
+		object3d_->SetTranslate(Add(object3d_->GetTranslate(), nowWhaleSpeed));
+		object3d_->Update(Camera::GetInstance().get());
 		
 		wCollision =
 		{
-			.min{object3d->GetTranslate().x - 3.0f,object3d->GetTranslate().y - 1.0f,object3d->GetTranslate().z - 1.0f},
-			.max{object3d->GetTranslate().x + 3.0f,object3d->GetTranslate().y + 1.0f,object3d->GetTranslate().z + 1.0f}
+			.min{object3d_->GetTranslate().x - 3.0f,object3d_->GetTranslate().y - 1.0f,object3d_->GetTranslate().z - 1.0f},
+			.max{object3d_->GetTranslate().x + 3.0f,object3d_->GetTranslate().y + 1.0f,object3d_->GetTranslate().z + 1.0f}
 		};
 
-		particle->Update(false, particle->GetElements());
+		particle_->Update(false, particle_->GetElements());
 
 #ifdef _DEBUG
 		ImGui::Begin("whale");
-		ImGui::DragFloat3("whale.translate", (float*)&object3d->GetTranslate(), 0.01f);
+		ImGui::DragFloat3("whale.translate", (float*)&object3d_->GetTranslate(), 0.01f);
 		ImGui::Text("life:%d", life);
 		ImGui::End();
 #endif
@@ -238,10 +192,74 @@
 
 	void Whale::Draw()
 	{
-		object3d->Draw(ModelManager::GetInstance()->GetModelCommon());
+		object3d_->Draw();
 		if (life != 4)
 		{
-			particle->Draw();
+			particle_->Draw();
+		}
+	}
+
+	void Whale::SetMaxPosition(float pos, float maxPos)
+	{
+		if (pos >= maxPos)
+		{
+			pos = maxPos;
+		}
+		if (pos <= -maxPos)
+		{
+			pos = -maxPos;
+		}
+	}
+
+	void Whale::ChangeModel(int32_t whaleLife)
+	{
+		switch (whaleLife)//ダメージ表現パーティクル
+		{
+		case 0:
+			ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
+			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
+				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
+				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+			particle_->RandomInitialize(particle_->GetElements());
+			particle_->SetColorRed(1.0f);
+
+			break;
+		case 1:
+			ChangeModel("whale/3DamagedWhale.obj", "Resource/3DamageBone.png");
+			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
+				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
+				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+			particle_->RandomInitialize(particle_->GetElements());
+			particle_->SetColorRed(1.0f);
+
+			break;
+		case 2:
+			ChangeModel("whale/2DamagedWhale.obj", "Resource/2DamageBone.png");
+			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
+				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
+				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+			particle_->RandomInitialize(particle_->GetElements());
+			particle_->SetColorRed(1.0f);
+
+			break;
+
+		case 3:
+			ChangeModel("whale/1DamagedWhale.obj", "Resource/1DamagedBone.png");
+			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
+				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
+				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+			particle_->RandomInitialize(particle_->GetElements());
+			particle_->SetColorRed(1.0f);
+
+			break;
 		}
 	}
 
@@ -253,27 +271,27 @@
 
 	void Whale::OnTideCollision(Vector3 tideVector)
 	{
-		object3d->SetTranslate(Add(object3d->GetTranslate(),tideVector));
+		object3d_->SetTranslate(Add(object3d_->GetTranslate(),tideVector));
 	}
 
 	void Whale::SetTranslate(Vector3 translate)
 	{
-		object3d->SetTranslate(translate);
+		object3d_->SetTranslate(translate);
 	}
 
 	void Whale::SetRotate(Vector3 rotate)
 	{
-		object3d->SetRotate(rotate);
+		object3d_->SetRotate(rotate);
 	}
 
 	void Whale::ChangeModel(std::string shape, std::string skin)
 	{
-		ModelManager::GetInstance()->EraseModel(whaleModel, whaleSkin);
+		modelManager_->EraseModel(whaleModel, whaleSkin);
 		whaleModel = shape;
 		whaleSkin = skin;
-		ModelManager::GetInstance()->LoadModel(whaleModel, whaleSkin, true);
-		object3d->SetModel(whaleModel);
-		Model* model = ModelManager::GetInstance()->FindModel(whaleModel);
+		modelManager_->LoadModel(whaleModel, whaleSkin, true);
+		object3d_->SetModel(whaleModel);
+		Model* model = modelManager_->FindModel(whaleModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
