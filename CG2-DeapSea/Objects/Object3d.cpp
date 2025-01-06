@@ -15,7 +15,7 @@ namespace MyEngine
 
 		transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 		directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
-		this->camera_ = object3dCommon_->GetDefaultCamera();
+		camera_ = object3dCommon_->GetDefaultCamera();
 		cameraResource = CreateBufferResource(sizeof(CameraTransform));
 		transformMatrix =
 		{
@@ -151,12 +151,16 @@ namespace MyEngine
 				Transpose(Inverse(model_->GetSkinCluster().mappedPalette[jointIndex].skeltonSpaceMatrix));
 		}
 
-		auto&& test = model_->GetSkinCluster();
-		(void)test;
+		//auto&& test = model_->GetSkinCluster();
+		//(void)test;
 	}
 
 	void Object3d::Draw()
 	{
+		object3dCommon_ = Object3dCommon::GetInstance();
+		srvManager_ = SRVManager::GetInstance();
+		dx12Common_ = DX12Common::GetInstance();
+
 		dx12Common_->GetCommandList().Get()->
 			SetPipelineState(object3dCommon_->GetGraphicsPipelineStates(0).Get());
 
