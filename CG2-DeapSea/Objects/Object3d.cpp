@@ -12,6 +12,7 @@ namespace MyEngine
 		object3dCommon_ = Object3dCommon::GetInstance();
 		srvManager_ = SRVManager::GetInstance();
 		dx12Common_ = object3dCommon_->GetDx12Common();
+		modelManager_ = ModelManager::GetInstance();
 
 		transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 		directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
@@ -316,23 +317,8 @@ namespace MyEngine
 
 	void Object3d::SetModel(const std::string& filePath)
 	{
-		model_ = ModelManager::GetInstance()->FindModel(filePath);
+		model_ = modelManager_->FindModel(filePath);
 	}
-
-	Object3d* Object3d::GetInstance()
-	{
-		static std::unique_ptr<Object3d> instance = std::make_unique<Object3d>();
-		return instance.get();
-	}
-
-	void Object3d::DeleteInstance()
-	{
-	}
-
-	//void Object3d::DeleteInstance()
-	//{
-	//	instance.reset();
-	//}
 
 	void Object3d::SetColor(Vector4 color)
 	{

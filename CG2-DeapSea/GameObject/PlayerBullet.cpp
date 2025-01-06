@@ -10,7 +10,7 @@ PlayerBullet::~PlayerBullet()
 
 void PlayerBullet::Initialize(Vector3 firstPos, Matrix4x4 angle)
 {
-	object3d_ = Object3d::GetInstance();
+	object3d_ = std::make_unique<Object3d>();
 	modelManager_ = ModelManager::GetInstance();
 
 	object3d_->Initialize();

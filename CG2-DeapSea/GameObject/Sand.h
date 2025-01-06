@@ -15,7 +15,7 @@ class Sand
 		Vector3 GetTranslate() { return object3d_->GetTranslate(); }
 		void SetTranslate(Vector3 translate) { object3d_->SetTranslate(translate); }
 	private:
-		Object3d* object3d_;
+		std::unique_ptr<Object3d> object3d_;
 		ModelManager* modelManager_;
 		std::string groundModel = "floor/floor.obj";
 		const std::string& groundSkin = "Resource/sand.png";

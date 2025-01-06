@@ -6,7 +6,7 @@ Cursor::~Cursor()
 
 	void Cursor::Initialize()
 	{
-		object3d_ = Object3d::GetInstance();
+		object3d_ = std::make_unique<Object3d>();
 		modelManager_ = ModelManager::GetInstance();
 		object3d_->Initialize();
 		modelManager_->LoadModel(cursorModel, cursorSkin, true);

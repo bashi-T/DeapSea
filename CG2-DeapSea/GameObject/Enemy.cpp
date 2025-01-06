@@ -13,7 +13,7 @@
 	{
 		player_ = player;
 		whale_ = whale;
-		object3d_ = Object3d::GetInstance();
+		object3d_ = std::make_unique<Object3d>();
 		modelManager_ = ModelManager::GetInstance();
 		switch (sort)
 		{

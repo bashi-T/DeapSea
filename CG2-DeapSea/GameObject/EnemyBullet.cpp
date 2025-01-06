@@ -10,7 +10,7 @@
 
 	void EnemyBullet::Initialize(Vector3 firstPos)
 	{
-		object3d_ = Object3d::GetInstance();
+		object3d_ = std::make_unique<Object3d>();
 		modelManager_ = ModelManager::GetInstance();
 		
 		object3d_->Initialize();

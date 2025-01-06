@@ -33,7 +33,7 @@ public:
 	const float& GetMaxDistance()const { return maxDistance; }
 	void ChangeModel(std::string shape, std::string skin);
 private:
-	Object3d* object3d_;
+	std::unique_ptr<Object3d> object3d_;
 	std::unique_ptr<Particle> particle_;
 	ModelManager* modelManager_;
 

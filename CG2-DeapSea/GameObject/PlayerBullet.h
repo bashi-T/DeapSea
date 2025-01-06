@@ -22,7 +22,7 @@ public:
 	Sphere GetCollision() { return playerBulletCollision; }
 
 private:
-	Object3d* object3d_;
+	std::unique_ptr<Object3d> object3d_;
 	ModelManager* modelManager_;
 
 	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";

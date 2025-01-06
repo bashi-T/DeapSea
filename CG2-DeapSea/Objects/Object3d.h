@@ -74,8 +74,6 @@ namespace MyEngine
 			pointLight.intensity = intensity;
 		}
 
-		static Object3d* GetInstance();
-		static void DeleteInstance();
 		const Vector4& GetColor()const { return model_->GetMaterial()->color; }
 		void SetColor(Vector4 color);
 
@@ -84,6 +82,7 @@ namespace MyEngine
 		DX12Common* dx12Common_ = nullptr;
 		Object3dCommon* object3dCommon_ = nullptr;
 		ModelCommon* modelCommon_ = nullptr;
+		ModelManager* modelManager_ = nullptr;
 		SRVManager* srvManager_ = nullptr;
 		Model* model_ = nullptr;
 		Camera* camera_ = nullptr;

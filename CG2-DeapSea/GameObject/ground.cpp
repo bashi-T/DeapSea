@@ -6,7 +6,7 @@ Ground::~Ground()
 
 	void Ground::Initialize()
 	{
-		object3d_ = Object3d::GetInstance();
+		object3d_ = std::make_unique<Object3d>();
 		object3d_->Initialize();
 		modelManager_ = ModelManager::GetInstance();
 		modelManager_->LoadModel(groundModel, groundSkin, true);

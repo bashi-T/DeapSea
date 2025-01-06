@@ -10,7 +10,7 @@ Player::~Player()
 
 void Player::Initialize()
 {
-	object3d_ = Object3d::GetInstance();
+	object3d_ = std::make_unique<Object3d>();
 	object3d_->Initialize();
 	modelManager_ = ModelManager::GetInstance();
 	modelManager_->LoadSkeltonAnimation(playerModel, playerSkin, true);
