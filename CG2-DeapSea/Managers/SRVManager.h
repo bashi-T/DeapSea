@@ -32,18 +32,17 @@ namespace MyEngine
 		UINT GetBackBufferIndex() { return backBufferIndex; }
 		ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return descriptorHeap; }
 		HANDLE GetFenceEvent() { return fenceEvent; }
-		static std::shared_ptr<SRVManager> GetInstance();
+		static SRVManager* GetInstance();
 
+		SRVManager() = default;
 		~SRVManager() = default;
+	private:
 		SRVManager(SRVManager&) = delete;
 		SRVManager& operator=(SRVManager&) = delete;
-	protected:
-		SRVManager() = default;
-	private:
 
-		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
+		DX12Common* dx12Common_ = nullptr;
 
-		static inline std::weak_ptr<SRVManager> instance;
+		static inline std::unique_ptr<SRVManager> instance;
 
 		uint32_t descriptorSize;
 		ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;

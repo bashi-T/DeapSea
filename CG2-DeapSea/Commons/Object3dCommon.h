@@ -20,28 +20,28 @@ namespace MyEngine
 		void MakePSO(DX12Common* dxcommon);
 		void MakeSkeltonPSO(DX12Common* dxcommon);
 		void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
-		static std::shared_ptr<Object3dCommon> GetInstance();
+		static Object3dCommon* GetInstance();
 		static void DeleteInstance();
 
 		ComPtr<ID3D12PipelineState> GetGraphicsPipelineStates(int32_t num) { return graphicsPipelineStates[num]; }
 		ComPtr<ID3D12RootSignature> GetRootSignatures(int32_t num) { return rootSignatures[num]; }
-		std::shared_ptr<DX12Common> GetDx12Common() { return dx12Common_; }
+		DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
 		Camera* GetDefaultCamera()const { return defaultCamera; }
 
+		Object3dCommon() = default;
 		~Object3dCommon() = default;
+
+	private:
 		Object3dCommon(const Object3dCommon& obj) = delete;
 		Object3dCommon& oparator(const Object3dCommon& obj) = delete;
-	protected:
-		Object3dCommon() = default;
-	private:
 
 		Debug* debug_ = nullptr;
 		HRESULT hr = NULL;
 		EulerTransform transformMatrix{};
 		Camera* defaultCamera = nullptr;
 
-		std::shared_ptr<DX12Common> dx12Common_;
-		static inline std::weak_ptr<Object3dCommon> instance;
+		DX12Common* dx12Common_;
+		static inline std::unique_ptr<Object3dCommon> instance;
 
 		ComPtr<ID3D12Resource> transformationMatrixResource;
 

@@ -34,8 +34,8 @@ public:
 	void ChangeModel(std::string shape, std::string skin);
 private:
 	std::unique_ptr< Object3d> object3d_;
-	std::shared_ptr<ModelManager>modelManager_;
 	std::unique_ptr<Particle> particle_;
+	ModelManager* modelManager_;
 
 	Player* player = nullptr;
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };

@@ -33,7 +33,7 @@ public:
 
 private:
 	std::shared_ptr<Object3d> object3d_;
-	std::shared_ptr<ModelManager>modelManager_;
+	ModelManager* modelManager_;
 
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;
 	AABB collision = {};

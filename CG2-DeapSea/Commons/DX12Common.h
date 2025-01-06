@@ -69,7 +69,7 @@ namespace MyEngine
 		ComPtr<ID3D12Debug1> GetDebugController() { return debugController; }
 		ComPtr<ID3D12DebugDevice> GetDebugDevice() { return debugDevice; }
 
-		static std::shared_ptr<DX12Common> GetInstance();
+		static DX12Common* GetInstance();
 		static void DeleteInstance();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
@@ -86,13 +86,13 @@ namespace MyEngine
 		ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 		ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
 
+		DX12Common() = default;
 		~DX12Common() = default;
+	private:
 		DX12Common(const DX12Common& obj) = delete;
 		DX12Common& oparator(const DX12Common& obj) = delete;
-	protected:
-		DX12Common() = default;
-	private:
-		static inline std::weak_ptr<DX12Common> instance;
+
+		static inline std::unique_ptr<DX12Common> instance;
 
 		Debug* debug_ = nullptr;
 		WinAPP* winApp_ = nullptr;

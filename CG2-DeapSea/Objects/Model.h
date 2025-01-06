@@ -166,10 +166,10 @@ namespace MyEngine
 
 	private:
 		ModelData modelData_;
-		std::shared_ptr<ModelCommon> modelCommon_ = nullptr;
-		std::shared_ptr<SRVManager> srvManager_ = nullptr;
-		std::shared_ptr<TextureManager> textureManager_ = nullptr;
-		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
+		ModelCommon* modelCommon_ = nullptr;
+		SRVManager* srvManager_ = nullptr;
+		TextureManager* textureManager_ = nullptr;
+		DX12Common* dx12Common_ = nullptr;
 		HRESULT hr = NULL;
 
 		VertexData* vertexData = nullptr;

@@ -81,9 +81,9 @@ namespace MyEngine
 		DirectionalLight* DrawDirectionalLightData() { return DirectionalLightData; }
 
 	private:
-		std::shared_ptr<SRVManager> srvManager_ = nullptr;
-		std::shared_ptr<SpriteCommon> spriteCommon_ = nullptr;
-		std::shared_ptr<DX12Common>dx12Common_ = nullptr;
+		SRVManager* srvManager_ = nullptr;
+		SpriteCommon* spriteCommon_ = nullptr;
+		DX12Common* dx12Common_ = nullptr;
 		HRESULT hr = NULL;
 		uint32_t textureIndex = 0;
 

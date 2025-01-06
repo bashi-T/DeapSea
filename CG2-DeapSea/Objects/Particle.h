@@ -191,11 +191,11 @@ namespace MyEngine
 		ParticleForGPU* GetInstancingData() { return instancingData; }
 		Particles* GetParticles() { return particles; }
 	private:
-		std::shared_ptr<SRVManager> srvManager_ = nullptr;
-		std::shared_ptr<Object3dCommon> object3dCommon_ = nullptr;
-		std::shared_ptr<ParticleCommon> particleCommon_;
-		std::shared_ptr<TextureManager>textureManager_;
-		std::shared_ptr<DX12Common>dx12Common_ = nullptr;
+		SRVManager* srvManager_ = nullptr;
+		Object3dCommon* object3dCommon_ = nullptr;
+		ParticleCommon* particleCommon_;
+		TextureManager* textureManager_;
+		DX12Common* dx12Common_ = nullptr;
 		Camera* camera_ = nullptr;
 		HRESULT hr = NULL;
 

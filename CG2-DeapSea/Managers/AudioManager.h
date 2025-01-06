@@ -39,18 +39,19 @@ namespace MyEngine
 		SoundData SoundLoadWave(const char* filename);
 		void SoundUnload(SoundData* soundData);
 		void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData);
-		static std::shared_ptr<AudioManager> GetInstance();
+		static AudioManager* GetInstance();
 
 		ComPtr<IXAudio2> GetxAudio2() { return xAudio2_; }
 
+		AudioManager() = default;
 		~AudioManager() = default;
+
+private:
 		AudioManager(AudioManager&) = delete;
 		AudioManager& operator=(AudioManager&) = delete;
-	protected:
-		AudioManager() = default;
-	private:
 
-		static inline std::weak_ptr<AudioManager> instance;
+		static inline std::unique_ptr<AudioManager> instance;
+
 		HRESULT hr = NULL;
 		ComPtr<IXAudio2>xAudio2_;
 		IXAudio2MasteringVoice* masterVoice = nullptr;

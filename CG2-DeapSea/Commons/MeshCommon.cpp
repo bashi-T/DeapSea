@@ -7,7 +7,7 @@ namespace MyEngine
 		dx12Common_ = DX12Common::GetInstance();
 		ResetDXC();
 
-		MakePSO(dx12Common_.get());
+		MakePSO(dx12Common_);
 	}
 
 	void MeshCommon::ResetDXC()
@@ -155,17 +155,13 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	std::shared_ptr<MeshCommon> MeshCommon::GetInstance()
+	MeshCommon* MeshCommon::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<MeshCommon>(new MeshCommon{});
-			instance = std::weak_ptr<MeshCommon>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<MeshCommon>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void MeshCommon::DeleteInstance()

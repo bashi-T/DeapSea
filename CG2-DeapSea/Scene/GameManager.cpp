@@ -33,11 +33,12 @@ namespace MyEngine
 		dx12Common = DX12Common::GetInstance();
 		srvManager = SRVManager::GetInstance();
 		audioManager = AudioManager::GetInstance();
+		textureManager = TextureManager::GetInstance();
+		modelManager = ModelManager::GetInstance();
 		spriteCommon = SpriteCommon::GetInstance();
 		object3dCommon = Object3dCommon::GetInstance();
 		particleCommon = ParticleCommon::GetInstance();
-		textureManager = TextureManager::GetInstance();
-		modelManager = ModelManager::GetInstance();
+		meshCommon = MeshCommon::GetInstance();
 
 		camera = std::make_unique <Camera>();
 		object3d = std::make_unique<Object3d>();
@@ -66,6 +67,7 @@ namespace MyEngine
 		object3d->Initialize();
 		spriteCommon->Initialize();
 		particleCommon->Initialize();
+		meshCommon->Initialize();
 		skyDome->Initialize();
 		sceneArr_[TITLE]->Init();
 		//ウィンドウのボタンが押されるまでループ

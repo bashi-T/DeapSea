@@ -32,7 +32,7 @@ class Enemy
 
 	private:
 		std::unique_ptr< Object3d> object3d_;
-		std::shared_ptr<ModelManager>modelManager_;
+		ModelManager* modelManager_;
 		std::list<std::unique_ptr<EnemyBullet>> eBullets;
 		Player* player_;
 		Whale* whale_;

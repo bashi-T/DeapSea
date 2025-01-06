@@ -7,7 +7,7 @@ namespace MyEngine
 		dx12Common_ = DX12Common::GetInstance();
 		ResetDXC();
 
-		MakePSO(dx12Common_.get());
+		MakePSO(dx12Common_);
 	}
 
 	void ParticleCommon::ResetDXC()
@@ -169,17 +169,13 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	std::shared_ptr<ParticleCommon> ParticleCommon::GetInstance()
+	ParticleCommon* ParticleCommon::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<ParticleCommon>(new ParticleCommon{});
-			instance = std::weak_ptr<ParticleCommon>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<ParticleCommon>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void ParticleCommon::DeleteInstance()

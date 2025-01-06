@@ -22,25 +22,25 @@ namespace MyEngine
 		void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 		ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState; }
 		ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature; }
-		std::shared_ptr<DX12Common> GetDx12Common() { return dx12Common_; }
+		DX12Common* GetDx12Common() { return DX12Common::GetInstance(); }
 
-		static std::shared_ptr<MeshCommon> GetInstance();
+		static MeshCommon* GetInstance();
 		static void DeleteInstance();
 
+		MeshCommon() = default;
 		~MeshCommon() = default;
+
+	private:
 		MeshCommon(const MeshCommon& obj) = delete;
 		MeshCommon& oparator(const MeshCommon& obj) = delete;
-	protected:
-		MeshCommon() = default;
-	private:
 
 		Debug* debug_ = nullptr;
 		HRESULT hr = NULL;
-		std::shared_ptr<DX12Common> dx12Common_;
+		DX12Common* dx12Common_;
 		EulerTransform transformMatrix{};
 		Camera* defaultCamera = nullptr;
 
-		static inline std::weak_ptr<MeshCommon> instance;
+		static inline std::unique_ptr<MeshCommon> instance;
 
 		ComPtr<IDxcUtils> dxcUtils = nullptr;
 		ComPtr<IDxcCompiler3> dxcCompiler = nullptr;

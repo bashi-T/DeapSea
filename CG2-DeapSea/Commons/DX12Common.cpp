@@ -2,23 +2,20 @@
 
 namespace MyEngine
 {
-	std::shared_ptr<DX12Common> DX12Common::GetInstance()
+	DX12Common* DX12Common::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<DX12Common>(new DX12Common{});
-			instance = std::weak_ptr<DX12Common>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<DX12Common>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void DX12Common::DeleteInstance()
 	{
 		instance.reset();
 	}
+
 
 	void DX12Common::InitializefixFPS()
 	{

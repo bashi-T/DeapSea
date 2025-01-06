@@ -27,7 +27,7 @@ namespace MyEngine
 		/// instance取得
 		/// </summary>
 		/// <returns></returns>
-		static std::shared_ptr<TextureManager> GetInstance();
+		static TextureManager* GetInstance();
 		/// <summary>
 		/// 初期化
 		/// </summary>
@@ -88,19 +88,18 @@ namespace MyEngine
 			const DirectX::ScratchImage& mipImages,
 			const DirectX::TexMetadata& metadata);
 
+		TextureManager() = default;
 		~TextureManager() = default;
+	private:
 		TextureManager(TextureManager&) = delete;
 		TextureManager& operator=(TextureManager&) = delete;
-	protected:
-		TextureManager() = default;
-	private:
+
 		template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-		static inline std::weak_ptr<TextureManager> instance;
+		static inline std::unique_ptr<TextureManager> instance;
 
-		friend std::shared_ptr<TextureManager>;
+		DX12Common* dx12Common_ = nullptr;
+		SRVManager* srvManager_ = nullptr;
 
-		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
-		std::shared_ptr<SRVManager> srvManager_ = nullptr;
 		Debug* debug_ = nullptr;
 		std::unordered_map<std::string, TextureData>textureDatas;
 		HRESULT hr = NULL;

@@ -7,7 +7,7 @@ namespace MyEngine
 		dx12Common_ = DX12Common::GetInstance();
 		ResetDXC();
 
-		MakePSO(dx12Common_.get());
+		MakePSO(dx12Common_);
 	}
 
 	void SpriteCommon::ResetDXC()
@@ -153,17 +153,13 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	std::shared_ptr<SpriteCommon> SpriteCommon::GetInstance()
+	SpriteCommon* SpriteCommon::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<SpriteCommon>(new SpriteCommon{});
-			instance = std::weak_ptr<SpriteCommon>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<SpriteCommon>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void SpriteCommon::DeleteInstance()

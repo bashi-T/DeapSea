@@ -92,16 +92,12 @@ namespace MyEngine
 		hr = pSourceVoice->Start();
 	}
 
-	std::shared_ptr<AudioManager> AudioManager::GetInstance()
+	AudioManager* AudioManager::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<AudioManager>(new AudioManager{});
-			instance = std::weak_ptr<AudioManager>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<AudioManager>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 }

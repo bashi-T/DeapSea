@@ -49,7 +49,7 @@ namespace MyEngine
 
 		LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
 		gameEnd = false;
-		bgm = AudioManager::GetInstance().get()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
+		bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
 		//AudioManager::GetInstance().get()->SoundPlayWave(AudioManager::GetInstance().get()->GetxAudio2().Get(), bgm);
 		time = 0;
 
@@ -298,7 +298,7 @@ namespace MyEngine
 			enemyPopCommands[i].str("");
 			enemyPopCommands[i].clear(std::stringstream::goodbit);
 		}
-		AudioManager::GetInstance().get()->SoundUnload(&bgm);
+		AudioManager::GetInstance()->SoundUnload(&bgm);
 		GameManager::stageNumber = 0;
 	}
 

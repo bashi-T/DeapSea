@@ -11,7 +11,7 @@ namespace MyEngine
 	class ModelManager
 	{
 	public:
-		static std::shared_ptr<ModelManager> GetInstance();
+		static ModelManager* GetInstance();
 
 		void Finalize();
 		void Initialize();
@@ -22,19 +22,20 @@ namespace MyEngine
 
 		Model* FindModel(const std::string& filePath);
 
-		std::shared_ptr<ModelCommon> GetModelCommon() { return modelCommon_; }
+		ModelCommon* GetModelCommon() { return modelCommon_; }
 
+		ModelManager() = default;
 		~ModelManager() = default;
+
+	private:
 		ModelManager(ModelManager&) = delete;
 		ModelManager& operator=(ModelManager&) = delete;
-	protected:
-		ModelManager() = default;
-	private:
 
-		static inline std::weak_ptr<ModelManager> instance;
-		std::shared_ptr<ModelCommon> modelCommon_ = nullptr;
-		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
-		std::shared_ptr<TextureManager> textureManager_ = nullptr;
+		static inline std::unique_ptr<ModelManager> instance;
+
+		ModelCommon* modelCommon_ = nullptr;
+		DX12Common* dx12Common_ = nullptr;
+		TextureManager* textureManager_ = nullptr;
 
 		std::map<std::string, std::unique_ptr<Model>>models;
 		std::vector<std::string>modelFilePaths;

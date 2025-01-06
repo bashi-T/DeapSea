@@ -2,19 +2,13 @@
 
 namespace MyEngine
 {
-	//std::shared_ptr<TextureManager> TextureManager::instance = nullptr;
-
-	std::shared_ptr<TextureManager> TextureManager::GetInstance()
+	TextureManager* TextureManager::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<TextureManager>(new TextureManager{});
-			instance = std::weak_ptr<TextureManager>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<TextureManager>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void TextureManager::Finalize()

@@ -13,10 +13,13 @@
 #include"Commons/SpriteCommon.h"
 #include"Commons/Object3dCommon.h"
 #include"Commons/ParticleCommon.h"
+#include"Commons/MeshCommon.h"
+
 #include"Managers/ModelManager.h"
 #include"Managers/AudioManager.h"
 #include"Managers/TextureManager.h"
 #include"Managers/SRVManager.h"
+
 #include"Objects/model.h"
 #include"Objects/SkyDome.h"
 #include"Objects/Mesh.h"
@@ -45,16 +48,18 @@ namespace MyEngine
 		MyImGui* imgui = nullptr;
 		HRESULT hr = NULL;
 
-		std::shared_ptr<DX12Common> dx12Common = nullptr;
-		std::shared_ptr<SRVManager> srvManager = nullptr;
-		std::shared_ptr<SpriteCommon> spriteCommon = nullptr;
-		std::shared_ptr<Object3dCommon> object3dCommon = nullptr;
-		std::shared_ptr<ParticleCommon> particleCommon = nullptr;
-		std::shared_ptr<AudioManager> audioManager = nullptr;
-		std::shared_ptr<Object3d> object3d = nullptr;
-		std::shared_ptr<SkyDome> skyDome = nullptr;
-		std::shared_ptr<TextureManager> textureManager = nullptr;
-		std::shared_ptr<ModelManager> modelManager = nullptr;
+		DX12Common* dx12Common = nullptr;
+		SRVManager* srvManager = nullptr;
+		AudioManager* audioManager = nullptr;
+		TextureManager* textureManager = nullptr;
+		ModelManager* modelManager = nullptr;
+		SpriteCommon* spriteCommon = nullptr;
+		Object3dCommon* object3dCommon = nullptr;
+		ParticleCommon* particleCommon = nullptr;
+		MeshCommon* meshCommon = nullptr;
+
+		std::unique_ptr<Object3d> object3d = nullptr;
+		std::unique_ptr<SkyDome> skyDome = nullptr;
 		std::unique_ptr<Camera> camera;
 
 	};

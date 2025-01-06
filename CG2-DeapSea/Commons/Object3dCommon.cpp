@@ -7,8 +7,8 @@ namespace MyEngine
 		dx12Common_ = DX12Common::GetInstance();
 		ResetDXC();
 
-		MakePSO(dx12Common_.get());
-		MakeSkeltonPSO(dx12Common_.get());
+		MakePSO(dx12Common_);
+		MakeSkeltonPSO(dx12Common_);
 	}
 
 	void Object3dCommon::ResetDXC()
@@ -310,17 +310,13 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	std::shared_ptr<Object3dCommon> Object3dCommon::GetInstance()
+	Object3dCommon* Object3dCommon::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<Object3dCommon>(new Object3dCommon{});
-			instance = std::weak_ptr<Object3dCommon>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<Object3dCommon>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void Object3dCommon::DeleteInstance()

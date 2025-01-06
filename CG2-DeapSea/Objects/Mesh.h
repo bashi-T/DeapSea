@@ -99,11 +99,11 @@ namespace MyEngine
 		MyImGui* imgui_;
 		Camera* camera_;
 
-		std::shared_ptr<DX12Common> dxCommon;
-		std::shared_ptr<SRVManager> srvManager_;
-		std::shared_ptr<Object3dCommon> object3dCommon_;
-		std::shared_ptr<SpriteCommon> spriteCom_;
-		std::shared_ptr<MeshCommon> meshCommon_;
+		DX12Common* dxCommon;
+		SRVManager* srvManager_;
+		Object3dCommon* object3dCommon_;
+		SpriteCommon* spriteCom_;
+		MeshCommon* meshCommon_;
 		HRESULT hr = NULL;
 
 		EulerTransform transformMatrix;

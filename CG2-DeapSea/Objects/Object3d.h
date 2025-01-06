@@ -80,10 +80,10 @@ namespace MyEngine
 
 	private:
 		HRESULT hr = NULL;
-		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
-		std::shared_ptr<Object3dCommon> object3dCommon_ = nullptr;
-		std::shared_ptr<ModelCommon> modelCommon_ = nullptr;
-		std::shared_ptr<SRVManager> srvManager_ = nullptr;
+		DX12Common* dx12Common_ = nullptr;
+		Object3dCommon* object3dCommon_ = nullptr;
+		ModelCommon* modelCommon_ = nullptr;
+		SRVManager* srvManager_ = nullptr;
 		Model* model_ = nullptr;
 		Camera* camera_ = nullptr;
 

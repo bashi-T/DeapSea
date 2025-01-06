@@ -18,20 +18,20 @@ namespace MyEngine
 		void ResetDXC();
 		void MakePSO(DX12Common* dxcommon);
 		void MakeSkeltonPSO(DX12Common* dxcommon);
-		static std::shared_ptr<ModelCommon> GetInstance();
+		static ModelCommon* GetInstance();
 		void Finalize();
 
-		std::shared_ptr<DX12Common> GetDx12Common()const { return dx12Common_; }
+		DX12Common* GetDx12Common()const { return dx12Common_; }
 
-		~ModelCommon() = default;
-		ModelCommon(ModelCommon&) = delete;
-		ModelCommon& operator=(ModelCommon&) = delete;
-	protected:
 		ModelCommon() = default;
+		~ModelCommon() = default;
 
 	private:
-		std::shared_ptr<DX12Common> dx12Common_ = nullptr;
-		static inline std::weak_ptr<ModelCommon> instance;
+		ModelCommon(ModelCommon&) = delete;
+		ModelCommon& operator=(ModelCommon&) = delete;
+
+		DX12Common* dx12Common_ = nullptr;
+		static inline std::unique_ptr<ModelCommon> instance;
 		HRESULT hr = NULL;
 		Debug* debug_ = nullptr;
 

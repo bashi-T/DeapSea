@@ -324,17 +324,13 @@ namespace MyEngine
 		assert(SUCCEEDED(hr));
 	}
 
-	std::shared_ptr<ModelCommon> ModelCommon::GetInstance()
+	ModelCommon* ModelCommon::GetInstance()
 	{
-		auto ret_ptr = instance.lock();
-		if (!ret_ptr)
+		if (instance == NULL)
 		{
-			ret_ptr = std::shared_ptr<ModelCommon>(new ModelCommon{});
-			instance = std::weak_ptr<ModelCommon>(ret_ptr);
-			return ret_ptr;
+			instance = std::make_unique<ModelCommon>();
 		}
-
-		return instance.lock();
+		return instance.get();
 	}
 
 	void ModelCommon::Finalize()
