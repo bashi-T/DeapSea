@@ -10,7 +10,7 @@ Player::~Player()
 
 void Player::Initialize()
 {
-	object3d_ = std::make_unique<Object3d>();
+	object3d_ = Object3d::GetInstance();
 	object3d_->Initialize();
 	modelManager_ = ModelManager::GetInstance();
 	modelManager_->LoadSkeltonAnimation(playerModel, playerSkin, true);
@@ -223,7 +223,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	object3d_->SkeltonDraw();
+	object3d_->SkeltonDraw(modelManager_->GetModelCommon());
 	for (const auto& bullet : pBullets)
 	{
 		bullet->Draw();

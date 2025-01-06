@@ -13,7 +13,7 @@
 	{
 		player_ = player;
 		whale_ = whale;
-		object3d_ = std::make_unique<Object3d>();
+		object3d_ = Object3d::GetInstance();
 		modelManager_ = ModelManager::GetInstance();
 		switch (sort)
 		{
@@ -174,14 +174,14 @@
 		switch (sort)
 		{
 		case 0:
-			object3d_->Draw();
+			object3d_->Draw(modelManager_->GetModelCommon());
 			for (const auto& bullet : eBullets)
 			{
 				bullet->Draw();
 			}
 			break;
 		case 1:
-			object3d_->Draw();
+			object3d_->Draw(modelManager_->GetModelCommon());
 			break;
 		}
 	}

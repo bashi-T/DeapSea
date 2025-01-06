@@ -12,7 +12,7 @@ namespace MyEngine
 		void Draw();
 
 	private:
-		std::shared_ptr< Object3d> object3d_;
+		Object3d* object3d_;
 		ModelManager* modelManager_;
 	};
 }

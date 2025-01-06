@@ -20,7 +20,7 @@ public:
 	Vector4 GetColor() { return model->GetMaterial()->color; }
 	void SetColor(Vector4 color);
 private:
-	std::unique_ptr< Object3d> object3d;
+	Object3d* object3d;
 	ModelManager* modelManager_;
 
 	std::string planeModel;

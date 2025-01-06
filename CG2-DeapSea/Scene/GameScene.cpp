@@ -266,8 +266,8 @@ namespace MyEngine
 	void GameScene::Draw()
 	{
 		ground_->Draw();
-		player_->Draw();
 		whale_->Draw();
+		player_->Draw();
 		for (int i = 0; i < NumArgument; i++)
 		{
 			uiPlanes_[i]->Draw();

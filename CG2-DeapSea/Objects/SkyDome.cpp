@@ -12,7 +12,7 @@ namespace MyEngine
 
 	void SkyDome::Initialize()
 	{
-		object3d_ = std::make_shared<Object3d>();
+		object3d_ = Object3d::GetInstance();
 		object3d_->Initialize();
 		std::string model_ = "world/skyDome.obj";
 		std::string skin = "Resource/sea2.png";
@@ -38,7 +38,7 @@ namespace MyEngine
 
 	void SkyDome::Draw()
 	{
-		object3d_->Draw();
+		object3d_->Draw(modelManager_->GetModelCommon());
 	}
 
 }

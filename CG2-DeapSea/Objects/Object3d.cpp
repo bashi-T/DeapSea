@@ -11,7 +11,7 @@ namespace MyEngine
 	{
 		object3dCommon_ = Object3dCommon::GetInstance();
 		srvManager_ = SRVManager::GetInstance();
-		dx12Common_ = DX12Common::GetInstance();
+		dx12Common_ = object3dCommon_->GetDx12Common();
 
 		transformationMatrixResource = CreateBufferResource(sizeof(TransformationMatrix));
 		directionalLightResource = CreateBufferResource(sizeof(DirectionalLight));
@@ -155,11 +155,9 @@ namespace MyEngine
 		//(void)test;
 	}
 
-	void Object3d::Draw()
+	void Object3d::Draw(ModelCommon* modelCommon)
 	{
-		object3dCommon_ = Object3dCommon::GetInstance();
-		srvManager_ = SRVManager::GetInstance();
-		dx12Common_ = DX12Common::GetInstance();
+		modelCommon_ = modelCommon;
 
 		dx12Common_->GetCommandList().Get()->
 			SetPipelineState(object3dCommon_->GetGraphicsPipelineStates(0).Get());
@@ -191,12 +189,14 @@ namespace MyEngine
 
 		if (model_)
 		{
-			model_->Draw();
+			model_->Draw(modelCommon_, srvManager_);
 		}
 	}
 
-	void Object3d::SkeltonDraw()
+	void Object3d::SkeltonDraw(ModelCommon* modelCommon)
 	{
+		modelCommon_ = modelCommon;
+
 		dx12Common_->GetCommandList().Get()->
 			SetPipelineState(object3dCommon_->GetGraphicsPipelineStates(1).Get());
 
@@ -227,7 +227,7 @@ namespace MyEngine
 
 		if (model_)
 		{
-			model_->SkeltonDraw();
+			model_->SkeltonDraw(modelCommon_, srvManager_);
 		}
 	}
 
@@ -319,10 +319,20 @@ namespace MyEngine
 		model_ = ModelManager::GetInstance()->FindModel(filePath);
 	}
 
-	std::shared_ptr<Object3d> Object3d::GetInstance()
+	Object3d* Object3d::GetInstance()
 	{
-		return std::make_shared<Object3d>();
+		static std::unique_ptr<Object3d> instance = std::make_unique<Object3d>();
+		return instance.get();
 	}
+
+	void Object3d::DeleteInstance()
+	{
+	}
+
+	//void Object3d::DeleteInstance()
+	//{
+	//	instance.reset();
+	//}
 
 	void Object3d::SetColor(Vector4 color)
 	{

@@ -6,7 +6,7 @@ UIPlane::~UIPlane()
 
 	void UIPlane::Initialize(std::string plane, std::string skin)
 	{
-		object3d = std::make_unique<Object3d>(); 
+		object3d = Object3d::GetInstance();
 		modelManager_ = ModelManager::GetInstance();
 
 		planeModel = plane;
@@ -33,7 +33,7 @@ UIPlane::~UIPlane()
 
 	void UIPlane::Draw()
 	{
-		object3d->Draw();
+		object3d->Draw(modelManager_->GetModelCommon());
 	}
 
 	void UIPlane::SetColor(Vector4 color)

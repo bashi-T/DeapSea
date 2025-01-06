@@ -31,7 +31,7 @@ class Enemy
 		int Getlife() { return life; }
 
 	private:
-		std::unique_ptr< Object3d> object3d_;
+		Object3d* object3d_;
 		ModelManager* modelManager_;
 		std::list<std::unique_ptr<EnemyBullet>> eBullets;
 		Player* player_;

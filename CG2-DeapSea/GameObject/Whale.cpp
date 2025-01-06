@@ -7,7 +7,7 @@
 	void Whale::Initialize(Player* players)
 	{
 		player = players;
-		object3d_ = std::make_unique<Object3d>();
+		object3d_ = Object3d::GetInstance();
 		object3d_->Initialize();
 		modelManager_ = ModelManager::GetInstance();
 		modelManager_->LoadModel(whaleModel, whaleSkin, true);
@@ -192,7 +192,7 @@
 
 	void Whale::Draw()
 	{
-		object3d_->Draw();
+		object3d_->Draw(modelManager_->GetModelCommon());
 		if (life != 4)
 		{
 			particle_->Draw();

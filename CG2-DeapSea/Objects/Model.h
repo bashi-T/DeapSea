@@ -136,8 +136,8 @@ namespace MyEngine
 		void AnimationInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting);
 		void SkeltonInitialize(std::string objFilePath, std::string TextureFilePath, bool isLighting);
 		void Update();
-		void Draw();
-		void SkeltonDraw();
+		void Draw(ModelCommon* modelCommon, SRVManager* srvManager);
+		void SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager);
 		void Memcpy();
 		ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 		ModelData LoadOBJFile(const std::string directryPath, const std::string filename);

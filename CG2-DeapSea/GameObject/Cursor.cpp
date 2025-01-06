@@ -6,11 +6,12 @@ Cursor::~Cursor()
 
 	void Cursor::Initialize()
 	{
-		object3d_ = std::make_unique<Object3d>();
+		object3d_ = Object3d::GetInstance();
+		modelManager_ = ModelManager::GetInstance();
 		object3d_->Initialize();
-		ModelManager::GetInstance()->LoadModel(cursorModel, cursorSkin, true);
+		modelManager_->LoadModel(cursorModel, cursorSkin, true);
 		object3d_->SetModel(cursorModel);
-		Model* model = ModelManager::GetInstance()->FindModel(cursorModel);
+		Model* model = modelManager_->FindModel(cursorModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
@@ -35,5 +36,5 @@ Cursor::~Cursor()
 
 	void Cursor::Draw()
 	{
-		object3d_->Draw();
+		object3d_->Draw(modelManager_->GetModelCommon());
 	}

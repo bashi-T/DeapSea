@@ -10,11 +10,13 @@ PlayerBullet::~PlayerBullet()
 
 void PlayerBullet::Initialize(Vector3 firstPos, Matrix4x4 angle)
 {
-	object3d_ = std::make_unique<MyEngine::Object3d>();
+	object3d_ = Object3d::GetInstance();
+	modelManager_ = ModelManager::GetInstance();
+
 	object3d_->Initialize();
-	MyEngine::ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin, true);
+	modelManager_->LoadModel(bulletModel, bulletSkin, true);
 	object3d_->SetModel(bulletModel);
-	MyEngine::Model* model = MyEngine::ModelManager::GetInstance()->FindModel(bulletModel);
+	MyEngine::Model* model = modelManager_->FindModel(bulletModel);
 
 	MyEngine::Model::ModelData* modelData = model->GetModelData();
 	for (MyEngine::Model::VertexData& vertex : modelData->vertices)
@@ -48,7 +50,7 @@ void PlayerBullet::Update()
 
 void PlayerBullet::Draw()
 {
-	object3d_->Draw();
+	object3d_->Draw(modelManager_->GetModelCommon());
 }
 
 void PlayerBullet::OnCollision()

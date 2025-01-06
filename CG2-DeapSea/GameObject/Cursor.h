@@ -15,7 +15,8 @@ class Cursor
 		Vector3 GetTranslate() { return object3d_->GetTranslate(); }
 		void SetTranslate(Vector3 translate) { object3d_->SetTranslate(translate); }
 	private:
-		std::unique_ptr<Object3d> object3d_;
+		Object3d* object3d_;
+		ModelManager* modelManager_;
 		std::string cursorModel = "cursor/cursor.obj";
 		const std::string& cursorSkin = "Resource/sea.png";
 

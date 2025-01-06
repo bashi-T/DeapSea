@@ -23,8 +23,8 @@ namespace MyEngine
 		void Update(Camera* camera);
 		void SkeltonUpdate(Camera* camera);
 		void AnimationUpdate(Camera* camera);
-		void Draw();
-		void SkeltonDraw();
+		void Draw(ModelCommon* modelCommon);
+		void SkeltonDraw(ModelCommon* modelCommon);
 
 		ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 		Vector3 CalculatevalueV(const std::vector<Model::KeyFrameVector3>& keyframes, float time);
@@ -74,7 +74,8 @@ namespace MyEngine
 			pointLight.intensity = intensity;
 		}
 
-		std::shared_ptr<Object3d>GetInstance();
+		static Object3d* GetInstance();
+		static void DeleteInstance();
 		const Vector4& GetColor()const { return model_->GetMaterial()->color; }
 		void SetColor(Vector4 color);
 
@@ -86,6 +87,7 @@ namespace MyEngine
 		SRVManager* srvManager_ = nullptr;
 		Model* model_ = nullptr;
 		Camera* camera_ = nullptr;
+		//static inline std::unique_ptr<Object3d> instance;
 
 		float animationTime_ = 0.0f;
 		float skeltonAnimationTime = 0.0f;

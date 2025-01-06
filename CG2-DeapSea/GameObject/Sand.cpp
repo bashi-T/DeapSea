@@ -6,11 +6,12 @@
 
 	void Sand::Initialize()
 	{
-		object3d_ = std::make_unique<Object3d>();
+		object3d_ = Object3d::GetInstance();
+		modelManager_ = ModelManager::GetInstance();
 		object3d_->Initialize();
-		ModelManager::GetInstance()->LoadModel(groundModel, groundSkin, true);
+		modelManager_->LoadModel(groundModel, groundSkin, true);
 		object3d_->SetModel(groundModel);
-		Model* model = ModelManager::GetInstance()->FindModel(groundModel);
+		Model* model = modelManager_->FindModel(groundModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
@@ -30,5 +31,5 @@
 
 	void Sand::Draw()
 	{
-		object3d_->Draw();
+		object3d_->Draw(modelManager_->GetModelCommon());
 	}

@@ -32,7 +32,7 @@ public:
 	void SetIsMovable(bool isMovable_) { isMovable = isMovable_; }
 
 private:
-	std::shared_ptr<Object3d> object3d_;
+	Object3d* object3d_;
 	ModelManager* modelManager_;
 
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;

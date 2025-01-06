@@ -10,11 +10,13 @@
 
 	void EnemyBullet::Initialize(Vector3 firstPos)
 	{
-		object3d_ = std::make_unique<Object3d>();
+		object3d_ = Object3d::GetInstance();
+		modelManager_ = ModelManager::GetInstance();
+		
 		object3d_->Initialize();
-		ModelManager::GetInstance()->LoadModel(bulletModel, bulletSkin, true);
+		modelManager_->LoadModel(bulletModel, bulletSkin, true);
 		object3d_->SetModel(bulletModel);
-		Model* model = ModelManager::GetInstance()->FindModel(bulletModel);
+		Model* model = modelManager_->FindModel(bulletModel);
 		Model::ModelData* modelData = model->GetModelData();
 		for (Model::VertexData& vertex : modelData->vertices)
 		{
@@ -42,7 +44,7 @@
 
 	void EnemyBullet::Draw()
 	{
-		object3d_->Draw();
+		object3d_->Draw(modelManager_->GetModelCommon());
 	}
 
 	void EnemyBullet::OnCollision()

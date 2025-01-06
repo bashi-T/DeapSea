@@ -190,7 +190,9 @@ namespace MyEngine
 		const D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandleGPU()const { return textureSrvHandleGPU; }
 		ParticleForGPU* GetInstancingData() { return instancingData; }
 		Particles* GetParticles() { return particles; }
+
 	private:
+
 		SRVManager* srvManager_ = nullptr;
 		Object3dCommon* object3dCommon_ = nullptr;
 		ParticleCommon* particleCommon_;

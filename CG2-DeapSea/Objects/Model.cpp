@@ -120,8 +120,10 @@ namespace MyEngine
 
 	}
 
-	void Model::Draw()
+	void Model::Draw(ModelCommon* modelCommon, SRVManager* srvManager)
 	{
+		dx12Common_ = modelCommon->GetDx12Common();
+		srvManager_ = srvManager;
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
@@ -141,8 +143,11 @@ namespace MyEngine
 			UINT(modelData_.indices.size()), 1, 0, 0, 0);
 	}
 
-	void Model::SkeltonDraw()
+	void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 	{
+		dx12Common_ = modelCommon->GetDx12Common();
+		srvManager_ = srvManager;
+
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
@@ -412,7 +417,7 @@ namespace MyEngine
 	{
 		Skelton skelton;
 		skelton.root = CreateJoint(rootNode, {}, skelton.joints);
-		for (const Joint& joint : skelton.joints)
+		for (const Joint& joint : skelton.joints)//名前とindexのマッピング
 		{
 			skelton.jointMap.emplace(joint.name, joint.index);
 		}
