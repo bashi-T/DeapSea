@@ -38,8 +38,7 @@ namespace MyEngine
 
 	void Input::Finalize()
 	{
-		delete instance;
-		instance = NULL;
+		instance.reset();
 	}
 
 	bool Input::PushKey(BYTE keyNumber)
@@ -70,9 +69,9 @@ namespace MyEngine
 	{
 		if (instance == NULL)
 		{
-			instance = new Input;
+			instance = std::make_unique<Input>();
 		}
-		return instance;
+		return instance.get();
 	}
 
 	bool Input::GetJoystickState(int32_t stickNo, XINPUT_STATE& state)

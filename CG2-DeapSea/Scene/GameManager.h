@@ -43,11 +43,11 @@ namespace MyEngine
 		std::unique_ptr<SceneManager> sceneArr_[4];
 		int32_t currentSceneNo_ = 0;
 		int32_t prevSceneNo_ = 0;
+		HRESULT hr = NULL;
+
 		WinAPP* winAPP = nullptr;
 		Input* input = nullptr;
 		MyImGui* imgui = nullptr;
-		HRESULT hr = NULL;
-
 		DX12Common* dx12Common = nullptr;
 		SRVManager* srvManager = nullptr;
 		AudioManager* audioManager = nullptr;
@@ -57,7 +57,7 @@ namespace MyEngine
 		Object3dCommon* object3dCommon = nullptr;
 		ParticleCommon* particleCommon = nullptr;
 		MeshCommon* meshCommon = nullptr;
-		Camera* camera;
+		Camera* camera = nullptr;
 
 		std::unique_ptr<Object3d> object3d = nullptr;
 		std::unique_ptr<SkyDome> skyDome = nullptr;

@@ -43,15 +43,14 @@ namespace MyEngine
 	{
 		if (instance == NULL)
 		{
-			instance = new MyImGui;
+			instance = std::make_unique<MyImGui>();
 		}
-		return instance;
+		return instance.get();
 	}
 
 	void MyImGui::Finalize()
 	{
-		delete instance;
-		instance = NULL;
+		instance.reset();
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();

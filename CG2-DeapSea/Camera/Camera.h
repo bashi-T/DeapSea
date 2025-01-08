@@ -34,10 +34,10 @@ namespace MyEngine
 		Matrix4x4 viewMatrix = {};
 		Matrix4x4 projectionMatrix = {};
 		Matrix4x4 viewProjectionMatrix = {};
-		float fovY;
-		float aspectRetio;
-		float nearClip;
-		float farClip;
+		float fovY = 0.0f;
+		float aspectRetio = 0.0f;
+		float nearClip = 0.0f;
+		float farClip = 0.0f;
 		static inline std::unique_ptr<Camera> instance;
 
 	};

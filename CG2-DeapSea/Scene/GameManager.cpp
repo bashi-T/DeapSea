@@ -47,10 +47,10 @@ namespace MyEngine
 
 		//ここから初期化
 		winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"深海デリバリー");
+		input->Initialize(winAPP);
 		dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
 		srvManager->Initialize();
 		audioManager->Initialize();
-		input->Initialize(winAPP);
 		imgui->Initialize(
 			winAPP->GetHWND(),
 			dx12Common->GetDevice().Get(),

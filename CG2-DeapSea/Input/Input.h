@@ -4,6 +4,7 @@
 #include<Xinput.h>
 #include<WRL.h>
 #include"Systems/WindowApp.h"
+#include<thread>
 
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -26,9 +27,9 @@ namespace MyEngine
 
 		static Input* GetInstance();
 
-	private:
 		Input() = default;
 		~Input() = default;
+	private:
 		Input(Input&) = delete;
 		Input& operator=(Input&) = delete;
 
@@ -38,7 +39,7 @@ namespace MyEngine
 		ComPtr<IDirectInputDevice8> keyboard;
 		BYTE key[256] = {};
 		BYTE keyPre[256] = {};
-		static inline Input* instance;
+		static inline std::unique_ptr<Input> instance;
 		// デッドゾーンの設定
 		const int DEADZONE_THRESHOLD = 8000;
 

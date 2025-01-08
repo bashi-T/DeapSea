@@ -5,6 +5,7 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 #include<WRL.h>
+#include<thread>
 
 #include<d3d12.h>
 #include<dxgi1_6.h>
@@ -41,12 +42,12 @@ namespace MyEngine
 
 		void Finalize();
 
-	private:
 		MyImGui() = default;
 		~MyImGui() = default;
+	private:
 		MyImGui(MyImGui&) = delete;
 		MyImGui& operator=(MyImGui&) = delete;
 
-		static inline MyImGui* instance;
+		static inline std::unique_ptr<MyImGui> instance;
 	};
 }

@@ -21,6 +21,7 @@ namespace MyEngine
 		void Finalize() override;
 
 	private:
+		Camera* camera_;
 		std::unique_ptr<Sprite> sprite_;
 		std::unique_ptr<Player> player_;
 		std::unique_ptr<Whale> whale_;

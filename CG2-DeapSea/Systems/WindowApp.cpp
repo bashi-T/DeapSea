@@ -92,7 +92,8 @@ namespace MyEngine
 		DispatchMessage(&NewMSG);
 
 	}
-	WinAPP* WinAPP::GetInstance() {
+	WinAPP* WinAPP::GetInstance()
+	{
 		static WinAPP instance;
 		return &instance;
 	}

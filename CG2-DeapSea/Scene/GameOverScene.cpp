@@ -4,19 +4,20 @@ namespace MyEngine
 {
 	void GameOverScene::Initialize()
 	{
+		camera_ = Camera::GetInstance();
 		sprite_ = std::make_unique<Sprite>();
 		sprite_->Initialize("Resource/GameOverExample.png");
 		sprite_->SetPosition({ float(WinAPP::clientWidth_ / 2) - (sprite_->GetSize().x / 2),0.0f });
 
 		player_ = std::make_unique<Player>();
-		player_->Initialize(Camera::GetInstance());
+		player_->Initialize(camera_);
 		whale_ = std::make_unique<Whale>();
 		whale_->Initialize(player_.get());
 		whale_->ChangeModel(boneWhaleModel, boneWhaleSkin);
 		whale_->SetTranslate({ 0.0f,-279.5f,0.0f });
 
-		Camera::GetInstance()->SetTranslate({ 0.0f,-277.0f,-20.0f });
-		Camera::GetInstance()->SetRotate({ 0.1f,0.0f,0.0f });
+		camera_->SetTranslate({ 0.0f,-277.0f,-20.0f });
+		camera_->SetRotate({ 0.1f,0.0f,0.0f });
 
 		sand_ = std::make_unique<Sand>();
 		sand_->Initialize();
