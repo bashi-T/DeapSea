@@ -57,10 +57,10 @@ namespace MyEngine
 		Object3dCommon* object3dCommon = nullptr;
 		ParticleCommon* particleCommon = nullptr;
 		MeshCommon* meshCommon = nullptr;
+		Camera* camera;
 
 		std::unique_ptr<Object3d> object3d = nullptr;
 		std::unique_ptr<SkyDome> skyDome = nullptr;
-		std::unique_ptr<Camera> camera;
 
 	};
 }

@@ -20,7 +20,7 @@ namespace MyEngine
 		enum EnemySort { NORMAL, STRAIGHT };
 
 	public:
-		void Init() override;
+		void Initialize() override;
 		void Update() override;
 		void Draw() override;
 		void Finalize() override;
@@ -31,6 +31,7 @@ namespace MyEngine
 
 		void CheckAllCollisions();
 	private:
+		Camera* camera_;
 		std::unique_ptr<Particle> particle_;
 		std::vector<std::unique_ptr<Sprite>>sprites_;
 		std::vector<std::unique_ptr<UIPlane>>uiPlanes_;

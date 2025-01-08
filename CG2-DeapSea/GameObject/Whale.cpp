@@ -172,7 +172,7 @@
 
 		nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
 		object3d_->SetTranslate(Add(object3d_->GetTranslate(), nowWhaleSpeed));
-		object3d_->Update(Camera::GetInstance().get());
+		object3d_->Update(Camera::GetInstance());
 		
 		wCollision =
 		{

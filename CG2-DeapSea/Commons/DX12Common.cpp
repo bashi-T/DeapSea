@@ -370,8 +370,6 @@ namespace MyEngine
 		hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 		assert(SUCCEEDED(hr));
 		debug_->Log(debug_->ConvertString(std::format(L"Compile Succeded,path:{}\n", filePath, profile)));
-		shaderSource->Release();
-		shaderResult->Release();
 		return shaderBlob;
 	}
 }

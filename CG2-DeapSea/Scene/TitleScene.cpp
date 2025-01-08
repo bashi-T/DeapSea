@@ -6,7 +6,7 @@
 
 namespace MyEngine
 {
-	void TitleScene::Init()
+	void TitleScene::Initialize()
 	{
 		std::string PNGs[NumArgument] =
 		{
@@ -18,12 +18,12 @@ namespace MyEngine
 			"Resource/black.png",
 		};
 
-		Object3dCommon::GetInstance()->SetDefaultCamera(Camera::GetInstance().get());
+		camera_ = Camera::GetInstance();
 		player_ = std::make_unique<Player>();
 		whale_ = std::make_unique<Whale>();
 		cursor_ = std::make_unique<Cursor>();
 
-		player_->Initialize();
+		player_->Initialize(camera_);
 		player_->SetIsHit(true);
 		whale_->Initialize(player_.get());
 		whale_->SetTranslate({ 0.0f,0.15f,5.0f });
@@ -50,13 +50,13 @@ namespace MyEngine
 			uiPlanes_[i]->SetScale(UIScale[i]);
 		}
 
-		uiPlanes_[Blackout]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + zfar });
+		uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar });
 		uiPlanes_[Blackout]->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 
 		cursor_->Initialize();
 		cursor_->SetTranslate({ uiPlanes_[Practice]->GetTranslate().x + cursorX,uiPlanes_[Practice]->GetTranslate().y,uiPlanes_[Practice]->GetTranslate().z });
-		Camera::GetInstance()->SetTranslate({ 0.0f,2.0f,-20.0f });
-		Camera::GetInstance()->SetRotate({ 0.1f,0.0f,0.0f });
+		camera_->SetTranslate({ 0.0f,2.0f,-20.0f });
+		camera_->SetRotate({ 0.1f,0.0f,0.0f });
 
 	}
 
@@ -144,13 +144,13 @@ namespace MyEngine
 			sceneTransitionTime++;
 			if (sceneTransitionTime >= sceneTransitionTimes[0])
 			{
-				Camera::GetInstance()->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y - 3.0f, Camera::GetInstance()->GetTranslate().z });
+				camera_->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y - 3.0f, camera_->GetTranslate().z });
 				uiPlanes_[nowStage]->SetTranslate({ uiPlanes_[nowStage]->GetTranslate().x,uiPlanes_[nowStage]->GetTranslate().y - 2.75f,uiPlanes_[nowStage]->GetTranslate().z });
 				whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y - 2.75f,whale_->GetTranslate().z });
 			}
 			if (sceneTransitionTime >= sceneTransitionTimes[1])
 			{
-				uiPlanes_[5]->SetTranslate({ Camera::GetInstance()->GetTranslate().x, Camera::GetInstance()->GetTranslate().y, Camera::GetInstance()->GetTranslate().z + 2.0f });
+				uiPlanes_[5]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f });
 				uiPlanes_[5]->SetColor({ uiPlanes_[5]->GetColor().x,uiPlanes_[5]->GetColor().y,uiPlanes_[5]->GetColor().z,uiPlanes_[5]->GetColor().a - 0.02f });
 				uiPlanes_[5]->Update();
 			}

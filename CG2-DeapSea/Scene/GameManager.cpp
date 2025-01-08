@@ -39,13 +39,13 @@ namespace MyEngine
 		object3dCommon = Object3dCommon::GetInstance();
 		particleCommon = ParticleCommon::GetInstance();
 		meshCommon = MeshCommon::GetInstance();
+		camera = Camera::GetInstance();
 
-		camera = std::make_unique <Camera>();
 		object3d = std::make_unique<Object3d>();
 		skyDome = std::make_unique<SkyDome>();
 
 
-
+		//ここから初期化
 		winAPP->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, L"深海デリバリー");
 		dx12Common->Initialize(WinAPP::clientWidth_, WinAPP::clientHeight_, winAPP);
 		srvManager->Initialize();
@@ -58,18 +58,19 @@ namespace MyEngine
 			dx12Common->GetRtvDesc(),
 			srvManager->GetSrvDescriptorHeap().Get());
 		textureManager->Initialize();
-
-		object3dCommon->Initialize();
-		modelManager->Initialize();
+		camera->Initialize();
 		camera->SetRotate({ 0.1f,0.0f,0.0f });
 		camera->SetTranslate({ 0.0f,3.0f,-20.0f });
-		object3dCommon->SetDefaultCamera(camera.get());
+		object3dCommon->Initialize();
+		modelManager->Initialize();
+		object3dCommon->SetDefaultCamera(camera);
 		object3d->Initialize();
 		spriteCommon->Initialize();
 		particleCommon->Initialize();
 		meshCommon->Initialize();
-		skyDome->Initialize();
-		sceneArr_[TITLE]->Init();
+		skyDome->Initialize(camera);
+		sceneArr_[TITLE]->Initialize();
+
 		//ウィンドウのボタンが押されるまでループ
 		while (NewMSG.message != WM_QUIT)
 		{
@@ -94,7 +95,7 @@ namespace MyEngine
 			{
 				sceneArr_[prevSceneNo_]->Finalize();
 				audioManager->Initialize();
-				sceneArr_[currentSceneNo_]->Init();
+				sceneArr_[currentSceneNo_]->Initialize();
 			}
 			imgui->Update();
 			skyDome->Update();

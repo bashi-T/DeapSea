@@ -10,9 +10,10 @@ namespace MyEngine
 	{
 	}
 
-	void SkyDome::Initialize()
+	void SkyDome::Initialize(Camera* camera)
 	{
 		object3d_ = std::make_unique<Object3d>();
+		camera_ = camera;
 		object3d_->Initialize();
 		std::string model_ = "world/skyDome.obj";
 		std::string skin = "Resource/sea2.png";
@@ -33,7 +34,7 @@ namespace MyEngine
 
 	void SkyDome::Update()
 	{
-		object3d_->Update(Camera::GetInstance().get());
+		object3d_->Update(camera_);
 	}
 
 	void SkyDome::Draw()

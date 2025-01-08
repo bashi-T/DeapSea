@@ -9,8 +9,6 @@ namespace MyEngine
 	class Camera
 	{
 	public:
-		Camera();
-		~Camera();
 		void Initialize();
 		void Update();
 		void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
@@ -25,20 +23,22 @@ namespace MyEngine
 		const Matrix4x4& GetViewMatrix() { return viewMatrix; }
 		const Matrix4x4& GetProjectionMatrix() { return projectionMatrix; }
 		const Matrix4x4& GetViewProjectionMatrix() { return viewProjectionMatrix; }
-		static std::shared_ptr<Camera> GetInstance();
+		static Camera* GetInstance();
 		static void DeleteInstance();
 
+		Camera();
+		~Camera();
 	private:
-		EulerTransform transformMatrix;
-		Matrix4x4 worldMatrix;
-		Matrix4x4 viewMatrix;
-		Matrix4x4 projectionMatrix;
-		Matrix4x4 viewProjectionMatrix;
+		EulerTransform transformMatrix = {};
+		Matrix4x4 worldMatrix = {};
+		Matrix4x4 viewMatrix = {};
+		Matrix4x4 projectionMatrix = {};
+		Matrix4x4 viewProjectionMatrix = {};
 		float fovY;
 		float aspectRetio;
 		float nearClip;
 		float farClip;
-		static inline std::shared_ptr<Camera> instance;
+		static inline std::unique_ptr<Camera> instance;
 
 	};
 }

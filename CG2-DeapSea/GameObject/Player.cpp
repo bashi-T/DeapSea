@@ -8,10 +8,11 @@ Player::~Player()
 {
 }
 
-void Player::Initialize()
+void Player::Initialize(Camera* camera)
 {
 	object3d_ = std::make_unique<Object3d>();
 	object3d_->Initialize();
+	camera_ = camera;
 	modelManager_ = ModelManager::GetInstance();
 	modelManager_->LoadSkeltonAnimation(playerModel, playerSkin, true);
 	object3d_->SetModel(playerModel);
@@ -208,7 +209,7 @@ void Player::Update()
 		}
 	}
 
-	object3d_->SkeltonUpdate(Camera::GetInstance().get());
+	object3d_->SkeltonUpdate(camera_);
 	//collision.center = object3d_->GetTranslate();
 	collision =
 	{

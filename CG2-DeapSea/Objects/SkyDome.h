@@ -7,13 +7,14 @@ namespace MyEngine
 	{
 	public:
 		~SkyDome();
-		void Initialize();
+		void Initialize(Camera* camera);
 		void Update();
 		void Draw();
 
 	private:
 		std::unique_ptr<Object3d> object3d_;
 		ModelManager* modelManager_;
+		Camera* camera_;
 	};
 }
 

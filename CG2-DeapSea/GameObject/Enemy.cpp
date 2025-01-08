@@ -110,7 +110,7 @@
 				}
 				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
 			}
-			object3d_->Update(Camera::GetInstance().get());
+			object3d_->Update(Camera::GetInstance());
 			enemyCollision =
 			{
 				.min{object3d_->GetTranslate().x - 0.1f,object3d_->GetTranslate().y - 0.25f,object3d_->GetTranslate().z - 1.5f},
@@ -159,7 +159,7 @@
 				}
 				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
 			}
-			object3d_->Update(Camera::GetInstance().get());
+			object3d_->Update(Camera::GetInstance());
 			enemyCollision =
 			{
 				.min{object3d_->GetTranslate().x - 0.05f,object3d_->GetTranslate().y - 0.4f,object3d_->GetTranslate().z - 2.5f},

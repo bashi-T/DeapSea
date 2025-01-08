@@ -2,7 +2,7 @@
 
 namespace MyEngine
 {
-	void ClearScene::Init()
+	void ClearScene::Initialize()
 	{
 		sprite_ = std::make_unique<Sprite>();
 		sprite_->Initialize("Resource/clearExample.png");

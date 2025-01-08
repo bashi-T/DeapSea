@@ -25,7 +25,7 @@ Cursor::~Cursor()
 	void Cursor::Update()
 	{
 		object3d_->SetRotate({ object3d_->GetRotate().x + 0.02f,object3d_->GetRotate().y,object3d_->GetRotate().z });
-		object3d_->Update(Camera::GetInstance().get());
+		object3d_->Update(Camera::GetInstance());
 #ifdef _DEBUG
 		ImGui::Begin("cursor");
 		ImGui::DragFloat3("cursor.translate", (float*)&object3d_->GetTranslate(), 0.01f);

@@ -15,7 +15,7 @@ namespace MyEngine
 	class GameOverScene :public SceneManager
 	{
 	public:
-		void Init() override;
+		void Initialize() override;
 		void Update() override;
 		void Draw() override;
 		void Finalize() override;

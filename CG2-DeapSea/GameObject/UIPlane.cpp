@@ -28,7 +28,7 @@ UIPlane::~UIPlane()
 
 	void UIPlane::Update()
 	{
-		object3d_->Update(Camera::GetInstance().get());
+		object3d_->Update(Camera::GetInstance());
 	}
 
 	void UIPlane::Draw()

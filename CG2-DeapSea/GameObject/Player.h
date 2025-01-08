@@ -11,7 +11,7 @@ class Player
 {
 public:
 	~Player();
-	void Initialize();
+	void Initialize(Camera* camera);
 	void Update();
 	void Draw();
 	void Shot();
@@ -34,6 +34,7 @@ public:
 private:
 	std::unique_ptr<Object3d> object3d_;
 	ModelManager* modelManager_;
+	Camera* camera_;
 
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;
 	AABB collision = {};

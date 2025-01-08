@@ -25,7 +25,7 @@ Ground::~Ground()
 
 	void Ground::Update()
 	{
-		object3d_->Update(Camera::GetInstance().get());
+		object3d_->Update(Camera::GetInstance());
 #ifdef _DEBUG
 		ImGui::Begin("ground");
 		ImGui::DragFloat3("ground.translate", (float*)&object3d_->GetTranslate(), 0.01f);

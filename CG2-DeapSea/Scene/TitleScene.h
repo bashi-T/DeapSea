@@ -17,7 +17,7 @@ namespace MyEngine
 	class TitleScene :public SceneManager
 	{
 	public:
-		void Init() override;
+		void Initialize() override;
 		void Update() override;
 		void Draw() override;
 		void Finalize() override;
@@ -25,7 +25,7 @@ namespace MyEngine
 		//Input* input;
 		//Object3dCommon* object3dCommon;
 		//SRVManager* srvManager;
-		//Camera* camera;
+		Camera* camera_;
 		std::vector<std::unique_ptr<Particle>> particles_;
 		std::vector<std::unique_ptr<Sprite>> sprites_;
 		std::vector<std::unique_ptr<UIPlane>> uiPlanes_;

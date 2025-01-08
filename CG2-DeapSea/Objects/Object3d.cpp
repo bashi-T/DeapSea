@@ -36,21 +36,21 @@ namespace MyEngine
 
 	void Object3d::Update(Camera* camera)
 	{
-		//transformMatrix.rotate.y -= 0.02f;
+		camera_ = camera;
 		Matrix4x4 worldMatrix = MakeAffineMatrix(
 			transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 
-		if (camera)
+		if (camera_)
 		{
-			const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 			worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 		}
 
 		cameraData->worldPosition =
 		{
-			camera->GetWorldMatrix().m[3][0],
-			camera->GetWorldMatrix().m[3][1],
-			camera->GetWorldMatrix().m[3][2]
+			camera_->GetWorldMatrix().m[3][0],
+			camera_->GetWorldMatrix().m[3][1],
+			camera_->GetWorldMatrix().m[3][2]
 		};
 		directionalLightData->color = directionalLight.color;
 		directionalLightData->direction = directionalLight.direction;
@@ -63,20 +63,21 @@ namespace MyEngine
 
 	void Object3d::AnimationUpdate(Camera* camera)//処理に問題の可能性あり
 	{
+		camera_ = camera;
 		Matrix4x4 worldMatrix = MakeAffineMatrix(
 			transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
 
-		if (camera)
+		if (camera_)
 		{
-			const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 			worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 		}
 
 		cameraData->worldPosition =
 		{
-			camera->GetWorldMatrix().m[3][0],
-			camera->GetWorldMatrix().m[3][1],
-			camera->GetWorldMatrix().m[3][2]
+			camera_->GetWorldMatrix().m[3][0],
+			camera_->GetWorldMatrix().m[3][1],
+			camera_->GetWorldMatrix().m[3][2]
 		};
 
 		if (isAnimation == true)
