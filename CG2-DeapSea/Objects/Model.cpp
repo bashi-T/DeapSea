@@ -145,7 +145,8 @@ namespace MyEngine
 
 	void Model::SkeltonDraw(ModelCommon* modelCommon, SRVManager* srvManager)
 	{
-		dx12Common_ = modelCommon->GetDx12Common();
+		modelCommon_ = modelCommon;
+		dx12Common_ = modelCommon_->GetDx12Common();
 		srvManager_ = srvManager;
 
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
