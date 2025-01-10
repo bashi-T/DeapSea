@@ -35,7 +35,7 @@ public:
 private:
 	std::unique_ptr<Object3d> object3d_;
 	std::unique_ptr<Particle> particle_;
-	ModelManager* modelManager_;
+	ModelManager* modelManager_ = nullptr;
 
 	Player* player = nullptr;
 	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };

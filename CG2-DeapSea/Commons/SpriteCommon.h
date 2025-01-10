@@ -50,7 +50,7 @@ namespace MyEngine
 		WinAPP* sWinApp = nullptr;
 		MyImGui* imgui_ = nullptr;
 		HRESULT hr = NULL;
-		DX12Common* dx12Common_;
+		DX12Common* dx12Common_ = nullptr;
 		EulerTransform transformMatrix{};
 		ComPtr<ID3D12Resource> transformationMatrixResource;
 		static inline std::unique_ptr<SpriteCommon> instance;

@@ -22,7 +22,7 @@ namespace MyEngine
 	int32_t GameManager::Run()
 	{
 		hr = CoInitializeEx(0, COINIT_MULTITHREADED);
-		Debug::D3DResourceLeakChecker* leakCheck = new Debug::D3DResourceLeakChecker;
+		std::unique_ptr<Debug::D3DResourceLeakChecker> leakCheck = std::make_unique<Debug::D3DResourceLeakChecker>();
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 		winAPP = WinAPP::GetInstance();
@@ -160,7 +160,6 @@ namespace MyEngine
 		input->Finalize();
 		winAPP->Finalize();
 		CoUninitialize();
-		delete leakCheck;
 		return 0;
     }
 }

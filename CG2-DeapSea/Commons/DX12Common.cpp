@@ -16,7 +16,6 @@ namespace MyEngine
 		instance.reset();
 	}
 
-
 	void DX12Common::InitializefixFPS()
 	{
 		reference_ = std::chrono::steady_clock::now();
@@ -82,9 +81,6 @@ namespace MyEngine
 
 			if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 			{
-				//debug_->Log(debug_->ConvertString(
-				//	std::format(L"Use Adapter:{}\n",
-				//		adapterDesc.Description)));
 				break;
 			}
 			useAdapter = nullptr;
@@ -111,13 +107,10 @@ namespace MyEngine
 				IID_PPV_ARGS(&device));
 			if (SUCCEEDED(hr))
 			{
-				//debug_->Log(std::format("featureLevel {}\n",
-				//	featureLevelStrings[i]));
 				break;
 			}
 		}
 		assert(device != nullptr);
-		//debug_->Log("Complete create D3D12Device\n");
 	}
 
 	void DX12Common::MakeCommandQueue()
@@ -244,7 +237,6 @@ namespace MyEngine
 		return descriptorHeap;
 	}
 
-
 	void DX12Common::MakeDSV()
 	{
 		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -257,7 +249,6 @@ namespace MyEngine
 		const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
 	}
-
 
 	ComPtr<ID3D12Resource> DX12Common::CreatedepthstencilTextureResource(int32_t width, int32_t height)
 	{
@@ -339,7 +330,9 @@ namespace MyEngine
 			InfoQueue->PushStorageFilter(&filter);
 		}
 	}
-	ComPtr<IDxcBlob> DX12Common::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
+
+	ComPtr<IDxcBlob> DX12Common::CompileShader(const std::wstring& filePath, const wchar_t* profile,
+		IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
 	{
 		debug_->Log(debug_->ConvertString(std::format(L"Begin CompileShader,path{},\n", filePath, profile)));
 		ComPtr<IDxcBlobEncoding> shaderSource = nullptr;

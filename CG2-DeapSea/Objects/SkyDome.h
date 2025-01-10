@@ -13,8 +13,8 @@ namespace MyEngine
 
 	private:
 		std::unique_ptr<Object3d> object3d_;
-		ModelManager* modelManager_;
-		Camera* camera_;
+		ModelManager* modelManager_ = nullptr;
+		Camera* camera_ = nullptr;
 	};
 }
 

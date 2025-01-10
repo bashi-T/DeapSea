@@ -21,7 +21,7 @@ public:
 	void SetColor(Vector4 color);
 private:
 	std::unique_ptr<Object3d> object3d_;
-	ModelManager* modelManager_;
+	ModelManager* modelManager_ = nullptr;
 
 	std::string planeModel;
 	std::string planeSkin;

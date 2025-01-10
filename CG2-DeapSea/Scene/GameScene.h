@@ -31,7 +31,7 @@ namespace MyEngine
 
 		void CheckAllCollisions();
 	private:
-		Camera* camera_;
+		Camera* camera_ = nullptr;
 		std::unique_ptr<Particle> particle_;
 		std::vector<std::unique_ptr<Sprite>>sprites_;
 		std::vector<std::unique_ptr<UIPlane>>uiPlanes_;
