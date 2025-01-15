@@ -36,6 +36,12 @@ namespace MyEngine
 		viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 	}
 
+	void Camera::Offset(Vector3 offset, Vector3 tergetTranslate, Matrix4x4 tergetWorld)//カメラをターゲットに追従させる
+	{
+		offset = TransformNormal(offset, tergetWorld);
+		transformMatrix.translate = Add(tergetTranslate, offset);
+	}
+
 	Camera* Camera::GetInstance()
 	{
 		if (instance == NULL)

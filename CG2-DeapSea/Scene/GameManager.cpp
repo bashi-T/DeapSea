@@ -77,14 +77,14 @@ namespace MyEngine
 			dx12Common->update();
 			Input::GetInstance()->Update();
 
-#ifdef DEBUG
-			if (Input::GetInstance()->PushKey(DIK_RIGHT))
+#ifdef _DEBUG
+			if (Input::GetInstance()->PushKey(DIK_D))
 			{
-				camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x + 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z });
+				camera->SetTranslate({ camera->GetTranslate().x + 0.2f, camera->GetTranslate().y, camera->GetTranslate().z });
 			}
-			if (Input::GetInstance()->PushKey(DIK_LEFT))
+			if (Input::GetInstance()->PushKey(DIK_A))
 			{
-				camera->GetInstance()->SetTranslate({ camera->GetInstance()->GetTranslate().x - 0.2f, camera->GetInstance()->GetTranslate().y, camera->GetInstance()->GetTranslate().z });
+				camera->SetTranslate({ camera->GetTranslate().x - 0.2f, camera->GetTranslate().y, camera->GetTranslate().z });
 		    }
 #endif // DEBUG
 

@@ -20,6 +20,7 @@ public:
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets()const { return pBullets; }
 	Vector3 GetTranslate() { return object3d_->GetTranslate(); }
+	Matrix4x4 GetWorldMatrix() { return object3d_->GetObjectMatrix(); }
 	const AABB& GetAABBCollision() const{ return collision; }
 	const bool& GetIsHit()const { return isHit; }
 	const bool& GetIsMovable()const { return isMovable; }

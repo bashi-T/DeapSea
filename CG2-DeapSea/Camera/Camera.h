@@ -11,6 +11,14 @@ namespace MyEngine
 	public:
 		void Initialize();
 		void Update();
+		/// <summary>
+		/// オフセットベクトルの設定
+		/// </summary>
+		/// <param name="offset"></param>
+		/// <param name="tergetTranslate"></param>
+		/// <param name="world"></param>
+		void Offset(Vector3 offset, Vector3 tergetTranslate, Matrix4x4 world);
+
 		void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 		void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
 		void SetFovY(const float& FovY) { fovY = FovY; }

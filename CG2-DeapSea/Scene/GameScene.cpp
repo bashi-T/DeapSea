@@ -74,7 +74,7 @@ namespace MyEngine
 			std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
 			sprite->Initialize("Resource/key.png");
 			sprite->SetPosition(spritePos);
-			//sprite->SetSize({ sprite->GetSize().x * 2.0f,sprite->GetSize().y * 2.0f });
+			sprite->SetSize({ sprite->GetSize().x * 1.2f,sprite->GetSize().y * 1.2f });
 			sprites_.push_back(std::move(sprite));
 		}
 	}
@@ -112,12 +112,12 @@ namespace MyEngine
 			uiPlanes_[Start]->Update();
 			particle_->Update(false, particle_->GetElements());
 
-			player_->SetMaxPosition(player_->GetTranslate().x, 10.0f);
-			whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x + whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x - whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z + whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z - whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().x, 10.0f);
+			//player_->SetMaxPosition(player_->GetTranslate().x, 20.0f);
+			//whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x + whale_->GetMaxDistance());
+			//whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x - whale_->GetMaxDistance());
+			//whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z + whale_->GetMaxDistance());
+			//whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z - whale_->GetMaxDistance());
+			//whale_->SetMaxPosition(whale_->GetTranslate().x, 10.0f);
 
 			UpdateEnemyPopCommands(GameManager::stageNumber);
 			for (const auto& enemy_ : enemys_)
@@ -126,8 +126,8 @@ namespace MyEngine
 			}
 
 			CheckAllCollisions();
-			camera_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
-			ground_->SetTranslate({ ground_->GetTranslate().x, ground_->GetTranslate().y, ground_->GetTranslate().z - 0.1f });
+			//camera_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
+			//ground_->SetTranslate({ ground_->GetTranslate().x, ground_->GetTranslate().y, ground_->GetTranslate().z - 0.1f });
 			tide_->SetTranslate({ tide_->GetTranslate().x, tide_->GetTranslate().y, tide_->GetTranslate().z - 0.1f });
 		}
 		else if (isGameOver == true)//GameOverSceneへ遷移
@@ -201,6 +201,7 @@ namespace MyEngine
 		}
 		else//導入遷移中
 		{
+
 			sceneTransitionTime++;
 			if (sceneTransitionTime <= 60)
 			{
@@ -221,6 +222,7 @@ namespace MyEngine
 				sceneTransitionTime = 0;
 				player_->SetIsMovable(true);
 			}
+			camera_->Offset({ 0.0f,2.0f,-20.0f }, player_->GetTranslate(), player_->GetWorldMatrix());
 		}
 		enemys_.remove_if([](std::unique_ptr<Enemy>& enemy)
 			{
@@ -262,6 +264,7 @@ namespace MyEngine
 		{
 			enemy_->Update(enemy_->GetSort());
 		}
+
 	}
 
 	void GameScene::Draw()

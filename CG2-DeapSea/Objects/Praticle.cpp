@@ -143,7 +143,7 @@ namespace MyEngine
 		{
 			float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
 			Matrix4x4 backToFrontMatrix = MakerotateYMatrix(std::numbers::pi_v<float>);
-			Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, Camera::GetInstance()->GetWorldMatrix());
+			Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, camera_->GetWorldMatrix());
 			billboardMatrix.m[3][0] = 0.0f;
 			billboardMatrix.m[3][1] = 0.0f;
 			billboardMatrix.m[3][2] = 0.0f;
@@ -161,9 +161,9 @@ namespace MyEngine
 				instancingData[index].color = particles[index].color;
 			}
 
-			particles[index].transform.translate.x += particles[index].velocity.x * kDeltaTime;
-			particles[index].transform.translate.y += particles[index].velocity.y * kDeltaTime;
-			particles[index].transform.translate.z += particles[index].velocity.z * kDeltaTime;
+			particles[index].transform.translate.x += particles[index].velocity.x/* * kDeltaTime*/;
+			particles[index].transform.translate.y += particles[index].velocity.y/* * kDeltaTime*/;
+			particles[index].transform.translate.z += particles[index].velocity.z/* * kDeltaTime*/;
 			particles[index].currentTime += kDeltaTime;
 			if (camera_)
 			{

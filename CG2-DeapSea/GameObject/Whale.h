@@ -31,6 +31,8 @@ public:
 	const int32_t& GetLife()const { return life; }
 	const bool& GetIsHit()const { return isHit; }
 	const float& GetMaxDistance()const { return maxDistance; }
+	Matrix4x4 GetWorldMatrix() { return object3d_->GetObjectMatrix(); }
+
 	void ChangeModel(std::string shape, std::string skin);
 private:
 	std::unique_ptr<Object3d> object3d_;
