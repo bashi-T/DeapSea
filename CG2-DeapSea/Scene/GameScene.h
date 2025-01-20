@@ -57,10 +57,12 @@ namespace MyEngine
 		{
 			Start,
 			Blackout,
+			moveKey,
+			attackKey,
 			NumArgument
 		};
 
-		std::string Planes[6]
+		std::string Planes[8]
 		{
 			"plane/plane.obj",
 			"plane/plane.obj",
@@ -75,5 +77,7 @@ namespace MyEngine
 		Vector3 ingameCameraRotate = { 0.2f,0.0f,0.0f };
 		const float zfar = 2.0f;
 		Vector2 spritePos = { 10.0f,-50.0f };
+		bool isMove;
+		bool isAttack;
 	};
 }

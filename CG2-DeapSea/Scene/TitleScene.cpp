@@ -161,7 +161,6 @@ namespace MyEngine
 			}
 		}
 
-		camera_->Offset({ 0.0f,2.0f,-30.0f }, whale_->GetTranslate());
 #ifdef _DEBUG
 		ImGui::Begin("num");
 		ImGui::InputInt("num", &nowStage);

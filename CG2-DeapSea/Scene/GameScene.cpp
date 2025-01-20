@@ -27,6 +27,8 @@ namespace MyEngine
 		{
 			"Resource/startUI.png",
 			"Resource/black.png",
+			"Resource/moveKey.png",
+			"Resource/attackKey.png",
 		};
 
 		for (uint32_t i = 0; i < NumArgument; i++)
@@ -43,6 +45,12 @@ namespace MyEngine
 		uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar });
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
+		uiPlanes_[moveKey]->SetScale({ 2.5f,1.0f,0.0f });
+		uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+
+		uiPlanes_[attackKey]->SetScale({ 2.5f,1.0f,0.0f });
+		uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+
 		enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
 		enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
 		enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
@@ -57,38 +65,38 @@ namespace MyEngine
 		isGameStart = false;
 		isGameOver = false;
 		isGameClear = false;
+
+		isMove = false;
+		isAttack = false;
+
 		sceneTransitionTime = 0;
 		player_->SetTranslate({ camera_->GetTranslate().x ,87.5f ,0.0f });
 		whale_->SetTranslate({ 0.0f,0.0f,1.5f });
 		particle_ = std::make_unique<Particle>();
 		particle_->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
 			-7.0f, 7.0f, -5.0f, -5.0f, -2.0f, -2.0f,
-			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 1.0f);
+			0.0f, 0.0f, 0.1f, 0.2f, 0.0f, 0.0f);
 		particle_->Initialize("Resource/clearbabble.png", particle_->GetElements(),100);
 		//if (GameManager::stageNumber >= 2)
 		//{
 
 		//}
-		for (uint32_t i = 0; i < 1; i++)
-		{
-			std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
-			sprite->Initialize("Resource/key.png");
-			sprite->SetPosition(spritePos);
-			sprite->SetSize({ sprite->GetSize().x * 1.2f,sprite->GetSize().y * 1.2f });
-			sprites_.push_back(std::move(sprite));
-		}
+		//for (uint32_t i = 0; i < 1; i++)
+		//{
+		//	std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
+		//	sprite->Initialize("Resource/key.png");
+		//	sprite->SetPosition(spritePos);
+		//	sprite->SetSize({ sprite->GetSize().x * 1.2f,sprite->GetSize().y * 1.2f });
+		//	sprites_.push_back(std::move(sprite));
+		//}
 	}
 
 	void GameScene::Update()
 	{
-		if (GameManager::stageNumber == 0)
-		{
-			sprites_[0]->Update();
-		}
 		if (isGameStart == true && whale_->GetLife() != 0)//gameScene
 		{
+			time++;
 #ifdef _DEBUG
-			//time++;
 			//if (time == 150)
 			//{
 			//	//isGameStart = false;
@@ -96,6 +104,43 @@ namespace MyEngine
 			//	whale_->SetLife(0);
 			//}
 #endif
+			if (GameManager::stageNumber == 0&&time>60)
+			{
+
+				if (Input::GetInstance()->PushKey(DIK_RIGHT)||Input::GetInstance()->PushKey(DIK_LEFT)||Input::GetInstance()->PushKey(DIK_UP)||Input::GetInstance()->PushKey(DIK_DOWN))
+				{
+					isMove = true;
+				}
+				if (Input::GetInstance()->PushKey(DIK_SPACE))
+				{
+					isAttack = true;
+				}
+
+				if (isMove == false)
+				{
+					uiPlanes_[moveKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 4.0f, player_->GetTranslate().z - 2.0f });
+					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				}
+				else
+				{
+					uiPlanes_[moveKey]->SetTranslate({ uiPlanes_[moveKey]->GetTranslate().x, uiPlanes_[moveKey]->GetTranslate().y + 0.01f, player_->GetTranslate().z - 2.0f });
+					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,uiPlanes_[moveKey]->GetColor().a-0.02f});
+				}
+
+				if (isAttack == false)
+				{
+					uiPlanes_[attackKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 3.0f, player_->GetTranslate().z - 2.0f });
+					uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				}
+				else
+				{
+					uiPlanes_[attackKey]->SetTranslate({ uiPlanes_[attackKey]->GetTranslate().x, uiPlanes_[attackKey]->GetTranslate().y+0.01f, player_->GetTranslate().z - 2.0f});
+					uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,uiPlanes_[attackKey]->GetColor().a - 0.02f });
+				}
+				uiPlanes_[moveKey]->Update();
+				uiPlanes_[attackKey]->Update();
+			}
+
 			if (uiPlanes_[Start]->GetTranslate().y >= 2.0f && uiPlanes_[Start]->GetTranslate().y <= 3.0f)
 			{
 				uiPlanes_[Start]->SetTranslate({ uiPlanes_[Start]->GetTranslate().x, uiPlanes_[Start]->GetTranslate().y + 0.1f,camera_->GetTranslate().z + 10.0f });
@@ -272,7 +317,7 @@ namespace MyEngine
 		ground_->Draw();
 		whale_->Draw();
 		player_->Draw();
-		for (int i = 0; i < NumArgument; i++)
+		for (uint32_t i = 0; i < NumArgument; i++)
 		{
 			uiPlanes_[i]->Draw();
 		}
@@ -284,7 +329,7 @@ namespace MyEngine
 		tide_->Draw();
 		if (GameManager::stageNumber == 0)
 		{
-			sprites_[0]->Draw();
+			//sprites_[0]->Draw();
 		}
 	}
 
@@ -294,7 +339,7 @@ namespace MyEngine
 		player_.reset();
 		whale_.reset();
 		enemys_.clear();
-		sprites_.clear();
+		//sprites_.clear();
 		for (uint32_t i = 0; i < 4; i++)
 		{
 			enemyPopFile[i].clear();
@@ -456,6 +501,10 @@ namespace MyEngine
 				std::unique_ptr<Enemy> enemy_ = std::make_unique<Enemy>();
 				enemy_->SetSort((int)enemySort(randomEngine));
 				enemy_->Initialize(player_.get(), whale_.get(), enemy_->GetSort());
+				if (GameManager::stageNumber == 0)
+				{
+					enemy_->SetIsPractice(true);
+				}
 				enemy_->SetTranslate({ x,y,z });
 				enemy_->SetEnemyVector(whale_->GetTranslate());
 				enemys_.push_back(std::move(enemy_));

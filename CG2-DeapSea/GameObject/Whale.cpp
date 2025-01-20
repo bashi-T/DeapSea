@@ -32,7 +32,7 @@
 		particle_ = std::make_unique<Particle>();
 		particle_->SetElements(0.0f, 1.0f, 1.0f, 2.0f,
 			-7.0f, 7.0f, -6.0f, -4.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 6.0f, 12.0f, 0.0f, 0.0f);
+			-0.005f, 0.005f, 0.005f, 0.01f, 0.0f, 0.0f);
 		particle_->Initialize("Resource/bloodParticle.png", particle_->GetElements(), 300);
 	}
 
@@ -221,7 +221,7 @@
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
 				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
-				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
 
@@ -232,7 +232,7 @@
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
 				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
-				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
 
@@ -243,7 +243,7 @@
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
 				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
-				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
 
@@ -255,7 +255,7 @@
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
 				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
-				-1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
+				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
 

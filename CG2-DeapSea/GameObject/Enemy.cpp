@@ -96,19 +96,22 @@
 			}
 			else
 			{
-				if (object3d_->GetTranslate().z > player_->GetTranslate().z)
+				if(isPractice_==false)
 				{
-					Shot();
+					if (object3d_->GetTranslate().z > player_->GetTranslate().z)
+					{
+						Shot();
+					}
+					if (shotInterval == 1 && object3d_->GetTranslate().z > whale_->GetTranslate().z)
+					{
+						SetEnemyVector(whale_->GetTranslate());
+					}
+					else if (shotInterval == 1 && enemyVector.z > 0.0f)
+					{
+						SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
+					}
+					object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
 				}
-				if (shotInterval == 1 && object3d_->GetTranslate().z > whale_->GetTranslate().z)
-				{
-					SetEnemyVector(whale_->GetTranslate());
-				}
-				else if (shotInterval == 1 && enemyVector.z > 0.0f)
-				{
-					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
-				}
-				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
 			}
 			object3d_->Update(Camera::GetInstance());
 			enemyCollision =

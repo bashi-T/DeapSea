@@ -22,6 +22,7 @@ class Enemy
 		void SetEnemyVector(Vector3 translate);
 		void SetSort(int i) { enemySort = i; }
 		void SubtractLife() { life--; }
+		void SetIsPractice(bool isPractice) { isPractice_ = isPractice; }
 
 		bool IsDead()const { return isDead; }
 		const std::list<std::unique_ptr<EnemyBullet>>& GetBullets()const { return eBullets; }
@@ -40,6 +41,7 @@ class Enemy
 		uint32_t shotInterval = 0;
 		bool isShot = false;
 		bool isDead = false;
+		bool isPractice_ = false;
 		AABB enemyCollision;
 		Vector3 enemyVector;
 		Vector3 enemyEscapeSpeed = { 4.0f, 1.0f, 4.0f };
