@@ -215,6 +215,7 @@ namespace MyEngine
 			{
 				player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f / 2, player_->GetTranslate().z });
 				camera_->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y - 0.5f,camera_->GetTranslate().z });
+				//camera_->Offset({ 0.0f,2.0f,-20.0f }, player_->GetTranslate());
 			}
 			if (sceneTransitionTime >= 120)
 			{
@@ -222,7 +223,6 @@ namespace MyEngine
 				sceneTransitionTime = 0;
 				player_->SetIsMovable(true);
 			}
-			camera_->Offset({ 0.0f,2.0f,-20.0f }, player_->GetTranslate(), player_->GetWorldMatrix());
 		}
 		enemys_.remove_if([](std::unique_ptr<Enemy>& enemy)
 			{

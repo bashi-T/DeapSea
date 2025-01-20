@@ -125,7 +125,7 @@ namespace MyEngine
 		dx12Common_ = modelCommon->GetDx12Common();
 		srvManager_ = srvManager;
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
-		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 		material_[0].uvTransform = uvTransformMatrix;
 
@@ -150,7 +150,7 @@ namespace MyEngine
 		srvManager_ = srvManager;
 
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
-		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 		material_[0].uvTransform = uvTransformMatrix;
 

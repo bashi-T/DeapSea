@@ -379,11 +379,13 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
-Matrix4x4 MakerotateXMatrix(float radian);
+Matrix4x4 MakeRotateXMatrix(float radian);
 
-Matrix4x4 MakerotateYMatrix(float radian);
+Matrix4x4 MakeRotateYMatrix(float radian);
 
-Matrix4x4 MakerotateZMatrix(float radian);
+Matrix4x4 MakeRotateZMatrix(float radian);
+
+Matrix4x4 MakeRotateMatrix(Vector3 rotate);
 
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
 //透視投影行列

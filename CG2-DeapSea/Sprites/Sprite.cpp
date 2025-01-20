@@ -150,7 +150,7 @@ namespace MyEngine
 		materialData[0].color = color;
 		materialData[0].uvTransform = MakeIdentity4x4();
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
-		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransform.rotate.z));
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 		materialData[0].uvTransform = uvTransformMatrix;
 

@@ -80,15 +80,22 @@ namespace MyEngine
 #ifdef _DEBUG
 			if (Input::GetInstance()->PushKey(DIK_D))
 			{
-				camera->SetTranslate({ camera->GetTranslate().x + 0.2f, camera->GetTranslate().y, camera->GetTranslate().z });
+				camera->SetRotate({ camera->GetRotate().x , camera->GetRotate().y + 0.01f, camera->GetRotate().z });
 			}
 			if (Input::GetInstance()->PushKey(DIK_A))
 			{
-				camera->SetTranslate({ camera->GetTranslate().x - 0.2f, camera->GetTranslate().y, camera->GetTranslate().z });
-		    }
+				camera->SetRotate({ camera->GetRotate().x, camera->GetRotate().y - 0.01f, camera->GetRotate().z });
+			}
+			if (Input::GetInstance()->PushKey(DIK_W))
+			{
+				camera->SetRotate({ camera->GetRotate().x + 0.01f, camera->GetRotate().y, camera->GetRotate().z });
+			}
+			if (Input::GetInstance()->PushKey(DIK_S))
+			{
+				camera->SetRotate({ camera->GetRotate().x - 0.01f, camera->GetRotate().y , camera->GetRotate().z });
+			}
 #endif // DEBUG
 
-			camera->Update();
 			prevSceneNo_ = currentSceneNo_;
 			currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();
 			if (prevSceneNo_ != currentSceneNo_)
@@ -100,6 +107,8 @@ namespace MyEngine
 			imgui->Update();
 			skyDome->Update();
 			sceneArr_[currentSceneNo_]->Update();
+			camera->Update();
+
 #ifdef _DEBUG
 			ImGui::Begin("camera");
 			//ImGui::DragFloat3("object.rotate", (float*)&object3d->GetRotate(), 0.01f);

@@ -235,7 +235,7 @@ namespace MyEngine
 		materialDataSphere[0].enableLighting = true;
 		materialDataSphere[0].uvTransform = MakeIdentity4x4();
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSphere.scale);
-		uvTransformMatrix = Multiply(uvTransformMatrix, MakerotateZMatrix(uvTransformSphere.rotate.z));
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSphere.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSphere.translate));
 		materialDataSphere[0].uvTransform = uvTransformMatrix;
 

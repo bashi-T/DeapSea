@@ -142,7 +142,7 @@ namespace MyEngine
 		for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 		{
 			float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
-			Matrix4x4 backToFrontMatrix = MakerotateYMatrix(std::numbers::pi_v<float>);
+			Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
 			Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, camera_->GetWorldMatrix());
 			billboardMatrix.m[3][0] = 0.0f;
 			billboardMatrix.m[3][1] = 0.0f;
