@@ -1,5 +1,5 @@
 #include "SceneManager.h"
-int SceneManager::sceneNo = TITLE;
+int SceneManager::sceneNo = INGAME;
 
 SceneManager::~SceneManager()
 {
