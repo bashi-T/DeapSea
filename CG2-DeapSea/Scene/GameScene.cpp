@@ -45,10 +45,10 @@ namespace MyEngine
 		uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar });
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-		uiPlanes_[moveKey]->SetScale({ 2.5f,1.0f,0.0f });
+		uiPlanes_[moveKey]->SetScale({ 1.5f,0.5f,0.0f });
 		uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 
-		uiPlanes_[attackKey]->SetScale({ 2.5f,1.0f,0.0f });
+		uiPlanes_[attackKey]->SetScale({ 1.5f,0.5f,0.0f });
 		uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 
 		enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
@@ -99,8 +99,8 @@ namespace MyEngine
 #ifdef _DEBUG
 			//if (time == 150)
 			//{
-			//	//isGameStart = false;
-			//	//isGameClear = true;
+			//	isGameStart = false;
+			//	isGameClear = true;
 			//	whale_->SetLife(0);
 			//}
 #endif
@@ -118,7 +118,7 @@ namespace MyEngine
 
 				if (isMove == false)
 				{
-					uiPlanes_[moveKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 4.0f, player_->GetTranslate().z - 2.0f });
+					uiPlanes_[moveKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 3.0f, player_->GetTranslate().z - 2.0f });
 					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 				}
 				else
@@ -129,7 +129,7 @@ namespace MyEngine
 
 				if (isAttack == false)
 				{
-					uiPlanes_[attackKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 3.0f, player_->GetTranslate().z - 2.0f });
+					uiPlanes_[attackKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 2.5f, player_->GetTranslate().z - 2.0f });
 					uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 				}
 				else
@@ -171,7 +171,7 @@ namespace MyEngine
 			}
 
 			CheckAllCollisions();
-			//camera_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
+			camera_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
 			//ground_->SetTranslate({ ground_->GetTranslate().x, ground_->GetTranslate().y, ground_->GetTranslate().z - 0.1f });
 			tide_->SetTranslate({ tide_->GetTranslate().x, tide_->GetTranslate().y, tide_->GetTranslate().z - 0.1f });
 		}
