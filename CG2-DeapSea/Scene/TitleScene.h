@@ -100,6 +100,5 @@ namespace MyEngine
 		const float whaleRotateY = 0.003f;
 		const float whaleFloating = 0.01f;
 		const float uiFloating = 0.001f;
-
 	};
 }

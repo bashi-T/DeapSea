@@ -28,8 +28,8 @@ namespace MyEngine
 		void LoadEnemyPopData(std::string filePath, int32_t fileNum);
 		void UpdateEnemyPopCommands(int32_t fileNum);
 
-
 		void CheckAllCollisions();
+
 	private:
 		Camera* camera_ = nullptr;
 		std::unique_ptr<Particle> particle_;
@@ -62,7 +62,7 @@ namespace MyEngine
 			NumArgument
 		};
 
-		std::string Planes[8]
+		std::string Planes[6]
 		{
 			"plane/plane.obj",
 			"plane/plane.obj",

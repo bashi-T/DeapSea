@@ -57,7 +57,6 @@ namespace MyEngine
 		cursor_->SetTranslate({ uiPlanes_[Practice]->GetTranslate().x + cursorX,uiPlanes_[Practice]->GetTranslate().y,uiPlanes_[Practice]->GetTranslate().z });
 		camera_->SetTranslate({ 0.0f,2.0f,-20.0f });
 		camera_->SetRotate({ 0.1f,0.0f,0.0f });
-
 	}
 
 	void TitleScene::Update()
@@ -199,6 +198,10 @@ namespace MyEngine
 	{
 		whale_.reset();
 		//player_.reset();
+		for (uint32_t i = 0; i < NumArgument; i++)
+		{
+			uiPlanes_[i].reset();
+		}
 		uiPlanes_.clear();
 		AudioManager::GetInstance()->SoundUnload(&bgm);
 		AudioManager::GetInstance()->SoundUnload(&enterSound);

@@ -309,7 +309,6 @@ namespace MyEngine
 		{
 			enemy_->Update(enemy_->GetSort());
 		}
-
 	}
 
 	void GameScene::Draw()
@@ -327,14 +326,14 @@ namespace MyEngine
 		}
 		particle_->Draw();
 		tide_->Draw();
-		if (GameManager::stageNumber == 0)
-		{
-			//sprites_[0]->Draw();
-		}
 	}
 
 	void GameScene::Finalize()
 	{
+		for (uint32_t i = 0; i < NumArgument; i++)
+		{
+			uiPlanes_[i].reset();
+		}
 		uiPlanes_.clear();
 		player_.reset();
 		whale_.reset();
