@@ -32,6 +32,7 @@ void Player::Initialize(Camera* camera)
 	};
 	//collision.radius = 2.0f;
 	angle_ = 0.0f;
+	object3d_->SetScale({2.0f, 2.0f, 2.0f});
 }
 
 void Player::Update()

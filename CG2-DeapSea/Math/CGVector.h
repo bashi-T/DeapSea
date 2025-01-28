@@ -174,7 +174,7 @@ constexpr double epsilon = std::numeric_limits<double>::epsilon();
 //	Novice::ScreenPrintf(x + kcolumnWidth, y, "%.02f", z.y);
 //}
 //
-//float theta = (1.0 / 16.0f) * M_PI;
+//float theta_ = (1.0 / 16.0f) * std::numbers::pi_v<float>;
 //
 //int kWorld = 500;
 //

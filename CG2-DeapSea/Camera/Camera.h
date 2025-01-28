@@ -21,6 +21,7 @@ namespace MyEngine
 
 		void SetRotate(const Vector3& rotate) { transformMatrix.rotate = rotate; }
 		void SetTranslate(const Vector3& translate) { transformMatrix.translate = translate; }
+		void SetDefaultAngle(const Vector3& angle) { defaultAngle = angle; }
 		void SetFovY(const float& FovY) { fovY = FovY; }
 		void SetAspectretio(const float& AspectRetio) { aspectRetio = AspectRetio; }
 		void SetNearClip(const float& NearClip) { nearClip = NearClip; }
@@ -28,11 +29,12 @@ namespace MyEngine
 
 		const Vector3& GetRotate()const { return transformMatrix.rotate; }
 		const Vector3& GetTranslate()const { return transformMatrix.translate; }
+	    const Vector3& GetDefaultAngle()const { return defaultAngle; }
 		const Matrix4x4& GetWorldMatrix() { return worldMatrix; }
 		const Matrix4x4& GetViewMatrix() { return viewMatrix; }
 		const Matrix4x4& GetProjectionMatrix() { return projectionMatrix; }
 		const Matrix4x4& GetViewProjectionMatrix() { return viewProjectionMatrix; }
-		static Camera* GetInstance();
+	    static Camera* GetInstance();
 		static void DeleteInstance();
 
 		Camera();
@@ -48,6 +50,8 @@ namespace MyEngine
 		float nearClip = 0.0f;
 		float farClip = 0.0f;
 		static inline std::unique_ptr<Camera> instance;
+
+	    Vector3 defaultAngle = {};
 
 	};
 }

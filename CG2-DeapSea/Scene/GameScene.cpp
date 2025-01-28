@@ -28,8 +28,9 @@ namespace MyEngine
 			"Resource/startUI.png",
 			"Resource/black.png",
 			"Resource/moveKey.png",
-			"Resource/attackKey.png",
-		};
+	        "Resource/attackKey.png",
+			"Resource/frontKey.png",
+	    };
 
 		for (uint32_t i = 0; i < NumArgument; i++)
 		{
@@ -37,8 +38,9 @@ namespace MyEngine
 			uiPlane->Initialize(Planes[i], PNGs[i]);
 			uiPlanes_.push_back(std::move(uiPlane));
 		}
-		uiPlanes_[Start]->SetScale({ 1.5f,1.0f,0.0f });
-		uiPlanes_[Start]->SetTranslate({ 0.0f, -3.0f,camera_->GetTranslate().z + 10.0f });
+	    uiPlanes_[Start]->SetScale({1.5f, 1.0f, 0.0f});
+	    uiPlanes_[Start]->SetRotate({1.47f, 0.0f, 0.0f});
+	    uiPlanes_[Start]->SetTranslate({0.0f, 58.0f, camera_->GetTranslate().z - 10.0f});
 		uiPlanes_[Start]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 		uiPlanes_[Blackout]->SetScale({ 10.0f,50.0f,0.0f });
@@ -47,11 +49,17 @@ namespace MyEngine
 
 		uiPlanes_[moveKey]->SetScale({ 1.5f,0.5f,0.0f });
 		uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	    uiPlanes_[moveKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
-		uiPlanes_[attackKey]->SetScale({ 1.5f,0.5f,0.0f });
-		uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+		uiPlanes_[attackKey]->SetScale({1.5f, 0.5f, 0.0f});
+	    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+	    uiPlanes_[attackKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
-		enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
+		uiPlanes_[lookKey]->SetScale({1.5f, 0.5f, 0.0f});
+	    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+	    uiPlanes_[lookKey]->SetRotate({-1.6f, -3.2f, 0.0f});
+
+	    enemyPopFile[0] = "Resource/CSV/practiceFile.csv";
 		enemyPopFile[1] = "Resource/CSV/STAGE1File.csv";
 		enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
 		enemyPopFile[3] = "Resource/CSV/STAGE3File.csv";
@@ -67,15 +75,16 @@ namespace MyEngine
 		isGameClear = false;
 
 		isMove = false;
-		isAttack = false;
+	    isAttack = false;
+	    isLook = false;
 
 		sceneTransitionTime = 0;
 		player_->SetTranslate({ camera_->GetTranslate().x ,87.5f ,0.0f });
 		whale_->SetTranslate({ 0.0f,0.0f,1.5f });
 		particle_ = std::make_unique<Particle>();
 		particle_->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
-			-7.0f, 7.0f, -5.0f, -5.0f, -2.0f, -2.0f,
-			0.0f, 0.0f, 0.1f, 0.2f, 0.0f, 0.0f);
+			-7.0f, 7.0f, 55.0f, 55.0f, -4.0f, -4.0f,
+			0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.2f);
 		particle_->Initialize("Resource/clearbabble.png", particle_->GetElements(),100);
 		//if (GameManager::stageNumber >= 2)
 		//{
@@ -111,39 +120,74 @@ namespace MyEngine
 				{
 					isMove = true;
 				}
-				if (Input::GetInstance()->PushKey(DIK_SPACE))
+			    if (Input::GetInstance()->PushKey(DIK_SPACE))
 				{
-					isAttack = true;
-				}
+				    isAttack = true;
+			    }
+			    if (Input::GetInstance()->PushKey(DIK_F))
+				{
+				    isLook = true;
+			    }
 
 				if (isMove == false)
 				{
-					uiPlanes_[moveKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 3.0f, player_->GetTranslate().z - 2.0f });
+				    uiPlanes_[moveKey]->SetRotate(camera_->GetRotate());
+				    uiPlanes_[moveKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 30.0f, player_->GetTranslate().z - 1.0f});
 					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 				}
 				else
 				{
-					uiPlanes_[moveKey]->SetTranslate({ uiPlanes_[moveKey]->GetTranslate().x, uiPlanes_[moveKey]->GetTranslate().y + 0.01f, player_->GetTranslate().z - 2.0f });
+				    uiPlanes_[moveKey]->SetTranslate({uiPlanes_[moveKey]->GetTranslate().x, uiPlanes_[moveKey]->GetTranslate().y, uiPlanes_[moveKey]->GetTranslate().z + 0.01f});
 					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,uiPlanes_[moveKey]->GetColor().a-0.02f});
 				}
 
 				if (isAttack == false)
 				{
-					uiPlanes_[attackKey]->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y + 2.5f, player_->GetTranslate().z - 2.0f });
-					uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-				}
+				    uiPlanes_[attackKey]->SetRotate(camera_->GetRotate());
+				    uiPlanes_[attackKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 30.0f, player_->GetTranslate().z - 1.5f});
+				    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+			    } 
 				else
 				{
-					uiPlanes_[attackKey]->SetTranslate({ uiPlanes_[attackKey]->GetTranslate().x, uiPlanes_[attackKey]->GetTranslate().y+0.01f, player_->GetTranslate().z - 2.0f});
-					uiPlanes_[attackKey]->SetColor({ 1.0f,1.0f,1.0f,uiPlanes_[attackKey]->GetColor().a - 0.02f });
-				}
-				uiPlanes_[moveKey]->Update();
-				uiPlanes_[attackKey]->Update();
-			}
+				    uiPlanes_[attackKey]->SetTranslate({uiPlanes_[attackKey]->GetTranslate().x, uiPlanes_[attackKey]->GetTranslate().y, uiPlanes_[attackKey]->GetTranslate().z + 0.01f});
+				    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, uiPlanes_[attackKey]->GetColor().a - 0.02f});
+			    }
+
+			    if (isLook == false)
+				{
+				    uiPlanes_[lookKey]->SetRotate(camera_->GetRotate());
+				    uiPlanes_[lookKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 30.0f, player_->GetTranslate().z - 2.0f});
+				    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+			    } 
+				else
+				{
+				    uiPlanes_[lookKey]->SetTranslate({uiPlanes_[lookKey]->GetTranslate().x, uiPlanes_[lookKey]->GetTranslate().y, uiPlanes_[lookKey]->GetTranslate().z + 0.01f});
+				    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, uiPlanes_[lookKey]->GetColor().a - 0.02f});
+			    }
+			    uiPlanes_[moveKey]->Update();
+			    uiPlanes_[attackKey]->Update();
+			    uiPlanes_[lookKey]->Update();
+		    }
+
+		    if (Input::GetInstance()->PushKey(DIK_F))
+			{
+			    if (camera_->GetRotate().x >= 1.4f)
+				{
+				    camera_->SetRotate({camera_->GetRotate().x - 0.01f, camera_->GetRotate().y, camera_->GetRotate().z});
+			    }
+		    }
+			else
+			{
+			    if (camera_->GetRotate().x <= camera_->GetDefaultAngle().x)
+				{
+				    camera_->SetRotate({camera_->GetRotate().x + 0.01f, camera_->GetRotate().y, camera_->GetRotate().z});
+			    }
+		    }
 
 			if (uiPlanes_[Start]->GetTranslate().y >= 2.0f && uiPlanes_[Start]->GetTranslate().y <= 3.0f)
 			{
-				uiPlanes_[Start]->SetTranslate({ uiPlanes_[Start]->GetTranslate().x, uiPlanes_[Start]->GetTranslate().y + 0.1f,camera_->GetTranslate().z + 10.0f });
+			    uiPlanes_[Start]->SetRotate(camera_->GetRotate());
+			    uiPlanes_[Start]->SetTranslate({uiPlanes_[Start]->GetTranslate().x, uiPlanes_[Start]->GetTranslate().y + 0.1f, camera_->GetTranslate().z + 10.0f});
 			}
 			else if (uiPlanes_[Start]->GetTranslate().y >= 3.0f)
 			{
@@ -157,12 +201,12 @@ namespace MyEngine
 			uiPlanes_[Start]->Update();
 			particle_->Update(false, particle_->GetElements());
 
-			//player_->SetMaxPosition(player_->GetTranslate().x, 20.0f);
-			//whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x + whale_->GetMaxDistance());
-			//whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x - whale_->GetMaxDistance());
-			//whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z + whale_->GetMaxDistance());
-			//whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z - whale_->GetMaxDistance());
-			//whale_->SetMaxPosition(whale_->GetTranslate().x, 10.0f);
+			player_->SetMaxPosition(player_->GetTranslate().x, 20.0f);
+			whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x + whale_->GetMaxDistance());
+			whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x - whale_->GetMaxDistance());
+			whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z + whale_->GetMaxDistance());
+			whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z - whale_->GetMaxDistance());
+			whale_->SetMaxPosition(whale_->GetTranslate().x, 10.0f);
 
 			UpdateEnemyPopCommands(GameManager::stageNumber);
 			for (const auto& enemy_ : enemys_)
@@ -171,7 +215,7 @@ namespace MyEngine
 			}
 
 			CheckAllCollisions();
-			camera_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y + 6.0f,player_->GetTranslate().z - 20.0f });
+		    camera_->SetTranslate({player_->GetTranslate().x, camera_->GetTranslate().y, player_->GetTranslate().z});
 			//ground_->SetTranslate({ ground_->GetTranslate().x, ground_->GetTranslate().y, ground_->GetTranslate().z - 0.1f });
 			tide_->SetTranslate({ tide_->GetTranslate().x, tide_->GetTranslate().y, tide_->GetTranslate().z - 0.1f });
 		}
@@ -188,6 +232,7 @@ namespace MyEngine
 				{
 					whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y - 0.05f,whale_->GetTranslate().z });
 					uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f });
+				    uiPlanes_[Blackout]->SetRotate(camera_->GetRotate());
 					uiPlanes_[Blackout]->SetColor({ uiPlanes_[Blackout]->GetColor().x,uiPlanes_[Blackout]->GetColor().y,uiPlanes_[Blackout]->GetColor().z,uiPlanes_[Blackout]->GetColor().a + 0.02f });
 					uiPlanes_[Blackout]->Update();
 				}
@@ -260,13 +305,31 @@ namespace MyEngine
 			{
 				player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f / 2, player_->GetTranslate().z });
 				camera_->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y - 0.5f,camera_->GetTranslate().z });
-				//camera_->Offset({ 0.0f,2.0f,-20.0f }, player_->GetTranslate());
 			}
 			if (sceneTransitionTime >= 120)
 			{
-				isGameStart = true;
-				sceneTransitionTime = 0;
-				player_->SetIsMovable(true);
+			    if (camera_->GetTranslate().z != 0.0f)
+				{
+				    float rotateX = camera_->GetRotate().x;
+				    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
+				    camera_->Offset({0.0f, 2.0f, -20.0f}, player_->GetTranslate());
+			    }
+			    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.2f)
+				{
+				    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, 0.0f});
+			    }
+			    if (camera_->GetTranslate().z == 0.0f)
+				{
+				    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y + 0.4f, camera_->GetTranslate().z});
+			    }
+			    if (camera_->GetTranslate().y >= 70.0f)
+				{
+				    camera_->SetTranslate({camera_->GetTranslate().x, 70.0f, camera_->GetTranslate().z});
+				    isGameStart = true;
+				    sceneTransitionTime = 0;
+				    player_->SetIsMovable(true);
+				    camera_->SetDefaultAngle(camera_->GetRotate());
+			    }
 			}
 		}
 		enemys_.remove_if([](std::unique_ptr<Enemy>& enemy)

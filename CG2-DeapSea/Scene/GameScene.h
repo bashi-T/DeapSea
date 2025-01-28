@@ -59,6 +59,7 @@ namespace MyEngine
 			Blackout,
 			moveKey,
 			attackKey,
+			lookKey,
 			NumArgument
 		};
 
@@ -79,5 +80,6 @@ namespace MyEngine
 		Vector2 spritePos = { 10.0f,-50.0f };
 		bool isMove;
 		bool isAttack;
+	    bool isLook;
 	};
 }
