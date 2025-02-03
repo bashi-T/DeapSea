@@ -1,6 +1,6 @@
 #pragma once
 #include"Input/Input.h"
-#include"SceneManager.h"
+#include"BaseScene.h"
 #include"Commons/Object3dCommon.h"
 #include"Objects/Object3d.h"
 #include"Sprites/Sprite.h"
@@ -14,7 +14,7 @@
 
 namespace MyEngine
 {
-	class TitleScene :public SceneManager
+class TitleScene : public BaseScene
 	{
 	public:
 		void Initialize() override;

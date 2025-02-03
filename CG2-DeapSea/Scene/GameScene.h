@@ -1,6 +1,6 @@
 #pragma once
 #include"Input/Input.h"
-#include"SceneManager.h"
+#include"BaseScene.h"
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
 #include"GameObject/Player.h"
@@ -15,7 +15,7 @@
 
 namespace MyEngine
 {
-	class GameScene :public SceneManager
+class GameScene : public BaseScene
 	{
 		enum EnemySort { NORMAL, STRAIGHT };
 
@@ -81,5 +81,6 @@ namespace MyEngine
 		bool isMove;
 		bool isAttack;
 	    bool isLook;
+	    bool isPose;
 	};
 }

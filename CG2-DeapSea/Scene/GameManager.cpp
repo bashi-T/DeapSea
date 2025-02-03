@@ -11,10 +11,7 @@ namespace MyEngine
 
 	GameManager::GameManager()
 	{
-		sceneArr_[TITLE] = std::make_unique<TitleScene>();
-		sceneArr_[INGAME] = std::make_unique<GameScene>();
-		sceneArr_[GAMEOVER] = std::make_unique<GameOverScene>();
-		sceneArr_[CLEAR] = std::make_unique<ClearScene>();
+		sceneArr_ = std::make_unique<TitleScene>();
 	}
 
 	GameManager::~GameManager() {}
@@ -69,44 +66,43 @@ namespace MyEngine
 		particleCommon->Initialize();
 		meshCommon->Initialize();
 		skyDome->Initialize(camera);
-		sceneArr_[TITLE]->Initialize();
+		sceneArr_->Initialize();
 
 		//ウィンドウのボタンが押されるまでループ
 		while (NewMSG.message != WM_QUIT)
 		{
 			dx12Common->update();
-			Input::GetInstance()->Update();
+			input->Update();
 
 #ifdef _DEBUG
-			if (Input::GetInstance()->PushKey(DIK_D))
+		    if (input->PushKey(DIK_D))
 			{
 				camera->SetRotate({ camera->GetRotate().x , camera->GetRotate().y + 0.01f, camera->GetRotate().z });
 			}
-			if (Input::GetInstance()->PushKey(DIK_A))
+		    if (input->PushKey(DIK_A))
 			{
 				camera->SetRotate({ camera->GetRotate().x, camera->GetRotate().y - 0.01f, camera->GetRotate().z });
 			}
-			if (Input::GetInstance()->PushKey(DIK_W))
+		    if (input->PushKey(DIK_W))
 			{
 				camera->SetRotate({ camera->GetRotate().x + 0.01f, camera->GetRotate().y, camera->GetRotate().z });
 			}
-			if (Input::GetInstance()->PushKey(DIK_S))
+		    if (input->PushKey(DIK_S))
 			{
 				camera->SetRotate({ camera->GetRotate().x - 0.01f, camera->GetRotate().y , camera->GetRotate().z });
 			}
 #endif // DEBUG
 
 			prevSceneNo_ = currentSceneNo_;
-			currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();
+			currentSceneNo_ = sceneArr_->GetSceneNo();
 			if (prevSceneNo_ != currentSceneNo_)
 			{
-				sceneArr_[prevSceneNo_]->Finalize();
-				audioManager->Initialize();
-				sceneArr_[currentSceneNo_]->Initialize();
+			    ChangeScene(currentSceneNo_);
+			    sceneArr_->Initialize();
 			}
 			imgui->Update();
 			skyDome->Update();
-			sceneArr_[currentSceneNo_]->Update();
+			sceneArr_->Update();
 			camera->Update();
 
 #ifdef _DEBUG
@@ -121,7 +117,7 @@ namespace MyEngine
 			object3d->GetDirectionalLightData()->direction = Normalize(object3d->GetDirectionalLightData()->direction);
 			ImGui::End();
 			ImGui::Begin("scene");
-			switch (int(sceneArr_[currentSceneNo_]->GetSceneNo()))
+			switch (int(sceneArr_->GetSceneNo()))
 			{
 			case 0:
 				ImGui::Text("TITLE");
@@ -146,7 +142,7 @@ namespace MyEngine
 			}
 			srvManager->PreDraw();
 			skyDome->Draw();
-			sceneArr_[currentSceneNo_]->Draw();
+			sceneArr_->Draw();
 
 			imgui->Endframe(dx12Common->GetCommandList().Get());
 
@@ -154,7 +150,7 @@ namespace MyEngine
 	    }
 
 		CloseHandle(srvManager->GetFenceEvent());
-		sceneArr_[currentSceneNo_]->Finalize();
+		sceneArr_->Finalize();
 		//particleCommon->DeleteInstance();
 		//spriteCommon->DeleteInstance();
 		//camera->DeleteInstance();
@@ -171,4 +167,24 @@ namespace MyEngine
 		CoUninitialize();
 		return 0;
     }
-}
+
+    void GameManager::ChangeScene(uint32_t sceneName)
+	{
+	    if (sceneName == TITLE)
+		{
+		    sceneArr_ = std::make_unique<TitleScene>();
+	    }
+	    if (sceneName == INGAME)
+		{
+		    sceneArr_ = std::make_unique<GameScene>();
+	    }
+	    if (sceneName == GAMEOVER)
+		{
+		    sceneArr_ = std::make_unique<GameOverScene>();
+	    }
+	    if (sceneName == CLEAR)
+		{
+		    sceneArr_ = std::make_unique<ClearScene>();
+	    }
+    }
+    } // namespace MyEngine

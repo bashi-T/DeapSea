@@ -1,17 +1,16 @@
 #pragma once
-
-enum Scene { TITLE, INGAME, GAMEOVER, CLEAR };
+#include"BaseScene.h"
 
 class SceneManager
 {
-protected:
 public:
-	static int sceneNo;
-	virtual void Initialize() = 0;
-	virtual void Update() = 0;
-	virtual void Draw() = 0;
-	virtual void Finalize() = 0;
-	virtual ~SceneManager();
-	int GetSceneNo();
+	~SceneManager();
+	void SetNextScene(BaseScene* nextScene) { nextScene_ = nextScene; }
+	void Update();
+	void Draw();
+
+private:
+	BaseScene* scene_ = nullptr;
+	BaseScene* nextScene_ = nullptr;
 };
 

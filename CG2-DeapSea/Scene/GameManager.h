@@ -1,7 +1,7 @@
 #pragma once
 #include<memory>
 #include<iostream>
-#include"SceneManager.h"
+#include"BaseScene.h"
 #include"TitleScene.h"
 #include"GameScene.h"
 #include"GameOverScene.h"
@@ -37,10 +37,11 @@ namespace MyEngine
 		/// </summary>
 		/// <returns></returns>
 		int32_t Run();
+	    void ChangeScene(uint32_t sceneName);
 		static int32_t stageNumber;
 
 	private:
-		std::unique_ptr<SceneManager> sceneArr_[4];
+		std::unique_ptr<BaseScene> sceneArr_;
 		int32_t currentSceneNo_ = 0;
 		int32_t prevSceneNo_ = 0;
 		HRESULT hr = NULL;

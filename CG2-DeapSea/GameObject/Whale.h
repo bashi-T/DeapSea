@@ -16,7 +16,7 @@ public:
 	void Initialize(Player* players);
 	void Update();
 	void Draw();
-	void SetMaxPosition(float pos, float maxPos);
+	void SetMaxPosition(float pos, float originalPos, float maxPos);
 
 	void ChangeModel(int32_t whaleLife);
 	void OnCollision();

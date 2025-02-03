@@ -39,12 +39,13 @@ namespace MyEngine
 			uiPlanes_.push_back(std::move(uiPlane));
 		}
 	    uiPlanes_[Start]->SetScale({1.5f, 1.0f, 0.0f});
-	    uiPlanes_[Start]->SetRotate({1.47f, 0.0f, 0.0f});
-	    uiPlanes_[Start]->SetTranslate({0.0f, 58.0f, camera_->GetTranslate().z - 10.0f});
+	    uiPlanes_[Start]->SetRotate({-1.6f, -3.2f, 0.0f});
+	    uiPlanes_[Start]->SetTranslate({0.0f, 58.0f, camera_->GetTranslate().z - 1.0f});
 		uiPlanes_[Start]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 		uiPlanes_[Blackout]->SetScale({ 10.0f,50.0f,0.0f });
-		uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar });
+	    uiPlanes_[Blackout]->SetRotate({-1.6f, -3.2f, 0.0f});
+	    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar});
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 		uiPlanes_[moveKey]->SetScale({ 1.5f,0.5f,0.0f });
@@ -77,6 +78,7 @@ namespace MyEngine
 		isMove = false;
 	    isAttack = false;
 	    isLook = false;
+	    isPose = false;
 
 		sceneTransitionTime = 0;
 		player_->SetTranslate({ camera_->GetTranslate().x ,87.5f ,0.0f });
@@ -88,7 +90,7 @@ namespace MyEngine
 		particle_->Initialize("Resource/clearbabble.png", particle_->GetElements(),100);
 		//if (GameManager::stageNumber >= 2)
 		//{
-
+		//
 		//}
 		//for (uint32_t i = 0; i < 1; i++)
 		//{
@@ -131,8 +133,8 @@ namespace MyEngine
 
 				if (isMove == false)
 				{
-				    uiPlanes_[moveKey]->SetRotate(camera_->GetRotate());
-				    uiPlanes_[moveKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 30.0f, player_->GetTranslate().z - 1.0f});
+				    //uiPlanes_[moveKey]->SetRotate(camera_->GetRotate());
+				    uiPlanes_[moveKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 40.0f, player_->GetTranslate().z - 1.0f});
 					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 				}
 				else
@@ -140,11 +142,10 @@ namespace MyEngine
 				    uiPlanes_[moveKey]->SetTranslate({uiPlanes_[moveKey]->GetTranslate().x, uiPlanes_[moveKey]->GetTranslate().y, uiPlanes_[moveKey]->GetTranslate().z + 0.01f});
 					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,uiPlanes_[moveKey]->GetColor().a-0.02f});
 				}
-
 				if (isAttack == false)
 				{
-				    uiPlanes_[attackKey]->SetRotate(camera_->GetRotate());
-				    uiPlanes_[attackKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 30.0f, player_->GetTranslate().z - 1.5f});
+				    //uiPlanes_[attackKey]->SetRotate(camera_->GetRotate());
+				    uiPlanes_[attackKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 40.0f, player_->GetTranslate().z - 1.5f});
 				    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 			    } 
 				else
@@ -152,11 +153,10 @@ namespace MyEngine
 				    uiPlanes_[attackKey]->SetTranslate({uiPlanes_[attackKey]->GetTranslate().x, uiPlanes_[attackKey]->GetTranslate().y, uiPlanes_[attackKey]->GetTranslate().z + 0.01f});
 				    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, uiPlanes_[attackKey]->GetColor().a - 0.02f});
 			    }
-
 			    if (isLook == false)
 				{
-				    uiPlanes_[lookKey]->SetRotate(camera_->GetRotate());
-				    uiPlanes_[lookKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 30.0f, player_->GetTranslate().z - 2.0f});
+				    //uiPlanes_[lookKey]->SetRotate({camera_->GetRotate().x, camera_->GetRotate().y - std::numbers::pi_v<float>, camera_->GetRotate().z});
+				    uiPlanes_[lookKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 40.0f, player_->GetTranslate().z - 2.0f});
 				    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 			    } 
 				else
@@ -184,29 +184,28 @@ namespace MyEngine
 			    }
 		    }
 
-			if (uiPlanes_[Start]->GetTranslate().y >= 2.0f && uiPlanes_[Start]->GetTranslate().y <= 3.0f)
+			if (uiPlanes_[Start]->GetTranslate().z >= camera_->GetTranslate().z - 1.0f && uiPlanes_[Start]->GetTranslate().z <= camera_->GetTranslate().z + 1.0f)
 			{
-			    uiPlanes_[Start]->SetRotate(camera_->GetRotate());
-			    uiPlanes_[Start]->SetTranslate({uiPlanes_[Start]->GetTranslate().x, uiPlanes_[Start]->GetTranslate().y + 0.1f, camera_->GetTranslate().z + 10.0f});
+			    //uiPlanes_[Start]->SetRotate({camera_->GetRotate().x, camera_->GetRotate().y - std::numbers::pi_v<float>, camera_->GetRotate().z});
+			    uiPlanes_[Start]->SetTranslate({uiPlanes_[Start]->GetTranslate().x, camera_->GetTranslate().y - 10.0f, uiPlanes_[Start]->GetTranslate().z + 0.1f});
 			}
-			else if (uiPlanes_[Start]->GetTranslate().y >= 3.0f)
+			else if (uiPlanes_[Start]->GetTranslate().z >= camera_->GetTranslate().z + 1.0f)
 			{
-				uiPlanes_[Start]->SetTranslate({ uiPlanes_[Start]->GetTranslate().x, uiPlanes_[Start]->GetTranslate().y + 0.2f, camera_->GetTranslate().z + 10.0f });
-				uiPlanes_[Start]->SetRotate({ uiPlanes_[Start]->GetRotate().x,uiPlanes_[Start]->GetRotate().y + 0.1f,uiPlanes_[Start]->GetRotate().z });
+				uiPlanes_[Start]->SetRotate({ uiPlanes_[Start]->GetRotate().x,uiPlanes_[Start]->GetRotate().y ,uiPlanes_[Start]->GetRotate().z+ 0.1f });
+			    uiPlanes_[Start]->SetTranslate({uiPlanes_[Start]->GetTranslate().x, camera_->GetTranslate().y - 10.0f, uiPlanes_[Start]->GetTranslate().z + 0.2f});
 			}
 			else
 			{
-				uiPlanes_[Start]->SetTranslate({ uiPlanes_[Start]->GetTranslate().x, uiPlanes_[Start]->GetTranslate().y + 0.2f,camera_->GetTranslate().z + 10.0f });
+			    //uiPlanes_[Start]->SetRotate({camera_->GetRotate().x, camera_->GetRotate().y - std::numbers::pi_v<float>, camera_->GetRotate().z});
+			    uiPlanes_[Start]->SetTranslate({uiPlanes_[Start]->GetTranslate().x, camera_->GetTranslate().y - 10.0f, uiPlanes_[Start]->GetTranslate().z + 0.5f});
 			}
 			uiPlanes_[Start]->Update();
 			particle_->Update(false, particle_->GetElements());
 
 			player_->SetMaxPosition(player_->GetTranslate().x, 20.0f);
-			whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x + whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x - whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z + whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z - whale_->GetMaxDistance());
-			whale_->SetMaxPosition(whale_->GetTranslate().x, 10.0f);
+			whale_->SetMaxPosition(whale_->GetTranslate().x,0.0f, 10.0f);
+		    whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x, whale_->GetMaxDistance());
+		    whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z, whale_->GetMaxDistance());
 
 			UpdateEnemyPopCommands(GameManager::stageNumber);
 			for (const auto& enemy_ : enemys_)
@@ -314,7 +313,7 @@ namespace MyEngine
 				    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
 				    camera_->Offset({0.0f, 2.0f, -20.0f}, player_->GetTranslate());
 			    }
-			    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.2f)
+			    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.02f)
 				{
 				    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, 0.0f});
 			    }

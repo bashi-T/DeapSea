@@ -199,15 +199,15 @@
 		}
 	}
 
-	void Whale::SetMaxPosition(float pos, float maxPos)
+	void Whale::SetMaxPosition(float pos, float originalPos, float maxPos)
 	{
-		if (pos >= maxPos)
+	    if (pos >= originalPos + maxPos)
 		{
-			pos = maxPos;
+		    pos = originalPos + maxPos;
 		}
-		if (pos <= -maxPos)
+	    if (pos <= originalPos - maxPos)
 		{
-			pos = -maxPos;
+		    pos = originalPos - maxPos;
 		}
 	}
 
