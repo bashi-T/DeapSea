@@ -2,10 +2,7 @@
 #include<memory>
 #include<iostream>
 #include"BaseScene.h"
-#include"TitleScene.h"
-#include"GameScene.h"
-#include"GameOverScene.h"
-#include"ClearScene.h"
+#include"SceneManager.h"
 
 #include"Systems/WindowApp.h"
 #include"Systems/Debug.h"
@@ -37,14 +34,13 @@ namespace MyEngine
 		/// </summary>
 		/// <returns></returns>
 		int32_t Run();
-	    void ChangeScene(uint32_t sceneName);
-		static int32_t stageNumber;
 
 	private:
-		std::unique_ptr<BaseScene> sceneArr_;
 		int32_t currentSceneNo_ = 0;
 		int32_t prevSceneNo_ = 0;
 		HRESULT hr = NULL;
+
+	    SceneManager* sceneManager_ = nullptr;
 
 		WinAPP* winAPP = nullptr;
 		Input* input = nullptr;
@@ -63,5 +59,8 @@ namespace MyEngine
 		std::unique_ptr<Object3d> object3d = nullptr;
 		std::unique_ptr<SkyDome> skyDome = nullptr;
 
+	    const Vector3 cameraFirstRotate = {0.1f, 0.0f, 0.0f};
+	    const Vector3 cameraFirsttranslate = {0.0f, 3.0f, -20.0f};
+		const float kRotateSpeed = 0.01f;
 	};
 }

@@ -1,26 +1,28 @@
 #include "SceneManager.h"
 
-SceneManager::~SceneManager()
+SceneManager::SceneManager()
 {
-	scene_->Finalize();
-	delete scene_;
+	currentScene = std::make_unique<TitleScene>(); // 最初のシーン
 }
 
-void SceneManager::Update() {
-	if (nextScene_)//次シーンがあるとき
+void SceneManager::Initialize() { currentScene->Initialize(); }
+
+void SceneManager::Update()
+{
+	std::unique_ptr<BaseScene> nextScene = currentScene->Update();
+
+	if (nextScene)
 	{
-		if (scene_)
-		{//旧シーン終了
-			scene_->Finalize();
-			delete scene_;
-		}
-		scene_ = nextScene_;//シーン切り替え
-		nextScene_ = nullptr;
-		scene_->Initialize();
+		currentScene = std::move(nextScene); // シーンを入れ替える
+		currentScene->Initialize();
 	}
 }
 
-void SceneManager::Draw()
-{ 
-	scene_->Draw();
+SceneManager* SceneManager::GetInstance()
+{
+	if (instance == NULL)
+	{
+		instance = std::make_unique<SceneManager>();
+	}
+	return instance.get();
 }

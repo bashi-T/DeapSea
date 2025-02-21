@@ -107,7 +107,7 @@ void Player::Update()
 
 			angle_ = std::atan2(object3d_->GetTranslate().x + (float)joyState.Gamepad.sThumbLX / (SHRT_MAX * 10.0f), object3d_->GetTranslate().z + (float)joyState.Gamepad.sThumbLY / (SHRT_MAX * 10.0f));
 			object3d_->SetRotate({ 0.0f,/*object3d_->GetRotate().y+*/LerpShortAngle(object3d_->GetRotate().y, angle_,0.1f),0.0f });
-
+			Move();
 
 			//if (Input::GetInstance()->PushKey(DIK_D))
 			//{
@@ -147,7 +147,7 @@ void Player::Update()
 				moveVector = { 0.0f, 0.0f,-0.075f };
 			}
 
-			object3d_->SetTranslate(Add(object3d_->GetTranslate(), moveVector));
+			Move();
 
 			if (moveVector.x != 0.0f || moveVector.z != 0.0f)
 			{
@@ -253,6 +253,11 @@ void Player::Shot()
 	{
 		shotInterval = 0;
 	}
+}
+
+void Player::Move()
+{
+	object3d_->SetTranslate(Add(object3d_->GetTranslate(), moveVector));
 }
 
 void Player::OnCollision()

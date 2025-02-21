@@ -171,7 +171,7 @@
 		}
 
 		nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
-		object3d_->SetTranslate(Add(object3d_->GetTranslate(), nowWhaleSpeed));
+	    Move();
 		object3d_->Update(Camera::GetInstance());
 		
 		wCollision =
@@ -216,7 +216,7 @@
 		switch (whaleLife)//ダメージ表現パーティクル
 		{
 		case 0:
-			ChangeModel("whale/BoneWhale.obj", "Resource/boneColor.png");
+			ChangeModel("whale/BoneWhale.obj", "Resource/whale/boneColor.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
@@ -227,7 +227,7 @@
 
 			break;
 		case 1:
-			ChangeModel("whale/3DamagedWhale.obj", "Resource/3DamageBone.png");
+			ChangeModel("whale/3DamagedWhale.obj", "Resource/whale/3DamageBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
@@ -238,7 +238,7 @@
 
 			break;
 		case 2:
-			ChangeModel("whale/2DamagedWhale.obj", "Resource/2DamageBone.png");
+			ChangeModel("whale/2DamagedWhale.obj", "Resource/whale/2DamageBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
@@ -250,7 +250,7 @@
 			break;
 
 		case 3:
-			ChangeModel("whale/1DamagedWhale.obj", "Resource/1DamagedBone.png");
+			ChangeModel("whale/1DamagedWhale.obj", "Resource/whale/1DamagedBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
@@ -300,4 +300,6 @@
 			vertex.normal.z = vertex.position.z;
 		}
 		model->Memcpy();
-	}
+    }
+
+    void Whale::Move() { object3d_->SetTranslate(Add(object3d_->GetTranslate(), nowWhaleSpeed)); }

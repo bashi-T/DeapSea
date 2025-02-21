@@ -220,12 +220,12 @@ namespace MyEngine
 		ComPtr<ID3D12Resource> directionalLightResource = nullptr;
 		D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 
-		Matrix4x4 cameraMatrix;
+		Matrix4x4 cameraMatrix{};
 
-		Matrix4x4 viewMatrix;
-		Matrix4x4 projectionMatrix;
-		Matrix4x4 ViewProjectionMatrix;
-		Matrix4x4 worldViewProjectionMatrix;
+		Matrix4x4 viewMatrix{};
+	    Matrix4x4 projectionMatrix{};
+	    Matrix4x4 ViewProjectionMatrix{};
+	    Matrix4x4 worldViewProjectionMatrix{};
 
 		uint32_t kSubdivision = 16;
 

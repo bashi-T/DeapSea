@@ -10,8 +10,10 @@ namespace MyEngine
 		sprite_->SetPosition({ float(WinAPP::clientWidth_ / 2) - (sprite_->GetSize().x / 2),0.0f });
 
 		player_ = std::make_unique<Player>();
+	    whale_ = std::make_unique<Whale>();
+
 		player_->Initialize(camera_);
-		whale_ = std::make_unique<Whale>();
+	    player_->SetIsHit(true);
 		whale_->Initialize(player_.get());
 		whale_->ChangeModel(boneWhaleModel, boneWhaleSkin);
 		whale_->SetTranslate({ 0.0f,-279.5f,0.0f });
@@ -25,7 +27,7 @@ namespace MyEngine
 
 	}
 
-	void GameOverScene::Update()
+	std::unique_ptr<BaseScene> GameOverScene::Update()
 	{
 		XINPUT_STATE joyState;
 		sprite_->Update();
@@ -36,8 +38,12 @@ namespace MyEngine
 		}
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || Input::GetInstance()->TriggerKey(DIK_SPACE))
 		{
-			sceneNo = TITLE;
-		}
+		    return std::make_unique<TitleScene>();
+	    }
+		else
+		{
+		    return nullptr;
+	    }
 	}
 
 	void GameOverScene::Draw()
@@ -45,12 +51,5 @@ namespace MyEngine
 		sprite_->Draw();
 		whale_->Draw();
 		sand_->Draw();
-	}
-
-	void GameOverScene::Finalize()
-	{
-		whale_.reset();
-		player_.reset();
-		sand_.reset();
 	}
 }

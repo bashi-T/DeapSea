@@ -26,7 +26,7 @@ namespace MyEngine
 		std::string PNGs[NumArgument] =
 		{
 			"Resource/startUI.png",
-			"Resource/black.png",
+			"Resource/black_1.png",
 			"Resource/moveKey.png",
 	        "Resource/attackKey.png",
 			"Resource/frontKey.png",
@@ -44,7 +44,7 @@ namespace MyEngine
 		uiPlanes_[Start]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 		uiPlanes_[Blackout]->SetScale({ 10.0f,50.0f,0.0f });
-	    uiPlanes_[Blackout]->SetRotate({-1.6f, -3.2f, 0.0f});
+	    //uiPlanes_[Blackout]->SetRotate({-1.6f, -3.2f, 0.0f});
 	    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar});
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
@@ -65,7 +65,7 @@ namespace MyEngine
 		enemyPopFile[2] = "Resource/CSV/STAGE2File.csv";
 		enemyPopFile[3] = "Resource/CSV/STAGE3File.csv";
 
-		LoadEnemyPopData(enemyPopFile[GameManager::stageNumber], GameManager::stageNumber);
+		LoadEnemyPopData(enemyPopFile[SceneManager::GetInstance()->GetStageNumber()], SceneManager::GetInstance()->GetStageNumber());
 		gameEnd = false;
 		bgm = AudioManager::GetInstance()->SoundLoadWave("Resource/Sounds/stage1bgm.wav");
 		//AudioManager::GetInstance().get()->SoundPlayWave(AudioManager::GetInstance().get()->GetxAudio2().Get(), bgm);
@@ -74,6 +74,8 @@ namespace MyEngine
 		isGameStart = false;
 		isGameOver = false;
 		isGameClear = false;
+	    isGameOverScene = false;
+	    isGameClearScene = false;
 
 		isMove = false;
 	    isAttack = false;
@@ -88,7 +90,7 @@ namespace MyEngine
 			-7.0f, 7.0f, 55.0f, 55.0f, -4.0f, -4.0f,
 			0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.2f);
 		particle_->Initialize("Resource/clearbabble.png", particle_->GetElements(),100);
-		//if (GameManager::stageNumber >= 2)
+		//if (BaseScene::stageNumber >= 2)
 		//{
 		//
 		//}
@@ -102,7 +104,7 @@ namespace MyEngine
 		//}
 	}
 
-	void GameScene::Update()
+	std::unique_ptr<BaseScene> GameScene::Update()
 	{
 		if (isGameStart == true && whale_->GetLife() != 0)//gameScene
 		{
@@ -115,7 +117,7 @@ namespace MyEngine
 			//	whale_->SetLife(0);
 			//}
 #endif
-			if (GameManager::stageNumber == 0&&time>60)
+		    if (SceneManager::GetInstance()->GetStageNumber() == 0 && time > 60)
 			{
 
 				if (Input::GetInstance()->PushKey(DIK_RIGHT)||Input::GetInstance()->PushKey(DIK_LEFT)||Input::GetInstance()->PushKey(DIK_UP)||Input::GetInstance()->PushKey(DIK_DOWN))
@@ -207,7 +209,7 @@ namespace MyEngine
 		    whale_->SetMaxPosition(whale_->GetTranslate().x, player_->GetTranslate().x, whale_->GetMaxDistance());
 		    whale_->SetMaxPosition(whale_->GetTranslate().z, player_->GetTranslate().z, whale_->GetMaxDistance());
 
-			UpdateEnemyPopCommands(GameManager::stageNumber);
+			UpdateEnemyPopCommands(SceneManager::GetInstance()->GetStageNumber());
 			for (const auto& enemy_ : enemys_)
 			{
 				enemy_->Update(enemy_->GetSort());
@@ -225,7 +227,8 @@ namespace MyEngine
 			{
 				if (sceneTransitionTime == -90)
 				{
-					sceneNo = GAMEOVER;
+				    isGameOverScene = true;
+
 				}
 				if (sceneTransitionTime <= -30)
 				{
@@ -260,7 +263,7 @@ namespace MyEngine
 
 			if (sceneTransitionTime == -90)
 			{
-				sceneNo = CLEAR;
+			    isGameClearScene = true;
 			}
 			if (sceneTransitionTime <= -35)
 			{
@@ -332,32 +335,32 @@ namespace MyEngine
 			}
 		}
 		enemys_.remove_if([](std::unique_ptr<Enemy>& enemy)
+		{
+			if (enemy->IsDead())
 			{
-				if (enemy->IsDead())
-				{
-					enemy.reset();
-					return true;
-				}
-				return false;
-			});
+				enemy.reset();
+				return true;
+			}
+			return false;
+		});
+
 		if (whale_->GetLife() == 0)
 		{
 			enemys_.resize(0);
 			isGameOver = true;
 		}
+#ifdef _DEBUG
 		else if (enemys_.size() == 0 && gameEnd == true || Input::GetInstance()->TriggerKey(DIK_RETURN))
 		{
-			enemys_.resize(0);
+		    enemys_.resize(0);
 			isGameStart = false;
 			isGameClear = true;
-		}
-		else if (Input::GetInstance()->TriggerKey(DIK_S))
+	    }
+		else if (Input::GetInstance()->TriggerKey(DIK_K))
 		{
-#ifdef DEBUG
-			enemys_.resize(0);
-			sceneNo = TITLE;
-#endif // DEBUG
+		    whale_->SetLife(0);
 		}
+#endif // DEBUG
 
 		if (isGameStart == false)
 		{
@@ -370,6 +373,19 @@ namespace MyEngine
 		for (const auto& enemy_ : enemys_)
 		{
 			enemy_->Update(enemy_->GetSort());
+		}
+
+		if (isGameOverScene == true)
+		{
+		    return std::make_unique<GameOverScene>();
+		}
+		else if (isGameClearScene == true)
+		{
+		    return std::make_unique<ClearScene>();
+		}
+		else
+		{
+		    return nullptr;
 		}
 	}
 
@@ -388,28 +404,6 @@ namespace MyEngine
 		}
 		particle_->Draw();
 		tide_->Draw();
-	}
-
-	void GameScene::Finalize()
-	{
-		for (uint32_t i = 0; i < NumArgument; i++)
-		{
-			uiPlanes_[i].reset();
-		}
-		uiPlanes_.clear();
-		player_.reset();
-		whale_.reset();
-		enemys_.clear();
-		//sprites_.clear();
-		for (uint32_t i = 0; i < 4; i++)
-		{
-			enemyPopFile[i].clear();
-			enemyPopFile[i].shrink_to_fit();
-			enemyPopCommands[i].str("");
-			enemyPopCommands[i].clear(std::stringstream::goodbit);
-		}
-		AudioManager::GetInstance()->SoundUnload(&bgm);
-		GameManager::stageNumber = 0;
 	}
 
 	void GameScene::CheckAllCollisions()
@@ -558,11 +552,11 @@ namespace MyEngine
 
 				std::random_device seedGenerator;
 				std::mt19937 randomEngine(seedGenerator());
-				std::uniform_real_distribution<float> enemySort(0.0f, (float)(GameManager::stageNumber + 1));
+			    std::uniform_real_distribution<float> enemySort(0.0f, (float)(SceneManager::GetInstance()->GetStageNumber() + 1));
 				std::unique_ptr<Enemy> enemy_ = std::make_unique<Enemy>();
 				enemy_->SetSort((int)enemySort(randomEngine));
 				enemy_->Initialize(player_.get(), whale_.get(), enemy_->GetSort());
-				if (GameManager::stageNumber == 0)
+			    if (SceneManager::GetInstance()->GetStageNumber() == 0)
 				{
 					enemy_->SetIsPractice(true);
 				}

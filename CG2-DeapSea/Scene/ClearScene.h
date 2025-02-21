@@ -1,6 +1,8 @@
 #pragma once
-#include"Input/Input.h"
 #include"BaseScene.h"
+#include"TitleScene.h"
+
+#include"Input/Input.h"
 #include"Objects/Object3d.h"
 #include"Commons/Object3dCommon.h"
 #include"Objects/Particle.h"
@@ -16,12 +18,12 @@ namespace MyEngine
 	{
 	public:
 		void Initialize() override;
-		void Update() override;
+	    std::unique_ptr<BaseScene> Update() override;
 		void Draw() override;
-		void Finalize() override;
 
 	private:
-		Camera* camera_;
+	    std::unique_ptr<BaseScene> nextScene = nullptr;
+	    Camera* camera_ = nullptr;
 		std::unique_ptr<Sprite> sprite_;
 		std::unique_ptr<Player> player_;
 		std::unique_ptr<Whale> whale_;

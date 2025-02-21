@@ -8,6 +8,7 @@ namespace MyEngine
 {
 	void TitleScene::Initialize()
 	{
+	SceneManager::GetInstance()->SetStageNumber(0);
 		std::string PNGs[NumArgument] =
 		{
 			"Resource/sinkaiTitle4.png",
@@ -31,6 +32,7 @@ namespace MyEngine
 
 		isSceneTransition = false;
 		isStageSelect = false;
+	    isSceneChange = false;
 		numStage = 1;
 		nowStage = 1;
 		cooltime = 0;
@@ -59,7 +61,7 @@ namespace MyEngine
 		camera_->SetRotate({ 0.1f,0.0f,0.0f });
 	}
 
-	void TitleScene::Update()
+	std::unique_ptr<BaseScene> TitleScene::Update()
 	{
 		XINPUT_STATE joyState;
 		//for (Particle* particle : particles)
@@ -153,16 +155,24 @@ namespace MyEngine
 			}
 			if (sceneTransitionTime == sceneTransitionTimes[2])//シーン遷移
 			{
-				sceneNo = INGAME;
-				GameManager::stageNumber = nowStage - 1;
+			    isSceneChange = true;
+			    SceneManager::GetInstance()->SetStageNumber(nowStage - 1);
 			}
 		}
-
 #ifdef _DEBUG
 		ImGui::Begin("num");
 		ImGui::InputInt("num", &nowStage);
 		ImGui::End();
 #endif
+		if (isSceneChange == true)
+		{
+		    return std::make_unique<GameScene>();
+		}
+		else
+		{
+		    return nullptr;
+		}
+
 	}
 
 	void TitleScene::Draw()
@@ -193,18 +203,4 @@ namespace MyEngine
 			//}
 		}
 	}
-
-	void TitleScene::Finalize()
-	{
-		whale_.reset();
-		//player_.reset();
-		for (uint32_t i = 0; i < NumArgument; i++)
-		{
-			uiPlanes_[i].reset();
-		}
-		uiPlanes_.clear();
-		AudioManager::GetInstance()->SoundUnload(&bgm);
-		AudioManager::GetInstance()->SoundUnload(&enterSound);
-		AudioManager::GetInstance()->SoundUnload(&moveSound);
-	};
 }

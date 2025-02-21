@@ -1,11 +1,13 @@
 #pragma once
-#include"Input/Input.h"
 #include"BaseScene.h"
+#include"GameScene.h"
+#include"SceneManager.h"
+
+#include"Input/Input.h"
 #include"Commons/Object3dCommon.h"
 #include"Objects/Object3d.h"
 #include"Sprites/Sprite.h"
 #include"Objects/Particle.h"
-#include "GameManager.h"
 #include"GameObject/Cursor.h"
 #include"GameObject/UIPlane.h"
 #include"GameObject/Whale.h"
@@ -18,14 +20,16 @@ class TitleScene : public BaseScene
 	{
 	public:
 		void Initialize() override;
-		void Update() override;
+	    std::unique_ptr<BaseScene> Update() override;
 		void Draw() override;
-		void Finalize() override;
+
 	private:
 		//Input* input;
 		//Object3dCommon* object3dCommon;
 		//SRVManager* srvManager;
-		Camera* camera_ = nullptr;
+	    std::unique_ptr<BaseScene> nextScene = nullptr;
+
+	    Camera* camera_ = nullptr;
 		std::vector<std::unique_ptr<Particle>> particles_;
 		std::vector<std::unique_ptr<Sprite>> sprites_;
 		std::vector<std::unique_ptr<UIPlane>> uiPlanes_;
@@ -34,6 +38,7 @@ class TitleScene : public BaseScene
 		std::unique_ptr<Whale> whale_;
 		bool isSceneTransition = false;
 		bool isStageSelect = false;
+	    bool isSceneChange = false;
 		int numStage = 0;
 		int sceneTransitionTime = 0;
 		int nowStage = 0;

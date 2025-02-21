@@ -22,6 +22,8 @@ public:
 	Sphere GetCollision() { return playerBulletCollision; }
 
 private:
+	void Move();
+
 	std::unique_ptr<Object3d> object3d_;
 	ModelManager* modelManager_;
 

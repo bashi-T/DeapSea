@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Scene\AbstractSceneFactory.cpp" />
     <ClCompile Include="Scene\BaseScene.cpp" />
     <ClCompile Include="Commons\MeshCommon.cpp" />
     <ClCompile Include="Math\Collision.cpp" />
@@ -70,7 +69,6 @@
     <ClCompile Include="GameObject\UIPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Scene\AbstractSceneFactory.h" />
     <ClInclude Include="Scene\BaseScene.h" />
     <ClInclude Include="Commons\MeshCommon.h" />
     <ClInclude Include="Math\Collision.h" />

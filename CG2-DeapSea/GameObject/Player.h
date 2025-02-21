@@ -14,7 +14,6 @@ public:
 	void Initialize(Camera* camera);
 	void Update();
 	void Draw();
-	void Shot();
 	void OnCollision();
 	void SetMaxPosition(float pos,float maxPos);
 
@@ -33,6 +32,9 @@ public:
 	void SetIsMovable(bool isMovable_) { isMovable = isMovable_; }
 
 private:
+	void Shot();
+	void Move();
+
 	std::unique_ptr<Object3d> object3d_;
 	ModelManager* modelManager_ = nullptr;
 	Camera* camera_ = nullptr;

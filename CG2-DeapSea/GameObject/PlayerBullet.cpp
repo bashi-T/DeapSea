@@ -41,7 +41,7 @@ void PlayerBullet::Update()
 	{
 		isDead = true;
 	}
-	object3d_->SetTranslate(Add(object3d_->GetTranslate(), bulletSpeed));
+	Move(); 
 	object3d_->Update(Camera::GetInstance());
 
 	playerBulletCollision.center = object3d_->GetTranslate();
@@ -60,6 +60,7 @@ void PlayerBullet::OnCollision()
 
 void PlayerBullet::SetTranslate(Vector3 translate)
 {
-	object3d_->SetTranslate(translate);
-}
+	object3d_->SetTranslate(translate); }
+
+void PlayerBullet::Move() { object3d_->SetTranslate(Add(object3d_->GetTranslate(), bulletSpeed)); }
 

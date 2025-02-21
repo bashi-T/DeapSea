@@ -22,8 +22,10 @@ public:
 	Sphere GetCollision() { return enemyBulletCollision; }
 
 private:
+	void Move();
+
 	std::unique_ptr<Object3d> object3d_;
-	ModelManager* modelManager_;
+	ModelManager* modelManager_ = nullptr;
 
 	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
 	const std::string bulletSkin = "Resource/white.png";

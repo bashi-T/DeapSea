@@ -15,6 +15,10 @@
 		whale_ = whale;
 		object3d_ = std::make_unique<Object3d>();
 		modelManager_ = ModelManager::GetInstance();
+	    isShot = false;
+	    isDead = false;
+	    isPractice_ = false;
+
 		switch (sort)
 		{
 		case 0:
@@ -91,7 +95,7 @@
 				{
 					isDead = true;
 				}
-				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
+			    Move();
 
 			}
 			else
@@ -110,7 +114,7 @@
 					{
 						SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 					}
-					object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector)));
+				    Move();
 				}
 			}
 			object3d_->Update(Camera::GetInstance());
@@ -143,7 +147,7 @@
 				{
 					isDead = true;
 				}
-				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
+			    Run();
 			}
 			else
 			{
@@ -160,7 +164,7 @@
 				{
 					SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 				}
-				object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, { enemyVector.x * 2,enemyVector.y,enemyVector.z * 2 })));
+			    Run();
 			}
 			object3d_->Update(Camera::GetInstance());
 			enemyCollision =
@@ -203,7 +207,11 @@
 		{
 			shotInterval = 0;
 		}
-	}
+    }
+
+    void Enemy::Move() { object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, enemyVector))); }
+
+    void Enemy::Run() { object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.05f, {enemyVector.x * 2, enemyVector.y, enemyVector.z * 2}))); }
 
 	void Enemy::OnCollision()
 	{

@@ -35,6 +35,8 @@ public:
 
 	void ChangeModel(std::string shape, std::string skin);
 private:
+	void Move();
+	
 	std::unique_ptr<Object3d> object3d_;
 	std::unique_ptr<Particle> particle_;
 	ModelManager* modelManager_ = nullptr;
@@ -50,5 +52,5 @@ private:
 	uint32_t coolTimer = 0;
 	float maxDistance = 6.0f;
 	std::string whaleModel = "whale/improvisedWhale2.obj";
-	std::string whaleSkin = "Resource/whaleSkin.png";
+	std::string whaleSkin = "Resource/whale/whaleSkin.png";
 };

@@ -16,7 +16,6 @@ class Enemy
 		void Initialize(Player* player, Whale* whale, int sort);
 		void Update(int sort);
 		void Draw(int sort);
-		void Shot();
 		void OnCollision();
 		void SetTranslate(Vector3 translate);
 		void SetEnemyVector(Vector3 translate);
@@ -32,7 +31,11 @@ class Enemy
 		int Getlife() { return life; }
 
 	private:
-		ModelManager* modelManager_;
+	    void Shot();
+	    void Move();
+	    void Run();
+
+	    ModelManager* modelManager_;
 		std::unique_ptr<Object3d> object3d_;
 		std::list<std::unique_ptr<EnemyBullet>> eBullets;
 		Player* player_;

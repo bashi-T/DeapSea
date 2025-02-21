@@ -37,7 +37,7 @@
 		{
 			isDead = true;
 		}
-		object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.1f, enemyBulletVector)));
+	    Move();
 		object3d_->Update(Camera::GetInstance());
 		enemyBulletCollision.center = object3d_->GetTranslate();
 	}
@@ -59,5 +59,6 @@
 
 	void EnemyBullet::SetEnemyBulletVector(Vector3 positoin)
 	{
-		enemyBulletVector = Normalize(Subtract(positoin, object3d_->GetTranslate()));
-	}
+		enemyBulletVector = Normalize(Subtract(positoin, object3d_->GetTranslate())); }
+
+    void EnemyBullet::Move() { object3d_->SetTranslate(Add(object3d_->GetTranslate(), Multiply(0.1f, enemyBulletVector))); }

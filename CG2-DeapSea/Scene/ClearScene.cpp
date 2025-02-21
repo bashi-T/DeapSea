@@ -19,7 +19,7 @@ namespace MyEngine
 		sand_->SetTranslate({ 0.0f,-280.0f,0.0f });
 	}
 
-	void ClearScene::Update()
+	std::unique_ptr<BaseScene> ClearScene::Update()
 	{
 		XINPUT_STATE joyState;
 		sprite_->Update();
@@ -29,7 +29,11 @@ namespace MyEngine
 		}
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || Input::GetInstance()->TriggerKey(DIK_SPACE))
 		{
-			sceneNo = TITLE;
+		    return std::make_unique<TitleScene>();
+		}
+		else
+		{
+		    return nullptr;
 		}
 	}
 
@@ -37,10 +41,5 @@ namespace MyEngine
 	{
 		sand_->Draw();
 		sprite_->Draw();
-	}
-
-	void ClearScene::Finalize()
-	{
-		sand_.reset();
 	}
 }
