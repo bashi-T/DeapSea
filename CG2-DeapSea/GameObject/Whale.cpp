@@ -220,7 +220,7 @@
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -231,7 +231,7 @@
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -242,7 +242,7 @@
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -254,7 +254,7 @@
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
 				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -286,7 +286,7 @@
 
 	void Whale::ChangeModel(std::string shape, std::string skin)
 	{
-		modelManager_->EraseModel(whaleModel, whaleSkin);
+		//modelManager_->EraseModel(whaleModel, whaleSkin);
 		whaleModel = shape;
 		whaleSkin = skin;
 		modelManager_->LoadModel(whaleModel, whaleSkin, true);

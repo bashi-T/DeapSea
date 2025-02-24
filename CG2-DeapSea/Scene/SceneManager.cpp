@@ -2,7 +2,7 @@
 
 SceneManager::SceneManager()
 {
-	currentScene = std::make_unique<TitleScene>(); // 最初のシーン
+	currentScene = std::make_unique<GameScene>(); // 最初のシーン
 }
 
 void SceneManager::Initialize() { currentScene->Initialize(); }
