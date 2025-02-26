@@ -32,6 +32,7 @@ namespace MyEngine
 	{
 	    if (fileNames.contains(textureFilePath))
 		{
+			//読み込まれているテクスチャに対応したモデルをあてがう
 		    modelFilePath = fileNames[textureFilePath];
 	    }
 		else if (models.contains(modelFilePath))//同じモデルを別テクスチャで使うとき
@@ -120,10 +121,11 @@ namespace MyEngine
 	    }
     }
 
-	void ModelManager::EraseModel(const std::string& filePath, const std::string& textureFilePath)//モデル使いまわし用の解放処理
+	void ModelManager::EraseModel(const std::string& modelFilePath, const std::string& textureFilePath)//モデル使いまわし用の解放処理
 	{
-		models.erase(filePath);
+	    models.erase(modelFilePath);
 		textureManager_->EraseTexture(textureFilePath);
+	    fileNames.erase(textureFilePath);
 	}
 
 	Model* ModelManager::FindModel(const std::string& filePath)

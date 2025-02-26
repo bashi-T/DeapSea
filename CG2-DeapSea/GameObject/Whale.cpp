@@ -46,41 +46,51 @@
 			}
 			if (player->GetMoveVector().x > 0.0f)//player右に移動
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_RIGHT))
+			    accSpeed.x += 0.01f;
+			    if (accSpeed.x >= player->GetMoveVector().x)
 				{
-					accSpeed.x += 0.01f;
-				    if (accSpeed.x >= player->GetMoveVector().x)
-					{
-					    accSpeed.x = player->GetMoveVector().x;
-					}
-				}
-				else//左に方向転換
-				{
-					accSpeed.x -= 0.01f;
-				    if (accSpeed.x <= player->GetMoveVector().x)
-					{
-					    accSpeed.x = player->GetMoveVector().x;
-					}
-				}
+				    accSpeed.x = player->GetMoveVector().x;
+			    }
+				//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_RIGHT))
+				//{
+				//	accSpeed.x += 0.01f;
+				//    if (accSpeed.x >= player->GetMoveVector().x)
+				//	{
+				//	    accSpeed.x = player->GetMoveVector().x;
+				//	}
+				//}
+				//else//左に方向転換
+				//{
+				//	accSpeed.x -= 0.01f;
+				//	if (accSpeed.x <= player->GetMoveVector().x)
+				//	{
+				//	    accSpeed.x = player->GetMoveVector().x;
+				//	}
+				//}
 			}
 			else if (player->GetMoveVector().x < 0.0f)//player左に移動
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_LEFT))
+			    accSpeed.x -= 0.01f;
+			    if (accSpeed.x <= player->GetMoveVector().x)
 				{
-					accSpeed.x -= 0.01f;
-					if (accSpeed.x <= player->GetMoveVector().x)
-					{
-					    accSpeed.x = player->GetMoveVector().x;
-					}
-				}
-				else//右に方向転換
-				{
-					accSpeed.x += 0.01f;
-				    if (accSpeed.x >= player->GetMoveVector().x)
-					{
-					    accSpeed.x = player->GetMoveVector().x;
-					}
-				}
+				    accSpeed.x = player->GetMoveVector().x;
+			    }
+			    // if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_LEFT))
+				//{
+				//	accSpeed.x -= 0.01f;
+				//	if (accSpeed.x <= player->GetMoveVector().x)
+				//	{
+				//	    accSpeed.x = player->GetMoveVector().x;
+				//	}
+				//}
+				//else//右に方向転換
+				//{
+				//	accSpeed.x += 0.01f;
+				//    if (accSpeed.x >= player->GetMoveVector().x)
+				//	{
+				//	    accSpeed.x = player->GetMoveVector().x;
+				//	}
+				//}
 			}
 			else//player停止
 			{
@@ -286,7 +296,6 @@
 
 	void Whale::ChangeModel(std::string shape, std::string skin)
 	{
-		//modelManager_->EraseModel(whaleModel, whaleSkin);
 		whaleModel = shape;
 		whaleSkin = skin;
 		modelManager_->LoadModel(whaleModel, whaleSkin, true);
