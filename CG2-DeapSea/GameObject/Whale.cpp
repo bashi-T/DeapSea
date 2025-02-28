@@ -46,119 +46,65 @@
 			}
 			if (player->GetMoveVector().x > 0.0f)//player右に移動
 			{
-			    accSpeed.x += 0.01f;
-			    if (accSpeed.x >= player->GetMoveVector().x)
+			    accVector.x += accSpeed;
+			    if (accVector.x >= player->GetMoveVector().x)
 				{
-				    accSpeed.x = player->GetMoveVector().x;
+				    accVector.x = player->GetMoveVector().x;
 			    }
-				//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_RIGHT))
-				//{
-				//	accSpeed.x += 0.01f;
-				//    if (accSpeed.x >= player->GetMoveVector().x)
-				//	{
-				//	    accSpeed.x = player->GetMoveVector().x;
-				//	}
-				//}
-				//else//左に方向転換
-				//{
-				//	accSpeed.x -= 0.01f;
-				//	if (accSpeed.x <= player->GetMoveVector().x)
-				//	{
-				//	    accSpeed.x = player->GetMoveVector().x;
-				//	}
-				//}
 			}
 			else if (player->GetMoveVector().x < 0.0f)//player左に移動
 			{
-			    accSpeed.x -= 0.01f;
-			    if (accSpeed.x <= player->GetMoveVector().x)
+			    accVector.x -= accSpeed;
+			    if (accVector.x <= player->GetMoveVector().x)
 				{
-				    accSpeed.x = player->GetMoveVector().x;
+				    accVector.x = player->GetMoveVector().x;
 			    }
-			    // if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_LEFT))
-				//{
-				//	accSpeed.x -= 0.01f;
-				//	if (accSpeed.x <= player->GetMoveVector().x)
-				//	{
-				//	    accSpeed.x = player->GetMoveVector().x;
-				//	}
-				//}
-				//else//右に方向転換
-				//{
-				//	accSpeed.x += 0.01f;
-				//    if (accSpeed.x >= player->GetMoveVector().x)
-				//	{
-				//	    accSpeed.x = player->GetMoveVector().x;
-				//	}
-				//}
 			}
 			else//player停止
 			{
-				if (accSpeed.x > 0.0f)
+			    if (accVector.x > accSpeed)
 				{
-					accSpeed.x -= 0.01f;
+					accVector.x -= accSpeed;
 				}
-				else if (accSpeed.x < 0.0f)
+				else if (accVector.x < -accSpeed)
 				{
-					accSpeed.x += 0.01f;
+					accVector.x += accSpeed;
 				}
-				else if (accSpeed.x == 0.0f)
+				else
 				{
-					accSpeed.x = 0.0f;
+					accVector.x = 0.0f;
 				}
 			}
 
 			if (player->GetMoveVector().z > 0.0f)//player前に移動
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_UP))
+			    accVector.z += accSpeed;
+			    if (accVector.z >= player->GetMoveVector().z)
 				{
-					accSpeed.z += 0.01f;
-				    if (accSpeed.z >= player->GetMoveVector().z)
-					{
-					    accSpeed.z = player->GetMoveVector().z;
-					}
-				}
-				else//後に方向転換
-				{
-					accSpeed.z -= 0.01f;
-				    if (accSpeed.z <= player->GetMoveVector().z)
-					{
-					    accSpeed.z = player->GetMoveVector().z;
-					}
-				}
+				    accVector.z = player->GetMoveVector().z;
+			    }
 			}
 			else if (player->GetMoveVector().z < 0.0f)//player後に移動
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_DOWN))
+			    accVector.z -= accSpeed;
+			    if (accVector.z <= player->GetMoveVector().z)
 				{
-					accSpeed.z -= 0.01f;
-				    if (accSpeed.z <= player->GetMoveVector().z)
-					{
-					    accSpeed.z = player->GetMoveVector().z;
-					}
-				}
-				else//前に方向転換
-				{
-					accSpeed.z += 0.01f;
-				    if (accSpeed.z >= player->GetMoveVector().z)
-					{
-					    accSpeed.z = player->GetMoveVector().z;
-					}
-				}
+				    accVector.z = player->GetMoveVector().z;
+			    }
 			}
 			else//player停止
 			{
-				if (accSpeed.z > 0.0f)
+			    if (accVector.z > accSpeed)
 				{
-					accSpeed.z -= 0.01f;
+					accVector.z -= accSpeed;
 				}
-				else if (accSpeed.z < 0.0f)
+				else if (accVector.z < -accSpeed)
 				{
-					accSpeed.z += 0.01f;
+					accVector.z += accSpeed;
 				}
-				else if (accSpeed.z == 0.0f)
+				else
 				{
-					accSpeed.z = 0.0f;
+					accVector.z = 0.0f;
 				}
 			}
 		}
@@ -170,7 +116,6 @@
 				ChangeModel(life);
 			}
 
-			//object3d_->SetRotate({ object3d_->GetRotate().x,object3d_->GetRotate().y + 0.3f,object3d_->GetRotate().z });
 			coolTimer++;
 			if (coolTimer == 120)
 			{
@@ -180,7 +125,7 @@
 			}
 		}
 
-		nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
+		nowWhaleSpeed = { (whaleSpeed.x * accVector.x) ,0.0f,(whaleSpeed.z * accVector.z) };
 	    Move();
 		object3d_->Update(Camera::GetInstance());
 		
@@ -194,7 +139,7 @@
 
 #ifdef _DEBUG
 		ImGui::Begin("whale");
-		ImGui::DragFloat3("whale.translate", (float*)&object3d_->GetTranslate(), 0.01f);
+		ImGui::DragFloat3("whale.translate", (float*)&object3d_->GetTranslate(), accSpeed);
 		ImGui::Text("life:%d", life);
 		ImGui::End();
 #endif

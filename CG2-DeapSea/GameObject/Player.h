@@ -53,4 +53,5 @@ private:
 	const std::string& playerSkin = "Resource/world.png";
 
 	const float collisionwidth = 2.0f;
+	const float moveSpeed = 0.075f;
 };

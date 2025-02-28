@@ -42,15 +42,17 @@ private:
 	ModelManager* modelManager_ = nullptr;
 
 	Player* player = nullptr;
-	Vector3 whaleSpeed = { 0.1f,0.1f,0.1f };
+	Vector3 whaleSpeed = { 1.0f,1.0f,1.0f };
 	Vector3 nowWhaleSpeed = { 0.0f,0.0f,0.0f };
-	Vector3 accSpeed = { 0.0f,0.0f,0.0f };
+	Vector3 accVector = { 0.0f,0.0f,0.0f };
 	bool isDead = false;
 	bool isHit = false;
 	AABB wCollision = {};
 	int32_t life = 4;
 	uint32_t coolTimer = 0;
-	float maxDistance = 6.0f;
+	const float maxDistance = 6.0f;
+	const float accSpeed = 0.001f;
+
 	std::string whaleModel = "whale/improvisedWhale2.obj";
 	std::string whaleSkin = "Resource/whale/whaleSkin.png";
 };

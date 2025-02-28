@@ -61,11 +61,11 @@ namespace MyEngine
 		}
 	}
 
-	void ModelManager::LoadAnimationModel(std::string& modelFilePath, const std::string& TextureFilePath, bool isLighting)//処理に問題の可能性あり
+	void ModelManager::LoadAnimationModel(std::string& modelFilePath, const std::string& textureFilePath, bool isLighting)//処理に問題の可能性あり
 	{
-	    if (fileNames.contains(TextureFilePath))
+	    if (fileNames.contains(textureFilePath))
 		{
-		    modelFilePath = fileNames[TextureFilePath];
+		    modelFilePath = fileNames[textureFilePath];
 	    }
 		else if (models.contains(modelFilePath)) // 同じモデルを別テクスチャで使うとき
 	    {
@@ -75,27 +75,27 @@ namespace MyEngine
 		    modelFilePaths.push_back(newModelFilePath);
 		    // モデル生成とファイル読み込み、初期化
 		    std::unique_ptr<Model> model = std::make_unique<Model>();
-		    model->AnimationInitialize(modelFilePath, TextureFilePath, isLighting);
+		    model->AnimationInitialize(modelFilePath, textureFilePath, isLighting);
 		    // モデル名を変更
 		    modelFilePath = newModelFilePath;
 		    // モデルとテクスチャをmapコンテナに格納
-		    models[modelFilePath] = {std::move(model), TextureFilePath};
-		    fileNames[TextureFilePath] = modelFilePath;
+		    models[modelFilePath] = {std::move(model), textureFilePath};
+		    fileNames[textureFilePath] = modelFilePath;
 	    } else {
 		    // モデル生成とファイル読み込み、初期化
 		    std::unique_ptr<Model> model = std::make_unique<Model>();
-		    model->AnimationInitialize(modelFilePath, TextureFilePath, isLighting);
+		    model->AnimationInitialize(modelFilePath, textureFilePath, isLighting);
 		    // モデルとテクスチャをmapコンテナに格納
-		    models[modelFilePath] = {std::move(model), TextureFilePath};
-		    fileNames[TextureFilePath] = modelFilePath;
+		    models[modelFilePath] = {std::move(model), textureFilePath};
+		    fileNames[textureFilePath] = modelFilePath;
 	    }
     }
 
-	void ModelManager::LoadSkeltonAnimation(std::string& modelFilePath, const std::string& TextureFilePath,bool isLighting)
+	void ModelManager::LoadSkeltonAnimation(std::string& modelFilePath, const std::string& textureFilePath,bool isLighting)
 	{
-	    if (fileNames.contains(TextureFilePath))
+	    if (fileNames.contains(textureFilePath))
 		{
-		    modelFilePath = fileNames[TextureFilePath];
+		    modelFilePath = fileNames[textureFilePath];
 	    }
 		else if (models.contains(modelFilePath)) // 同じモデルを別テクスチャで使うとき
 	    {
@@ -105,19 +105,19 @@ namespace MyEngine
 		    modelFilePaths.push_back(newModelFilePath);
 		    // モデル生成とファイル読み込み、初期化
 		    std::unique_ptr<Model> model = std::make_unique<Model>();
-		    model->SkeltonInitialize(modelFilePath, TextureFilePath, isLighting);
+		    model->SkeltonInitialize(modelFilePath, textureFilePath, isLighting);
 		    // モデル名を変更
 		    modelFilePath = newModelFilePath;
 		    // モデルとテクスチャをmapコンテナに格納
-		    models[modelFilePath] = {std::move(model), TextureFilePath};
-		    fileNames[TextureFilePath] = modelFilePath;
+		    models[modelFilePath] = {std::move(model), textureFilePath};
+		    fileNames[textureFilePath] = modelFilePath;
 	    } else {
 		    // モデル生成とファイル読み込み、初期化
 		    std::unique_ptr<Model> model = std::make_unique<Model>();
-		    model->SkeltonInitialize(modelFilePath, TextureFilePath, isLighting);
+		    model->SkeltonInitialize(modelFilePath, textureFilePath, isLighting);
 		    // モデルとテクスチャをmapコンテナに格納
-		    models[modelFilePath] = {std::move(model), TextureFilePath};
-		    fileNames[TextureFilePath] = modelFilePath;
+		    models[modelFilePath] = {std::move(model), textureFilePath};
+		    fileNames[textureFilePath] = modelFilePath;
 	    }
     }
 

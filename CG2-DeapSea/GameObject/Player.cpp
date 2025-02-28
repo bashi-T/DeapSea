@@ -132,19 +132,19 @@ void Player::Update()
 			moveVector = { 0.0f,0.0f,0.0f };
 			if (Input::GetInstance()->PushKey(DIK_RIGHT))
 			{
-				moveVector = { 0.075f, 0.0f,0.0f };
+				moveVector = {moveSpeed, 0.0f, 0.0f};
 			}
 			if (Input::GetInstance()->PushKey(DIK_LEFT))
 			{
-				moveVector = { -0.075f, 0.0f,0.0f };
+				moveVector = {-moveSpeed, 0.0f, 0.0f};
 			}
 			if (Input::GetInstance()->PushKey(DIK_UP))
 			{
-				moveVector = { 0.0f, 0.0f,0.075f };
+				moveVector = {0.0f, 0.0f, moveSpeed};
 			}
 			if (Input::GetInstance()->PushKey(DIK_DOWN))
 			{
-				moveVector = { 0.0f, 0.0f,-0.075f };
+				moveVector = {0.0f, 0.0f, -moveSpeed};
 			}
 
 			Move();
