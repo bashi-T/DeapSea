@@ -12,13 +12,13 @@ namespace MyEngine
 		player_ = std::make_unique<Player>();
 		whale_ = std::make_unique<Whale>();
 		ground_ = std::make_unique<Ground>();
-		tide_ = std::make_unique<Tide>();
+	    tide_ = std::make_unique<Tide>();
 
 		player_->Initialize(camera_);
 		player_->SetIsMovable(false);
 		whale_->Initialize(player_.get());
 		ground_->Initialize();
-		tide_->Initialize();
+	    tide_->Initialize();
 
 		camera_->SetTranslate({ camera_->GetTranslate().x, ingameCameraY, camera_->GetTranslate().z });
 		camera_->SetRotate(ingameCameraRotate);
@@ -44,7 +44,6 @@ namespace MyEngine
 		uiPlanes_[Start]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 		uiPlanes_[Blackout]->SetScale({ 10.0f,50.0f,0.0f });
-	    //uiPlanes_[Blackout]->SetRotate({-1.6f, -3.2f, 0.0f});
 	    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar});
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
@@ -272,7 +271,8 @@ namespace MyEngine
 			if (sceneTransitionTime <= -30)
 			{
 				uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f });
-				uiPlanes_[Blackout]->SetColor({ uiPlanes_[Blackout]->GetColor().x,uiPlanes_[Blackout]->GetColor().y,uiPlanes_[Blackout]->GetColor().z,uiPlanes_[Blackout]->GetColor().a + 0.02f });
+			    uiPlanes_[Blackout]->SetRotate(camera_->GetRotate());
+			    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a + 0.02f});
 				uiPlanes_[Blackout]->Update();
 				player_->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y - 1.0f , player_->GetTranslate().z });
 			}
@@ -286,6 +286,7 @@ namespace MyEngine
 				player_->SetTranslate({ player_->GetTranslate().x, player_->GetTranslate().y, player_->GetTranslate().z + 2.0f });
 				whale_->SetTranslate({ whale_->GetTranslate().x, whale_->GetTranslate().y, whale_->GetTranslate().z + 2.0f });
 				sceneTransitionTime++;
+
 			}
 			sceneTransitionTime--;
 
@@ -349,6 +350,11 @@ namespace MyEngine
 			enemys_.resize(0);
 			isGameOver = true;
 		}
+	    else if(enemys_.size() == 0 && gameEnd == true)
+		{
+		    isGameStart = false;
+		    isGameClear = true;
+		}
 #ifdef _DEBUG
 		else if (enemys_.size() == 0 && gameEnd == true || Input::GetInstance()->TriggerKey(DIK_RETURN))
 		{
@@ -367,7 +373,7 @@ namespace MyEngine
 			player_->SetIsShot(false);
 		}
 		ground_->Update();
-		player_->Update();
+		player_->Update(whale_->GetTranslate());
 		whale_->Update();
 		tide_->Update();
 		for (const auto& enemy_ : enemys_)
@@ -408,8 +414,9 @@ namespace MyEngine
 
 	void GameScene::CheckAllCollisions()
 	{
-		const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
-		if (player_->GetIsHit() == false && player_->GetIsHitTimer() == 0)
+	    const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
+	    const std::unique_ptr<Shield>& shield = player_->GetShield();
+	    if (player_->GetIsHit() == false && player_->GetIsHitTimer() == 0)
 		{
 #pragma region 自機と敵弾の当たり判定
 			for (const auto& enemy_ : enemys_)
@@ -501,6 +508,32 @@ namespace MyEngine
 			whale_->OnTideCollision(tide_->GetTideVector());
 		}
 #pragma endregion
+	    if (shield!=nullptr&&shield->IsDead() == false)
+		{
+#pragma region シールドと敵の当たり判定
+		    for (const auto& enemy_ : enemys_)
+			{
+			    if (isCollision(enemy_->GetCollision(), shield->GetCollision()))
+				{
+				    enemy_->OnCollision();
+			    }
+		    }
+#pragma endregion
+#pragma region シールドと敵弾の当たり判定
+		    for (const auto& enemy_ : enemys_)
+			{
+			    const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy_->GetBullets();
+			    for (const auto& bullet : enemyBullets)
+				{
+				    if (isCollision(shield->GetCollision(), bullet->GetCollision()))
+					{
+					    bullet->OnCollision();
+				    }
+			    }
+		    }
+#pragma endregion
+	    }
+
 	}
 
 	void GameScene::LoadEnemyPopData(std::string filePath, int32_t fileNum)

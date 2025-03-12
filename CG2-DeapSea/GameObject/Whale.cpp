@@ -33,7 +33,7 @@
 		particle_->SetElements(0.0f, 1.0f, 1.0f, 2.0f,
 			-7.0f, 7.0f, -6.0f, -4.0f, 0.0f, 0.0f,
 			-0.005f, 0.005f, 0.005f, 0.01f, 0.0f, 0.0f);
-		particle_->Initialize("Resource/bloodParticle.png", particle_->GetElements(), 300);
+		particle_->Initialize("Resource/bloodParticle.png", particle_->GetElements(), 500);
 	}
 
 	void Whale::Update()
@@ -174,7 +174,7 @@
 			ChangeModel("whale/BoneWhale.obj", "Resource/whale/boneColor.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
 				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
@@ -185,7 +185,7 @@
 			ChangeModel("whale/3DamagedWhale.obj", "Resource/whale/3DamageBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
 				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
@@ -196,7 +196,7 @@
 			ChangeModel("whale/2DamagedWhale.obj", "Resource/whale/2DamageBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
 				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
@@ -208,7 +208,7 @@
 			ChangeModel("whale/1DamagedWhale.obj", "Resource/whale/1DamagedBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
 				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
