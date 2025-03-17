@@ -31,6 +31,7 @@ private:
 	bool isDead = false;
 	Sphere collision{};
 
+	float rotateSpeed = 2.0f;
 	std::string shieldModel = "axis/axis.obj";
 	std::string shieldSkin = "Resource/colorbabble.png";
 };

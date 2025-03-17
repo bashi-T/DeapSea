@@ -39,8 +39,9 @@ void Shield::Update(Vector3 playerPos,Vector3 whalePos)
 	{
 	    collision.radius -= 0.2f;
 	}
-    object3d_->SetScale({collision.radius, collision.radius, collision.radius});
-    collision.center = object3d_->GetTranslate();
+	object3d_->SetScale({collision.radius, collision.radius, collision.radius});
+	object3d_->SetRotate({object3d_->GetRotate().x, object3d_->GetRotate().y + rotateSpeed, object3d_->GetRotate().z});
+	collision.center = object3d_->GetTranslate();
     object3d_->Update(Camera::GetInstance());
 }
 
