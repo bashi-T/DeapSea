@@ -581,7 +581,7 @@ namespace MyEngine
 
 				//z座標
 				getline(line_stream, word, ',');
-				float z = (float)std::atof(word.c_str()) + player_->GetTranslate().z;
+				float z = (float)std::atof(word.c_str()) + whale_->GetTranslate().z;
 
 				std::random_device seedGenerator;
 				std::mt19937 randomEngine(seedGenerator());
