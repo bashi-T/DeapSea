@@ -6,8 +6,6 @@ Tide::~Tide()
 
 	void Tide::Initialize()
 	{
-		//object3d = std::make_unique<Object3d>();
-		//object3d->Initialize(Object3dCommon::GetInstance(), SRVManager::GetInstance());
 		tideTranslate = { 0.0f,2.0f,20.0f };
 		collision =
 		{

@@ -33,7 +33,7 @@
 		particle_->SetElements(0.0f, 1.0f, 1.0f, 2.0f,
 			-7.0f, 7.0f, -6.0f, -4.0f, 0.0f, 0.0f,
 			-0.005f, 0.005f, 0.005f, 0.01f, 0.0f, 0.0f);
-		particle_->Initialize("Resource/bloodParticle.png", particle_->GetElements(), 300);
+		particle_->Initialize("Resource/bloodParticle.png", particle_->GetElements(), 500);
 	}
 
 	void Whale::Update()
@@ -44,111 +44,67 @@
 			if (Input::GetInstance()->GetJoystickState(0, joyState))
 			{
 			}
-			if (player->GetMoveVector().x > 0.0f)
+			if (player->GetMoveVector().x > 0.0f)//player右に移動
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
+			    accVector.x += accSpeed;
+			    if (accVector.x >= player->GetMoveVector().x)
 				{
-					accSpeed.x -= 0.01f;
-					if (accSpeed.x <= 0.0f)
-					{
-						accSpeed.x = 0.0f;
-					}
+				    accVector.x = player->GetMoveVector().x;
+			    }
+			}
+			else if (player->GetMoveVector().x < 0.0f)//player左に移動
+			{
+			    accVector.x -= accSpeed;
+			    if (accVector.x <= player->GetMoveVector().x)
+				{
+				    accVector.x = player->GetMoveVector().x;
+			    }
+			}
+			else//player停止
+			{
+			    if (accVector.x > accSpeed)
+				{
+					accVector.x -= accSpeed;
+				}
+				else if (accVector.x < -accSpeed)
+				{
+					accVector.x += accSpeed;
 				}
 				else
 				{
-					accSpeed.x += 0.01f;
-					if (accSpeed.x >= 1.0f)
-					{
-						accSpeed.x = 1.0f;
-					}
-				}
-			}
-			else if (player->GetMoveVector().x < 0.0f)
-			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
-				{
-					accSpeed.x += 0.01f;
-					if (accSpeed.x >= 0.0f)
-					{
-						accSpeed.x = 0.0f;
-					}
-				}
-				else
-				{
-					accSpeed.x -= 0.01f;
-					if (accSpeed.x <= -1.0f)
-					{
-						accSpeed.x = -1.0f;
-					}
-				}
-			}
-			else
-			{
-				if (accSpeed.x > 0.0f)
-				{
-					accSpeed.x -= 0.01f;
-				}
-				else if (accSpeed.x < 0.0f)
-				{
-					accSpeed.x += 0.01f;
-				}
-				else if (accSpeed.x == 0.0f)
-				{
-					accSpeed.x = 0.0f;
+					accVector.x = 0.0f;
 				}
 			}
 
-			if (player->GetMoveVector().z > 0.0f)
+			if (player->GetMoveVector().z > 0.0f)//player前に移動
 			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
+			    accVector.z += accSpeed;
+			    if (accVector.z >= player->GetMoveVector().z)
 				{
-					accSpeed.z -= 0.01f;
-					if (accSpeed.z <= 0.0f)
-					{
-						accSpeed.z = 0.0f;
-					}
+				    accVector.z = player->GetMoveVector().z;
+			    }
+			}
+			else if (player->GetMoveVector().z < 0.0f)//player後に移動
+			{
+			    accVector.z -= accSpeed;
+			    if (accVector.z <= player->GetMoveVector().z)
+				{
+				    accVector.z = player->GetMoveVector().z;
+			    }
+			}
+			else//player停止
+			{
+			    if (accVector.z > accSpeed)
+				{
+					accVector.z -= accSpeed;
+				}
+				else if (accVector.z < -accSpeed)
+				{
+					accVector.z += accSpeed;
 				}
 				else
 				{
-					accSpeed.z += 0.01f;
-					if (accSpeed.z >= 1.0f)
-					{
-						accSpeed.z = 1.0f;
-					}
-				}
-			}
-			else if (player->GetMoveVector().z < 0.0f)
-			{
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || Input::GetInstance()->PushKey(DIK_S))
-				{
-					accSpeed.z += 0.01f;
-					if (accSpeed.z >= 0.0f)
-					{
-						accSpeed.z = 0.0f;
-					}
-				}
-				else
-				{
-					accSpeed.z -= 0.01f;
-					if (accSpeed.z <= -1.0f)
-					{
-						accSpeed.z = -1.0f;
-					}
-				}
-			}
-			else
-			{
-				if (accSpeed.z > 0.0f)
-				{
-					accSpeed.z -= 0.01f;
-				}
-				else if (accSpeed.z < 0.0f)
-				{
-					accSpeed.z += 0.01f;
-				}
-				else if (accSpeed.z == 0.0f)
-				{
-					accSpeed.z = 0.0f;
+					accVector.z = 0.0f;
 				}
 			}
 		}
@@ -160,7 +116,6 @@
 				ChangeModel(life);
 			}
 
-			//object3d_->SetRotate({ object3d_->GetRotate().x,object3d_->GetRotate().y + 0.3f,object3d_->GetRotate().z });
 			coolTimer++;
 			if (coolTimer == 120)
 			{
@@ -170,7 +125,7 @@
 			}
 		}
 
-		nowWhaleSpeed = { (whaleSpeed.x * accSpeed.x) ,0.0f,(whaleSpeed.z * accSpeed.z) };
+		nowWhaleSpeed = { (whaleSpeed.x * accVector.x) ,0.0f,(whaleSpeed.z * accVector.z) };
 	    Move();
 		object3d_->Update(Camera::GetInstance());
 		
@@ -184,7 +139,7 @@
 
 #ifdef _DEBUG
 		ImGui::Begin("whale");
-		ImGui::DragFloat3("whale.translate", (float*)&object3d_->GetTranslate(), 0.01f);
+		ImGui::DragFloat3("whale.translate", (float*)&object3d_->GetTranslate(), accSpeed);
 		ImGui::Text("life:%d", life);
 		ImGui::End();
 #endif
@@ -219,8 +174,8 @@
 			ChangeModel("whale/BoneWhale.obj", "Resource/whale/boneColor.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -230,8 +185,8 @@
 			ChangeModel("whale/3DamagedWhale.obj", "Resource/whale/3DamageBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -241,8 +196,8 @@
 			ChangeModel("whale/2DamagedWhale.obj", "Resource/whale/2DamageBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -253,8 +208,8 @@
 			ChangeModel("whale/1DamagedWhale.obj", "Resource/whale/1DamagedBone.png");
 			particle_->SetElements(0.0f, 1.0f, 0.5f, 1.5f,
 				object3d_->GetTranslate().x - 4.0f, object3d_->GetTranslate().x + 4.0f,
-				object3d_->GetTranslate().y - 2.0f, object3d_->GetTranslate().y + 2.0f,
-				object3d_->GetTranslate().z - 4.0f, object3d_->GetTranslate().z - 2.0f,
+				object3d_->GetTranslate().y, object3d_->GetTranslate().y + 4.0f,
+				object3d_->GetTranslate().z - 2.0f, object3d_->GetTranslate().z + 2.0f,
 				-0.005f, 0.005f, 0.005f, 0.01f, -0.005f, 0.005f);
 			particle_->RandomInitialize(particle_->GetElements());
 			particle_->SetColorRed(1.0f);
@@ -286,7 +241,6 @@
 
 	void Whale::ChangeModel(std::string shape, std::string skin)
 	{
-		modelManager_->EraseModel(whaleModel, whaleSkin);
 		whaleModel = shape;
 		whaleSkin = skin;
 		modelManager_->LoadModel(whaleModel, whaleSkin, true);

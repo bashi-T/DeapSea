@@ -161,9 +161,9 @@ namespace MyEngine
 				instancingData[index].color = particles[index].color;
 			}
 
-			particles[index].transform.translate.x += particles[index].velocity.x/* * kDeltaTime*/;
-			particles[index].transform.translate.y += particles[index].velocity.y/* * kDeltaTime*/;
-			particles[index].transform.translate.z += particles[index].velocity.z/* * kDeltaTime*/;
+			particles[index].transform.translate.x += particles[index].velocity.x;
+			particles[index].transform.translate.y += particles[index].velocity.y;
+			particles[index].transform.translate.z += particles[index].velocity.z;
 			particles[index].currentTime += kDeltaTime;
 			if (camera_)
 			{
@@ -268,7 +268,14 @@ namespace MyEngine
 		elements.velzMax = velzMax;
 	}
 
-	void Particle::SetScale(Vector3 scale)
+	void Particle::SetDistance(float distanceX, float distanceY, float distanceZ)
+	{
+	    revolveDistance.distancex = distanceX;
+	    revolveDistance.distancey = distanceY;
+	    revolveDistance.distancez = distanceZ;
+	}
+
+    void Particle::SetScale(Vector3 scale)
 	{
 		for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 		{
@@ -289,5 +296,15 @@ namespace MyEngine
 		{
 			particles[index].color.x = red;
 		}
-	}
+    }
+    void Particle::Revolution(RevolveDistance pDistance, Vector3 tergetTranslate)
+	{
+	    for (uint32_t index = 0; index < kNumMaxInstance; ++index)
+		{
+		    Matrix4x4 RotateMatrix = MakeRotateMatrix(particles[index].transform.rotate);
+		    Vector3 distanceParticle = {pDistance.distancex, pDistance.distancey, pDistance.distancez};
+		    Vector3 offset = TransformNormal(distanceParticle, RotateMatrix);
+		    particles[index].transform.translate = Add(tergetTranslate, offset);
+	    }
+    }
 }

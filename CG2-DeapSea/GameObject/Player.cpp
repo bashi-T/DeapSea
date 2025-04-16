@@ -35,7 +35,7 @@ void Player::Initialize(Camera* camera)
 	object3d_->SetScale({2.0f, 2.0f, 2.0f});
 }
 
-void Player::Update()
+void Player::Update(Vector3 whalePos)
 {
 	pBullets.remove_if([](std::unique_ptr<PlayerBullet>& bullet)
 		{
@@ -109,15 +109,6 @@ void Player::Update()
 			object3d_->SetRotate({ 0.0f,/*object3d_->GetRotate().y+*/LerpShortAngle(object3d_->GetRotate().y, angle_,0.1f),0.0f });
 			Move();
 
-			//if (Input::GetInstance()->PushKey(DIK_D))
-			//{
-			//	object3d_->SetTranslate({ object3d_->GetTranslate().x + 0.05f, object3d_->GetTranslate().y, object3d_->GetTranslate().z });
-			//}
-			//if (Input::GetInstance()->PushKey(DIK_A))
-			//{
-			//	object3d_->SetTranslate({ object3d_->GetTranslate().x - 0.05f, object3d_->GetTranslate().y, object3d_->GetTranslate().z });
-			//}
-
 			if (joyState.Gamepad.bRightTrigger)
 			{
 				isShot = true;
@@ -132,19 +123,19 @@ void Player::Update()
 			moveVector = { 0.0f,0.0f,0.0f };
 			if (Input::GetInstance()->PushKey(DIK_RIGHT))
 			{
-				moveVector = { 0.075f, 0.0f,0.0f };
+				moveVector = {moveSpeed, 0.0f, 0.0f};
 			}
 			if (Input::GetInstance()->PushKey(DIK_LEFT))
 			{
-				moveVector = { -0.075f, 0.0f,0.0f };
+				moveVector = {-moveSpeed, 0.0f, 0.0f};
 			}
 			if (Input::GetInstance()->PushKey(DIK_UP))
 			{
-				moveVector = { 0.0f, 0.0f,0.075f };
+				moveVector = {0.0f, 0.0f, moveSpeed};
 			}
 			if (Input::GetInstance()->PushKey(DIK_DOWN))
 			{
-				moveVector = { 0.0f, 0.0f,-0.075f };
+				moveVector = {0.0f, 0.0f, -moveSpeed};
 			}
 
 			Move();
@@ -183,10 +174,13 @@ void Player::Update()
 				isShot = false;
 			}
 
+			if (Input::GetInstance()->PushKey(DIK_V) && isGuard==false)
+			{
+				isGuard = true;
+			}
 		}
 		Shot();
-
-		//collision.center = object3d_->GetTranslate();
+		Guard(whalePos);
 		if (hitTimer >= 60)
 		{
 			object3d_->SetColor({ 1.0f,1.0f,1.0f,0.25f });
@@ -211,6 +205,7 @@ void Player::Update()
 	}
 
 	object3d_->SkeltonUpdate(camera_);
+	
 	//collision.center = object3d_->GetTranslate();
 	collision =
 	{
@@ -221,6 +216,17 @@ void Player::Update()
 	{
 		bullet->Update();
 	}
+
+	#ifdef _DEBUG
+	if (shieldTimer < 0)
+	{
+		object3d_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+	}
+	else
+	{
+		object3d_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	}
+	#endif
 }
 
 void Player::Draw()
@@ -229,6 +235,11 @@ void Player::Draw()
 	for (const auto& bullet : pBullets)
 	{
 		bullet->Draw();
+	}
+
+	if (shieldTimer > 0)
+	{
+		shield_->Draw();
 	}
 }
 
@@ -239,7 +250,7 @@ void Player::Shot()
 		shotInterval++;
 		if (shotInterval == 1)
 		{
-			std::unique_ptr<PlayerBullet> newBullet = std::make_unique< PlayerBullet>();
+			std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
 			newBullet->Initialize(object3d_->GetTranslate(), object3d_->GetObjectMatrix());
 			pBullets.push_back(std::move(newBullet));
 		}
@@ -249,15 +260,46 @@ void Player::Shot()
 
 		}
 	}
-	else
-	{
-		shotInterval = 0;
-	}
+	//else
+	//{
+	//	shotInterval = 0;
+	//}
 }
 
 void Player::Move()
 {
 	object3d_->SetTranslate(Add(object3d_->GetTranslate(), moveVector));
+}
+
+void Player::Guard(Vector3 whalePos)
+{
+	if (isGuard && shieldTimer == 0)
+	{
+		shield_ = std::make_unique<Shield>();
+		shield_->Initialize();
+		shield_->SetIsDead(false);
+	} 
+	else if (shield_ == nullptr)
+	{
+		if (shieldTimer<0)
+		{
+			shieldTimer++;
+		}
+		return;
+	}
+	shieldTimer++;
+	shield_->Update(object3d_->GetTranslate(), whalePos);
+	if (shieldTimer >= 300)
+	{
+		shield_->SetIsDead(true);
+	}
+
+	if (shield_->IsDead() == true&&shield_->GetRadius()<=0.0f)
+	{
+		shieldTimer *= -10;
+		isGuard = false;
+		shield_.reset();
+	};
 }
 
 void Player::OnCollision()

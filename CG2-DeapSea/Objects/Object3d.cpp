@@ -321,6 +321,14 @@ namespace MyEngine
 		model_ = modelManager_->FindModel(filePath);
 	}
 
+    void Object3d::Revolution(Vector3 distance, Vector3 tergetTranslate)
+	{
+	    Matrix4x4 RotateMatrix = MakeRotateMatrix(transformMatrix.rotate);
+	    Vector3 offset = TransformNormal(distance, RotateMatrix);
+	    transformMatrix.translate = Add(tergetTranslate, offset);
+    }
+
+
 	void Object3d::SetColor(Vector4 color)
 	{
 		model_->SetColor(color);

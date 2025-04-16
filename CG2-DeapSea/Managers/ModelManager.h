@@ -15,9 +15,9 @@ namespace MyEngine
 
 		void Finalize();
 		void Initialize();
-	    void LoadModel(std::string& modelFilePath, const std::string& TextureFilePath, bool isLighting);
-	    void LoadAnimationModel(std::string& modelFilePath, const std::string& TextureFilePath, bool isLighting);
-	    void LoadSkeltonAnimation(std::string& modelFilePath, const std::string& TextureFilePath, bool isLighting);
+	    void LoadModel(std::string& modelFilePath, const std::string& textureFilePath, bool isLighting);
+	    void LoadAnimationModel(std::string& modelFilePath, const std::string& textureFilePath, bool isLighting);
+	    void LoadSkeltonAnimation(std::string& modelFilePath, const std::string& textureFilePath, bool isLighting);
 	    void EraseModel(const std::string& modelFilePath, const std::string& textureFilePath);
 
 		Model* FindModel(const std::string& filePath);

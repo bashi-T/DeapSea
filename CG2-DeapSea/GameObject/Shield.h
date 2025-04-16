@@ -11,10 +11,24 @@ class Shield
 public:
 	~Shield();
 	void Initialize();
-	void Update();
+	void Update(Vector3 playerPos, Vector3 whalePos);
 	void Draw();
 
+	void SetIsDead(bool isdead) { isDead = isdead; }
+	const bool& IsDead() const { return isDead; }
+
+	void SetRadius(float r) { collision.radius = r; }
+	float GetRadius() { return collision.radius; }
+	Sphere GetCollision() { return collision; }
+
 private:
-	std::unique_ptr< Object3d> object3d;
-	std::vector < std::unique_ptr<Particle>> particles;
+	std::unique_ptr<Particle> particle_;
+	ModelManager* modelManager_ = nullptr;
+
+	bool isDead = false;
+	Sphere collision{};
+
+	float rotateSpeed = 0.0f;
+	std::string shieldModel = "axis/axis.obj";
+	std::string shieldSkin = "Resource/colorbabble.png";
 };

@@ -36,10 +36,10 @@ namespace MyEngine
 		viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 	}
 
-	void Camera::Offset(Vector3 offset, Vector3 tergetTranslate/*, Matrix4x4 tergetWorld*/)//カメラをターゲットに追従させる
+	void Camera::Offset(Vector3 distance, Vector3 tergetTranslate)//カメラをターゲットに追従させる
 	{
-		Matrix4x4 RotareMatrix = MakeRotateMatrix(transformMatrix.rotate);
-		offset = TransformNormal(offset, RotareMatrix);
+		Matrix4x4 RotateMatrix = MakeRotateMatrix(transformMatrix.rotate);
+		Vector3 offset = TransformNormal(distance, RotateMatrix);
 		transformMatrix.translate = Add(tergetTranslate, offset);
 	}
 
