@@ -60,7 +60,8 @@ namespace MyEngine
 	    int32_t gameOverSceneTransitionTime = 0;
 	    int32_t clearSceneTransitionTime = 0;
 
-		float distance = 0.0f;
+		float distanceCtoPL = 0.0f;
+	    float distanceCtoW= 0.0f;
 
 		enum UIType
 		{

@@ -84,7 +84,8 @@ namespace MyEngine
 		sceneTransitionTime = 0;
 		player_->SetTranslate({ camera_->GetTranslate().x ,87.5f ,0.0f });
 		whale_->SetTranslate({ 0.0f,0.0f,1.5f });
-	    distance = camera_->GetTranslate().z - player_->GetTranslate().z;
+	    distanceCtoPL = camera_->GetTranslate().z - player_->GetTranslate().z;
+	    distanceCtoW = camera_->GetTranslate().z - whale_->GetTranslate().z;
 
 		particle_ = std::make_unique<Particle>();
 		particle_->SetElements(1.0f, 1.0f, 1.0f, 6.0f,
@@ -247,7 +248,7 @@ namespace MyEngine
 			{
 			    float rotateX = camera_->GetRotate().x;
 			    camera_->SetRotate({rotateX - 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
-			    camera_->Offset({0.0f, 2.0f, -distance}, whale_->GetTranslate());
+			    camera_->Offset({0.0f, 2.0f, -distanceCtoW}, whale_->GetTranslate());
 		    }
 			else if (camera_->GetTranslate().y <= 0.0f)
 			{
@@ -340,7 +341,7 @@ namespace MyEngine
 				{
 				    float rotateX = camera_->GetRotate().x;
 				    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
-				    camera_->Offset({0.0f, 2.0f, distance}, player_->GetTranslate());
+				    camera_->Offset({0.0f, 2.0f, distanceCtoPL}, player_->GetTranslate());
 			    }
 			    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.02f)
 				{
@@ -382,7 +383,7 @@ namespace MyEngine
 		if (whale_->GetLife() == 0 && isGameOver == false)
 		{
 			enemys_.resize(0);
-		    distance = camera_->GetTranslate().y - whale_->GetTranslate().y;
+		    distanceCtoW = camera_->GetTranslate().y - whale_->GetTranslate().y;
 			isGameOver = true;
 		}
 	    else if(enemys_.size() == 0 && gameEnd == true)
