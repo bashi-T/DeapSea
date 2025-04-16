@@ -17,21 +17,18 @@ public:
 	void SetIsDead(bool isdead) { isDead = isdead; }
 	const bool& IsDead() const { return isDead; }
 
-	void SetTranslate(Vector3 translate) { object3d_->SetTranslate(translate); }
 	void SetRadius(float r) { collision.radius = r; }
 	float GetRadius() { return collision.radius; }
-	Vector3 GetTranslate() { return object3d_->GetTranslate(); }
 	Sphere GetCollision() { return collision; }
 
 private:
-	std::unique_ptr< Object3d> object3d_;
-	std::vector < std::unique_ptr<Particle>> particles_;
+	std::unique_ptr<Particle> particle_;
 	ModelManager* modelManager_ = nullptr;
 
 	bool isDead = false;
 	Sphere collision{};
 
-	float rotateSpeed = 2.0f;
+	float rotateSpeed = 0.0f;
 	std::string shieldModel = "axis/axis.obj";
 	std::string shieldSkin = "Resource/colorbabble.png";
 };

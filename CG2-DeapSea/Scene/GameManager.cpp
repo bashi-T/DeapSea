@@ -72,24 +72,24 @@ namespace MyEngine
 			dx12Common->update();
 			input->Update();
 
-#ifdef _DEBUG
-		    if (input->PushKey(DIK_D))
-			{
-			    camera->SetRotate({camera->GetRotate().x, camera->GetRotate().y + kRotateSpeed, camera->GetRotate().z});
-			}
-		    if (input->PushKey(DIK_A))
-			{
-			    camera->SetRotate({camera->GetRotate().x, camera->GetRotate().y - kRotateSpeed, camera->GetRotate().z});
-			}
-		    if (input->PushKey(DIK_W))
-			{
-			    camera->SetRotate({camera->GetRotate().x + kRotateSpeed, camera->GetRotate().y, camera->GetRotate().z});
-			}
-		    if (input->PushKey(DIK_S))
-			{
-			    camera->SetRotate({camera->GetRotate().x - kRotateSpeed, camera->GetRotate().y, camera->GetRotate().z});
-			}
-#endif // DEBUG
+//#ifdef _DEBUG
+//		    if (input->PushKey(DIK_D))
+//			{
+//			    camera->SetRotate({camera->GetRotate().x, camera->GetRotate().y + kRotateSpeed, camera->GetRotate().z});
+//			}
+//		    if (input->PushKey(DIK_A))
+//			{
+//			    camera->SetRotate({camera->GetRotate().x, camera->GetRotate().y - kRotateSpeed, camera->GetRotate().z});
+//			}
+//		    if (input->PushKey(DIK_W))
+//			{
+//			    camera->SetRotate({camera->GetRotate().x + kRotateSpeed, camera->GetRotate().y, camera->GetRotate().z});
+//			}
+//		    if (input->PushKey(DIK_S))
+//			{
+//			    camera->SetRotate({camera->GetRotate().x - kRotateSpeed, camera->GetRotate().y, camera->GetRotate().z});
+//			}
+//#endif // DEBUG
 
 			imgui->Update();
 			skyDome->Update();

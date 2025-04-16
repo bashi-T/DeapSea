@@ -45,6 +45,14 @@ namespace MyEngine
 			float velzMax;
 		};
 		ElementsParticle elements;
+
+		struct RevolveDistance
+		{
+		    float distancex;
+		    float distancey;
+		    float distancez;
+		};
+	    RevolveDistance revolveDistance;
 		/// <summary>
 		/// 初期化
 		/// </summary>
@@ -132,7 +140,8 @@ namespace MyEngine
 			Matrix4x4 World;
 			Vector4 color;
 		};
-		struct CameraTransform {
+		struct CameraTransform
+		{
 			Vector3 worldPosition;
 		};
 
@@ -167,7 +176,13 @@ namespace MyEngine
 		void SetElements(float colorMin, float colorMax, float timeMin, float timeMax,
 			float posxMin, float posxMax, float posyMin, float posyMax, float poszMin, float poszMax,
 			float velxMin, float velxMax, float velyMin, float velyMax, float velzMin, float velzMax);
-
+	    /// <summary>
+	    /// 公転用の距離設定
+	    /// </summary>
+	    /// <param name="distanceX"></param>
+	    /// <param name="distanceY"></param>
+	    /// <param name="distanceZ"></param>
+	    void SetDistance(float distanceX, float distanceY, float distanceZ);
 		/// <summary>
 		/// particleの拡縮(一律)
 		/// </summary>
@@ -183,6 +198,12 @@ namespace MyEngine
 		/// </summary>
 		/// <param name="red"></param>
 		void SetColorRed(float red);
+	    /// <summary>
+	    /// 公転
+	    /// </summary>
+	    /// <param name="distance"></param>
+	    /// <param name="tergetTranslate"></param>
+	    void Revolution(RevolveDistance distance, Vector3 tergetTranslate);
 
 		const ElementsParticle& GetElements()const { return elements; }
 		const Matrix4x4& GetCameraMatrix()const { return cameraMatrix; }
@@ -190,7 +211,9 @@ namespace MyEngine
 		const D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandleGPU()const { return textureSrvHandleGPU; }
 		ParticleForGPU* GetInstancingData() { return instancingData; }
 		Particles* GetParticles() { return particles; }
-
+	    const RevolveDistance GetDistance() { return revolveDistance; }
+	    const uint32_t GetNumMaxInstance() { return kNumMaxInstance; }
+	    EulerTransform GetTransform(int index) { return particles[index].transform; }
 	private:
 
 		SRVManager* srvManager_ = nullptr;
@@ -261,6 +284,7 @@ namespace MyEngine
 		Vector2 texcoordLeftBottom{};
 		Vector2 texcoordRightTop{};
 		Vector2 texcoordRightBottom{};
+	    Vector3 distance{};
 
 		const float kDeltaTime = 1.0f / 60.0f;
 		Vector2 anchorPoint = { 0.0f,0.0f };

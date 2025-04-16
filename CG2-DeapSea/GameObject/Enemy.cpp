@@ -115,6 +115,13 @@
 						SetEnemyVector({ enemyVector.x,enemyVector.y,-1.0f });
 					}
 				    Move();
+				} 
+				else
+				{
+					if (object3d_->GetTranslate().z >= Camera::GetInstance()->GetTranslate().z + 10.0f)
+					{
+					    Move();
+				    }
 				}
 			}
 			object3d_->Update(Camera::GetInstance());
@@ -203,7 +210,7 @@
 			newBullet->SetEnemyBulletVector(player_->GetTranslate());
 			eBullets.push_back(std::move(newBullet));
 		}
-		if (shotInterval == 180)
+		if (shotInterval == 300)
 		{
 			shotInterval = 0;
 		}
@@ -216,10 +223,6 @@
 	void Enemy::OnCollision()
 	{
 		SubtractLife();
-		//if (life <= 0)
-		//{
-		//	isDead = true;
-		//}
 	}
 
 	void Enemy::SetTranslate(Vector3 translate)

@@ -1,7 +1,217 @@
 #include "CGVector.h"
 
-Vector2 Lerp(const Vector2& a, const Vector2& b, float t)
+Matrix2x2 Add(Matrix2x2 a, Matrix2x2 b)
 {
+	Matrix2x2 add;
+	for (int x = 0; x < 2; x++)
+	{
+		for (int y = 0; y < 2; y++)
+		{
+			add.m[x][y] = a.m[x][y] + b.m[x][y];
+		}
+	}
+	return add;
+}
+
+Matrix2x2 Subtract(Matrix2x2 a, Matrix2x2 b) 
+{
+	Matrix2x2 subtract;
+	for (int x = 0; x < 2; x++)
+	{
+		for (int y = 0; y < 2; y++) 
+		{
+			subtract.m[x][y] = a.m[x][y] - b.m[x][y];
+		}
+	}
+	return subtract;
+}
+
+Matrix2x2 Multiply(Matrix2x2 a, Matrix2x2 b)
+{
+	Matrix2x2 multiply;
+	multiply.m[0][0] = (a.m[0][0] * b.m[0][0]) + (a.m[0][1] * b.m[1][0]);
+	multiply.m[0][1] = (a.m[0][0] * b.m[0][1]) + (a.m[0][1] * b.m[1][1]);
+	multiply.m[1][0] = (a.m[1][0] * b.m[0][0]) + (a.m[1][1] * b.m[1][0]);
+	multiply.m[1][1] = (a.m[1][0] * b.m[0][1]) + (a.m[1][1] * b.m[1][1]);
+
+	return multiply;
+}
+
+Vector2 Multiply(Vector2 v, Matrix2x2 b)
+{
+	Vector2 multiply;
+	multiply.x = (v.x * b.m[0][0]) + (v.y * b.m[1][0]);
+	multiply.y = (v.x * b.m[0][1]) + (v.y * b.m[1][1]);
+	return multiply;
+}
+
+Matrix3x3 Multiply(Matrix3x3 a, Matrix3x3 b)
+{
+	Matrix3x3 multiply;
+	multiply.m[0][0] = (a.m[0][0] * b.m[0][0]) + (a.m[0][1] * b.m[1][0]);
+	multiply.m[0][1] = (a.m[0][0] * b.m[0][1]) + (a.m[0][1] * b.m[1][1]);
+	multiply.m[0][2] = (a.m[0][0] * b.m[0][1]) + (a.m[0][1] * b.m[1][1]);
+	multiply.m[1][0] = (a.m[1][0] * b.m[0][0]) + (a.m[1][1] * b.m[1][0]);
+	multiply.m[1][1] = (a.m[1][0] * b.m[0][1]) + (a.m[1][1] * b.m[1][1]);
+	multiply.m[1][2] = (a.m[1][0] * b.m[0][1]) + (a.m[1][1] * b.m[1][1]);
+	multiply.m[2][0] = (a.m[1][0] * b.m[0][0]) + (a.m[1][1] * b.m[1][0]);
+	multiply.m[2][1] = (a.m[1][0] * b.m[0][1]) + (a.m[1][1] * b.m[1][1]);
+	multiply.m[2][2] = (a.m[1][0] * b.m[0][1]) + (a.m[1][1] * b.m[1][1]);
+
+	return multiply;
+}
+
+Matrix2x2 MakeRotateMatrix(float theta)
+{
+	Matrix2x2 rotate;
+	rotate.m[0][0] = std::cos(theta);
+	rotate.m[0][1] = std::sin(theta);
+	rotate.m[1][0] = -std::sin(theta);
+	rotate.m[1][1] = std::cos(theta);
+
+	return rotate;
+}
+Matrix3x3 MakeRotateMatrix3x3(float theta)
+{
+	Matrix3x3 rotate;
+	rotate.m[0][0] = std::cos(theta);
+	rotate.m[1][0] = -std::sin(theta);
+	rotate.m[2][0] = 0;
+	rotate.m[0][1] = std::sin(theta);
+	rotate.m[1][1] = std::cos(theta);
+	rotate.m[2][1] = 0;
+	rotate.m[0][2] = 0;
+	rotate.m[1][2] = 0;
+	rotate.m[2][2] = 1;
+
+	return rotate;
+}
+Matrix3x3 MakeTranslateMatrix(Vector2 translate)
+{
+	Matrix3x3 result;
+	result.m[0][0] = 1.0f;
+	result.m[0][1] = 0.0f;
+	result.m[0][2] = 0.0f;
+	result.m[1][0] = 0.0f;
+	result.m[1][1] = 1.0f;
+	result.m[1][2] = 0.0f;
+	result.m[2][0] = translate.x;
+	result.m[2][1] = translate.y;
+	result.m[2][2] = 1.0f;
+
+	return result;
+}
+
+Vector2 Transform(Vector2 vector, Matrix3x3 matrix)
+{
+	Vector2 result;
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + 1.0f * matrix.m[2][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + 1.0f * matrix.m[2][1];
+	float w = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + 1.0f * matrix.m[2][2];
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	return result;
+}
+
+Matrix2x2 Inverse(Matrix2x2 a) 
+{
+	Matrix2x2 result = {0};
+	float x = a.m[0][0] * a.m[1][1] - a.m[0][1] * a.m[1][0];
+	if (x != 0)
+	{
+		result.m[0][0] = 1 / x * a.m[1][1];
+		result.m[0][1] = 1 / x * -(a.m[0][1]);
+		result.m[1][0] = 1 / x * -(a.m[1][0]);
+		result.m[1][1] = 1 / x * a.m[0][0];
+	}
+	return result;
+}
+
+Matrix3x3 Inverse(Matrix3x3 a)
+{
+	Matrix3x3 result;
+	float x = a.m[0][0] * a.m[1][1] * a.m[2][2] + a.m[0][1] * a.m[1][2] * a.m[2][1] + a.m[0][2] * a.m[1][0] * a.m[2][1] - 
+		a.m[2][0] * a.m[1][1] * a.m[2][0] - a.m[0][1] * a.m[2][1] * a.m[2][2] - a.m[0][0] * a.m[1][0] * a.m[2][1];
+	if (x != 0)
+	{
+		result.m[0][0] = 1 / x * (a.m[1][1] * a.m[2][2] - a.m[1][2] * a.m[2][1]);
+		result.m[0][1] = 1 / x * -(a.m[0][1] * a.m[2][2] - a.m[0][2] * a.m[2][1]);
+		result.m[0][2] = 1 / x * (a.m[0][1] * a.m[1][2] - a.m[0][2] * a.m[1][1]);
+		result.m[1][0] = 1 / x * -(a.m[1][0] * a.m[2][2] - a.m[1][2] * a.m[2][0]);
+		result.m[1][1] = 1 / x * (a.m[0][0] * a.m[2][2] - a.m[0][2] * a.m[2][0]);
+		result.m[1][2] = 1 / x * -(a.m[0][0] * a.m[1][2] - a.m[0][2] * a.m[1][0]);
+		result.m[2][0] = 1 / x * (a.m[1][0] * a.m[2][1] - a.m[1][1] * a.m[2][0]);
+		result.m[2][1] = 1 / x * -(a.m[0][0] * a.m[2][1] - a.m[0][1] * a.m[2][0]);
+		result.m[2][2] = 1 / x * (a.m[0][0] * a.m[1][1] - a.m[0][1] * a.m[1][0]);
+	}
+	return result;
+}
+
+Matrix2x2 Transpose(Matrix2x2 a)
+{
+	Matrix2x2 result;
+	result.m[0][0] = a.m[0][0];
+	result.m[1][1] = a.m[1][1];
+	result.m[0][1] = a.m[1][0];
+	result.m[1][0] = a.m[0][1];
+	return result;
+}
+
+Matrix3x3 Transpose(Matrix3x3 a)
+{
+	Matrix3x3 result;
+	result.m[0][0] = a.m[0][0];
+	result.m[1][0] = a.m[0][1];
+	result.m[2][0] = a.m[0][2];
+	result.m[0][1] = a.m[1][0];
+	result.m[1][1] = a.m[1][1];
+	result.m[2][1] = a.m[1][2];
+	result.m[0][2] = a.m[2][0];
+	result.m[1][2] = a.m[2][1];
+	result.m[2][2] = a.m[2][2];
+	return result;
+}
+
+Matrix3x3 MakeOrthographicMatrix(float left, float top, float right, float bottom) // 正射影
+{
+	Matrix3x3 result;
+	result.m[0][0] = 2.0f / (right - left);
+	result.m[1][0] = 0;
+	result.m[2][0] = (left + right) / (left - right);
+	result.m[0][1] = 0;
+	result.m[1][1] = 2.0f / (top - bottom);
+	result.m[2][1] = (top + bottom) / (bottom - top);
+	result.m[0][2] = 0;
+	result.m[1][2] = 0;
+	result.m[2][2] = 1;
+	return result;
+}
+
+Matrix3x3 MakeViewportMatrix(float left, float top, float width, float height)// ビューポート
+{ 
+	Matrix3x3 result;
+	result.m[0][0] = width / 2;
+	result.m[1][0] = 0;
+	result.m[2][0] = left + width / 2;
+	result.m[0][1] = 0;
+	result.m[1][1] = -height / 2;
+	result.m[2][1] = top + height / 2;
+	result.m[0][2] = 0;
+	result.m[1][2] = 0;
+	result.m[2][2] = 1;
+	return result;
+}
+
+Matrix3x3 Inverse3x3(Matrix3x3 a)
+{
+	Matrix3x3 result;
+	result.m[2][0] = -a.m[2][0];
+	result.m[2][1] = -a.m[2][1];
+	return result;
+};
+
+Vector2 Lerp(const Vector2& a, const Vector2& b, float t) {
 	Vector2 f;
 	f.x = t * b.x + (1.0f - t) * a.x;
 	f.y = t * b.y + (1.0f - t) * a.y;
@@ -881,3 +1091,13 @@ float LerpShortAngle(float a, float b, float t)
 
 	return Lerp(a, diff, t);
 }
+
+Vector3 Revolution(Vector3 distance, Vector3 tergetTranslate, Vector3 rotate)
+{
+	Matrix4x4 RotateMatrix = MakeRotateMatrix(rotate);
+	Vector3 distanceParticle = {distance.x, distance.y, distance.z};
+	Vector3 offset = TransformNormal(distanceParticle, RotateMatrix);
+	Vector3 translate = Add(tergetTranslate, offset);
+	return translate;
+}
+

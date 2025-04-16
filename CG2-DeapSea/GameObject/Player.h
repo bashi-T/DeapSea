@@ -20,6 +20,7 @@ public:
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() const { return pBullets; }
 	const std::unique_ptr<Shield>& GetShield() const { return shield_; }
+	Vector3 GetRotate() { return object3d_->GetRotate(); }
 	Vector3 GetTranslate() { return object3d_->GetTranslate(); }
 	Matrix4x4 GetWorldMatrix() { return object3d_->GetObjectMatrix(); }
 	const AABB& GetAABBCollision() const{ return collision; }
@@ -28,6 +29,7 @@ public:
 	const uint32_t& GetIsHitTimer()const { return hitTimer; }
 	const Vector3& GetMoveVector()const { return moveVector; }
 
+	void SetRotate(Vector3 rotate) { object3d_->SetRotate(rotate); }
 	void SetTranslate(Vector3 translate) { object3d_->SetTranslate(translate); }
 	void SetIsHit(bool isHit_) { isHit = isHit_; }
 	void SetIsShot(bool isShot_) { isShot = isShot_; }

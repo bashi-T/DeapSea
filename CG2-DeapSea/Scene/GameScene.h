@@ -56,7 +56,11 @@ namespace MyEngine
 		bool isGameStart = false;
 		bool isGameOver = false;
 		bool isGameClear = false;
-		int32_t sceneTransitionTime = 0;
+	    int32_t sceneTransitionTime = 0;
+	    int32_t gameOverSceneTransitionTime = 0;
+	    int32_t clearSceneTransitionTime = 0;
+
+		float distance = 0.0f;
 
 		enum UIType
 		{
@@ -83,6 +87,8 @@ namespace MyEngine
 		Vector3 ingameCameraRotate = { 0.2f,0.0f,0.0f };
 		const float zfar = 2.0f;
 		Vector2 spritePos = { 10.0f,-50.0f };
+	    float enemyDeadLine = 15.0f;
+	    Vector3 distanceCtoUI = {0.0f, -10.0f, -20.0f};
 
 		bool isMove = false;
 	    bool isAttack = false;
@@ -90,6 +96,6 @@ namespace MyEngine
 	    bool isPose = false;
 	    bool isGameOverScene = false;
 	    bool isGameClearScene = false;
-
+	    Vector3 offset;
 	};
 }

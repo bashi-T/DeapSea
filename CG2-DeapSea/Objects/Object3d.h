@@ -39,6 +39,8 @@ namespace MyEngine
 		void SetCamera(Camera* cameras) { camera_ = cameras; }
 		bool SetIsAnimation(bool IsAnimation) { return isAnimation = IsAnimation; }
 
+		void Revolution(Vector3 distance, Vector3 tergetTranslate);
+
 		const Vector3& GetScale()const { return transformMatrix.scale; }
 		const Vector3& GetRotate()const { return transformMatrix.rotate; }
 		const Vector3& GetTranslate()const { return transformMatrix.translate; }

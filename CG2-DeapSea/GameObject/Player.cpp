@@ -260,10 +260,10 @@ void Player::Shot()
 
 		}
 	}
-	else
-	{
-		shotInterval = 0;
-	}
+	//else
+	//{
+	//	shotInterval = 0;
+	//}
 }
 
 void Player::Move()
