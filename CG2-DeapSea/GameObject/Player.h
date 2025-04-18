@@ -59,7 +59,7 @@ private:
 	uint32_t hitTimer = 0;
 	float angle_ = 0.0f;
 	std::string playerModel = "human/walk.gltf";
-	const std::string& playerSkin = "Resource/world.png";
+	const std::string& playerSkin = "Resource/AnimatedCube/AnimatedCube_BaseColor.png";
 
 	const float collisionwidth = 2.0f;
 	const float moveSpeed = 0.15f;

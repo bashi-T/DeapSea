@@ -31,6 +31,10 @@ namespace MyEngine
 
 		void CheckAllCollisions();
 
+		void DirectGameStart();
+	    void DirectGameOver();
+	    void DirectGameClear();
+
 	private:
 	    std::unique_ptr<BaseScene> nextScene = nullptr;
 

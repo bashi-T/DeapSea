@@ -29,7 +29,7 @@ void Shield::Initialize()
 			collision.center.y - collision.radius, collision.center.y + collision.radius,
 		    collision.center.z - collision.radius, collision.center.z + collision.radius,
 			0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-		particle_->Initialize("Resource/clearbabble.png", particle_->GetElements(), 100);
+		particle_->Initialize("Resource/clearbabble.png", particle_->GetElements(), 30);
 		particle_->SetScale({0.75f, 0.75f, 0.75f});
 		particle_->SetDistance(0.0f, 0.0f, 0.0f);
 	}
@@ -63,7 +63,7 @@ void Shield::Update(Vector3 playerPos,Vector3 whalePos)
 
 	   particle_->Update(true, particle_->GetElements());
 	   particle_->SetRotate({0.0f, rotateSpeed++, 0.0f});
-	   particle_->Revolution({particle_->GetDistance().distancex, particle_->GetDistance().distancey, -particle_->GetDistance().distancez}, collision.center);
+	   particle_->Revolution({0.0f, particle_->GetDistance().distancey, -particle_->GetDistance().distancez}, collision.center);
    }
    else if (collision.radius > 0.0f)
    {
@@ -71,7 +71,7 @@ void Shield::Update(Vector3 playerPos,Vector3 whalePos)
 
 	   particle_->Update(false, particle_->GetElements());
 	   particle_->SetRotate({0.0f, rotateSpeed++, 0.0f});
-	   particle_->Revolution(particle_->GetDistance(), collision.center);
+	   particle_->Revolution({0.0f, particle_->GetDistance().distancey, -particle_->GetDistance().distancez}, collision.center);
    }
 }
 

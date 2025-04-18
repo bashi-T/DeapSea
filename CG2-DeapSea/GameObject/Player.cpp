@@ -194,7 +194,7 @@ void Player::Update(Vector3 whalePos)
 	else if (isHit == true)
 	{
 		object3d_->SetIsAnimation(false);
-		object3d_->SetColor({ 1.0f,1.0f,1.0f,0.15f });
+		object3d_->SetColor({ 1.0f,0.3f,0.3f,0.15f });
 		hitTimer++;
 		if (hitTimer == 60)
 		{
@@ -217,16 +217,14 @@ void Player::Update(Vector3 whalePos)
 		bullet->Update();
 	}
 
-	#ifdef _DEBUG
-	if (shieldTimer < 0)
+	if (shieldTimer < 0 && isHit == false)
 	{
-		object3d_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+		object3d_->SetColor({0.0f, 0.0f, 1.0f, object3d_->GetColor().a});
 	}
-	else
+	else if (isHit==false)
 	{
-		object3d_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+		object3d_->SetColor({1.0f, 1.0f, 1.0f, object3d_->GetColor().a});
 	}
-	#endif
 }
 
 void Player::Draw()

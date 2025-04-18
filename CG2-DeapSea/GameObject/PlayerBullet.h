@@ -28,7 +28,7 @@ private:
 	ModelManager* modelManager_;
 
 	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
-	const std::string& bulletSkin = "Resource/AnimatedCube/AnimatedCube_BaseColor.png";
+	const std::string& bulletSkin = "Resource/white.png";
 	Vector3 bulletSpeed = { 0.0f,0.0f,3.0f };
 	static const int32_t kLifeTime = 60 * 2;
 	int32_t deathTimer = kLifeTime;
