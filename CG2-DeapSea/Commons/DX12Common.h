@@ -72,17 +72,16 @@ namespace MyEngine
 		static DX12Common* GetInstance();
 		static void DeleteInstance();
 
-		D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i) { return rtvHandles[i]; }
-		D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() { return dsvHandle; }
-
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandles(int32_t i)const { return rtvHandles[i]; }
+	    D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() const { return dsvHandle; }
 		ComPtr<ID3D12Device> GetDevice() { return device; }
 		ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList.Get(); }
 		ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue.Get(); }
 		ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator.Get(); }
-		DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
+	    DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() const { return swapChainDesc; }
 		ComPtr<IDXGISwapChain4> GetSwapChain() { return swapChain; }
 		std::array<ComPtr<ID3D12Resource>, 10> GetSwapChainResources() { return swapChainResources; }
-		D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
+		D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc()const { return rtvDesc; }
 		ComPtr<ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 		ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
 
@@ -121,7 +120,7 @@ namespace MyEngine
 		ComPtr<ID3D12DebugDevice> debugDevice;
 		ComPtr<ID3D12Debug1> debugController = nullptr;
 
-		void InitializefixFPS();
+		void InitializeFixFPS();
 		void UpdateFixFPS();
 
 		std::chrono::steady_clock::time_point reference_;

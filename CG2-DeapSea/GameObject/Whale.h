@@ -51,7 +51,7 @@ private:
 	int32_t life = 4;
 	uint32_t coolTimer = 0;
 	const float maxDistance = 6.0f;
-	const float accSpeed = 0.001f;
+	const float accSpeed = 0.003f;
 
 	std::string whaleModel = "whale/improvisedWhale2.obj";
 	std::string whaleSkin = "Resource/whale/whaleSkin.png";

@@ -16,7 +16,7 @@ namespace MyEngine
 		instance.reset();
 	}
 
-	void DX12Common::InitializefixFPS()
+	void DX12Common::InitializeFixFPS()
 	{
 		reference_ = std::chrono::steady_clock::now();
 	}
@@ -44,7 +44,7 @@ namespace MyEngine
 #ifdef _DEBUG
 		DebugLayer();
 #endif
-		InitializefixFPS();
+		InitializeFixFPS();
 		MakeDXGIFactory();
 		ChoseUseAdapter();
 		MakeD3D12Device();

@@ -45,13 +45,13 @@ class Enemy
 		bool isShot = false;
 		bool isDead = false;
 		bool isPractice_ = false;
-		AABB enemyCollision;
-		Vector3 enemyVector;
+	    AABB enemyCollision = {};
+	    Vector3 enemyVector = {};
 		Vector3 enemyEscapeSpeed = { 4.0f, 1.0f, 4.0f };
-		int enemySort;
+	    int enemySort = 0;
 		int moveInterval = 0;
-		int life;
+	    int life = 0;
 		int escapeTime = 0;
-		std::unique_ptr<Particle> particle;
+		std::unique_ptr<Particle> particle_;
 	};
 

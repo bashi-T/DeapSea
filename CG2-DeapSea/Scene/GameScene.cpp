@@ -47,15 +47,15 @@ namespace MyEngine
 	    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar});
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-		uiPlanes_[moveKey]->SetScale({ 2.5f,1.5f,0.0f });
+		uiPlanes_[moveKey]->SetScale({ 2.5f,1.0f,0.0f });
 		uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 	    uiPlanes_[moveKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
-		uiPlanes_[attackKey]->SetScale({2.5f, 1.5f, 0.0f});
+		uiPlanes_[attackKey]->SetScale({2.5f, 1.0f, 0.0f});
 	    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 	    uiPlanes_[attackKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
-		uiPlanes_[lookKey]->SetScale({2.5f, 1.5f, 0.0f});
+		uiPlanes_[lookKey]->SetScale({2.5f, 1.0f, 0.0f});
 	    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 	    uiPlanes_[lookKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
@@ -468,7 +468,8 @@ namespace MyEngine
     void GameScene::DirectGameStart() 
 	{
 	    sceneTransitionTime++;
-	    if (sceneTransitionTime <= 60)
+	    float flameNum[3] = {60, 80, 120};
+	    if (sceneTransitionTime <= flameNum[0])
 		{
 		    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y - 1.25f, player_->GetTranslate().z});
 		    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y - 1.0f, camera_->GetTranslate().z});
@@ -476,12 +477,12 @@ namespace MyEngine
 		    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a - 0.02f});
 		    uiPlanes_[Blackout]->Update();
 	    }
-	    if (sceneTransitionTime >= 61 && sceneTransitionTime <= 80)
+	    if (sceneTransitionTime > flameNum[0] && sceneTransitionTime <= flameNum[1])
 		{
 		    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y - 1.25f / 2, player_->GetTranslate().z});
 		    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y - 0.5f, camera_->GetTranslate().z});
 	    }
-	    if (sceneTransitionTime >= 120)
+	    if (sceneTransitionTime >= flameNum[2])
 		{
 		    if (camera_->GetTranslate().z != 0.0f) 
 			{
@@ -510,7 +511,8 @@ namespace MyEngine
 
     void GameScene::DirectGameOver()
 	{
-	    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z - 10.0f};
+	    float distanceCtoW = -10.0f;
+	    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z + distanceCtoW};
 	    player_->SetIsMovable(false);
 	    if (camera_->GetTranslate().y >= 0.0f)
 		{
@@ -532,13 +534,13 @@ namespace MyEngine
 			    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a + 0.02f});
 			    uiPlanes_[Blackout]->Update();
 		    }
-		    if (camera_->GetTranslate().z - whale_->GetTranslate().z <= -10.0f)
+		    if (camera_->GetTranslate().z - whale_->GetTranslate().z <= distanceCtoW)
 			{
 			    camera_->SetTranslate({whale_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
 		    }
-		    if (camera_->GetTranslate().z - whale_->GetTranslate().z > -10.0f)
+		    if (camera_->GetTranslate().z - whale_->GetTranslate().z > distanceCtoW)
 			{
-			    camera_->SetTranslate({whale_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
+			    camera_->SetTranslate({whale_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z});
 		    }
 				
 		    gameOverSceneTransitionTime++;
@@ -547,11 +549,12 @@ namespace MyEngine
 		{
 		    if (isGameStart)
 			{
-			    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z - 10.0f};
+			    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z + distanceCtoW};
 			    v = Subtract(zoomPos, camera_->GetTranslate());
 			    isGameStart = false;
 		    }
-		    camera_->SetTranslate({camera_->GetTranslate().x + v.x / 50.0f, camera_->GetTranslate().y + v.y / 50.0f, camera_->GetTranslate().z + v.z / 50.0f});
+		    float flameNum = 50.0f;
+		    camera_->SetTranslate({camera_->GetTranslate().x + v.x / flameNum, camera_->GetTranslate().y + v.y / flameNum, camera_->GetTranslate().z + v.z / flameNum});
 	    }
     }
 

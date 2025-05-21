@@ -27,11 +27,11 @@ void PlayerBullet::Initialize(Vector3 firstPos, Matrix4x4 angle)
 	}
 	model->Memcpy();
 	object3d_->SetTranslate({ firstPos.x + 0.01f, firstPos.y,firstPos.z });
-	playerBulletCollision.radius = 0.5f;
+	playerBulletCollision.radius = 1.0f;
 	Vector3 bulletSpeeds = TransformNormal(bulletSpeed, angle);
 
 
-	object3d_->SetScale({ 0.5f,0.5f,0.5f });
+	object3d_->SetScale({playerBulletCollision.radius, playerBulletCollision.radius, playerBulletCollision.radius});
 	object3d_->SetIsAnimation(false);
 }
 

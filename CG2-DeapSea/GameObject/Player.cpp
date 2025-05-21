@@ -252,16 +252,20 @@ void Player::Shot()
 			newBullet->Initialize(object3d_->GetTranslate(), object3d_->GetObjectMatrix());
 			pBullets.push_back(std::move(newBullet));
 		}
-		if (shotInterval == 15)
+		if (shotInterval == shotIntervalMax)
 		{
 			shotInterval = 0;
 
 		}
 	}
-	//else
-	//{
-	//	shotInterval = 0;
-	//}
+	else if (shotInterval > 0 && shotInterval < shotIntervalMax)
+	{
+		shotInterval++;
+	} 
+	else if (shotInterval >= shotIntervalMax)
+	{
+		shotInterval = 0;
+	}
 }
 
 void Player::Move()
