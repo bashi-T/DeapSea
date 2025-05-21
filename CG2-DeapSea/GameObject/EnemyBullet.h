@@ -28,7 +28,7 @@ private:
 	ModelManager* modelManager_ = nullptr;
 
 	std::string bulletModel = "AnimatedCube/AnimatedCube.gltf";
-	const std::string bulletSkin = "Resource/white.png";
+	const std::string bulletSkin = "Resource/circle.png";
 	Vector3 bulletSpeed = { 0.0f,0.0f,-0.1f };
 	bool isDead = false;
 	Sphere enemyBulletCollision;

@@ -110,7 +110,7 @@ namespace MyEngine
 				{
 					AudioManager::GetInstance()->SoundPlayWave(AudioManager::GetInstance()->GetxAudio2().Get(), moveSound);
 					nowStage++;
-					if (nowStage > Stage3)//一番下に移動
+					if (nowStage > Stage1)//一番下に移動
 					{
 						nowStage = Practice;
 					}
@@ -123,7 +123,7 @@ namespace MyEngine
 					nowStage--;
 					if (nowStage < Practice)//一番上に移動
 					{
-						nowStage = Stage3;
+						nowStage = Stage1;
 					}
 					cursor_->SetTranslate({ uiPlanes_[nowStage]->GetTranslate().x + cursorX,uiPlanes_[nowStage]->GetTranslate().y,uiPlanes_[nowStage]->GetTranslate().z });
 					cooltime = 0;
@@ -187,8 +187,8 @@ namespace MyEngine
 			cursor_->Draw();
 			uiPlanes_[Practice]->Draw();
 			uiPlanes_[Stage1]->Draw();
-			uiPlanes_[Stage2]->Draw();
-			uiPlanes_[Stage3]->Draw();
+			//uiPlanes_[Stage2]->Draw();
+			//uiPlanes_[Stage3]->Draw();
 		}
 		else if (isSceneTransition == true)
 		{

@@ -47,15 +47,15 @@ namespace MyEngine
 	    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + zfar});
 		uiPlanes_[Blackout]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-		uiPlanes_[moveKey]->SetScale({ 2.5f,1.5f,0.0f });
+		uiPlanes_[moveKey]->SetScale({ 2.5f,1.0f,0.0f });
 		uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 	    uiPlanes_[moveKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
-		uiPlanes_[attackKey]->SetScale({2.5f, 1.5f, 0.0f});
+		uiPlanes_[attackKey]->SetScale({2.5f, 1.0f, 0.0f});
 	    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 	    uiPlanes_[attackKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
-		uiPlanes_[lookKey]->SetScale({2.5f, 1.5f, 0.0f});
+		uiPlanes_[lookKey]->SetScale({2.5f, 1.0f, 0.0f});
 	    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 	    uiPlanes_[lookKey]->SetRotate({-1.6f, -3.2f, 0.0f});
 
@@ -156,7 +156,6 @@ namespace MyEngine
 
 				if (isMove == false)
 				{
-				    //uiPlanes_[moveKey]->SetRotate(camera_->GetRotate());
 				    uiPlanes_[moveKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 40.0f, player_->GetTranslate().z - 1.0f});
 					uiPlanes_[moveKey]->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 				}
@@ -167,7 +166,6 @@ namespace MyEngine
 				}
 				if (isAttack == false)
 				{
-				    //uiPlanes_[attackKey]->SetRotate(camera_->GetRotate());
 				    uiPlanes_[attackKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 40.0f, player_->GetTranslate().z - 2.0f});
 				    uiPlanes_[attackKey]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 			    } 
@@ -178,7 +176,6 @@ namespace MyEngine
 			    }
 			    if (isLook == false)
 				{
-				    //uiPlanes_[lookKey]->SetRotate({camera_->GetRotate().x, camera_->GetRotate().y - std::numbers::pi_v<float>, camera_->GetRotate().z});
 				    uiPlanes_[lookKey]->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 40.0f, player_->GetTranslate().z - 3.0f});
 				    uiPlanes_[lookKey]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 			    } 
@@ -237,129 +234,19 @@ namespace MyEngine
 
 			CheckAllCollisions();
 		    camera_->SetTranslate({player_->GetTranslate().x, camera_->GetTranslate().y, player_->GetTranslate().z});
-			//ground_->SetTranslate({ ground_->GetTranslate().x, ground_->GetTranslate().y, ground_->GetTranslate().z - 0.1f });
 			tide_->SetTranslate({ tide_->GetTranslate().x, tide_->GetTranslate().y, tide_->GetTranslate().z - 0.1f });
 		}
 		else if (isGameOver == true)//GameOverSceneへ遷移
 		{
-		    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z - 10.0f};
-		    player_->SetIsMovable(false);
-			if (camera_->GetTranslate().y >= 0.0f)
-			{
-			    float rotateX = camera_->GetRotate().x;
-			    camera_->SetRotate({rotateX - 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
-			    camera_->Offset({0.0f, 2.0f, -distanceCtoW}, whale_->GetTranslate());
-		    }
-			else if (camera_->GetTranslate().y <= 0.0f)
-			{
-			    if (gameOverSceneTransitionTime == 90)
-				{
-				    isGameOverScene = true;
-				}
-			    if (gameOverSceneTransitionTime >= 30)
-				{
-					whale_->SetTranslate({ whale_->GetTranslate().x,whale_->GetTranslate().y - 0.05f,whale_->GetTranslate().z });
-					uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f });
-				    uiPlanes_[Blackout]->SetRotate(camera_->GetRotate());
-					uiPlanes_[Blackout]->SetColor({ uiPlanes_[Blackout]->GetColor().x,uiPlanes_[Blackout]->GetColor().y,uiPlanes_[Blackout]->GetColor().z,uiPlanes_[Blackout]->GetColor().a + 0.02f });
-					uiPlanes_[Blackout]->Update();
-				}
-			    if (camera_->GetTranslate().z - whale_->GetTranslate().z <= -10.0f)
-				{
-				    camera_->SetTranslate({whale_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
-			    }
-			    gameOverSceneTransitionTime++;
-			}
-			else
-			{
-				if (isGameStart)
-				{
-					zoomPos = { whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z - 10.0f };
-					v = Subtract(zoomPos, camera_->GetTranslate());
-					isGameStart = false;
-				}
-				camera_->SetTranslate(
-				{
-					camera_->GetTranslate().x + v.x / 50.0f,
-					camera_->GetTranslate().y + v.y / 50.0f,
-					camera_->GetTranslate().z + v.z / 50.0f
-				});
-			}
-		}
+		    DirectGameOver();
+	    }
 		else if (isGameClear == true)//GameClearSceneへ遷移
 		{
-			player_->SetIsMovable(false);
-
-			if (clearSceneTransitionTime<=60)
-			{
-			    float pRotateY = player_->GetRotate().y;
-			    player_->SetRotate({player_->GetRotate().x, pRotateY - 0.1f, camera_->GetRotate().z});
-			    whale_->SetTranslate({whale_->GetTranslate().x, player_->GetTranslate().y, whale_->GetTranslate().z});
-			    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 0.5f, player_->GetTranslate().z});
-			    Vector3 distanceWtoP = Subtract(player_->GetTranslate(), whale_->GetTranslate());
-			    float wRotateY = whale_->GetRotate().y;
-			    whale_->SetRotate({whale_->GetRotate().x, wRotateY - 0.1f, whale_->GetRotate().z});
-			    whale_->SetTranslate(Revolution({distanceWtoP.x, distanceWtoP.y, distanceWtoP.z}, player_->GetTranslate(), whale_->GetRotate()));
-		    }
-			if (clearSceneTransitionTime >= 61)
-			{
-			    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y, player_->GetTranslate().z + 1.25f});
-			    whale_->SetTranslate({whale_->GetTranslate().x, whale_->GetTranslate().y, whale_->GetTranslate().z + 1.25f});
-			    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
-			    uiPlanes_[Blackout]->SetRotate(camera_->GetRotate());
-			    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a + 0.02f});
-			    uiPlanes_[Blackout]->Update();
-			}
-			if (uiPlanes_[Blackout]->GetColor().a >= 1.0f)
-			{
-			    isGameClearScene = true;
-			}
-		    clearSceneTransitionTime++;
-
-			    uiPlanes_[Blackout]->Update();
+		    DirectGameClear();
 	    }
 		else//導入遷移中
 		{
-
-			sceneTransitionTime++;
-			if (sceneTransitionTime <= 60)
-			{
-				player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f, player_->GetTranslate().z });
-				camera_->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y - 1.0f, camera_->GetTranslate().z });
-				uiPlanes_[Blackout]->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f });
-				uiPlanes_[Blackout]->SetColor({ uiPlanes_[Blackout]->GetColor().x,uiPlanes_[Blackout]->GetColor().y,uiPlanes_[Blackout]->GetColor().z,uiPlanes_[Blackout]->GetColor().a - 0.02f });
-				uiPlanes_[Blackout]->Update();
-			}
-			if (sceneTransitionTime >= 61 && sceneTransitionTime <= 80)
-			{
-				player_->SetTranslate({ player_->GetTranslate().x,player_->GetTranslate().y - 1.25f / 2, player_->GetTranslate().z });
-				camera_->SetTranslate({ camera_->GetTranslate().x, camera_->GetTranslate().y - 0.5f,camera_->GetTranslate().z });
-			}
-			if (sceneTransitionTime >= 120)
-			{
-			    if (camera_->GetTranslate().z != 0.0f)
-				{
-				    float rotateX = camera_->GetRotate().x;
-				    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
-				    camera_->Offset({0.0f, 2.0f, distanceCtoPL}, player_->GetTranslate());
-			    }
-			    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.02f)
-				{
-				    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, 0.0f});
-			    }
-			    if (camera_->GetTranslate().z == 0.0f)
-				{
-				    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y + 0.4f, camera_->GetTranslate().z});
-			    }
-			    if (camera_->GetTranslate().y >= 70.0f)
-				{
-				    camera_->SetTranslate({camera_->GetTranslate().x, 70.0f, camera_->GetTranslate().z});
-				    isGameStart = true;
-				    sceneTransitionTime = 0;
-				    player_->SetIsMovable(true);
-				    camera_->SetDefaultAngle(camera_->GetRotate());
-			    }
-			}
+		    DirectGameStart();
 		}
 
 	    for (const auto& enemy_ : enemys_)
@@ -472,7 +359,7 @@ namespace MyEngine
 #pragma region 自機と敵の当たり判定
 			for (const auto& enemy_ : enemys_)
 			{
-				if (isCollision(enemy_->GetCollision(), player_->GetAABBCollision()))
+			    if (isCollision(enemy_->GetCollision(), player_->GetAABBCollision()) && enemy_->Getlife() >= 1)
 				{
 					player_->OnCollision();
 				}
@@ -517,7 +404,7 @@ namespace MyEngine
 #pragma region 敵とクジラの当たり判定
 			for (const auto& enemy_ : enemys_)
 			{
-				if (isCollision(whale_->GetCollision(), enemy_->GetCollision()))
+			    if (isCollision(whale_->GetCollision(), enemy_->GetCollision()) && enemy_->Getlife() >= 1)
 				{
 					whale_->OnCollision();
 					enemy_->OnCollision();
@@ -578,6 +465,133 @@ namespace MyEngine
 	    }
 
 	}
+
+    void GameScene::DirectGameStart() 
+	{
+	    sceneTransitionTime++;
+	    float flameNum[3] = {60, 80, 120};
+	    if (sceneTransitionTime <= flameNum[0])
+		{
+		    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y - 1.25f, player_->GetTranslate().z});
+		    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y - 1.0f, camera_->GetTranslate().z});
+		    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
+		    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a - 0.02f});
+		    uiPlanes_[Blackout]->Update();
+	    }
+	    if (sceneTransitionTime > flameNum[0] && sceneTransitionTime <= flameNum[1])
+		{
+		    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y - 1.25f / 2, player_->GetTranslate().z});
+		    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y - 0.5f, camera_->GetTranslate().z});
+	    }
+	    if (sceneTransitionTime >= flameNum[2])
+		{
+		    if (camera_->GetTranslate().z != 0.0f) 
+			{
+			    float rotateX = camera_->GetRotate().x;
+			    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
+			    camera_->Offset({0.0f, 2.0f, distance}, player_->GetTranslate());
+		    }
+		    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.02f)
+			{
+			    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, 0.0f});
+		    }
+		    if (camera_->GetTranslate().z == 0.0f)
+			{
+			    camera_->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y + 0.4f, camera_->GetTranslate().z});
+		    }
+		    if (camera_->GetTranslate().y >= 70.0f)
+			{
+			    camera_->SetTranslate({camera_->GetTranslate().x, 70.0f, camera_->GetTranslate().z});
+			    isGameStart = true;
+			    sceneTransitionTime = 0;
+			    player_->SetIsMovable(true);
+			    camera_->SetDefaultAngle(camera_->GetRotate());
+		    }
+	    }
+    }
+
+    void GameScene::DirectGameOver()
+	{
+	    float distanceCtoW = -10.0f;
+	    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z + distanceCtoW};
+	    player_->SetIsMovable(false);
+	    if (camera_->GetTranslate().y >= 0.0f)
+		{
+		    float rotateX = camera_->GetRotate().x;
+		    camera_->SetRotate({rotateX - 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
+		    camera_->Offset({0.0f, 2.0f, -distance}, whale_->GetTranslate());
+	    }
+		else if (camera_->GetTranslate().y <= 0.0f)
+		{
+		    if (gameOverSceneTransitionTime == 90)
+			{
+			    isGameOverScene = true;
+		    }
+		    if (gameOverSceneTransitionTime >= 30)
+			{
+			    whale_->SetTranslate({whale_->GetTranslate().x, whale_->GetTranslate().y - 0.05f, whale_->GetTranslate().z});
+			    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
+			    uiPlanes_[Blackout]->SetRotate(camera_->GetRotate());
+			    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a + 0.02f});
+			    uiPlanes_[Blackout]->Update();
+		    }
+		    if (camera_->GetTranslate().z - whale_->GetTranslate().z <= distanceCtoW)
+			{
+			    camera_->SetTranslate({whale_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
+		    }
+		    if (camera_->GetTranslate().z - whale_->GetTranslate().z > distanceCtoW)
+			{
+			    camera_->SetTranslate({whale_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z});
+		    }
+				
+		    gameOverSceneTransitionTime++;
+	    } 
+		else
+		{
+		    if (isGameStart)
+			{
+			    zoomPos = {whale_->GetTranslate().x, whale_->GetTranslate().y + 1.0f, whale_->GetTranslate().z + distanceCtoW};
+			    v = Subtract(zoomPos, camera_->GetTranslate());
+			    isGameStart = false;
+		    }
+		    float flameNum = 50.0f;
+		    camera_->SetTranslate({camera_->GetTranslate().x + v.x / flameNum, camera_->GetTranslate().y + v.y / flameNum, camera_->GetTranslate().z + v.z / flameNum});
+	    }
+    }
+
+    void GameScene::DirectGameClear()
+	{
+	    player_->SetIsMovable(false);
+
+	    if (clearSceneTransitionTime <= 60)
+		{
+		    float pRotateY = player_->GetRotate().y;
+		    player_->SetRotate({player_->GetRotate().x, pRotateY - 0.1f, camera_->GetRotate().z});
+		    whale_->SetTranslate({whale_->GetTranslate().x, player_->GetTranslate().y, whale_->GetTranslate().z});
+		    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y + 0.5f, player_->GetTranslate().z});
+		    Vector3 distanceWtoP = Subtract(player_->GetTranslate(), whale_->GetTranslate());
+		    float fDistanceWtoP = Length(distanceWtoP);
+		    float wRotateY = whale_->GetRotate().y;
+		    whale_->SetRotate({whale_->GetRotate().x, wRotateY - 0.1f, whale_->GetRotate().z});
+		    whale_->SetTranslate(Revolution({0.0f, distanceWtoP.y, -fDistanceWtoP}, player_->GetTranslate(), whale_->GetRotate()));
+	    }
+	    if (clearSceneTransitionTime >= 61) 
+		{
+		    player_->SetTranslate({player_->GetTranslate().x, player_->GetTranslate().y, player_->GetTranslate().z + 1.25f});
+		    whale_->SetTranslate({whale_->GetTranslate().x, whale_->GetTranslate().y, whale_->GetTranslate().z + 1.25f});
+		    uiPlanes_[Blackout]->SetTranslate({camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z + 2.0f});
+		    uiPlanes_[Blackout]->SetRotate(camera_->GetRotate());
+		    uiPlanes_[Blackout]->SetColor({uiPlanes_[Blackout]->GetColor().x, uiPlanes_[Blackout]->GetColor().y, uiPlanes_[Blackout]->GetColor().z, uiPlanes_[Blackout]->GetColor().a + 0.02f});
+		    uiPlanes_[Blackout]->Update();
+	    }
+	    if (uiPlanes_[Blackout]->GetColor().a >= 1.0f)
+		{
+		    isGameClearScene = true;
+	    }
+	    clearSceneTransitionTime++;
+
+	    uiPlanes_[Blackout]->Update();
+    }
 
 	void GameScene::LoadEnemyPopData(std::string filePath, int32_t fileNum)
 	{

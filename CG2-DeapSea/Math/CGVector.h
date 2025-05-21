@@ -148,11 +148,11 @@ Vector3 Add(const Vector3& v1, const Vector3& v2);
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
 Vector3 Multiply(float scalar, const Vector3& v);
-
+//内積
 float Dot(const Vector3& v1, const Vector3& v2);
-
+//ベクトルの長さ
 float Length(const Vector3& v);
-
+//正規化
 Vector3 Normalize(const Vector3& v);
 
 Matrix4x4 Add(Matrix4x4 a, Matrix4x4 b);
@@ -224,5 +224,5 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Quaternion rotate, Vector3 translate);
 float Lerp(const float& a, const float& b, float t);
 
 float LerpShortAngle(float a, float b, float t);
-
+//公転
 Vector3 Revolution(Vector3 distance, Vector3 tergetTranslate,Vector3 rotate);

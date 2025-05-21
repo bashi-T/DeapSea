@@ -1092,11 +1092,10 @@ float LerpShortAngle(float a, float b, float t)
 	return Lerp(a, diff, t);
 }
 
-Vector3 Revolution(Vector3 distance, Vector3 tergetTranslate, Vector3 rotate)
+Vector3 Revolution(Vector3 distance, Vector3 tergetTranslate, Vector3 rotate)//distance.xは0,distance.zはマイナス
 {
 	Matrix4x4 RotateMatrix = MakeRotateMatrix(rotate);
-	Vector3 distanceParticle = {distance.x, distance.y, distance.z};
-	Vector3 offset = TransformNormal(distanceParticle, RotateMatrix);
+	Vector3 offset = TransformNormal(distance, RotateMatrix);
 	Vector3 translate = Add(tergetTranslate, offset);
 	return translate;
 }

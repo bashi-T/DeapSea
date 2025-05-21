@@ -297,7 +297,7 @@ namespace MyEngine
 			particles[index].color.x = red;
 		}
     }
-    void Particle::Revolution(RevolveDistance pDistance, Vector3 tergetTranslate)
+    void Particle::Revolution(RevolveDistance pDistance, Vector3 tergetTranslate)//distance.xは0,distance.zはマイナス
 	{
 	    for (uint32_t index = 0; index < kNumMaxInstance; ++index)
 		{

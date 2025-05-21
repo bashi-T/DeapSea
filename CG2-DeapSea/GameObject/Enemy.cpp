@@ -61,7 +61,13 @@
 			break;
 		}
 		}
-	}
+	  //  particle_ = std::make_unique<Particle>();
+	  //  particle_->SetElements(
+	  //      1.0f, 1.0f, 1.0f, 2.0f, object3d_->GetTranslate().x, object3d_->GetTranslate().x, object3d_->GetTranslate().y, object3d_->GetTranslate().y,
+			//object3d_->GetTranslate().z, object3d_->GetTranslate().z, -1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 1.0f);
+	  //  particle_->Initialize("Resource/blue.png", particle_->GetElements(), 20);
+	  //  particle_->SetScale({0.25f, 0.25f, 0.25f});
+    }
 
 	void Enemy::Update(int sort)
 	{
@@ -118,14 +124,14 @@
 				} 
 				else
 				{
-					if (object3d_->GetTranslate().z >= Camera::GetInstance()->GetTranslate().z + 10.0f)
+					if (Length(Subtract(object3d_->GetTranslate(),player_->GetTranslate()))>=10.0f)
 					{
 					    Move();
 				    }
 				}
 			}
 			object3d_->Update(Camera::GetInstance());
-			enemyCollision =
+		    enemyCollision =
 			{
 				.min{object3d_->GetTranslate().x - 0.1f,object3d_->GetTranslate().y - 0.25f,object3d_->GetTranslate().z - 1.5f},
 				.max{object3d_->GetTranslate().x + 0.1f,object3d_->GetTranslate().y + 0.25f,object3d_->GetTranslate().z + 1.5f}
@@ -174,13 +180,18 @@
 			    Run();
 			}
 			object3d_->Update(Camera::GetInstance());
-			enemyCollision =
+		    enemyCollision =
 			{
 				.min{object3d_->GetTranslate().x - 0.05f,object3d_->GetTranslate().y - 0.4f,object3d_->GetTranslate().z - 2.5f},
 				.max{object3d_->GetTranslate().x + 0.05f,object3d_->GetTranslate().y + 0.4f,object3d_->GetTranslate().z + 2.5f}
 			};
 			break;
 		}
+
+		if (particle_!=nullptr)
+		{
+		    particle_->Update(false, particle_->GetElements());
+	    }
 	}
 
 	void Enemy::Draw(int sort)
@@ -198,6 +209,10 @@
 			object3d_->Draw(modelManager_->GetModelCommon());
 			break;
 		}
+	    if (particle_ != nullptr)
+		{
+		    particle_->Draw();
+	    }
 	}
 
 	void Enemy::Shot()
@@ -222,7 +237,13 @@
 
 	void Enemy::OnCollision()
 	{
-		SubtractLife();
+	    particle_ = std::make_unique<Particle>();
+	    particle_->SetElements(
+	        1.0f, 1.0f, 1.0f, 2.0f, object3d_->GetTranslate().x, object3d_->GetTranslate().x, object3d_->GetTranslate().y, object3d_->GetTranslate().y,
+			object3d_->GetTranslate().z, object3d_->GetTranslate().z, -0.05f, 0.05f, 0.0f, 0.0f, -0.05f, 0.05f);
+	    particle_->Initialize("Resource/blue.png", particle_->GetElements(), 30);
+	    particle_->SetScale({0.25f, 0.25f, 0.25f});
+	    SubtractLife();
 	}
 
 	void Enemy::SetTranslate(Vector3 translate)
