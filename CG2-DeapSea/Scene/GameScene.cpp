@@ -489,7 +489,7 @@ namespace MyEngine
 			{
 			    float rotateX = camera_->GetRotate().x;
 			    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
-			    camera_->Offset({0.0f, 2.0f, distance}, player_->GetTranslate());
+			    camera_->Offset({0.0f, 2.0f, distanceCtoPL}, player_->GetTranslate());
 		    }
 		    if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.02f)
 			{
@@ -519,7 +519,7 @@ namespace MyEngine
 		{
 		    float rotateX = camera_->GetRotate().x;
 		    camera_->SetRotate({rotateX - 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
-		    camera_->Offset({0.0f, 2.0f, -distance}, whale_->GetTranslate());
+		    camera_->Offset({0.0f, 2.0f, -distanceCtoW}, whale_->GetTranslate());
 	    }
 		else if (camera_->GetTranslate().y <= 0.0f)
 		{
