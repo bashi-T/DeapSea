@@ -103,6 +103,7 @@ struct QuaternionTransform
 };
 
 const float radianPerFrequency = 0.0174533f;
+const float theta_ = 3.14159265359f;
 
 constexpr double epsilon = std::numeric_limits<double>::epsilon();
 

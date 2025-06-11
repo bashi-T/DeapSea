@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Objects\BlenderModel.cpp" />
     <ClCompile Include="Systems\FileLoader.cpp" />
     <ClCompile Include="Scene\BaseScene.cpp" />
     <ClCompile Include="Commons\MeshCommon.cpp" />
@@ -70,6 +71,8 @@
     <ClCompile Include="GameObject\UIPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="Objects\BlenderModel.h" />
     <ClInclude Include="Systems\FileLoader.h" />
     <ClInclude Include="Scene\BaseScene.h" />
     <ClInclude Include="Commons\MeshCommon.h" />

@@ -13,6 +13,7 @@
 #include"GameObject/UIPlane.h"
 #include"GameObject/Tide.h"
 #include"Managers/AudioManager.h"
+#include"Systems/FileLoader.h"
 #include <random>
 
 namespace MyEngine
@@ -85,13 +86,41 @@ namespace MyEngine
 			"plane/plane.obj",
 			"plane/plane.obj",
 		};
+
+		std::string UIVectorFile[20]
+		{
+			"Resource/CSV/startUI/scale.csv",
+	        "Resource/CSV/startUI/rotate.csv",
+	        "Resource/CSV/startUI/translate.csv",
+	        "Resource/CSV/startUI/defaultColor.csv",
+
+			"Resource/CSV/blackOut/scale.csv",
+			"Resource/CSV/blackOut/defaultColor.csv",
+
+			"Resource/CSV/key/moveKey/scale.csv",
+			"Resource/CSV/key/moveKey/rotate.csv",
+			"Resource/CSV/key/moveKey/color.csv",
+
+			"Resource/CSV/key/attackKey/scale.csv",
+			"Resource/CSV/key/attackKey/rotate.csv",
+			"Resource/CSV/key/attackKey/color.csv",
+
+	   		"Resource/CSV/key/lookKey/scale.csv",
+			"Resource/CSV/key/lookKey/rotate.csv",
+			"Resource/CSV/key/lookKey/color.csv",
+
+			"Resource/CSV/key/barrierKey/scale.csv",
+			"Resource/CSV/key/barrierKey/rotate.csv",
+			"Resource/CSV/key/barrierKey/color.csv",
+};
 		Vector3 v = {};
 		Vector3 zoomPos = {};
 		float ingameCameraY = 76.0f;
 		Vector3 ingameCameraRotate = { 0.2f,0.0f,0.0f };
-		const float zfar = 2.0f;
-		Vector2 spritePos = { 10.0f,-50.0f };
+	    const float zfar = 2.0f;
+	    Vector2 spritePos = {10.0f, -50.0f};
 	    float enemyDeadLine = 15.0f;
+	    const float reverse = radianPerFrequency * 180;
 	    Vector3 distanceCtoUI = {0.0f, -10.0f, -20.0f};
 
 		bool isMove = false;

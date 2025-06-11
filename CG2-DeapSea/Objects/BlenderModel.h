@@ -6,37 +6,39 @@
 #include<vector>
 #include<map>
 #include "Math/CGVector.h"
-
-class BlenderModel
+namespace MyEngine
 {
-public:
-	void Initialize(std::string objectName);
-	void Update();
-	void Draw();
-	void Finalize();
-	void LoadLevelData();
-	Object3d* GetObject3d() { return  object3d; }
-private:
-	const std::string fullpath;
 
-	struct LevelData
+	class BlenderModel
 	{
-		struct ObjectData
+	public:
+		void Initialize(std::string objectName);
+		void Update();
+		void Draw();
+		void Finalize();
+		void LoadLevelData();
+		Object3d* GetObject3d() { return object3d; }
+
+	private:
+		const std::string fullpath;
+		struct LevelData
 		{
-			std::string fileName;
-			Vector3 transration;
-			Vector3 rotation;
-			Vector3 scaling;
+			struct ObjectData
+			{
+				std::string fileName;
+				Vector3 transration;
+				Vector3 rotation;
+				Vector3 scaling;
+			};
+			// オブジェクトのコンテナ
+			std::vector<ObjectData> objects;
 		};
-		//オブジェクトのコンテナ
-		std::vector<ObjectData>objects;
+		LevelData* levelData = new LevelData();
+		std::map<std::string, Model*> models;
+	
+		// jsonから解凍したデータ
+		nlohmann::json desrialized;
+		std::vector<Object3d*> objects;
+		Object3d* object3d = new Object3d;
 	};
-	LevelData* levelData = new LevelData();
-	std::map<std::string, Model*>models;
-
-	//jsonから解凍したデータ
-	nlohmann::json desrialized;
-	std::vector<Object3d*> objects;
-	Object3d* object3d = new Object3d;
-};
-
+} // namespace MyEngine
