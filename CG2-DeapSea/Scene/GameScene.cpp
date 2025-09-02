@@ -120,24 +120,24 @@ namespace MyEngine
 			//	isGameClear = true;
 			//	//whale_->SetLife(0);
 			//}
-		 //   if (Input::GetInstance()->PushKey(DIK_D))
+		    //if (Input::GetInstance()->PushKey(DIK_D))
 			//{
 			//    camera_->SetRotate({camera_->GetRotate().x, camera_->GetRotate().y, camera_->GetRotate().z + 0.1f});
-		 //   }
-		 //   if (Input::GetInstance()->PushKey(DIK_A))
+		    //}
+		    //if (Input::GetInstance()->PushKey(DIK_A))
 			//{
 			//    camera_->SetRotate({camera_->GetRotate().x, camera_->GetRotate().y, camera_->GetRotate().z - 0.1f});
-		 //   }
-		 //   if (Input::GetInstance()->PushKey(DIK_W))
+		    //}
+		    //if (Input::GetInstance()->PushKey(DIK_W))
 			//{
 			//    camera_->SetRotate({camera_->GetRotate().x + 0.1f, camera_->GetRotate().y, camera_->GetRotate().z});
-		 //   }
-		 //   if (Input::GetInstance()->PushKey(DIK_S)) 
+		    //}
+		    //if (Input::GetInstance()->PushKey(DIK_S)) 
 			//{
 			//    camera_->SetRotate({camera_->GetRotate().x - 0.1f, camera_->GetRotate().y, camera_->GetRotate().z});
-		 //   }
-		 //   offset = Subtract(camera_->GetTranslate(), player_->GetTranslate());
-		 //   camera_->Offset({offset.x, offset.z, offset.y}, player_->GetTranslate());
+		    //}
+		    //offset = Subtract(camera_->GetTranslate(), player_->GetTranslate());
+		    //camera_->Offset({offset.x, offset.z, offset.y}, player_->GetTranslate());
 #endif
 		    if (SceneManager::GetInstance()->GetStageNumber() == 0 && time > 60)
 			{
@@ -493,7 +493,7 @@ namespace MyEngine
 			{
 			    distance -= 1.0f;
 			    float rotateX = camera_->GetRotate().x;
-			    camera_->SetRotate({rotateX + 0.02f, camera_->GetRotate().y, camera_->GetRotate().z});
+			    camera_->SetRotate({rotateX + 0.025f, camera_->GetRotate().y, camera_->GetRotate().z});
 			    camera_->Offset({0.0f, 2.0f, distance}, player_->GetTranslate());
 		    }
 		    //if (camera_->GetTranslate().z <= 0.2f && camera_->GetTranslate().z >= -0.02f)
