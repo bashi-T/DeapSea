@@ -5,7 +5,6 @@
 #include"Objects/Particle.h"
 #include"EnemyBullet.h"
 #include"Player.h"
-#include"Whale.h"
 
 using namespace MyEngine;
 
@@ -13,7 +12,7 @@ class Enemy
 	{
 	public:
 		~Enemy();
-		void Initialize(Player* player, Whale* whale, int sort);
+		void Initialize(Player* player);
 		void Update(int sort);
 		void Draw(int sort);
 		void OnCollision();
@@ -39,7 +38,6 @@ class Enemy
 		std::unique_ptr<Object3d> object3d_;
 		std::list<std::unique_ptr<EnemyBullet>> eBullets;
 		Player* player_;
-		Whale* whale_;
 
 		uint32_t shotInterval = 0;
 		bool isShot = false;

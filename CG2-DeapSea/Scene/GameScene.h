@@ -7,11 +7,8 @@
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
 #include"GameObject/Player.h"
-#include"GameObject/Whale.h"
 #include"GameObject/Enemy.h"
 #include"GameObject/ground.h"
-#include"GameObject/UIPlane.h"
-#include"GameObject/Tide.h"
 #include"Managers/AudioManager.h"
 #include <random>
 
@@ -19,7 +16,6 @@ namespace MyEngine
 {
     class GameScene : public BaseScene
 	{
-		enum EnemySort { NORMAL, STRAIGHT };
 
 	public:
 		void Initialize() override;
@@ -29,11 +25,11 @@ namespace MyEngine
 		void LoadEnemyPopData(std::string filePath, int32_t fileNum);
 		void UpdateEnemyPopCommands(int32_t fileNum);
 
-		void CheckAllCollisions();
+		void CheckAllCollisions();//当たり判定
 
-		void DirectGameStart();
-	    void DirectGameOver();
-	    void DirectGameClear();
+		void DirectGameStart();//シーン演出
+	    void DirectGameOver();//シーン演出
+	    void DirectGameClear();//シーン演出
 
 	private:
 	    std::unique_ptr<BaseScene> nextScene = nullptr;
@@ -41,11 +37,8 @@ namespace MyEngine
 	    Camera* camera_ = nullptr;
 		std::unique_ptr<Particle> particle_;
 		std::vector<std::unique_ptr<Sprite>>sprites_;
-		std::vector<std::unique_ptr<UIPlane>>uiPlanes_;
 		std::unique_ptr<Player> player_;
-	    std::unique_ptr<Whale> whale_;
 	    std::list<std::unique_ptr<Enemy>> enemys_;
-		std::unique_ptr<Tide>tide_;
 		std::unique_ptr<Ground>ground_;
 
 		std::stringstream enemyPopCommands[10];
@@ -64,43 +57,6 @@ namespace MyEngine
 	    int32_t gameOverSceneTransitionTime = 0;
 	    int32_t clearSceneTransitionTime = 0;
 
-		float distanceCtoPL = 0.0f;
-	    float distanceCtoW= 0.0f;
 
-		enum UIType
-		{
-			Start,
-			Blackout,
-			moveKey,
-			attackKey,
-			lookKey,
-			NumArgument
-		};
-
-		std::string Planes[6]
-		{
-			"plane/plane.obj",
-			"plane/plane.obj",
-			"plane/plane.obj",
-			"plane/plane.obj",
-			"plane/plane.obj",
-			"plane/plane.obj",
-		};
-		Vector3 v = {};
-		Vector3 zoomPos = {};
-		float ingameCameraY = 76.0f;
-		Vector3 ingameCameraRotate = { 0.2f,0.0f,0.0f };
-		const float zfar = 2.0f;
-		Vector2 spritePos = { 10.0f,-50.0f };
-	    float enemyDeadLine = 15.0f;
-	    Vector3 distanceCtoUI = {0.0f, -10.0f, -20.0f};
-
-		bool isMove = false;
-	    bool isAttack = false;
-	    bool isLook = false;
-	    bool isPose = false;
-	    bool isGameOverScene = false;
-	    bool isGameClearScene = false;
-	    Vector3 offset;
 	};
 }

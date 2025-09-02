@@ -132,9 +132,6 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>ソース ファイル\externals\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject\Cursor.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject\Enemy.cpp">
       <Filter>ソース ファイル\GameObject</Filter>
     </ClCompile>
@@ -148,12 +145,6 @@
       <Filter>ソース ファイル\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="GameObject\PlayerBullet.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Tide.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Whale.cpp">
       <Filter>ソース ファイル\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Input\Input.cpp">
@@ -219,16 +210,7 @@
     <ClCompile Include="Systems\WindowApp.cpp">
       <Filter>ソース ファイル\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject\UIPlane.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Light.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Sand.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Shield.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Commons\MeshCommon.cpp">
@@ -287,9 +269,6 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>ヘッダー ファイル\externals\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject\Cursor.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject\Enemy.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
@@ -303,12 +282,6 @@
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="GameObject\PlayerBullet.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Tide.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Whale.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Input\Input.h">
@@ -374,16 +347,7 @@
     <ClInclude Include="Systems\WindowApp.h">
       <Filter>ヘッダー ファイル\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject\UIPlane.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\Light.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Sand.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Shield.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Commons\MeshCommon.h">

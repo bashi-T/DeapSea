@@ -8,9 +8,6 @@
 #include"Objects/Object3d.h"
 #include"Sprites/Sprite.h"
 #include"Objects/Particle.h"
-#include"GameObject/Cursor.h"
-#include"GameObject/UIPlane.h"
-#include"GameObject/Whale.h"
 #include"GameObject/Player.h"
 #include"Managers/AudioManager.h"
 
@@ -24,18 +21,12 @@ class TitleScene : public BaseScene
 		void Draw() override;
 
 	private:
-		//Input* input;
-		//Object3dCommon* object3dCommon;
-		//SRVManager* srvManager;
 	    std::unique_ptr<BaseScene> nextScene = nullptr;
 
 	    Camera* camera_ = nullptr;
 		std::vector<std::unique_ptr<Particle>> particles_;
 		std::vector<std::unique_ptr<Sprite>> sprites_;
-		std::vector<std::unique_ptr<UIPlane>> uiPlanes_;
-		std::unique_ptr<Cursor> cursor_;
 		std::unique_ptr<Player> player_;
-		std::unique_ptr<Whale> whale_;
 		bool isSceneTransition = false;
 		bool isStageSelect = false;
 	    bool isSceneChange = false;
@@ -87,23 +78,5 @@ class TitleScene : public BaseScene
 			{ 0.0f,-2.1f,0.0f },
 			{ 10.0f,10.0f,0.0f },
 		};
-		const float zfar = 2.0f;
-		const float cursorX = -2.5f;
-		const int maxCoolTime = 10;
-		const int floatingTimes[2]//折り返しの時間
-		{
-			120,
-			240
-		};
-		const int sceneTransitionTimes[3]
-		{
-			20,
-			40,
-			90
-		};
-
-		const float whaleRotateY = 0.003f;
-		const float whaleFloating = 0.01f;
-		const float uiFloating = 0.001f;
 	};
 }

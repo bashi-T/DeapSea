@@ -8,9 +8,7 @@
 #include"Objects/Particle.h"
 #include"Sprites/Sprite.h"
 #include"Commons/SpriteCommon.h"
-#include"GameObject/Whale.h"
 #include"GameObject/Player.h"
-#include"GameObject/Sand.h"
 
 namespace MyEngine
 {
@@ -26,8 +24,6 @@ namespace MyEngine
 	    Camera* camera_ = nullptr;
 		std::unique_ptr<Sprite> sprite_;
 		std::unique_ptr<Player> player_;
-		std::unique_ptr<Whale> whale_;
-		std::unique_ptr<Sand> sand_;
 
 	};
 }

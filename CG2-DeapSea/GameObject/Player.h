@@ -4,7 +4,6 @@
 #include"Commons/Object3dCommon.h"
 #include"Objects/Particle.h"
 #include"PlayerBullet.h"
-#include"Shield.h"
 
 using namespace MyEngine;
 
@@ -19,7 +18,6 @@ public:
 	void SetMaxPosition(float pos,float maxPos);
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() const { return pBullets; }
-	const std::unique_ptr<Shield>& GetShield() const { return shield_; }
 	Vector3 GetRotate() { return object3d_->GetRotate(); }
 	Vector3 GetTranslate() { return object3d_->GetTranslate(); }
 	Matrix4x4 GetWorldMatrix() { return object3d_->GetObjectMatrix(); }
@@ -45,7 +43,6 @@ private:
 	Camera* camera_ = nullptr;
 
 	std::list<std::unique_ptr<PlayerBullet>> pBullets;
-	std::unique_ptr<Shield> shield_;
 	AABB collision = {};
 	Vector3 moveVector = {};
 

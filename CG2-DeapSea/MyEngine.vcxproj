@@ -17,13 +17,11 @@
     <ClCompile Include="Math\Collision.cpp" />
     <ClCompile Include="Objects\Light.cpp" />
     <ClCompile Include="Managers\AudioManager.cpp" />
-    <ClCompile Include="GameObject\Cursor.cpp" />
     <ClCompile Include="GameObject\ground.cpp" />
     <ClCompile Include="Commons\ParticleCommon.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="GameObject\Sand.cpp" />
     <ClCompile Include="Scene\ClearScene.cpp" />
     <ClCompile Include="GameObject\EnemyBullet.cpp" />
     <ClCompile Include="GameObject\PlayerBullet.cpp" />
@@ -41,7 +39,6 @@
     <ClCompile Include="Managers\SRVManager.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="Objects\SkyDome.cpp" />
-    <ClCompile Include="GameObject\Shield.cpp" />
     <ClCompile Include="Systems\Debug.cpp" />
     <ClCompile Include="Commons\DX12Common.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -65,9 +62,6 @@
     <ClCompile Include="Managers\TextureManager.cpp" />
     <ClCompile Include="Systems\WindowApp.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
-    <ClCompile Include="GameObject\Whale.cpp" />
-    <ClCompile Include="GameObject\Tide.cpp" />
-    <ClCompile Include="GameObject\UIPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Systems\FileLoader.h" />
@@ -76,13 +70,11 @@
     <ClInclude Include="Math\Collision.h" />
     <ClInclude Include="Objects\Light.h" />
     <ClInclude Include="Managers\AudioManager.h" />
-    <ClInclude Include="GameObject\Cursor.h" />
     <ClInclude Include="GameObject\ground.h" />
     <ClInclude Include="Commons\ParticleCommon.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="GameObject\Sand.h" />
     <ClInclude Include="Scene\ClearScene.h" />
     <ClInclude Include="GameObject\EnemyBullet.h" />
     <ClInclude Include="GameObject\PlayerBullet.h" />
@@ -96,7 +88,6 @@
     <ClInclude Include="Managers\SRVManager.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Objects\SkyDome.h" />
-    <ClInclude Include="GameObject\Shield.h" />
     <ClInclude Include="Systems\Debug.h" />
     <ClInclude Include="Commons\DX12Common.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
@@ -121,9 +112,6 @@
     <ClInclude Include="Managers\TextureManager.h" />
     <ClInclude Include="Systems\WindowApp.h" />
     <ClInclude Include="Scene\TitleScene.h" />
-    <ClInclude Include="GameObject\Whale.h" />
-    <ClInclude Include="GameObject\Tide.h" />
-    <ClInclude Include="GameObject\UIPlane.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\Object3d.VS.hlsl">
